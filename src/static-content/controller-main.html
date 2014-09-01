@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<!--
+Copyright (c) 2014, tibbitts
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+* Redistributions of source code must retain the above copyright notice, this
+  list of conditions and the following disclaimer.
+* Redistributions in binary form must reproduce the above copyright notice,
+  this list of conditions and the following disclaimer in the documentation
+  and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+POSSIBILITY OF SUCH DAMAGE.
+-->
+<div>
+    <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+        <div class="container-fluid">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="#">Brand</a>
+            </div>
+
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav">
+                    <li class="active"><a href="#">Link</a></li>
+                    <li><a href="#">Link</a></li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Dropdown <span class="caret"></span></a>
+                        <ul class="dropdown-menu" role="menu">
+                            <li><a href="#">Action</a></li>
+                            <li><a href="#">Another action</a></li>
+                            <li><a href="#">Something else here</a></li>
+                            <li class="divider"></li>
+                            <li><a href="#">Separated link</a></li>
+                            <li class="divider"></li>
+                            <li><a href="#">One more separated link</a></li>
+                        </ul>
+                    </li>
+                </ul>
+                <form class="navbar-form navbar-right" role="search">
+                    <div class="form-group">
+                        <input type="text" class="form-control" placeholder="Search">
+                    </div>
+                    <button type="submit" class="btn btn-default">Submit</button>
+                </form>
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a href="#">Link</a></li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span id="family-name">Family name</span> <span class="caret"></span></a>
+                        <ul class="dropdown-menu" role="menu">
+                            <li><a href="#" id="settings-link">Settings</a></li>
+                            <li class="divider"></li>
+                            <li><a href="#" id="logout-link">Log out</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div> <!--/.navbar-collapse -->
+        </div> <!-- /.container-fluid -->
+    </nav>
+</div>
+
+<script>
+    $("#logout-link").click(function() {
+        settings.logOut();
+    });
+</script>
+
+<div class="panel panel-default">
+    <!-- Default panel contents -->
+    <div class="panel-heading"><h3>Ancestry</h3></div>
+    <div class="container-fluid">
+        <div id="table-toolbar">
+            <div class="btn-group btn-group-normal">
+                <button class="btn btn-primary life-map" ><span class="glyphicon glyphicon-map-marker"></span> Life map</button>
+                <button class="btn btn-default family-map" ><span class="glyphicon glyphicon-heart"></span> Family map</button>
+                <button class="btn btn-default life-sketch" ><span class="glyphicon glyphicon-pencil"></span> Life sketch</button>
+                <button class="btn btn-default timeline" ><span class="glyphicon glyphicon-time"></span> Timeline</button>
+                <button class="btn btn-default images" ><span class="glyphicon glyphicon-picture"></span> Images</button>
+                <button class="btn btn-default quiz" ><span class="glyphicon glyphicon-question-sign"></span> Quiz</button>
+            </div>
+        </div>
+        <table id="table-javascript"></table>
+    </div>
+</div>    
+
+<script>
+
+    $(function() {
+        $('#table-javascript').bootstrapTable({
+            //method: 'get',
+            //url: 'data2.json',
+            data: [
+                {
+                    id: "asdfasf",
+                    name: "John Smith",
+                    birth: "1745",
+                    death: "1821"
+                }, {
+                    id: "dfghdfgh",
+                    name: "Maggie Smith",
+                    birth: "1766",
+                    death: "1845"
+                }
+            ],
+            height: 400,
+            striped: true,
+            pagination: true,
+            pageSize: 50,
+            pageList: [10, 25, 50, 100, 200],
+            search: true,
+            showColumns: true,
+            showToggle: true,
+            minimumCountColumns: 0,
+            toolbar: "#table-toolbar",
+            clickToSelect: true,
+            columns: [{
+                    field: 'state',
+                    checkbox: true
+                }, {
+                    field: 'name',
+                    title: 'Name',
+                    align: 'center',
+                    valign: 'middle',
+                    sortable: true,
+                    switchable: false
+                }, {
+                    field: 'lifespan',
+                    title: 'Lifespan',
+                    align: 'center',
+                    valign: 'middle',
+                    sortable: true,
+                    formatter: lifespanFormatter
+                }]
+        });
+
+        $('#table-javascript').bootstrapTable("append", [
+            {
+                id: "sdfgsdfg",
+                name: "Angie Smith",
+                birth: "1749",
+                death: "1830"
+            }
+        ]);
+    });
+
+    function lifespanFormatter(value, row, index) {
+        return row.birth + '-' + row.death;
+    }
+</script>
+
+<script>
+    $("td").hover(function() {
+        $(this).find("action-buttons").show();
+    },
+            function() {
+                $(this).find("action-buttons").hide();
+            });
+</script>
