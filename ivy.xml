@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ivy-module version="2.0">
-    <info module="RemoteMouse" organisation="RemoteMouse" revision="1.0"/>
+    <info module="FamilyHistoryCacheService" organisation="PuyallupFamilyHistoryCenter" revision="1.0"/>
     <configurations>
         <conf name="compile"/>
         <conf name="runtime"/>
@@ -10,5 +10,6 @@
     
     <dependencies>
         <dependency org="org.eclipse.jetty.websocket" name="websocket-server" rev="9.2.2.v20140723" />
+        <dependency org="org.gedcomx.extensions.familysearch" name="familysearch-api-client" rev="latest.revision"/>
     </dependencies>
 </ivy-module>

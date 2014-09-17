@@ -3,14 +3,12 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/home/local/ANT/tibbitts/Documents/Programming/RemoteMouse/src/static-content/controls.html</file>
-            <file>file:/home/local/ANT/tibbitts/Documents/Programming/RemoteMouse/src/remotemouse/RemoteMouseServlet.java</file>
-            <file>file:/home/local/ANT/tibbitts/Documents/Programming/RemoteMouse/src/remotemouse/RemoteMouseSocket.java</file>
-            <file>file:/home/local/ANT/tibbitts/Documents/Programming/RemoteMouse/nbproject/ivy-impl.xml</file>
-            <file>file:/home/local/ANT/tibbitts/Documents/Programming/RemoteMouse/src/static-content/controller.html</file>
-            <file>file:/home/local/ANT/tibbitts/Documents/Programming/RemoteMouse/nbproject/project.properties</file>
-            <file>file:/home/local/ANT/tibbitts/Documents/Programming/RemoteMouse/src/static-content/websockets.js</file>
-            <file>file:/home/local/ANT/tibbitts/Documents/Programming/RemoteMouse/src/static-content/display.html</file>
+            <file>file:/home/local/ANT/tibbitts/Documents/Programming/FamilyHistoryCacheService/src/static-content/controller-login.html</file>
+            <file>file:/home/local/ANT/tibbitts/Documents/Programming/FamilyHistoryCacheService/src/static-content/controller-family-table.html</file>
+            <file>file:/home/local/ANT/tibbitts/Documents/Programming/FamilyHistoryCacheService/src/static-content/controller-display.js</file>
+            <file>file:/home/local/ANT/tibbitts/Documents/Programming/FamilyHistoryCacheService/src/static-content/kiosk-main.html</file>
+            <file>file:/home/local/ANT/tibbitts/Documents/Programming/FamilyHistoryCacheService/src/static-content/controller-main.html</file>
+            <file>file:/home/local/ANT/tibbitts/Documents/Programming/FamilyHistoryCacheService/src/static-content/controller-display-base.html</file>
         </group>
     </open-files>
 </project-private>

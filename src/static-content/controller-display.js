@@ -35,6 +35,9 @@ var token;
 //Add message listener to websocket
 ws.addMessageListener(function(message) {
     var parts = message.data.split(" ");
+    // TODO: Incorporate these verbs into the settings object if possible
+    // so that the different screens can define which verbs they accept and
+    // how to handle each one
     switch (parts[0]) {
         case "connected":
         case "ok":
@@ -51,7 +54,7 @@ ws.addMessageListener(function(message) {
             break;
         case "attached":
             ws.socketSend("nav " + displayName + " " + "display-login");
-            token = $.cookie("token", {expires: 1/24, path: '/'});
+            token = $.cookie("token", {expires: 1 / 24, path: '/'});
             if (!token) {
                 navigate("controller-login");
             } else {
@@ -62,8 +65,16 @@ ws.addMessageListener(function(message) {
             token = parts[1];
             settings.gotToken(token);
             break;
-            
+
+        case "ancestor":
+            if (settings.gotAncestor) {
+                var ancestor = JSON.parse(message.data.substring(parts[0].length+1));
+                settings.gotAncestor(ancestor);
+            }
+            break;
+
         default:
+            //TODO: Improve error handling (with error codes?)
             if (parts[0] === "Error:") {
                 error(message.data.substring(6));
             } else {
@@ -79,32 +90,32 @@ $(window).ready(function() {
         error("Mode parameter is required");
         return;
     }
-    
+
     switch (mode) {
-        case "controller":
-            settings = controllerSettings;
-            break;
-            
-        case "display":
-            settings = displaySettings;
-            break;
-            
         case "clear-display-name":
             $.removeCookie("display-name");
-            break;
-            
-        default:
-            error("Invalid type mode '" + mode + "'");
             return;
+
+        default:
+            settings = defaultSettings[mode];
+            break;
     }
     
+    if (!settings) {
+        error("Invalid type mode '" + mode + "'");
+    }
+
     setup();
-    
-    displayName = $.cookie("display-name");
-    if (!displayName) {
-        settings.getNewDisplayName();
-    } else {
-        settings.gotNewDisplayName(displayName);
+
+    if (settings.getNewDisplayName) {
+        displayName = $.cookie("display-name");
+        if (!displayName) {
+            settings.getNewDisplayName();
+        } else {
+            settings.gotNewDisplayName(displayName);
+        }
+    } else if (settings.begin) {
+        settings.begin();
     }
 });
 
@@ -112,44 +123,66 @@ function setup() {
     document.title = settings.title;
     var pageHeader = $("#page-header"); //TODO: This isn't working
     pageHeader.html("<h1>" + settings.header + "</h1>");
+    if (settings.contentPadding) {
+        $("#messages").addClass("content-padding");
+    } else {
+        $("#messages").removeClass("content-padding");
+    }
 }
 
-var displaySettings = {
-    title: "Display",
-    header: "Display",
-    getNewDisplayName: function() {
-        ws.socketSend("display-name");
+var defaultSettings = {
+    display: {
+        title: "Display",
+        header: '<img src="logo.png" alt="Puyallup Family History Center logo" />',
+        contentPadding: false,
+        getNewDisplayName: function() {
+            ws.socketSend("display-name");
+        },
+        gotNewDisplayName: function(name) {
+            displayName = name;
+            $.cookie("display-name", displayName);
+            ws.socketSend("display " + displayName);
+        }
     },
-    gotNewDisplayName: function(name) {
-        displayName = name;
-        $.cookie("display-name", displayName);
-        ws.socketSend("display " + displayName);
-    }
-};
-
-var controllerSettings = {
-    title: "Controller",
-    header: '<img src="logo.png" alt="Puyallup Family History Center logo" />',
-    getNewDisplayName: function() {
-        navigate("controller-attach");
+    controller: {
+        title: "Controller",
+        header: '',
+        contentPadding: true,
+        getNewDisplayName: function() {
+            navigate("controller-attach");
+        },
+        gotNewDisplayName: function(name) {
+            displayName = name;
+            $.cookie("display-name", displayName);
+            ws.socketSend("controller " + displayName);
+        },
+        getToken: function(username, pin) {
+            ws.socketSend("login " + username + " " + pin);
+        },
+        gotToken: function(newToken) {
+            $.cookie("token", newToken, {expires: 1 / 24, path: '/'});
+            ws.socketSend("nav " + displayName + " " + "display-main");
+            navigate("controller-main");
+            ws.socketSend("get-ancestors " + token);
+        },
+        logOut: function() {
+            if (!$.removeCookie("token", {expires: 1 / 24, path: '/'})) {
+                error("Failed to remove login cookie");
+            }
+            ws.socketSend("nav " + displayName + " display-login");
+            navigate("controller-login");
+        }
     },
-    gotNewDisplayName: function(name) {
-        displayName = name;
-        $.cookie("display-name", displayName);
-        ws.socketSend("controller " + displayName);
-    },
-    getToken: function(username, pin) {
-        ws.socketSend("login " + username + " " + pin);
-    },
-    gotToken: function(newToken) {
-        $.cookie("token", newToken, {expires: 1/24, path: '/'});
-        ws.socketSend("nav " + displayName + " " + "display-main");
-        navigate("controller-main");
-    },
-    logOut: function() {
-        $.removeCookie("token", {expires: 1/24, path: '/'});
-        ws.socketSend("nav " + displayName + " display-login");
-        navigate("controller-login");
+    kiosk: {
+        title: "Kiosk",
+        header: '<img src="logo.png" alt="Puyallup Family History Center logo" />',
+        contentPadding: false,
+        begin: function() {
+            navigate("kiosk-main");
+        }, 
+        gotAccessToken: function(userName, userId, pin, accessToken) {
+            ws.socketSend("access-token " + userId + " " + pin + " " + accessToken);
+        }
     }
 };
 
@@ -170,19 +203,34 @@ function success(message) {
 }
 
 function log(level, message) {
-    $("#messages").append('<div class="alert alert-' + level + '">' + message + '</div>');
+    //TODO: Add timeout parameter for messages to disappear
+    $("#messages").append('<div class="alert alert-' + level + ' alert-dismissible" role="alert">'+
+            '<button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>' + 
+            message + '</div>');
 }
 
 function navigate(dest) {
     $("#messages").html("");
-    $.get(dest + ".html", function(data) {
-            content.html(data);
-        });
+    var split = dest.split("?");
+    var actualDest = split[0] + ".html";
+    if (split.length > 1) {
+        actualDest += "?" + split[1];
+    }
+    $.ajax(actualDest)
+            .done(function(data) {
+                content.html(data);
+            }).fail(function(message) {
+                error("Could not load " + actualDest + " - " + message);
+            });
+}
+
+function navigateDisplay(dest) {
+    ws.socketSend("nav " + displayName + " " + dest);
 }
 
 function getParameterByName(name) {
     name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
     var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
-        results = regex.exec(location.search);
+            results = regex.exec(location.search);
     return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
 }

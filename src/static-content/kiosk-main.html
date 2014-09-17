@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<!--
+Copyright (c) 2014, tibbitts
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+* Redistributions of source code must retain the above copyright notice, this
+  list of conditions and the following disclaimer.
+* Redistributions in binary form must reproduce the above copyright notice,
+  this list of conditions and the following disclaimer in the documentation
+  and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+POSSIBILITY OF SUCH DAMAGE.
+-->
+
+<h3>
+    Welcome to the Puyallup Stake Family History Center
+</h3>
+
+<div id="login-start">
+    <p>
+        If you have a FamilySearch.org account already, please log in. If you don't
+        have an account you can create one, or ask a staff member for help
+    </p>
+
+    <p>
+        <button class='btn btn-lg btn-primary' id='show-login-screen'>Log in to FamilySearch.org</button>
+
+    </p>
+</div>
+
+<div id="login-continue">
+    <p>
+        Welcome, <span id="user-name">USER NAME</span>
+    </p>
+    
+    <p>
+        Now you need to set up a PIN you'll use to access your data while you're in the center.
+        The PIN should be 4-6 characters and [FLESH OUT THE PIN REQUIREMENTS].
+    </p>
+    
+    <div class="panel panel-default" style="max-width: 300px;">
+        <div class="panel-body">
+            <div class="panel-heading"><h3>Create PIN</h3></div>
+            <div class="input-group input-group-lg">
+                <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
+                <input type="password" id="pin-input" pattern="[0-9]*" class="form-control" placeholder="PIN" />
+            </div>
+            <br>
+            <div class="input-group input-group-lg">
+                <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
+                <input type="password" id="pin-confirm" pattern="[0-9]*" class="form-control" placeholder="Confirm PIN" />
+            </div>
+            <br>
+            <button class='btn btn-lg btn-primary' id='set-pin' >Set Pin</button>
+        </div>
+    </div>
+</div>
+
+<div>
+    <h4>
+        Success!
+    </h4>
+    
+    <p>
+        You are now logged into the center. Choose your name from any controller and enter your PIN to access your
+        FamilySearch.org data.
+    </p>
+</div>
+
+<script src="familysearch-javascript-sdk.min.js"></script>
+
+<script>
+    
+    $("#login-continue").hide();
+    
+    $("#show-login-screen").click(function(event) {
+        event.preventDefault();
+        
+        FamilySearch.init({
+          app_key: 'WCQY-7J1Q-GKVV-7DNM-SQ5M-9Q5H-JX3H-CMJK',
+          environment: 'sandbox',
+          auth_callback: 'http://localhost:8000/auth-redirect.html',
+          http_function: $.ajax,
+          deferred_function: $.Deferred,
+          save_access_token: false
+        });
+        
+        
+        FamilySearch.getAccessToken().then(function (accessToken) {
+            var timeout = setTimeout(function() {
+                navigate("kiosk-main");
+                warn("Timeout creating PIN. Please log in again.", 5000);
+            }, 60000);
+            $("#messages").html("");
+            
+            var userName = "Willow Ufgood"; //TODO
+            var userId = "AEF-2344";        //TODO
+            //var accessToken = "fake-access-token-replace-with-actual";
+            
+            FamilySearch.getCurrentUser().then(function (user) {
+                
+            });
+            
+            $("#user-name").html(userName);
+               
+            $("#login-start").hide();
+            $("#login-continue").show();
+            
+            $("#set-pin").click(function(event) {
+                clearTimeout(timeout);
+                
+                var pin = $("#pin-input").val();
+                var pinConfirm = $("#pin-confirm").val();
+                
+                if (pin !== pinConfirm) {
+                    //TODO: Replace this with actual validation
+                    error("PINs don't match");
+                    timeout = setTimeout(function() {
+                        navigate("kiosk-main");
+                        warn("Timeout creating PIN. Please log in again.", 5000);
+                    }, 60000);
+                    return;
+                }
+                
+                settings.gotAccessToken(userName, userId, pin, accessToken);
+            
+                navigate("kiosk-main");
+            });
+            $("#pin-confirm").keypress(function(e) {
+                // if the key pressed is the enter key
+                if (e.which === 13){
+                    $("#set-pin").click();
+                }
+            });
+        });
+        
+    });
+    
+    asdf()
+</script>
+
+<p>Add FamilySearch.org certified logo</p>

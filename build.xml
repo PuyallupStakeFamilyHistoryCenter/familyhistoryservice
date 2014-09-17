@@ -7,8 +7,8 @@
 <!-- the Compile on Save feature is turned off for the project. -->
 <!-- You can turn off the Compile on Save (or Deploy on Save) setting -->
 <!-- in the project's Project Properties dialog box.-->
-<project name="RemoteMouse" default="default" basedir="." xmlns:ivy="antlib:org.apache.ivy.ant">
-    <description>Builds, tests, and runs the project RemoteMouse.</description>
+<project name="FamilyHistoryCacheService" default="default" basedir="." xmlns:ivy="antlib:org.apache.ivy.ant">
+    <description>Builds, tests, and runs the project FamilyHistoryCacheService.</description>
     <import file="nbproject/build-impl.xml"/>
     <!--
 
@@ -58,7 +58,7 @@
 
     An example of overriding the target for project execution could look like this:
 
-        <target name="run" depends="RemoteMouse-impl.jar">
+        <target name="run" depends="FamilyHistoryCacheService-impl.jar">
             <exec dir="bin" executable="launcher.exe">
                 <arg file="${dist.jar}"/>
             </exec>
@@ -72,4 +72,10 @@
     -->
     
     <echo message="ivy.default.settings.dir=${ivy.default.settings.dir}" />
+    
+    <target name="report" depends="init">
+        <mkdir dir="report" />
+        <ivy:resolve type="${ivy.resolve.types}"/>
+        <ivy:report todir="report" />
+    </target>
 </project>

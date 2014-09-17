@@ -45,10 +45,13 @@ POSSIBILITY OF SUCH DAMAGE.
 
 <script>
     $("#login-form").submit(function(event) {
+        $("#messages").html("");
+        event.preventDefault();
+        
         var username = $("#lastname-input").val();
         var pin = $("#pin-input").val();
         
-        settings.gotLoginCredentials(username, pin);
-        event.preventDefault();
+        settings.getToken(username, pin);
     });
+    mibi.asdf();
 </script>

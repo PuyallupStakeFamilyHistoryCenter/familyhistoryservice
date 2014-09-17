@@ -35,43 +35,13 @@ POSSIBILITY OF SUCH DAMAGE.
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="#">Brand</a>
+                <a class="navbar-brand" href="#">Puyallup Family History Center</a>
             </div>
 
             <!-- Collect the nav links, forms, and other content for toggling -->
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-                <ul class="nav navbar-nav">
-                    <li class="active"><a href="#">Link</a></li>
-                    <li><a href="#">Link</a></li>
-                    <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Dropdown <span class="caret"></span></a>
-                        <ul class="dropdown-menu" role="menu">
-                            <li><a href="#">Action</a></li>
-                            <li><a href="#">Another action</a></li>
-                            <li><a href="#">Something else here</a></li>
-                            <li class="divider"></li>
-                            <li><a href="#">Separated link</a></li>
-                            <li class="divider"></li>
-                            <li><a href="#">One more separated link</a></li>
-                        </ul>
-                    </li>
-                </ul>
-                <form class="navbar-form navbar-right" role="search">
-                    <div class="form-group">
-                        <input type="text" class="form-control" placeholder="Search">
-                    </div>
-                    <button type="submit" class="btn btn-default">Submit</button>
-                </form>
                 <ul class="nav navbar-nav navbar-right">
-                    <li><a href="#">Link</a></li>
-                    <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span id="family-name">Family name</span> <span class="caret"></span></a>
-                        <ul class="dropdown-menu" role="menu">
-                            <li><a href="#" id="settings-link">Settings</a></li>
-                            <li class="divider"></li>
-                            <li><a href="#" id="logout-link">Log out</a></li>
-                        </ul>
-                    </li>
+                    <li><a href="#" id="logout-link">Log out</a></li>
                 </ul>
             </div> <!--/.navbar-collapse -->
         </div> <!-- /.container-fluid -->
@@ -82,96 +52,220 @@ POSSIBILITY OF SUCH DAMAGE.
     $("#logout-link").click(function() {
         settings.logOut();
     });
+</script>  
+
+<div id="nav-buttons">
+    <button id="maps-button" class="btn btn-lg btn-primary">
+        <span class="btn-nav">
+            <img src="old-world-map.jpg" />
+        </span>
+        <br>
+        Maps
+    </button>
+    <button id="your-family-button" class="btn btn-lg btn-success">
+        <span class="btn-nav">
+            <img src="old-family.jpg" />
+        </span>
+        <br>
+        Your family
+    </button>
+    <button id="quiz-button" class="btn btn-lg btn-warning">
+        <span class="btn-nav">
+            <img src="old-world-map.jpg" />
+        </span>
+        <br>
+        Quiz
+    </button>
+    <button id="statistics-button" class="btn btn-lg btn-danger">
+        <span class="btn-nav">
+            <img src="old-world-map.jpg" />
+        </span>
+        <br>
+        Statistics
+    </button>
+</div>
+
+<script>
+    var buttonGroups = {
+        main: {
+            parent: null,
+            label: "Main",
+            buttons: [
+                {
+                    name: "maps",
+                    label: "Maps",
+                    image: "old-world-map.jpg",
+                    child: "maps"
+                },
+                {
+                    name: "your-family",
+                    label: "Your family",
+                    image: "old-family.jpg",
+                    child: "yourfamily",
+                },
+                {
+                    name: "tutorials",
+                    label: "Tutorials",
+                    image: "tutorials.jpg",
+                    child: "tutorials",
+                    disabled: true
+                }
+            ]
+        },
+        maps: {
+            parent: "main",
+            label: "Maps",
+            buttons: [
+                {
+                    name: "life-map",
+                    label: "Life map",
+                    image: "life-map.jpg",
+                    nav: "maps?type=life",
+                },
+                {
+                    name: "family-map",
+                    label: "Family map",
+                    image: "family-map.jpg",
+                    nav: "maps?type=family",
+                    disabled: true
+                },
+                {
+                    name: "google-earth",
+                    label: "Google Earth",
+                    image: "google-earth.svg",
+                    nav: "google-earth",
+                    disabled: true
+                }
+            ]
+        },
+        yourfamily: {
+            parent: "main",
+            label: "Your family",
+            buttons: [
+                {
+                    name: "stats",
+                    label: "Statistics",
+                    image: "statistics.jpg",
+                    nav: "stats"
+                },
+                {
+                    name: "stories",
+                    label: "Stories",
+                    image: "old-book.jpg",
+                    nav: "stories",
+                    disabled: true
+                },
+                {
+                    name: "collage",
+                    label: "Collage",
+                    image: "collage.jpg",
+                    nav: "collage",
+                    disabled: true
+                }
+            ]
+        },
+        tutorials: {
+            parent: "main",
+            label: "Tutorials",
+            buttons: [
+                {
+                    name: "research",
+                    label: "Research",
+                    image: "research.png",
+                    nav: "research",
+                    disabled: true
+                },
+                {
+                    name: "indexing",
+                    label: "Indexing",
+                    image: "indexing.gif",
+                    nav: "indexing",
+                    disabled: true
+                }
+            ]
+        }
+    };
+    
+    function setButtons(groupName) {
+        //Clear messages
+        $("#messages").html("");
+        
+        var group = buttonGroups[groupName];
+        if (!group || !group.buttons) {
+            error("Button group " + groupName + " not found");
+            return;
+        }
+        
+        var navButtons = $("#nav-buttons");
+        navButtons.html("");
+        
+        if (group.label) {
+            navButtons.append("<h2>" + group.label + "</h2>");
+        }
+        
+        if (group.parent) {
+            navButtons.append('<button id="back-button" class="btn btn-lg btn-default"><span class="glyphicon glyphicon-chevron-left glyphicon-sm"></span> Back</button>');
+            $("#back-button").click(function(e) {
+                setButtons(group.parent);
+                e.preventDefault();
+            });
+        }
+        
+        navButtons.append('<hr>');
+        
+        $.each(group.buttons, function(i, buttonInfo) {
+            navButtons.append('<button id="'+buttonInfo.name+'-button" class="btn btn-lg btn-default" style="margin: 5px;" '
+                    +(buttonInfo.disabled?"disabled":"")+'>'+
+                    '<span class="btn-nav"><img src="' + buttonInfo.image + '" /></span><br><strong>'+
+                    buttonInfo.label + '</strong></button>');
+            $("#" + buttonInfo.name + "-button").click(function(e) {
+                if (buttonInfo.nav) {
+                    navigateDisplay("display-" + buttonInfo.nav);
+                    navigate("controller-" + buttonInfo.nav);
+                } else if (buttonInfo.child) {
+                    setButtons(buttonInfo.child);
+                }
+                
+                e.preventDefault();
+            });
+        });
+        
+    }
+        
+    setButtons("main");
+    mab.asdf()
 </script>
 
-<div class="panel panel-default">
-    <!-- Default panel contents -->
-    <div class="panel-heading"><h3>Ancestry</h3></div>
-    <div class="container-fluid">
-        <div id="table-toolbar">
-            <div class="btn-group btn-group-normal">
-                <button class="btn btn-primary life-map" ><span class="glyphicon glyphicon-map-marker"></span> Life map</button>
-                <button class="btn btn-default family-map" ><span class="glyphicon glyphicon-heart"></span> Family map</button>
-                <button class="btn btn-default life-sketch" ><span class="glyphicon glyphicon-pencil"></span> Life sketch</button>
-                <button class="btn btn-default timeline" ><span class="glyphicon glyphicon-time"></span> Timeline</button>
-                <button class="btn btn-default images" ><span class="glyphicon glyphicon-picture"></span> Images</button>
-                <button class="btn btn-default quiz" ><span class="glyphicon glyphicon-question-sign"></span> Quiz</button>
+<div style="display: none;">
+    <form id="nav-form">
+        <input type="text" id="address-text" /><button type="submit">Navigate</button>
+    </form>
+</div>
+
+<script>
+    $(function() {
+        $("#nav-form").submit(function(e) {
+            var address = $("#address-text").val();
+            navigateDisplay(address);
+            e.preventDefault();
+        });
+    });
+</script>
+
+<div>
+    <nav class="navbar navbar-default navbar-fixed-bottom">
+        <div class="container-fluid">
+            <div class="progress">
+                <div class="progress-bar progress-bar-success" style="width: 50%">
+                    <span>2500</span>
+                </div>
+                <div class="progress-bar progress-bar-warning" style="width: 40%">
+                    <span>2000</span>
+                </div>
+                <div class="progress-bar progress-bar-danger" style="width: 10%">
+                    <span>500</span>
+                </div>
             </div>
         </div>
-        <table id="table-javascript"></table>
-    </div>
-</div>    
-
-<script>
-
-    $(function() {
-        $('#table-javascript').bootstrapTable({
-            //method: 'get',
-            //url: 'data2.json',
-            data: [
-                {
-                    id: "asdfasf",
-                    name: "John Smith",
-                    birth: "1745",
-                    death: "1821"
-                }, {
-                    id: "dfghdfgh",
-                    name: "Maggie Smith",
-                    birth: "1766",
-                    death: "1845"
-                }
-            ],
-            height: 400,
-            striped: true,
-            pagination: true,
-            pageSize: 50,
-            pageList: [10, 25, 50, 100, 200],
-            search: true,
-            showColumns: true,
-            showToggle: true,
-            minimumCountColumns: 0,
-            toolbar: "#table-toolbar",
-            clickToSelect: true,
-            columns: [{
-                    field: 'state',
-                    checkbox: true
-                }, {
-                    field: 'name',
-                    title: 'Name',
-                    align: 'center',
-                    valign: 'middle',
-                    sortable: true,
-                    switchable: false
-                }, {
-                    field: 'lifespan',
-                    title: 'Lifespan',
-                    align: 'center',
-                    valign: 'middle',
-                    sortable: true,
-                    formatter: lifespanFormatter
-                }]
-        });
-
-        $('#table-javascript').bootstrapTable("append", [
-            {
-                id: "sdfgsdfg",
-                name: "Angie Smith",
-                birth: "1749",
-                death: "1830"
-            }
-        ]);
-    });
-
-    function lifespanFormatter(value, row, index) {
-        return row.birth + '-' + row.death;
-    }
-</script>
-
-<script>
-    $("td").hover(function() {
-        $(this).find("action-buttons").show();
-    },
-            function() {
-                $(this).find("action-buttons").hide();
-            });
-</script>
+    </nav>
+</div>

@@ -30,6 +30,8 @@
             <ibiblio name="java.net" root="http://download.java.net/maven/1/"
                                      pattern="[organisation]/[type]s/[artifact]-[revision].[ext]"/>
              -->
+            <ibiblio name="gedcomx" m2compatible="true" root="https://repository-gedcom.forge.cloudbees.com/release/"/>
+            <ibiblio name="opencastproject" m2compatible="true" root="http://repository.opencastproject.org/nexus/content/repositories/public/" />
         </chain>
         <chain name="local">
             <filesystem local="true" />
