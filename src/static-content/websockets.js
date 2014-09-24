@@ -24,34 +24,44 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-
 var messageQueue = [];
 var connection;
 var blocking = true;
 var messageListeners = [];
 
-$(window).ready(function() {
-    
-    connection = new WebSocket('ws://' + window.location.host + '/remote-control/', ['soap', 'xmpp']);
-    connection.onmessage = function(message) {
-        for (var i = 0; i < messageListeners.length; i++) {
-            messageListeners[i](message);
-        }
-        
-        if (messageQueue.length > 0) {
-            var nextMessage = messageQueue[0];
-            messageQueue = messageQueue.slice(1, messageQueue.length);
-            connection.send(nextMessage);
-        } else {
-            blocking = false;
-        }
-    };
-    connection.onopen = function() {
-        ping();
-    };
-});
-
 var ws = {
+    reset: function() {
+        if (connection) connection.close();
+        connection = null;
+    },
+    connect: function(endpoint) {
+        if (connection) {
+            return;
+        }
+        if (!endpoint) {
+            endpoint = window.location.host;
+        }
+        connection = new WebSocket('ws://' + endpoint + '/remote-control/', ['soap', 'xmpp']); //TODO: Use secure web sockets (need certificate)
+        connection.onmessage = function(message) {
+            for (var i = 0; i < messageListeners.length; i++) {
+                messageListeners[i](message);
+            }
+            drainQueue();
+        };
+        connection.onopen = function() {
+            ping();
+            drainQueue();
+        };
+        function drainQueue() {
+            if (messageQueue.length > 0) {
+                var nextMessage = messageQueue[0];
+                messageQueue = messageQueue.slice(1, messageQueue.length);
+                connection.send(nextMessage);
+            } else {
+                blocking = false;
+            }
+        }
+    },
     socketSend: function (message) {
         if (blocking) {
             messageQueue.push(message);

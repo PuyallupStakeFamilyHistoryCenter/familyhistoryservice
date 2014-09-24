@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<!--
+Copyright (c) 2014, tibbitts
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+* Redistributions of source code must retain the above copyright notice, this
+  list of conditions and the following disclaimer.
+* Redistributions in binary form must reproduce the above copyright notice,
+  this list of conditions and the following disclaimer in the documentation
+  and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+POSSIBILITY OF SUCH DAMAGE.
+-->
+
+<button id="resetButton" type="button">Reset</button>
+<div>
+    <input type="radio" name="difficulty" value="easy">Easy
+    <input type="radio" name="difficulty" value="medium">Medium
+    <input type="radio" name="difficulty" value="hard">Hard
+    <input type="radio" name="difficulty" value="insane">Insane
+    <input type="radio" name="difficulty" value="custom">Custom
+</div>
+<div id="customControls" style="display: none;">
+    <dl>
+        <dt>Piece size</dt>
+        <dd>
+            <select name="depth">
+                <option value="3">Extra large</option>
+                <option value="4">Large</option>
+                <option value="5">Medium</option>
+                <option value="6">Small</option>
+                <option value="7">Extra small</option>
+            </select>
+        </dd>
+
+        <dt>
+        Board height
+        </dt>
+        <dd>
+            <input name="boardHeight">
+        </dd>
+
+        <dd>
+            <input type="checkbox" name="protrusions" id="protrusions"><label for="protrusions">Show protrusions</label>
+        </dd>
+
+        <dd>
+            <input type="checkbox" name="thumbnail">Show thumbnail
+        </dd>
+
+        <dd>
+            <input type="checkbox" name="presort" id="presort"><label for="presort">Pre-sort pieces</label>
+        </dd>
+
+        <dd>
+            <input type="checkbox" name="rotate" id="rotate"><label for="rotate">Rotate pieces</label>
+        </dd>
+
+        <dd>
+            <input type="checkbox" name="snapOnDrag" id="snapOnDrag"><label for="snapOnDrag">Snap on drag</label>
+        </dd>
+
+        <dt>
+        Snap threshold
+        </dt>
+        <dd>
+            <input name="snapThreshold">
+        </dd>
+
+        <dt>
+        Background
+        </dt>
+        <dd>
+            <select name="backgroundTransparency">
+                <option value="1">Invisible</option>
+                <option value="0.75">..</option>
+                <option value="0.5">...</option>
+                <option value="0.25">....</option>
+            </select>
+        </dd>
+    </dl>
+</div>

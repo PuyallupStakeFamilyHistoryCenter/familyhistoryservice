@@ -28,66 +28,34 @@
 
 var content;
 var mode;
+var settings = {
+    global: {
+        verbs: {
+            connected: doNothing,
+            ok: doNothing,
+            pong: doNothing
+        }
+    },
+    page: {verbs:{}},
+    local: {verbs:{}}
+}
 var displayName;
-var settings;
 var token;
+var userName;
+var urlVars = {};
 
-//Add message listener to websocket
-ws.addMessageListener(function(message) {
-    var parts = message.data.split(" ");
-    // TODO: Incorporate these verbs into the settings object if possible
-    // so that the different screens can define which verbs they accept and
-    // how to handle each one
-    switch (parts[0]) {
-        case "connected":
-        case "ok":
-        case "pong":
-            break;
-        case "nav":
-            navigate(parts[1]);
-            break;
-        case "name":
-            settings.gotNewDisplayName(parts[1]);
-            break;
-        case "standby":
-            navigate("display-ready");
-            break;
-        case "attached":
-            ws.socketSend("nav " + displayName + " " + "display-login");
-            token = $.cookie("token", {expires: 1 / 24, path: '/'});
-            if (!token) {
-                navigate("controller-login");
-            } else {
-                settings.gotToken(token);
-            }
-            break;
-        case "token":
-            token = parts[1];
-            settings.gotToken(token);
-            break;
+function doNothing() {}
 
-        case "ancestor":
-            if (settings.gotAncestor) {
-                var ancestor = JSON.parse(message.data.substring(parts[0].length+1));
-                settings.gotAncestor(ancestor);
-            }
-            break;
 
-        default:
-            //TODO: Improve error handling (with error codes?)
-            if (parts[0] === "Error:") {
-                error(message.data.substring(6));
-            } else {
-                error("unrecognized command '" + message.data + "'");
-            }
-    }
-});
-
-$(window).ready(function() {
+function getReady() {
+    //Add message listener to websocket
+    ws.addMessageListener(messageHandler);
+    ws.connect();
+    
     content = $("#content");
     mode = getParameterByName("mode");
     if (!mode) {
-        error("Mode parameter is required");
+        logger.error("Mode parameter is required");
         return;
     }
 
@@ -97,33 +65,34 @@ $(window).ready(function() {
             return;
 
         default:
-            settings = defaultSettings[mode];
+            settings.page = defaultSettings[mode];
             break;
     }
     
-    if (!settings) {
-        error("Invalid type mode '" + mode + "'");
+    if (!settings.page) {
+        logger.error("Invalid type mode '" + mode + "'");
+        return;
     }
 
     setup();
 
-    if (settings.getNewDisplayName) {
+    if (settings.page.getNewDisplayName) {
         displayName = $.cookie("display-name");
         if (!displayName) {
-            settings.getNewDisplayName();
+            settings.page.getNewDisplayName();
         } else {
-            settings.gotNewDisplayName(displayName);
+            settings.page.verbs.name(["name",displayName]);
         }
-    } else if (settings.begin) {
-        settings.begin();
+    } else if (settings.page.begin) {
+        settings.page.begin();
     }
-});
+}
 
 function setup() {
-    document.title = settings.title;
+    document.title = settings.page.title;
     var pageHeader = $("#page-header"); //TODO: This isn't working
-    pageHeader.html("<h1>" + settings.header + "</h1>");
-    if (settings.contentPadding) {
+    pageHeader.html("<h1>" + settings.page.header + "</h1>");
+    if (settings.page.contentPadding) {
         $("#messages").addClass("content-padding");
     } else {
         $("#messages").removeClass("content-padding");
@@ -133,73 +102,131 @@ function setup() {
 var defaultSettings = {
     display: {
         title: "Display",
-        header: '<img src="logo.png" alt="Puyallup Family History Center logo" />',
+        header: '<img src="logo.png<ERROR>" alt="Puyallup Family History Center logo" />',
         contentPadding: false,
+        verbs: {
+            nav: function(parts) {
+                navigate(parts[1]);
+            },
+            standby: function(parts) {
+                navigate("display-ready");
+            },
+            name: function(parts) {
+                displayName = parts[1];
+                $.cookie("display-name", displayName);
+                ws.socketSend("display " + displayName);
+            }
+        },
         getNewDisplayName: function() {
             ws.socketSend("display-name");
-        },
-        gotNewDisplayName: function(name) {
-            displayName = name;
-            $.cookie("display-name", displayName);
-            ws.socketSend("display " + displayName);
         }
     },
     controller: {
         title: "Controller",
         header: '',
         contentPadding: true,
-        getNewDisplayName: function() {
-            navigate("controller-attach");
+        verbs: {
+            attached: function(parts) {
+                $.cookie("display-name", displayName);
+                ws.socketSend("nav " + displayName + " " + "display-login");
+                token = $.cookie("token");
+                if (!token) {
+                    navigate("controller-login");
+                } else {
+                    settings.page.verbs.token(token);
+                }
+            },
+            name: function(parts) {
+                settings.page.gotNewDisplayName(parts[1]);
+            },
+            token: function(parts) {
+                var type = Object.toType(parts);
+                switch (type) {
+                    case "array":
+                        token = parts[1];
+                        break;
+                    case "string":
+                        token = parts;
+                        break;
+                }
+                $.cookie("token", token);
+                ws.socketSend("nav " + displayName + " " + "display-main");
+                navigate("controller-main");
+                ws.socketSend("get-ancestors " + token);
+            }
         },
         gotNewDisplayName: function(name) {
             displayName = name;
-            $.cookie("display-name", displayName);
             ws.socketSend("controller " + displayName);
         },
-        getToken: function(username, pin) {
-            ws.socketSend("login " + username + " " + pin);
+        getNewDisplayName: function() {
+            navigate("controller-attach");
         },
-        gotToken: function(newToken) {
-            $.cookie("token", newToken, {expires: 1 / 24, path: '/'});
-            ws.socketSend("nav " + displayName + " " + "display-main");
-            navigate("controller-main");
-            ws.socketSend("get-ancestors " + token);
+        getToken: function(userId, pin) {
+            ws.socketSend("login " + userId + " " + pin);
         },
         logOut: function() {
-            if (!$.removeCookie("token", {expires: 1 / 24, path: '/'})) {
-                error("Failed to remove login cookie");
+            //TODO: This doesn't appear to be working
+            if (!$.removeCookie("token")) {
+                logger.error("Failed to remove login cookie");
             }
             ws.socketSend("nav " + displayName + " display-login");
             navigate("controller-login");
-        }
+        },
     },
     kiosk: {
         title: "Kiosk",
-        header: '<img src="logo.png" alt="Puyallup Family History Center logo" />',
+        header: '<img src="logo.png<ERROR>" alt="Puyallup Family History Center logo" />',
         contentPadding: false,
+        verbs:{},
         begin: function() {
             navigate("kiosk-main");
         }, 
-        gotAccessToken: function(userName, userId, pin, accessToken) {
-            ws.socketSend("access-token " + userId + " " + pin + " " + accessToken);
+        gotAccessToken: function(userId, userName, pin, accessToken) {
+            ws.socketSend("access-token " + userId + " " + encodeURI(userName) + " " + pin + " " + accessToken);
         }
     }
 };
 
-function error(message) {
-    log("danger", "<strong>Error:</strong> " + message);
+function messageHandler(message) {
+    $("#messages").html("");
+    
+    var parts = message.data.split(" ");
+    // TODO: Incorporate these verbs into the settings.page object if possible
+    // so that the different screens can define which verbs they accept and
+    // how to handle each one
+    if (settings.local.verbs[parts[0]]) {
+        settings.local.verbs[parts[0]](parts);
+    } else if (settings.page.verbs[parts[0]]) {
+        settings.page.verbs[parts[0]](parts);
+    } else if (settings.global.verbs[parts[0]]) {
+        settings.global.verbs[parts[0]](parts);
+    } else {
+        if (parts[0] === "Error:") {
+            logger.error(message.data.substring(6));
+        } else {
+            logger.error("unrecognized command '" + message.data + "'");
+        }
+    }
+    return;
 }
 
-function warn(message) {
-    log("warning", "<strong>Warning:</strong> " + message);
-}
+var logger = {
+    error: function (message) {
+        log("danger", "<strong>Error:</strong> " + message);
+    },
 
-function info(message) {
-    log("info", "<strong>Info:</strong> " + message);
-}
+    warn: function (message) {
+        log("warning", "<strong>Warning:</strong> " + message);
+    },
 
-function success(message) {
-    log("success", message);
+    info: function (message) {
+        log("info", "<strong>Info:</strong> " + message);
+    },
+
+    success: function (message) {
+        log("success", message);
+    }
 }
 
 function log(level, message) {
@@ -210,27 +237,70 @@ function log(level, message) {
 }
 
 function navigate(dest) {
-    $("#messages").html("");
     var split = dest.split("?");
     var actualDest = split[0] + ".html";
     if (split.length > 1) {
         actualDest += "?" + split[1];
     }
+    var tempVars = getUrlVars(split[1]);
+    var deferred = new $.Deferred();
+    
     $.ajax(actualDest)
-            .done(function(data) {
+        .done(
+            function(data) {
+                settings.local = {verbs: {}};
                 content.html(data);
-            }).fail(function(message) {
-                error("Could not load " + actualDest + " - " + message);
-            });
+                urlVars = tempVars;
+                deferred.resolve();
+            }
+        ).fail(
+            function(response) {
+                logger.error("Could not load " + actualDest + " - " + response.statusText);
+                deferred.reject();
+            }
+        );
+    return deferred.promise();
 }
 
 function navigateDisplay(dest) {
     ws.socketSend("nav " + displayName + " " + dest);
 }
 
-function getParameterByName(name) {
-    name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
-    var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
-            results = regex.exec(location.search);
-    return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+// Read a page's GET URL variables and return them as an associative array.
+// Courtesy of http://jquery-howto.blogspot.com/2009/09/get-url-parameters-values-with-jquery.html
+function getUrlVars(hashes)
+{
+    if (urlVars) {
+        return urlVars;
+    }
+    
+    var vars = [], hash;
+    if (!hashes) {
+        hashes = window.location.search.substring(1).split('&');
+    }   
+    for(var i = 0; i < hashes.length; i++)
+    {
+        hash = hashes[i].split('=');
+        vars.push(hash[0]);
+        if (hash.length === 2) {
+            vars[hash[0]] = decodeURIComponent(hash[1]);
+        } else {
+            vars[hash[0]] = true;
+        }
+    }
+    urlVars = vars;
+    return vars;
 }
+
+function getParameterByName(name) {
+    return getUrlVars()[name];
+}
+
+Object.toType = (function toType(global) {
+  return function(obj) {
+    if (obj === global) {
+      return "global";
+    }
+    return ({}).toString.call(obj).match(/\s([a-z|A-Z]+)/)[1].toLowerCase();
+  }
+})(this)

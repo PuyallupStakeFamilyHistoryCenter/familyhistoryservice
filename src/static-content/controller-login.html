@@ -24,34 +24,65 @@ CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 -->
-<div class="panel panel-default" style="max-width: 300px">
+<div class="panel panel-default">
   <div class="panel-body">
     <form autocomplete="off" id="login-form">
         <div class="panel-heading"><h3>Login</h3></div>
-        <div class="input-group input-group-lg">
-            <span class="input-group-addon"><span class="glyphicon glyphicon-user"></span></span>
-            <input type="text" id="lastname-input" class="form-control" placeholder="Last name" />
+        <div id="user-list">
+            <input type="hidden" id="userid-input" value="guest" />
         </div>
         <br>
-        <div class="input-group input-group-lg">
+        <div class="input-group input-group-lg" id="pin-input-div" style="max-width: 200px; display: none;">
             <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
-            <input type="password" id="pin-input" pattern="[0-9]*" class="form-control" placeholder="PIN" />
+            <input type="password" id="pin-input" pattern="[0-9]*" maxlength="6" class="form-control" placeholder="PIN" value="1234" />
         </div>
         <br>
-        <button type="submit" class="btn btn-primary" >Login</button>
+        <button type="submit" class="btn btn-primary btn-lg" >Login</button>
     </form>
   </div>
 </div>
 
 <script>
+    settings.local = {
+        verbs: {
+            "user-list": function(parts) {
+                for (var i = 1; i < parts.length; i+=2) {
+                    var user = parts[i];
+                    $("#user-list").append("<button class='btn btn-default btn-lg username-btn' data-user-id='"+ parts[i+1] +"'>" + decodeURI(parts[i]) + "</button>");
+                }
+
+                $(".username-btn").click(function(e) {
+                    e.preventDefault();
+                    var value = $(e.target).attr("data-user-id");
+                    $("#userid-input").val(value);
+                    $(".username-btn").removeClass("btn-warning");
+                    $(e.target).addClass("btn-warning");
+
+                    if (value === "guest") {
+                        $("#pin-input-div").hide()
+                        $("#pin-input").val("1234");
+                    } else {
+                        $("#pin-input-div").show();
+                        $("#pin-input").val("").focus();
+                    }
+                });
+            }
+        }
+    };
+    ws.socketSend("list-current-users");
+    
     $("#login-form").submit(function(event) {
         $("#messages").html("");
         event.preventDefault();
         
-        var username = $("#lastname-input").val();
+        var userId = $("#userid-input").val();
         var pin = $("#pin-input").val();
         
-        settings.getToken(username, pin);
+        if (!userId || !pin) {
+            error("You must choose a user and enter a valid PIN");
+            return;
+        }
+        
+        settings.page.getToken(userId, pin);
     });
-    mibi.asdf();
 </script>

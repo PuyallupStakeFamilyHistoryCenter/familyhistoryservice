@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<!--
+Copyright (c) 2014, tibbitts
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+* Redistributions of source code must retain the above copyright notice, this
+  list of conditions and the following disclaimer.
+* Redistributions in binary form must reproduce the above copyright notice,
+  this list of conditions and the following disclaimer in the documentation
+  and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+POSSIBILITY OF SUCH DAMAGE.
+-->
+
+<div>
+    <canvas id="canvas" width="1000" height="500"></canvas>
+</div>
+
+<script>
+    var configurations = {
+        easy: {
+            depth: 3,
+            protrusions: true,
+            backgroundTransparency: 0.5,
+            thumbnail: false,
+            snapThreshold: 15,
+            snapOnDrag: true,
+            presort: false,
+            rotate: false,
+            boardHeight: 500,
+        },
+        medium: {
+            depth: 4,
+            protrusions: true,
+            backgroundTransparency: 0.75,
+            thumbnail: false,
+            snapThreshold: 10,
+            snapOnDrag: false,
+            presort: true,
+            rotate: false,
+            boardHeight: 500,
+        },
+        hard: {
+            depth: 6,
+            protrusions: true,
+            backgroundTransparency: 1,
+            thumbnail: true,
+            snapThreshold: 10,
+            snapOnDrag: false,
+            presort: true,
+            rotate: true,
+            boardHeight: 500,
+        },
+        insane: {
+            depth: 7,
+            protrusions: false,
+            backgroundTransparency: 1,
+            thumbnail: true,
+            snapThreshold: 10,
+            snapOnDrag: false,
+            presort: false,
+            rotate: true,
+            boardHeight: 500,
+        }
+    }
+    var config = configurations.medium;
+
+    var imagesrc = urlVars["image"];//"house.jpg"; //"arc-de-triomphe.jpg"; //Eiffel-Tower-Paris-Facts-and-Information-of-Incredible-History1.jpg"; //"children.jpg"; //"blown-plastic.jpg"; //
+    var canvas,context,image;
+    var pieces;
+    var tolerance = 10;
+    var scale;
+
+    var lastX = -1;
+    var lastY = -1;
+    var lastRotation = 0;
+    var lastClicked = null;
+
+    var imageWidth;
+    var imageHeight;
+    
+    init();
+
+    $('input[name=difficulty]:radio').click(function () {
+        config = configurations[$(this).val()]
+        $("#customControls").hide();
+        init();
+    });
+
+    $("input[name=difficulty][value='custom']:radio").unbind().click(function () {
+        if (config == null) {
+            config = configurations['medium'];
+        }
+        config = cloneObject(config);
+        $("[name=depth]").val(config.depth);
+        $("[name=boardHeight]").val(config.boardHeight);
+        $("[name=protrusions]").prop('checked', config.protrusions);
+        $("[name=rotate]").prop('checked', config.rotate);
+        $("[name=snapOnDrag]").prop('checked', config.snapOnDrag);
+        $("[name=snapThreshold]").val(config.snapThreshold);
+        $("[name=presort]").prop('checked', config.presort);
+        $("[name=backgroundTransparency]").val(config.backgroundTransparency);
+        $("[name=thumbnail]").prop('checked', config.thumbnail);
+        $("#customControls").show();
+    });
+
+    $("[name=depth]").change(function () {
+        config.depth = parseInt($(this).val());
+        init();
+    })
+
+    $("[name=boardHeight]").change(function () {
+        if ($(this).val() == null || $(this).val() == "") {
+            $(this).val(canvas.height);
+        }
+        var boardHeight = parseInt($(this).val());
+        if (boardHeight == NaN) {
+            boardHeight = canvas.height;
+            $(this).val(boardHeight);
+        }
+        if (boardHeight > canvas.height) {
+            boardHeight = canvas.height;
+            $(this).val(boardHeight);
+        }
+        if (boardHeight < 300) {
+            boardHeight = 300;
+            $(this).val(boardHeight);
+        }
+
+        config.boardHeight = boardHeight;
+        init();
+    })
+
+    $("[name=protrusions]").click(function () {
+        config.protrusions = $(this).prop('checked');
+        draw();
+    })
+
+    $("[name=rotate]").click(function () {
+        config.rotate = $(this).prop('checked');
+        init();
+    })
+
+    $("[name=snapOnDrag]").click(function () {
+        config.snapOnDrag = $(this).prop('checked');
+    })
+
+    $("[name=snapThreshold]").change(function () {
+        if ($(this).val() == null || $(this).val() == "") {
+            $(this).val(15);
+        }
+        var snapThreshold = parseInt($(this).val());
+        if (snapThreshold == NaN) {
+            snapThreshold = 15;
+            $(this).val(snapThreshold);
+        }
+        if (snapThreshold > 20) {
+            snapThreshold = 20;
+            $(this).val(snapThreshold);
+        }
+        if (snapThreshold < 0) {
+            snapThreshold = 0;
+            $(this).val(snapThreshold);
+        }
+
+        config.snapThreshold = snapThreshold;
+    })
+
+    $("[name=presort]").click(function () {
+        config.presort = $(this).prop('checked');
+        init();
+    })
+
+    $("[name=backgroundTransparency]").change(function () {
+        config.backgroundTransparency = parseFloat($(this).val());
+        draw();
+    })
+
+    $("[name=thumbnail]").click(function () {
+        config.thumbnail = $(this).prop('checked');
+        draw();
+    })
+
+    $("input[name='difficulty'][value='medium']:radio").click();
+
+    $("#resetButton").click(init)
+
+    canvas.onmousedown = function (e) {
+        touchStart(e.pageX - canvas.offsetLeft, e.pageY - canvas.offsetTop);
+    }
+
+    canvas.onmousemove = function (e) {
+        if (e.ctrlKey) {
+            rotate(e.pageX - canvas.offsetLeft);
+        } else {
+            touchMove(e.pageX - canvas.offsetLeft, e.pageY - canvas.offsetTop);
+        }
+    }
+
+    canvas.onmouseup = function (e) {
+        touchEnd();
+    }
+
+    canvas.addEventListener("touchstart", function (e) {
+        if (e.touches.length > 1)
+            return;
+        touchStart(e.touches[0].pageX - canvas.offsetLeft, e.touches[0].pageY - canvas.offsetTop);
+        e.preventDefault();
+    }, false);
+
+    canvas.addEventListener("touchmove", function (e) {
+        if (e.touches.length > 1)
+            return;
+        touchMove(e.touches[0].pageX - canvas.offsetLeft, e.touches[0].pageY - canvas.offsetTop);
+        e.preventDefault();
+    }, false);
+
+    canvas.addEventListener("touchend", function (e) {
+        touchEnd();
+        e.preventDefault();
+    }, false);
+
+    canvas.addEventListener("gesturestart", function (e) {
+        lastRotation = 0;
+        e.preventDefault();
+    }, false);
+
+    canvas.addEventListener("gesturechange", function (e) {
+        rotate(e.rotation);
+    }, false);
+
+    function init() {
+        pieces = new Array();
+        canvas = document.getElementById("canvas");
+        context = canvas.getContext("2d");
+        dragging = false;
+        image = new Image();
+        image.src = imagesrc ? imagesrc : "life-map.jpg";
+        image.crossOrigin = "Anonymous";
+        image.onload = function () {
+            scale = config.boardHeight / image.height;
+            var pieceNum = 0;
+            var piecesDeep = config.depth;
+            var pieceHeight = Math.floor(image.height / piecesDeep);
+            imageHeight = piecesDeep * pieceHeight;
+            var piecesAcross = Math.max(Math.round(image.width / pieceHeight), 1);
+            var pieceWidth = Math.floor(image.width / piecesAcross);
+            imageWidth = piecesAcross * pieceWidth;
+            var pNSMap = {};
+            var pWEMap = {};
+            for (var x = 0; x < imageWidth; x += pieceWidth) {
+                for (var y = 0; y < imageHeight; y += pieceHeight) {
+                    var rot = config.rotate ? rand(-Math.PI, Math.PI) : 0;
+                    var destx = rand(image.width * scale + 10, canvas.width - pieceWidth * scale - 10);
+                    var desty = rand(10, canvas.height - pieceHeight * scale - 10);
+                    var n = pNSMap[x + "," + y];
+                    var w = pWEMap[x + "," + y];
+                    var s = (Math.random() * .5 + .75) * Math.floor(Math.random() * 2) * 2 - 1;
+                    var e = (Math.random() * .5 + .75) * Math.floor(Math.random() * 2) * 2 - 1;
+                    pNSMap[x + "," + (y + pieceHeight)] = s;
+                    pWEMap[(x + pieceWidth) + "," + y] = e;
+                    if (n === undefined) {
+                        n = 0;
+                    }
+                    if (w === undefined) {
+                        w = 0;
+                    }
+                    if (y / pieceHeight >= piecesDeep - 1) {
+                        s = 0;
+                    }
+                    if (x / pieceWidth >= piecesAcross - 1) {
+                        e = 0;
+                    }
+                    pieces[pieceNum] = {
+                        targetX: x,
+                        targetY: y,
+                        actualX: destx,
+                        actualY: desty,
+                        north: n,
+                        south: s,
+                        west: w,
+                        east: e,
+                        width: pieceWidth,
+                        height: pieceHeight,
+                        rotation: rot,
+                        found: false
+                    }
+                    pieceNum++;
+                }
+            }
+
+            shuffle(pieces);
+            if (config.presort) {
+                preSort(pieces);
+            }
+            draw();
+        }
+    }
+
+    function touchStart(x, y) {
+        findClickedPiece(x, y);
+        lastX = x;
+        lastY = y;
+    }
+
+    function touchMove(x, y) {
+        if (lastClicked != null) {
+            lastClicked.actualX += x - lastX;
+            lastClicked.actualY += y - lastY;
+            lastX = x;
+            lastY = y;
+
+            if (config.snapOnDrag) {
+                checkForCorrectPlacement();
+            }
+            draw();
+        }
+    }
+
+    function touchEnd() {
+        if (!config.snapOnDrag) {
+            checkForCorrectPlacement();
+        }
+        lastClicked = null;
+    }
+
+    function rotate(r) {
+        if (lastClicked != null && config.rotate) {
+            lastClicked.rotation += (r - lastRotation) * Math.PI / 180;
+            while (lastClicked.rotation > Math.PI) {
+                lastClicked.rotation -= Math.PI * 2;
+            }
+            while (lastClicked.rotation < -Math.PI) {
+                lastClicked.rotation += Math.PI * 2;
+            }
+            lastRotation = r;
+
+            if (config.snapOnDrag) {
+                checkForCorrectPlacement();
+            }
+            draw();
+        }
+    }
+
+    function checkForCorrectPlacement() {
+        var shouldCheckForWin = false;
+        if (lastClicked != null &&
+                Math.abs(lastClicked.actualX - lastClicked.targetX * scale) <= config.snapThreshold &&
+                Math.abs(lastClicked.actualY - lastClicked.targetY * scale) <= config.snapThreshold &&
+                Math.abs(lastClicked.rotation) <= config.snapThreshold / 150) {
+            lastClicked.actualX = lastClicked.targetX * scale;
+            lastClicked.actualY = lastClicked.targetY * scale;
+            lastClicked.rotation = 0;
+            lastClicked.found = true;
+            lastClicked = null;
+
+            pushToBack();
+            draw();
+
+            shouldCheckForWin = true;
+        }
+
+        if (shouldCheckForWin) {
+            checkForWin();
+        }
+    }
+
+    /*
+     * Finds the topmost piece that is on the given coordinants
+     */
+    function findClickedPiece(x, y) {
+        var lastIndex;
+        for (i = 0; i < pieces.length; i++) {
+            var piece = pieces[i];
+            if (piece != null &&
+                    x >= piece.actualX && x < piece.actualX + piece.width * scale &&
+                    y >= piece.actualY && y < piece.actualY + piece.height * scale &&
+                    !piece.found) {
+                lastIndex = i;
+                lastClicked = pieces[i];
+            }
+        }
+        if (lastClicked != null) {
+            for (i = lastIndex; i < pieces.length - 1; i++) {
+                pieces[i] = pieces[i + 1];
+            }
+            pieces[pieces.length - 1] = lastClicked;
+        }
+    }
+
+    function pushToBack() {
+        for (i = pieces.length - 2; i >= 0; i--) {
+            var temp = pieces[i];
+            pieces[i] = pieces[i + 1];
+            pieces[i + 1] = temp;
+        }
+    }
+
+    function draw() {
+        canvas.width = canvas.width; //Reset canvas
+
+        drawBoard();
+
+        for (i = 0; i < pieces.length; i++) {
+            drawPiece(pieces[i]);
+        }
+    }
+
+    function drawBoard() {
+        context.drawImage(image, 0, 0, imageWidth, imageHeight, 0, 0, imageWidth * scale, imageHeight * scale);
+        context.fillStyle = "rgba(255,255,255," + config.backgroundTransparency + ")";
+        context.fillRect(0, 0, imageWidth * scale, imageHeight * scale);
+        context.strokeRect(0, 0, imageWidth * scale, imageHeight * scale);
+
+        if (config.thumbnail) {
+            context.drawImage(image, 0, 0, imageWidth, imageHeight, imageWidth * scale + 10, 0, imageWidth * scale / 2, imageHeight * scale / 2);
+        }
+    }
+
+    function drawPiece(p) {
+        if (p == null)
+            return;
+
+        context.save();
+        context.translate(p.actualX + p.width / 2 * scale, p.actualY + p.height / 2 * scale);
+        if (p.rotation != 0) {
+            context.rotate(p.rotation);
+        }
+
+        context.beginPath();
+        context.moveTo(-p.width * 1 / 2 * scale, -p.height / 2 * scale);
+        if (config.protrusions && p.north != 0) {
+            context.lineTo(-p.width * 1 / 10 * scale, -p.height / 2 * scale);
+            context.arcTo(-p.width * 1 / 10 * scale, -p.height / 2 * scale + p.north * p.height * 1 / 5 * scale,
+                    0, -p.height / 2 * scale + p.north * p.height * 1 / 5 * scale,
+                    p.height / 10 * scale);
+            context.arcTo(p.width * 1 / 10 * scale, -p.height / 2 * scale + p.north * p.height * 1 / 5 * scale,
+                    p.width * 1 / 10 * scale, -p.height / 2 * scale,
+                    p.height / 10 * scale);
+            context.lineTo(p.width * 1 / 10 * scale, -p.height / 2 * scale);
+        }
+        context.lineTo(p.width * 1 / 2 * scale, -p.height / 2 * scale);
+        if (config.protrusions && p.east != 0) {
+            context.lineTo(p.width * 1 / 2 * scale, -p.height * 1 / 10 * scale);
+            context.arcTo((p.width * 1 / 2 + p.east * p.width * 1 / 5) * scale, -p.height * 1 / 10 * scale,
+                    (p.width * 1 / 2 + p.east * p.width * 1 / 5) * scale, 0,
+                    p.width / 10 * scale);
+            context.arcTo((p.width * 1 / 2 + p.east * p.width * 1 / 5) * scale, p.height * 1 / 10 * scale,
+                    p.width * 1 / 2 * scale, p.height * 1 / 10 * scale,
+                    p.width / 10 * scale);
+            context.lineTo(p.width * 1 / 2 * scale, p.height * 1 / 10 * scale);
+        }
+        context.lineTo(p.width * 1 / 2 * scale, p.height * 1 / 2 * scale);
+        if (config.protrusions && p.south != 0) {
+            context.lineTo(p.width * 1 / 10 * scale, p.height * 1 / 2 * scale);
+            context.arcTo(p.width * 1 / 10 * scale, (p.height * 1 / 2 + p.south * p.height * 1 / 5) * scale,
+                    0, (p.height * 1 / 2 + p.south * p.height * 1 / 5) * scale,
+                    p.height / 10 * scale);
+            context.arcTo(-p.width * 1 / 10 * scale, (p.height * 1 / 2 + p.south * p.height * 1 / 5) * scale,
+                    -p.width * 1 / 10 * scale, p.height * 1 / 2 * scale,
+                    p.height / 10 * scale);
+            context.lineTo(-p.width * 1 / 10 * scale, p.height * 1 / 2 * scale);
+        }
+        context.lineTo(-p.width * 1 / 2 * scale, p.height * 1 / 2 * scale);
+        if (config.protrusions && p.west != 0) {
+            context.lineTo(-p.width * 1 / 2 * scale, p.height * 1 / 10 * scale);
+            context.arcTo((-p.width * 1 / 2 + p.west * p.width * 1 / 5) * scale, p.height * 1 / 10 * scale,
+                    (-p.width * 1 / 2 + p.west * p.width * 1 / 5) * scale, 0,
+                    p.width / 10 * scale);
+            context.arcTo((-p.width * 1 / 2 + p.west * p.width * 1 / 5) * scale, -p.height * 1 / 10 * scale,
+                    -p.width * 1 / 2 * scale, -p.height * 1 / 10 * scale,
+                    p.width / 10 * scale);
+            context.lineTo(-p.width * 1 / 2 * scale, -p.height * 1 / 10 * scale);
+        }
+        context.lineTo(-p.width * 1 / 2 * scale, -p.height / 2 * scale);
+        context.closePath();
+
+        context.save();
+        context.clip();
+        context.drawImage(image,
+                -(p.targetX + p.width / 2) * scale, //Canvas position
+                -(p.targetY + p.height / 2) * scale,
+                image.width * scale, //Canvas size
+                image.height * scale);
+        context.restore();
+        if (!p.found) {
+            context.stroke();
+        }
+        context.restore();
+    }
+
+    function checkForWin() {
+        for (i = 0; i < pieces.length; i++) {
+            if (pieces[i] != null && !pieces[i].found) {
+                return;
+            }
+        }
+        alert("You win!");
+    }
+
+    /*
+     * Courtesy of http://stackoverflow.com/a/2450976
+     */
+    function shuffle(array) {
+        var currentIndex = array.length
+                , temporaryValue
+                , randomIndex
+                ;
+
+        // While there remain elements to shuffle...
+        while (0 !== currentIndex) {
+
+            // Pick a remaining element...
+            randomIndex = Math.floor(Math.random() * currentIndex);
+            currentIndex -= 1;
+
+            // And swap it with the current element.
+            temporaryValue = array[currentIndex];
+            array[currentIndex] = array[randomIndex];
+            array[randomIndex] = temporaryValue;
+        }
+
+        return array;
+    }
+
+    function preSort(pieces) {
+        var currentIndex = 0;
+        var currentEdge = pieces.length - 1;
+
+        while (currentIndex < currentEdge) {
+            var temp = pieces[currentIndex];
+            if (temp.north == 0 || temp.south == 0 || temp.east == 0 || temp.west == 0) {
+                pieces[currentIndex] = pieces[currentEdge];
+                pieces[currentEdge--] = temp;
+            } else {
+                currentIndex++;
+            }
+        }
+    }
+
+    function rand(min, max) {
+        return Math.random() * (max - min) + min;
+    }
+
+    function cloneObject(obj) {
+        var serialized = window.JSON.stringify(obj);
+        var clone = window.JSON.parse(serialized);
+        return clone;
+    }
+</script>

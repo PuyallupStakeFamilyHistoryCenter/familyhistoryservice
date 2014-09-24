@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<!--
+Copyright (c) 2014, tibbitts
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+* Redistributions of source code must retain the above copyright notice, this
+  list of conditions and the following disclaimer.
+* Redistributions in binary form must reproduce the above copyright notice,
+  this list of conditions and the following disclaimer in the documentation
+  and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+POSSIBILITY OF SUCH DAMAGE.
+-->
+
+<h2>Map</h2>
+<div>
+    <button id="back-button" class="btn btn-lg btn-default"><span class="glyphicon glyphicon-chevron-left glyphicon-sm"></span> Back</button>
+</div>
+<hr>
+
+<div>
+    <button class="btn btn-primary btn-lg invisible"><span class="glyphicon glyphicon-arrow-left"></span></button>
+    <button id="up-btn" class="btn btn-primary btn-lg"><span class="glyphicon glyphicon-arrow-up"></span></button>
+    <button class="btn btn-primary btn-lg invisible"><span class="glyphicon glyphicon-arrow-left"></span></button>
+    <button class="btn btn-primary btn-lg invisible"><span class="glyphicon glyphicon-arrow-left"></span></button>
+    <button id="zoom-in-btn" class="btn btn-primary btn-lg"><span class="glyphicon glyphicon-zoom-in"></span></button>
+</div>
+<div>
+    <button id="left-btn" class="btn btn-primary btn-lg"><span class="glyphicon glyphicon-arrow-left"></span></button>
+    <button class="btn btn-primary btn-lg invisible"><span class="glyphicon glyphicon-arrow-down"></span></button>
+    <button id="right-btn" class="btn btn-primary btn-lg"><span class="glyphicon glyphicon-arrow-right"></span></button>
+    <button class="btn btn-primary btn-lg invisible"><span class="glyphicon glyphicon-arrow-left"></span></button>
+    <button id="zoom-out-btn" class="btn btn-primary btn-lg"><span class="glyphicon glyphicon-zoom-out"></span></button>
+</div>
+<div>
+    <button class="btn btn-primary btn-lg invisible"><span class="glyphicon glyphicon-arrow-left"></span></button>
+    <button id="down-btn" class="btn btn-primary btn-lg"><span class="glyphicon glyphicon-arrow-down"></span></button>
+    <button class="btn btn-primary btn-lg invisible"><span class="glyphicon glyphicon-arrow-right"></span></button>
+</div>
+
+<script>
+    $("#back-button").click(function (e) {
+        navigate("controller-main");
+    });
+    $("#left-btn").click(function (e) {
+        ws.socketSend("move-left " + displayName);
+    });
+    $("#right-btn").click(function (e) {
+        ws.socketSend("move-right " + displayName);
+    });
+    $("#up-btn").click(function (e) {
+        ws.socketSend("move-up " + displayName);
+    });
+    $("#down-btn").click(function (e) {
+        ws.socketSend("move-down " + displayName);
+    });
+    $("#zoom-out-btn").click(function (e) {
+        ws.socketSend("zoom-in " + displayName);
+    });
+    $("#zoom-in-btn").click(function (e) {
+        ws.socketSend("zoom-out " + displayName);
+    });
+</script>

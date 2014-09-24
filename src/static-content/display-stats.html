@@ -24,21 +24,42 @@ CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 -->
-<div class="panel panel-default" style="max-width: 300px">
-    <div class="panel-body">
-        <form id="display-name-form">
-            <div class="input-group input-group-lg">
-                <span class="input-group-addon"><span class="glyphicon glyphicon-barcode"></span></span>
-                <input type="text" id="display-name-input" class="form-control" placeholder="Display name" />
-            </div>
-        </form>
-    </div>
-</div>
 
 <script>
-    $("#display-name-form").submit(function(event) {
-        var name = $("#display-name-input").val();
-        settings.page.gotNewDisplayName(name);
-        event.preventDefault();
-    });
+    var sampleData = [
+        {
+            userId: "AEFD-221",
+            name: "John Smith",
+            birthDate: {year:1890,month:6,day:29},
+            birthPlace: "Provo, Utah, Utah, USA",
+            deathDate: {year:1945,month:11,day:3},
+            deathPlace: "Logan, Cache, Utah, USA",
+            motherId: "AEFD-118",
+            fatherId: "AEFD-117",
+            childIds: [
+                "AEFD-334",
+                "AEFD-335",
+                "AEFD-336",
+            ]
+        },
+        {
+            userId: "AEFD-222",
+            name: "Abigail Jones",
+            birthDate: {year:1893,month:2,day:16},
+            birthPlace: "Bountiful, Davis, Utah, USA",
+            deathDate: {year:1959,month:4,day:12},
+            deathPlace: "Logan, Cache, Utah, USA",
+            motherId: "AEFD-114",
+            fatherId: "AEFD-115",
+            childIds: [
+                "AEFD-334",
+                "AEFD-335",
+                "AEFD-336",
+            ]
+        }
+    ];
+    
+    function getAncestors(root) {
+        return sampleData;
+    }
 </script>

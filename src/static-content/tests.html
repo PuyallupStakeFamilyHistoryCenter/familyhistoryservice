@@ -24,21 +24,26 @@ CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 -->
-<div class="panel panel-default" style="max-width: 300px">
-    <div class="panel-body">
-        <form id="display-name-form">
-            <div class="input-group input-group-lg">
-                <span class="input-group-addon"><span class="glyphicon glyphicon-barcode"></span></span>
-                <input type="text" id="display-name-input" class="form-control" placeholder="Display name" />
-            </div>
-        </form>
-    </div>
-</div>
 
-<script>
-    $("#display-name-form").submit(function(event) {
-        var name = $("#display-name-input").val();
-        settings.page.gotNewDisplayName(name);
-        event.preventDefault();
-    });
-</script>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>QUnit Tests</title>
+  <link rel="stylesheet" href="qunit-1.15.0.css">
+</head>
+<body>
+  <div id="qunit"></div>
+  <div id="qunit-fixture"></div>
+  <script src="qunit-1.15.0.js"></script>
+  <script src="qunit-promises.js"></script>
+  <script src="qunit-parameterize.js"></script>
+  <script src="qunit-once.js"></script>
+  <script src="sockete.js"></script>
+  <script src="blanket.min.js" data-cover-flags="debug"></script>
+  <script src="jquery-1.11.1.min.js"></script>
+  <script src="jquery.cookie.js"></script>
+  <script src="websockets.js" data-cover></script>
+  <script src="controller-display.js" data-cover></script>
+  <script src="tests.js"></script>
+</body>
+</html>

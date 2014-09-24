@@ -24,21 +24,11 @@ CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 -->
-<div class="panel panel-default" style="max-width: 300px">
-    <div class="panel-body">
-        <form id="display-name-form">
-            <div class="input-group input-group-lg">
-                <span class="input-group-addon"><span class="glyphicon glyphicon-barcode"></span></span>
-                <input type="text" id="display-name-input" class="form-control" placeholder="Display name" />
-            </div>
-        </form>
-    </div>
-</div>
 
 <script>
-    $("#display-name-form").submit(function(event) {
-        var name = $("#display-name-input").val();
-        settings.page.gotNewDisplayName(name);
-        event.preventDefault();
-    });
+    ws.socketSend("get-images " + token + " " + "asdfasdf");
 </script>
+
+<div>
+    
+</div>

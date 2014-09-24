@@ -11,5 +11,6 @@
     <dependencies>
         <dependency org="org.eclipse.jetty.websocket" name="websocket-server" rev="9.2.2.v20140723" />
         <dependency org="org.gedcomx.extensions.familysearch" name="familysearch-api-client" rev="latest.revision"/>
+        <dependency org="com.sun.jersey" name="jersey-core" rev="1.17"/>
     </dependencies>
 </ivy-module>

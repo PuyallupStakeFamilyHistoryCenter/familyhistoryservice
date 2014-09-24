@@ -41,6 +41,7 @@ POSSIBILITY OF SUCH DAMAGE.
             <!-- Collect the nav links, forms, and other content for toggling -->
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                 <ul class="nav navbar-nav navbar-right">
+                    <li><span class="disabled" style="padding: 15px; display: block; line-height: 20px">You are logged in as <span class="username"></span></span></li>
                     <li><a href="#" id="logout-link">Log out</a></li>
                 </ul>
             </div> <!--/.navbar-collapse -->
@@ -50,8 +51,10 @@ POSSIBILITY OF SUCH DAMAGE.
 
 <script>
     $("#logout-link").click(function() {
-        settings.logOut();
+        settings.page.logOut();
     });
+    
+    $(".username").html(decodeURI(userName));
 </script>  
 
 <div id="nav-buttons">
@@ -109,6 +112,12 @@ POSSIBILITY OF SUCH DAMAGE.
                     image: "tutorials.jpg",
                     child: "tutorials",
                     disabled: true
+                },
+                {
+                    name: "games",
+                    label: "Games",
+                    image: "old-game.jpg",
+                    child: "games",
                 }
             ]
         },
@@ -120,13 +129,13 @@ POSSIBILITY OF SUCH DAMAGE.
                     name: "life-map",
                     label: "Life map",
                     image: "life-map.jpg",
-                    nav: "maps?type=life",
+                    nav: "map?type=life",
                 },
                 {
                     name: "family-map",
                     label: "Family map",
                     image: "family-map.jpg",
-                    nav: "maps?type=family",
+                    nav: "map?type=family",
                     disabled: true
                 },
                 {
@@ -183,6 +192,18 @@ POSSIBILITY OF SUCH DAMAGE.
                     disabled: true
                 }
             ]
+        },
+        games: {
+            parent: "main",
+            label: "Games",
+            buttons: [
+                {
+                    name: "puzzle",
+                    label: "Puzzle",
+                    image: "puzzle.jpg",
+                    nav: "puzzle" //"image-chooser?target=puzzle"
+                }
+            ]
         }
     };
     
@@ -233,7 +254,6 @@ POSSIBILITY OF SUCH DAMAGE.
     }
         
     setButtons("main");
-    mab.asdf()
 </script>
 
 <div style="display: none;">
@@ -252,7 +272,7 @@ POSSIBILITY OF SUCH DAMAGE.
     });
 </script>
 
-<div>
+<div style="display: none">
     <nav class="navbar navbar-default navbar-fixed-bottom">
         <div class="container-fluid">
             <div class="progress">

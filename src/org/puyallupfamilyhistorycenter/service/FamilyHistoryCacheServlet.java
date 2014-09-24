@@ -64,7 +64,8 @@ public class FamilyHistoryCacheServlet {
         
         
         ContextHandlerCollection handlerCollection = new ContextHandlerCollection();
-        handlerCollection.setHandlers(new Handler[]{mouseContext, indexContext, cacheContext});
+        //handlerCollection.setHandlers(new Handler[]{mouseContext, indexContext, cacheContext});
+        handlerCollection.setHandlers(new Handler[]{indexContext});
         
         // TODO: Add authentication handler
         

@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (c) 2014, tibbitts
  * All rights reserved.
  *
@@ -23,23 +23,23 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
+package org.puyallupfamilyhistorycenter.service.websocket;
 
-.content-padding {
-    padding-top: 50px;
-}
+import org.familysearch.api.client.memories.FamilySearchMemories;
 
-button .btn-nav {
-    margin: 5px 5px 5px 5px; //TODO: Doesn't work
-}
+/**
+ *
+ * @author tibbitts
+ */
 
-.btn-nav {
-    width: 200px;
-    height: 130px;
-    overflow: hidden;
-    display: block;
-}
 
-.btn-nav img {
-    width: 200px;
-    vertical-align: middle;
+public class FamilyHistoryMemories extends FamilySearchMemories {
+
+    public FamilyHistoryMemories(boolean sandbox) {
+        super(sandbox);
+    }
+    
+    public FamilySearchMemories authenticate(String accessToken) {
+        return (FamilyHistoryMemories) authenticateWithAccessToken(accessToken);
+    }
 }
