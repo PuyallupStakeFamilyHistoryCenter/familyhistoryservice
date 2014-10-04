@@ -58,34 +58,6 @@ POSSIBILITY OF SUCH DAMAGE.
 </script>  
 
 <div id="nav-buttons">
-    <button id="maps-button" class="btn btn-lg btn-primary">
-        <span class="btn-nav">
-            <img src="old-world-map.jpg" />
-        </span>
-        <br>
-        Maps
-    </button>
-    <button id="your-family-button" class="btn btn-lg btn-success">
-        <span class="btn-nav">
-            <img src="old-family.jpg" />
-        </span>
-        <br>
-        Your family
-    </button>
-    <button id="quiz-button" class="btn btn-lg btn-warning">
-        <span class="btn-nav">
-            <img src="old-world-map.jpg" />
-        </span>
-        <br>
-        Quiz
-    </button>
-    <button id="statistics-button" class="btn btn-lg btn-danger">
-        <span class="btn-nav">
-            <img src="old-world-map.jpg" />
-        </span>
-        <br>
-        Statistics
-    </button>
 </div>
 
 <script>
@@ -170,6 +142,12 @@ POSSIBILITY OF SUCH DAMAGE.
                     image: "collage.jpg",
                     nav: "collage",
                     disabled: true
+                },
+                {
+                    name: "individual",
+                    label: "Individual",
+                    image: "individual.jpg",
+                    nav: "person-detail?personId=KWJJ-4XH"
                 }
             ]
         },
@@ -213,7 +191,7 @@ POSSIBILITY OF SUCH DAMAGE.
         
         var group = buttonGroups[groupName];
         if (!group || !group.buttons) {
-            error("Button group " + groupName + " not found");
+            logger.error("Button group " + groupName + " not found");
             return;
         }
         
@@ -252,8 +230,13 @@ POSSIBILITY OF SUCH DAMAGE.
         });
         
     }
-        
-    setButtons("main");
+    
+    var groupName = getParameterByName("group");
+    console.info("Got group name " + groupName);
+    if (!groupName) {
+        groupName = "main";
+    }
+    setButtons(groupName);
 </script>
 
 <div style="display: none;">

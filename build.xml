@@ -70,6 +70,8 @@
     nbproject/build-impl.xml file. 
 
     -->
+    <target name="-pre-compile" depends="-ivy-retrieve" />
+    <target name="-pre-compile-test" depends="-ivy-retrieve" />
     
     <echo message="ivy.default.settings.dir=${ivy.default.settings.dir}" />
     

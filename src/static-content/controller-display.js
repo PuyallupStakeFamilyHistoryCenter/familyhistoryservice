@@ -33,7 +33,10 @@ var settings = {
         verbs: {
             connected: doNothing,
             ok: doNothing,
-            pong: doNothing
+            pong: doNothing,
+            nav: function(parts) {
+                navigate(parts[1]);
+            }
         }
     },
     page: {verbs:{}},
@@ -42,7 +45,7 @@ var settings = {
 var displayName;
 var token;
 var userName;
-var urlVars = {};
+var urlVars;
 
 function doNothing() {}
 
@@ -65,6 +68,7 @@ function getReady() {
             return;
 
         default:
+            console.info("Selected mode " + mode);
             settings.page = defaultSettings[mode];
             break;
     }
@@ -76,14 +80,7 @@ function getReady() {
 
     setup();
 
-    if (settings.page.getNewDisplayName) {
-        displayName = $.cookie("display-name");
-        if (!displayName) {
-            settings.page.getNewDisplayName();
-        } else {
-            settings.page.verbs.name(["name",displayName]);
-        }
-    } else if (settings.page.begin) {
+    if (settings.page.begin) {
         settings.page.begin();
     }
 }
@@ -99,15 +96,24 @@ function setup() {
     }
 }
 
+function getDisplayName() {
+    console.info("Getting display name from cookie");
+    displayName = $.cookie("display-name");
+    if (!displayName) {
+        console.info("No display name cookie found; getting display name assignment");
+        settings.page.getNewDisplayName();
+    } else {
+        console.info("Found display name " + displayName);
+        settings.page.verbs.name(["name",displayName]);
+    }
+}
+
 var defaultSettings = {
     display: {
         title: "Display",
-        header: '<img src="logo.png<ERROR>" alt="Puyallup Family History Center logo" />',
+        header: '<img src="logo.png" alt="Puyallup Family History Center logo" />',
         contentPadding: false,
         verbs: {
-            nav: function(parts) {
-                navigate(parts[1]);
-            },
             standby: function(parts) {
                 navigate("display-ready");
             },
@@ -117,6 +123,7 @@ var defaultSettings = {
                 ws.socketSend("display " + displayName);
             }
         },
+        begin: getDisplayName,
         getNewDisplayName: function() {
             ws.socketSend("display-name");
         }
@@ -128,33 +135,21 @@ var defaultSettings = {
         verbs: {
             attached: function(parts) {
                 $.cookie("display-name", displayName);
+                console.info("Found token '" + token + "'");
                 ws.socketSend("nav " + displayName + " " + "display-login");
-                token = $.cookie("token");
-                if (!token) {
-                    navigate("controller-login");
-                } else {
-                    settings.page.verbs.token(token);
-                }
+                navigate("controller-login");
             },
             name: function(parts) {
                 settings.page.gotNewDisplayName(parts[1]);
             },
             token: function(parts) {
-                var type = Object.toType(parts);
-                switch (type) {
-                    case "array":
-                        token = parts[1];
-                        break;
-                    case "string":
-                        token = parts;
-                        break;
-                }
+                token = parts[1];
                 $.cookie("token", token);
                 ws.socketSend("nav " + displayName + " " + "display-main");
                 navigate("controller-main");
-                ws.socketSend("get-ancestors " + token);
             }
         },
+        begin: getDisplayName,
         gotNewDisplayName: function(name) {
             displayName = name;
             ws.socketSend("controller " + displayName);
@@ -176,7 +171,7 @@ var defaultSettings = {
     },
     kiosk: {
         title: "Kiosk",
-        header: '<img src="logo.png<ERROR>" alt="Puyallup Family History Center logo" />',
+        header: '<img src="logo.png" alt="Puyallup Family History Center logo" />',
         contentPadding: false,
         verbs:{},
         begin: function() {
@@ -192,9 +187,6 @@ function messageHandler(message) {
     $("#messages").html("");
     
     var parts = message.data.split(" ");
-    // TODO: Incorporate these verbs into the settings.page object if possible
-    // so that the different screens can define which verbs they accept and
-    // how to handle each one
     if (settings.local.verbs[parts[0]]) {
         settings.local.verbs[parts[0]](parts);
     } else if (settings.page.verbs[parts[0]]) {
@@ -202,11 +194,14 @@ function messageHandler(message) {
     } else if (settings.global.verbs[parts[0]]) {
         settings.global.verbs[parts[0]](parts);
     } else {
+        var errorMessage;
         if (parts[0] === "Error:") {
-            logger.error(message.data.substring(6));
+            errorMessage = message.data.substring(6);
         } else {
-            logger.error("unrecognized command '" + message.data + "'");
+            errorMessage = "unrecognized command '" + message.data + "'";
         }
+        logger.error(errorMessage);
+        //throw new Error(errorMessage);
     }
     return;
 }
@@ -239,18 +234,22 @@ function log(level, message) {
 function navigate(dest) {
     var split = dest.split("?");
     var actualDest = split[0] + ".html";
+    var tempVars = null;
     if (split.length > 1) {
         actualDest += "?" + split[1];
+        getUrlVars(split[1].split("&"));
     }
-    var tempVars = getUrlVars(split[1]);
     var deferred = new $.Deferred();
     
+    console.info("Navigating to " + actualDest);
     $.ajax(actualDest)
         .done(
             function(data) {
                 settings.local = {verbs: {}};
                 content.html(data);
-                urlVars = tempVars;
+                if (tempVars) {
+                    urlVars = tempVars;
+                }
                 deferred.resolve();
             }
         ).fail(
@@ -288,19 +287,10 @@ function getUrlVars(hashes)
             vars[hash[0]] = true;
         }
     }
-    urlVars = vars;
+//    urlVars = vars;
     return vars;
 }
 
 function getParameterByName(name) {
     return getUrlVars()[name];
 }
-
-Object.toType = (function toType(global) {
-  return function(obj) {
-    if (obj === global) {
-      return "global";
-    }
-    return ({}).toString.call(obj).match(/\s([a-z|A-Z]+)/)[1].toLowerCase();
-  }
-})(this)

@@ -64,6 +64,330 @@ public class FamilySearchCacheHandler extends AbstractHandler {
 //            ResourceReference father = relationship.getFather();
 //            ResourceReference mother = relationship.getMother();
 //        }
+        
+        
+//        {
+//    "status": "OK",
+//    "statusText": null,
+//    "data": {
+//        "parents": [
+//            {
+//                "husband": {
+//                    "id": "KWCB-HZV",
+//                    "lifeSpanDates": "",
+//                    "isDeleted": false,
+//                    "obsoleteIdWasRequested": false,
+//                    "name": "Willis Aaron Dial",
+//                    "gender": "Male",
+//                    "lifeSpan": "1897-1985",
+//                    "spaceId": "MMMM-MMM",
+//                    "isLiving": false,
+//                    "inPrivateSpace": false,
+//                    "readOnly": false,
+//                    "principlePerson": false,
+//                    "living": false
+//                },
+//                "wife": {
+//                    "id": "KWCB-HZ2",
+//                    "lifeSpanDates": "",
+//                    "isDeleted": false,
+//                    "obsoleteIdWasRequested": false,
+//                    "name": "Ida Geneva Beckstrand",
+//                    "gender": "Female",
+//                    "lifeSpan": "1901-2000",
+//                    "spaceId": "MMMM-MMM",
+//                    "isLiving": false,
+//                    "inPrivateSpace": false,
+//                    "readOnly": false,
+//                    "principlePerson": false,
+//                    "living": false
+//                },
+//                "current": true,
+//                "relationshipId": "MDTN-Q8Z",
+//                "coupleId": "KWCB-HZV_KWCB-HZ2",
+//                "event": {
+//                    "originalPlace": "Salt Lake City, Salt Lake, Utah, United States",
+//                    "standardPlace": "Salt Lake City, Salt Lake, Utah, United States",
+//                    "originalDate": "13 February 1925",
+//                    "standardDate": "13 February 1925",
+//                    "type": "MARRIAGE"
+//                },
+//                "children": [
+//                    {
+//                        "id": "KW8W-CBX",
+//                        "lifeSpanDates": "",
+//                        "isDeleted": false,
+//                        "obsoleteIdWasRequested": false,
+//                        "name": "Marian Lovina Dial",
+//                        "gender": "Female",
+//                        "lifeSpan": "1926-2012",
+//                        "spaceId": "MMMM-MMM",
+//                        "isLiving": false,
+//                        "inPrivateSpace": false,
+//                        "readOnly": false,
+//                        "principlePerson": false,
+//                        "relationshipId": "M4H1-493",
+//                        "lineageConclusions": [],
+//                        "living": false
+//                    },
+//                    {
+//                        "id": "KWZZ-7PD",
+//                        "lifeSpanDates": "",
+//                        "isDeleted": false,
+//                        "obsoleteIdWasRequested": false,
+//                        "name": "Erma Dial",
+//                        "gender": "Female",
+//                        "lifeSpan": "1933-2004",
+//                        "spaceId": "MMMM-MMM",
+//                        "isLiving": false,
+//                        "inPrivateSpace": false,
+//                        "readOnly": false,
+//                        "principlePerson": false,
+//                        "relationshipId": "M7VV-JW5",
+//                        "lineageConclusions": [],
+//                        "living": false
+//                    },
+//                    {
+//                        "id": "KWC6-X7D",
+//                        "lifeSpanDates": "",
+//                        "isDeleted": false,
+//                        "obsoleteIdWasRequested": false,
+//                        "name": "Glen &quot;B&quot; Dial",
+//                        "gender": "Male",
+//                        "lifeSpan": "1929-1967",
+//                        "spaceId": "MMMM-MMM",
+//                        "isLiving": false,
+//                        "inPrivateSpace": false,
+//                        "readOnly": false,
+//                        "principlePerson": false,
+//                        "relationshipId": "M8YK-7W2",
+//                        "lineageConclusions": [],
+//                        "living": false
+//                    },
+//                    {
+//                        "id": "KWJJ-4XH",
+//                        "lifeSpanDates": "",
+//                        "isDeleted": false,
+//                        "obsoleteIdWasRequested": false,
+//                        "name": "Merlin &quot;B&quot; Dial",
+//                        "gender": "Male",
+//                        "lifeSpan": "1927-1974",
+//                        "spaceId": "MMMM-MMM",
+//                        "isLiving": false,
+//                        "inPrivateSpace": false,
+//                        "readOnly": false,
+//                        "principlePerson": true,
+//                        "relationshipId": "MWXJ-RF4",
+//                        "lineageConclusions": [],
+//                        "living": false
+//                    }
+//                ]
+//            }
+//        ],
+//        "spouses": [
+//            {
+//                "husband": {
+//                    "id": "KWJJ-4XH",
+//                    "lifeSpanDates": "",
+//                    "isDeleted": false,
+//                    "obsoleteIdWasRequested": false,
+//                    "name": "Merlin &quot;B&quot; Dial",
+//                    "gender": "Male",
+//                    "lifeSpan": "1927-1974",
+//                    "spaceId": "MMMM-MMM",
+//                    "isLiving": false,
+//                    "inPrivateSpace": false,
+//                    "readOnly": false,
+//                    "principlePerson": true,
+//                    "living": false
+//                },
+//                "wife": null,
+//                "current": true,
+//                "relationshipId": null,
+//                "coupleId": null,
+//                "event": null,
+//                "children": null
+//            }
+//        ]
+//    },
+//    "statuses": null
+//}
+        
+        
+//        {
+//    "properties": {
+//        "readOnly": false,
+//        "lifespan": {
+//            "years": "1927 - 1974",
+//            "value": "29 December 1927 - 2 January 1974"
+//        },
+//        "living": false
+//    },
+//    "id": "KWJJ-4XH",
+//    "parentChildRelationship": null,
+//    "conclusions": {
+//        "list": [
+//            {
+//                "genderConclusion": {
+//                    "type": "MALE",
+//                    "id": "V.777-777H",
+//                    "behavior": "SINGLE_VALUE_NON_DELETABLE",
+//                    "justification": {
+//                        "reason": null,
+//                        "confidence": "LOW"
+//                    },
+//                    "conclusionType": "GENDER",
+//                    "contribution": {
+//                        "timeStamp": 1338051636348,
+//                        "contributorId": "MMWW-DVV",
+//                        "submitterId": null
+//                    }
+//                }
+//            },
+//            {
+//                "nameConclusion": {
+//                    "type": "BIRTH",
+//                    "preferred": true,
+//                    "primaryForm": {
+//                        "script": "UNSPECIFIED",
+//                        "prefixPart": null,
+//                        "givenPart": "Merlin \" B\"",
+//                        "familyPart": "Dial",
+//                        "suffixPart": null,
+//                        "fullText": "Merlin \"B\" Dial"
+//                    },
+//                    "style": "EUROTYPIC",
+//                    "alternateForms": [],
+//                    "id": "V.777-777N",
+//                    "behavior": "SINGLE_VALUE_NON_DELETABLE",
+//                    "justification": {
+//                        "reason": null,
+//                        "confidence": "LOW"
+//                    },
+//                    "conclusionType": "NAME",
+//                    "contribution": {
+//                        "timeStamp": 1210208693896,
+//                        "contributorId": "MMXJ-KTG",
+//                        "submitterId": null
+//                    }
+//                }
+//            },
+//            {
+//                "eventConclusion": {
+//                    "type": "BIRTH",
+//                    "date": {
+//                        "localizedText": null,
+//                        "normalizedText": null,
+//                        "originalText": "29 December 1927",
+//                        "julianDateRange": null,
+//                        "modifier": null
+//                    },
+//                    "place": {
+//                        "geoCode": null,
+//                        "localizedText": null,
+//                        "normalizedText": null,
+//                        "originalText": "Logan, Cache, Utah, United States"
+//                    },
+//                    "id": "V.777-777P",
+//                    "behavior": "SINGLE_VALUE_NON_DELETABLE",
+//                    "justification": {
+//                        "reason": null,
+//                        "confidence": null
+//                    },
+//                    "conclusionType": "BIRTH",
+//                    "contribution": {
+//                        "timeStamp": 1365996685122,
+//                        "contributorId": "MMXJ-KTG",
+//                        "submitterId": null
+//                    }
+//                }
+//            },
+//            {
+//                "eventConclusion": {
+//                    "type": "DEATH",
+//                    "date": {
+//                        "localizedText": null,
+//                        "normalizedText": null,
+//                        "originalText": "2 January 1974",
+//                        "julianDateRange": null,
+//                        "modifier": null
+//                    },
+//                    "place": {
+//                        "geoCode": null,
+//                        "localizedText": null,
+//                        "normalizedText": null,
+//                        "originalText": "Fresno, Fresno, California, United States"
+//                    },
+//                    "id": "V.777-7774",
+//                    "behavior": "SINGLE_VALUE_NON_DELETABLE",
+//                    "justification": {
+//                        "reason": null,
+//                        "confidence": null
+//                    },
+//                    "conclusionType": "DEATH",
+//                    "contribution": {
+//                        "timeStamp": 1365996700113,
+//                        "contributorId": "MMXJ-KTG",
+//                        "submitterId": null
+//                    }
+//                }
+//            },
+//            {
+//                "eventConclusion": {
+//                    "type": "BURIAL",
+//                    "date": {
+//                        "localizedText": "7 January 1974",
+//                        "normalizedText": "7 January 1974",
+//                        "originalText": "7 January 1974",
+//                        "julianDateRange": {
+//                            "latestDay": 2442055,
+//                            "earliestDay": 2442055
+//                        },
+//                        "modifier": null
+//                    },
+//                    "place": {
+//                        "geoCode": null,
+//                        "localizedText": "San Diego, San Diego, California, United States",
+//                        "normalizedText": "San Diego, San Diego, California, United States",
+//                        "originalText": "El Camino Memorial Park, San Diego, San Diego, California, United States"
+//                    },
+//                    "id": "V.777-7771",
+//                    "behavior": "SINGLE_VALUE_DELETABLE",
+//                    "justification": {
+//                        "reason": null,
+//                        "confidence": "LOW"
+//                    },
+//                    "conclusionType": "BURIAL",
+//                    "contribution": {
+//                        "timeStamp": 1338051636348,
+//                        "contributorId": "MMXJ-KTG",
+//                        "submitterId": null
+//                    }
+//                }
+//            },
+//            {
+//                "livingStatusConclusion": {
+//                    "type": "DECEASED",
+//                    "id": "V.777-777L",
+//                    "behavior": "SINGLE_VALUE_NON_DELETABLE",
+//                    "justification": {
+//                        "reason": null,
+//                        "confidence": null
+//                    },
+//                    "conclusionType": "LIVING_STATUS",
+//                    "contribution": {
+//                        "timeStamp": 1410472282324,
+//                        "contributorId": "MMMM-MMK",
+//                        "submitterId": null
+//                    }
+//                }
+//            }
+//        ]
+//    },
+//    "link": null,
+//    "spaceId": "MMMM-MMM",
+//    "coupleRelationship": null
+//}
     }
     
 }

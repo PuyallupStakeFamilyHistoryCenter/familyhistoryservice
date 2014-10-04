@@ -42,6 +42,17 @@ POSSIBILITY OF SUCH DAMAGE.
         </p>
     </div>
 
+    <div id="login-wait">
+        <h3>
+            Please wait while we load your FamilySearch.org account
+        </h3>
+        <div class="progress">
+            <div class="progress-bar progress-bar-striped active"  role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%">
+                <span class="sr-only"></span>
+            </div>
+        </div>
+    </div>
+
     <div id="login-continue">
         <h3>
             Welcome, <span id="user-name">USER NAME</span>
@@ -92,11 +103,15 @@ POSSIBILITY OF SUCH DAMAGE.
 
 <script>
 
+    $("#login-wait").hide();
     $("#login-continue").hide();
     $("#login-success").hide();
 
     $("#show-login-screen").click(function (event) {
         event.preventDefault();
+        
+        $("#login-start").hide();
+        $("#login-wait").show();
 
         FamilySearch.init({
             app_key: 'WCQY-7J1Q-GKVV-7DNM-SQ5M-9Q5H-JX3H-CMJK',
@@ -108,24 +123,32 @@ POSSIBILITY OF SUCH DAMAGE.
         });
 
 
+        var timeout = setTimeout(function () {
+            navigate("kiosk-main");
+            warn("Timeout logging into FamilySearch. Please try again.", 5000);
+        }, 60000);
+        
 //        FamilySearch.getAccessToken().then(function (accessToken) {
-            var timeout = setTimeout(function () {
-                navigate("kiosk-main");
-                warn("Timeout creating PIN. Please log in again.", 5000);
-            }, 60000);
             $("#messages").html("");
+            clearTimeout(timeout);
+            timeout = setTimeout(function () {
+                navigate("kiosk-main");
+                warn("Timeout setting PIN. Please log in again", 5000);
+            }, 60000);
 
 //            FamilySearch.getCurrentUser().then(function (result) {
 //                var user = result.getUser();
-                    var displayName = "Willow Ufgood"; //["Willow Ufgood", "Luke Skywalker", "Indiana Jones"][//Choose random element];
-                    var userId = "AEF-2344";        //TODO
-                    var accessToken = "fake-access-token-replace-with-actual";
-                
+                var displayName = "Willow Ufgood"; //["Willow Ufgood", "Luke Skywalker", "Indiana Jones"][//Choose random element];
+                var userId = "AEF-2344";        //TODO
+                var accessToken = "fake-access-token-replace-with-actual";
+//                var displayName = user.displayName;
+//                var userId = user.personId;
+
                 $("#user-name").html(displayName);
 
-                $("#login-start").hide();
+                $("#login-wait").hide();
                 $("#login-continue").show();
-                
+
                 $("#set-pin-form").submit(function (event) {
                     $("#messages").html("");
                     event.preventDefault();
@@ -159,7 +182,6 @@ POSSIBILITY OF SUCH DAMAGE.
 //        });
 
 //    });
-
 </script>
 
 

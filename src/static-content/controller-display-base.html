@@ -61,8 +61,13 @@ POSSIBILITY OF SUCH DAMAGE.
         <![endif]-->
         <script src="websockets.js"></script>
         <script src="controller-display.js"></script>
+        <script>
+            $(window).ready(function() {
+                getReady();
+            });
+        </script>
     </head>
-    <body onload="getReady()">
+    <body>
         <div class="container" >
             <div id="page-header">
                 <h1>Header placeholder</h1>

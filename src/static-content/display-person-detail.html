@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<!--
+Copyright (c) 2014, tibbitts
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+* Redistributions of source code must retain the above copyright notice, this
+  list of conditions and the following disclaimer.
+* Redistributions in binary form must reproduce the above copyright notice,
+  this list of conditions and the following disclaimer in the documentation
+  and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+POSSIBILITY OF SUCH DAMAGE.
+-->
+
+<div id="instructions">
+    <h3>
+        Select a person from the list
+    </h3>
+</div>
+
+<div class="media" id="person-bio">
+    <a class="pull-left" href="#">
+        <img class="media-object" style="max-width: 500px" id="person-img" src="#" alt="#" />
+    </a>
+    <div class="media-body">
+        <h2 class="person-name"></h2>
+        <dl class="dl-horizontal">
+            <dt>
+                Birth:
+            </dt>
+            <dd id="birth"></dd>
+            <dt>
+                Death:
+            </dt>
+            <dd id="death"></dd>
+            <dt id="spouse-label">
+                Spouse:
+            </dt>
+            <dd id="spouse"></dd>
+            <dt id="children-label">
+                Children:
+            </dt>
+            <dd id="children"></dd>
+        </dl>
+    </div>
+</div>
+
+<script>
+    $("#instructions").show();
+    $("#person-bio").hide();
+    
+    settings.local = {
+        verbs: {
+            "person": function(parts) {
+                gotPerson(parts[1]);
+            },
+            "person-id": function(parts) {
+                getPerson(parts[1]);
+            }
+        }
+    };
+    
+    function getPerson(personId) {
+        ws.socketSend("get-person " + personId);
+    }
+    
+    function gotPerson(data) {
+        var person = JSON.parse(data);
+        $("#instructions").hide();
+        $("#person-bio").show();
+        if (person.image) {
+            $("#person-img").attr("src", person.image).attr("alt", "Image of " + person.name).show();
+        } else {
+            $("#person-img").hide();
+        }
+        $(".person-name").html(decodeURI(person.name));
+        $("#birth").html(decodeURI(person.birthDate) + " - " + decodeURI(person.birthPlace));
+        $("#death").html(decodeURI(person.deathDate) + " - " + decodeURI(person.deathPlace));
+        if (person.spouses) {
+            $("#spouse-label").html(person.spouses.length > 1 ? "Spouses:" : "Spouse:");
+            $("#spouse").html("");
+            $.each(person.spouses, function(index, value) {
+                $("#spouse").append(decodeURI(value.name) + "<br>");
+            });
+        } else {
+            $("#spouse-label").html("Spouse:");
+            $("#spouse").html("none");
+        }
+        if (person.children) {
+            $("#children-label").html(person.children.length > 1 ? "Children:" : "Child:");
+            $("#children").html("");
+            $.each(person.children, function(index, value) {
+                $("#children").append(decodeURI(value.name) + "<br>");
+            });
+        } else {
+            $("#children-label").html("Children:");
+            $("#children").html("none");
+        }
+    }
+</script>

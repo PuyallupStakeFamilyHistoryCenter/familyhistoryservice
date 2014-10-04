@@ -78,7 +78,7 @@ POSSIBILITY OF SUCH DAMAGE.
     }
     var config = configurations.medium;
 
-    var imagesrc = urlVars["image"];//"house.jpg"; //"arc-de-triomphe.jpg"; //Eiffel-Tower-Paris-Facts-and-Information-of-Incredible-History1.jpg"; //"children.jpg"; //"blown-plastic.jpg"; //
+    var imagesrc = urlVars["image"];
     var canvas,context,image;
     var pieces;
     var tolerance = 10;
@@ -248,7 +248,7 @@ POSSIBILITY OF SUCH DAMAGE.
         context = canvas.getContext("2d");
         dragging = false;
         image = new Image();
-        image.src = imagesrc ? imagesrc : "life-map.jpg";
+        image.src = imagesrc ? imagesrc : "children.png";
         image.crossOrigin = "Anonymous";
         image.onload = function () {
             scale = config.boardHeight / image.height;

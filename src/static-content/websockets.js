@@ -27,28 +27,45 @@
 var messageQueue = [];
 var connection;
 var blocking = true;
+var isOpen = false;
 var messageListeners = [];
+var pingTimeout;
 
 var ws = {
-    reset: function() {
+    close: function() {
+        console.info("Closing web socket");
+        if (pingTimeout) clearTimeout(pingTimeout);
         if (connection) connection.close();
         connection = null;
+        messageListeners = [];
+        messageQueue = [];
+        isOpen = false;
     },
     connect: function(endpoint) {
         if (connection) {
-            return;
+            throw new Error("Already connected");
+            //return;
         }
+        
+        console.info("Connecting web socket");
         if (!endpoint) {
             endpoint = window.location.host;
         }
+        blocking = true;
         connection = new WebSocket('ws://' + endpoint + '/remote-control/', ['soap', 'xmpp']); //TODO: Use secure web sockets (need certificate)
+        
         connection.onmessage = function(message) {
+            if (!isOpen) return;
+            
+            console.info("Got message '" + message.data + "' from web socket");
             for (var i = 0; i < messageListeners.length; i++) {
                 messageListeners[i](message);
             }
             drainQueue();
         };
         connection.onopen = function() {
+            console.info("Web socket open");
+            isOpen = true;
             ping();
             drainQueue();
         };
@@ -56,16 +73,27 @@ var ws = {
             if (messageQueue.length > 0) {
                 var nextMessage = messageQueue[0];
                 messageQueue = messageQueue.slice(1, messageQueue.length);
+                console.info("Sending message '" + nextMessage + "' from queue");
                 connection.send(nextMessage);
             } else {
+                console.info("No messages waiting to send");
                 blocking = false;
             }
         }
+        function ping() {
+            ws.socketSend("ping");
+            pingTimeout = setTimeout(ping, 60000);
+        }
     },
     socketSend: function (message) {
+        if (!connection) {
+            throw new Error("No connection; cannot send message " + message);
+        }
         if (blocking) {
+            console.info("Queueing message websocket message '" + message + "'")
             messageQueue.push(message);
         } else {
+            console.info("Sending message websocket message '" + message + "'")
             blocking = true;
             connection.send(message);
         }
@@ -74,10 +102,3 @@ var ws = {
         messageListeners.push(listener);
     }
 };
-
-function ping() {
-    ws.socketSend("ping");
-    setTimeout(ping, 60000);
-}
-
-

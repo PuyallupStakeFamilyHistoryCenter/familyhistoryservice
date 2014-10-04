@@ -118,6 +118,8 @@ var Sockete = (function () {
     }
     
     function dispatch (response) {
+      if (self.readyState === 3) 
+          return; 
       // Store history here, or something
       switch(response.type) {
         case 'open': readyState(1); break;
@@ -223,7 +225,9 @@ var Sockete = (function () {
         }
       }
       Sockete.logRound(this, request, response)
-      callback( response );
+      setTimeout(function() {
+        callback( response );
+      }, 10);
     },
     
     // URL matching

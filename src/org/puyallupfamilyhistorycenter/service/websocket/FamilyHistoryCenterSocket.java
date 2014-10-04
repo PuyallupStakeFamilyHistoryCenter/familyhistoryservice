@@ -1,12 +1,7 @@
 /*
  * Copyright (c) 2014, tibbitts
  * All rights reserved.
- 
-                    @Override
-                    public void apply(ClientRequest request) {
-                        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-                    }
-                }
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -31,13 +26,15 @@
 
 package org.puyallupfamilyhistorycenter.service.websocket;
 
+import com.google.gson.Gson;
+import org.puyallupfamilyhistorycenter.service.cache.PersonDao;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.SecureRandom;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Scanner;
@@ -47,10 +44,10 @@ import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.*;
 import org.familysearch.api.client.ft.FamilySearchFamilyTree;
 import org.familysearch.api.client.memories.FamilySearchMemories;
-import org.gedcomx.conclusion.Relationship;
 import org.gedcomx.rs.client.PersonState;
 import org.gedcomx.rs.client.SourceDescriptionsState;
 import org.gedcomx.rs.client.StateTransitionOption;
+import org.puyallupfamilyhistorycenter.service.models.Person;
 
 /**
  *
@@ -58,6 +55,7 @@ import org.gedcomx.rs.client.StateTransitionOption;
  */
 @WebSocket(maxTextMessageSize = 64 * 1024)
 public class FamilyHistoryCenterSocket {
+    private static final Gson GSON = new Gson();
     private static final class AccessTokenInfo {
         public final String userName;
         public final String userId;
@@ -72,14 +70,16 @@ public class FamilyHistoryCenterSocket {
         }
     }
     
-    private static final Map<String, RemoteEndpoint> remoteDisplays = new HashMap<>();
-    private static final Map<String, RemoteEndpoint> remoteControllers = new HashMap<>();
-    private static final Map<String, String> tokenDisplayMap = new HashMap<>();
-    private static final Map<String, String> tokenUserIdMap = new HashMap<>();
-    private static final Map<String, AccessTokenInfo> accessTokenMap = new LinkedHashMap<>();
-    private static final Random rand = new SecureRandom();
+    private final Map<String, RemoteEndpoint> remoteDisplays = new HashMap<>();
+    private final Map<String, RemoteEndpoint> remoteControllers = new HashMap<>();
+    private final Map<String, String> tokenDisplayMap = new HashMap<>();
+    private final Map<String, String> tokenUserIdMap = new HashMap<>();
+    private final Map<String, AccessTokenInfo> accessTokenMap = new LinkedHashMap<>();
+    private final Random rand = new SecureRandom();
+    private final PersonDao personCache;
 
-    public FamilyHistoryCenterSocket() {
+    public FamilyHistoryCenterSocket(PersonDao personCache) {
+        this.personCache = personCache;
         accessTokenMap.put("guest", new AccessTokenInfo("guest", "Guest%20account", "1234", null));
     }
     
@@ -178,7 +178,7 @@ public class FamilyHistoryCenterSocket {
                 case "login": {
                     String userId = scanner.next();
                     String pin = scanner.next(); //TODO: This is pretty insecure
-
+                    
                     AccessTokenInfo tokenInfo = accessTokenMap.get(userId);
                     if (tokenInfo != null && tokenInfo.pin.equals(pin)) {
                         String token = Long.toHexString(rand.nextLong());
@@ -220,20 +220,110 @@ public class FamilyHistoryCenterSocket {
 
                     break;
                 }
-
-                case "get-ancestors": {
+                
+                case "get-person": {
                     String token = scanner.next();
-                    String userId = tokenUserIdMap.get(token);
-
-                    response = "ancestor {\"first_name\":\"John\",\"last_name\":\"Smith\",\"birth\":\"1765\",\"death\":\"1824\"}";
-
+                    String personId = scanner.next();
+                    
+                    //TODO: Check token
+                    Person person = personCache.getPerson(personId);
+                    if (person != null) {
+                        response = "person " + GSON.toJson(person);
+                    } else {
+                        response = "Error: person " + personId + " not found";
+                    }
+                    
                     break;
                 }
-
-                case "ancestry-stop": {
+                
+                case "send-person": {
                     String token = scanner.next();
-
-
+                    String displayId = scanner.next();
+                    String personId = scanner.next();
+                    
+                    RemoteEndpoint displayEndpoint = remoteDisplays.get(displayId);
+                    if (displayEndpoint == null) {
+                        response = "Error: token '" + token + "' has no attached display";
+                        break;
+                    }
+                    
+                    try {
+                        displayEndpoint.sendString("person " + personCache.getPerson(personId));
+                    } catch (IOException e) {
+                        response = "Error: failed to send person '" + personId + "' to display " + displayId + ": " + e.getMessage();
+                    }
+                    
+                    break;
+                }
+                
+                case "get-family": {
+                    String token = scanner.next();
+                    String personId = scanner.next();
+                    String lastPageId = scanner.next();
+                    
+                    //TODO: Check token
+                    //TODO: Actually get family
+                    Person person = personCache.getPerson(personId);
+                    if (person != null) {
+                        response = "family [" + GSON.toJson(person) + "]";
+                    } else {
+                        response = "Error: person " + personId + " not found";
+                    }
+                    
+                    break;
+                }
+                
+                case "get-ancestors": {
+                    String token = scanner.next();
+                    String personId = scanner.next();
+                    String paginationKey = null;
+                    
+                    //TODO: Check token
+                    //TODO: Actually get family
+                    Person person = personCache.getPerson(personId);
+                    if (person != null) {
+                        response = "family [" + GSON.toJson(person) + "]";
+                    } else {
+                        response = "Error: person " + personId + " not found";
+                    }
+                    
+                    break;
+                }
+                
+                case "get-descendents": {
+                    String token = scanner.next();
+                    String personId = scanner.next();
+                    String paginationKey = null;
+                    
+                    //TODO: Check token
+                    //TODO: Actually get descendents
+                    Person person = personCache.getPerson(personId);
+                    if (person != null) {
+                        response = "family [" + GSON.toJson(person) + "]";
+                    } else {
+                        response = "Error: person " + personId + " not found";
+                    }
+                    
+                    break;
+                }
+                
+                case "send": {
+                    String id = scanner.next();
+                    RemoteEndpoint displayEndpoint = remoteDisplays.get(id);
+                    if (displayEndpoint != null) {
+                        StringBuilder builder = new StringBuilder();
+                        while (scanner.hasNext()) {
+                            builder.append(scanner.next()).append(" ");
+                        }
+                        
+                        try {
+                            displayEndpoint.sendString(builder.toString());
+                        } catch (IOException e) {
+                            response = "Error: failed to communicate with display " + id + ": " + e.getMessage();
+                        }
+                    } else {
+                        response = "Error: display not found '" + id + "'";
+                    }
                     break;
                 }
 
@@ -312,6 +402,7 @@ public class FamilyHistoryCenterSocket {
                     response = "Error: unrecognized command '" + message + "'";
             }
         } catch (Throwable e) {
+            e.printStackTrace(System.err);
             response = "Error: " + e.getMessage();
         }
         if (session.isOpen()) {

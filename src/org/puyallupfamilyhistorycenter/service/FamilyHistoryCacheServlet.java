@@ -37,6 +37,7 @@ import org.eclipse.jetty.util.resource.Resource;
 
 import org.eclipse.jetty.websocket.server.WebSocketHandler;
 import org.puyallupfamilyhistorycenter.service.cache.FamilySearchCacheHandler;
+import org.puyallupfamilyhistorycenter.service.cache.FamilySearchImageCacheHandler;
 
 
 /**
@@ -62,10 +63,14 @@ public class FamilyHistoryCacheServlet {
         Handler cacheHandler = new FamilySearchCacheHandler();
         cacheContext.setHandler(cacheHandler);
         
+        ContextHandler imageCacheContext = new ContextHandler("/image-cache");
+        Handler imageCacheHandler = new FamilySearchImageCacheHandler();
+        imageCacheContext.setHandler(imageCacheHandler);
+        
         
         ContextHandlerCollection handlerCollection = new ContextHandlerCollection();
-        //handlerCollection.setHandlers(new Handler[]{mouseContext, indexContext, cacheContext});
-        handlerCollection.setHandlers(new Handler[]{indexContext});
+        handlerCollection.setHandlers(new Handler[]{mouseContext, indexContext, cacheContext, imageCacheContext});
+        //handlerCollection.setHandlers(new Handler[]{indexContext});
         
         // TODO: Add authentication handler
         
