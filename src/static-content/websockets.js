@@ -52,7 +52,7 @@ var ws = {
             endpoint = window.location.host;
         }
         blocking = true;
-        connection = new WebSocket('ws://' + endpoint + '/remote-control/', ['soap', 'xmpp']); //TODO: Use secure web sockets (need certificate)
+        connection = new WebSocket('wss://' + endpoint + '/remote-control/', ['soap', 'xmpp']); //TODO: Use secure web sockets (need certificate)
         
         connection.onmessage = function(message) {
             if (!isOpen) return;
