@@ -34,6 +34,7 @@ package org.puyallupfamilyhistorycenter.service.models;
 public class PersonBuilder {
     private String id;
     private String name;
+    private String gender;
     private boolean living = true;
     private Fact[] facts;
     private PersonReference[] parents;
@@ -47,6 +48,11 @@ public class PersonBuilder {
 
     public PersonBuilder withName(String name) {
         this.name = name;
+        return this;
+    }
+    
+    public PersonBuilder withGender(String gender) {
+        this.gender = gender;
         return this;
     }
     
@@ -76,6 +82,6 @@ public class PersonBuilder {
     }
     
     public Person build() {
-        return new Person(id, name, living, facts, parents, spouses, children);
+        return new Person(id, name, gender, living, facts, parents, spouses, children);
     }
 }

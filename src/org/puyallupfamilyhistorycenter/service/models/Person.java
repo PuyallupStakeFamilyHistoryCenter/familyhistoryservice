@@ -39,6 +39,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 public class Person {
     public final String id;
     public final String name;
+    public final String gender;
     public final boolean living;
     public final Fact[] facts;
     public final PersonReference[] parents;
@@ -46,9 +47,10 @@ public class Person {
     public final PersonReference[] children;
     //TODO: Finish this (quickly!)
 
-    Person(String id, String name, Boolean living, Fact[] facts, PersonReference[] parents, PersonReference[] spouses, PersonReference[] children) {
+    Person(String id, String name, String gender, Boolean living, Fact[] facts, PersonReference[] parents, PersonReference[] spouses, PersonReference[] children) {
         this.id = id;
         this.name = name;
+        this.gender = gender;
         this.living = (living == null ? true : living);
         this.facts = facts;
         this.parents = parents;
