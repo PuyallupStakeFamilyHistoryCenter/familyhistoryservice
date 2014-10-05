@@ -34,7 +34,7 @@ package org.puyallupfamilyhistorycenter.service.models;
 public class PersonBuilder {
     private String id;
     private String name;
-    private boolean living;
+    private boolean living = true;
     private Fact[] facts;
     private PersonReference[] parents;
     private PersonReference[] spouses;

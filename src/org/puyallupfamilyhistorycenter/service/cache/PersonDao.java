@@ -26,7 +26,6 @@
 
 package org.puyallupfamilyhistorycenter.service.cache;
 
-import java.io.IOException;
 import java.util.Iterator;
 import org.puyallupfamilyhistorycenter.service.models.Person;
 
@@ -52,39 +51,57 @@ public class PersonDao {
         return source.get(personId);
     }
     
+    /**
+     * Get an iterator over family records for the given person
+     * @param personId The person whose family to get
+     * @param pageSize The number of records to return wit each request
+     * @param lastPageEndId The id of the final record in the previous request
+     *                      no previous request exists)
+     * @return an iterator over the family of the given person
+     */
     public Iterator<Person> traverseImmediateFamily(String personId, int pageSize, String lastPageEndId) {
-        return traverse(personId, pageSize, lastPageEndId, "IMMEDIATE_FAMILY");
+        return traverse(personId, pageSize, lastPageEndId, new FamilyIterationStrategy(source.get(personId), source));
     }
     
     /**
-     * Get an input stream of ancestor records for the given person
+     * Get an iterator over ancestor records for the given person
      * @param personId The person whose ancestry to get
      * @param pageSize The number of records to return wit each request
      * @param lastPageEndId The id of the final record in the previous request
      *                      no previous request exists)
-     * @return an input
+     * @return an iterator over the ancestors of the given person
      */
     public Iterator<Person> traverseAncestors(String personId, int pageSize, String lastPageEndId) {
-        return traverse(personId, pageSize, lastPageEndId, "ANCESTORS");
+        return traverse(personId, pageSize, lastPageEndId, new AncestorsIterationStrategy(source.get(personId), source));
     }
     
+    /**
+     * Get an iterator over descendant records for the given person
+     * @param personId The person whose descendants to get
+     * @param pageSize The number of records to return wit each request
+     * @param lastPageEndId The id of the final record in the previous request
+     *                      no previous request exists)
+     * @return an iterator over the descendants of the given person
+     */
     public Iterator<Person> traverseDescendants(String personId, int pageSize, String lastPageEndId) {
-        return traverse(personId, pageSize, lastPageEndId, "DESCENDANTS");
+        return traverse(personId, pageSize, lastPageEndId, new DescendantsIterationStrategy(source.get(personId), source));
     }
     
-    private Iterator<Person> traverse(String personId, int pageSize, final String lastPageEndId, String strategy) {
+    private Iterator<Person> traverse(String personId, int pageSize, final String currentId, final IterationStrategy<Person> strategy) {
         return new Iterator<Person>() {
             int currentPageIndex = 0;
-            String currentId = lastPageEndId;
+            Person next = strategy.next(currentId == null ? null : source.get(currentId));
             
             @Override
             public boolean hasNext() {
-                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+                return next != null;
             }
 
             @Override
             public Person next() {
-                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+                Person current = next;
+                next = strategy.next(current);
+                return current;
             }
 
             @Override

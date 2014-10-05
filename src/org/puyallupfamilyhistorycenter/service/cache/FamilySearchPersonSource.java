@@ -26,7 +26,16 @@
 package org.puyallupfamilyhistorycenter.service.cache;
 
 import com.google.gson.Gson;
+import java.util.List;
+import org.familysearch.api.client.ft.FamilySearchFamilyTree;
+import org.gedcomx.rs.client.PersonChildrenState;
+import org.gedcomx.rs.client.PersonParentsState;
+import org.gedcomx.rs.client.PersonSpousesState;
+import org.gedcomx.rs.client.PersonState;
 import org.puyallupfamilyhistorycenter.service.models.Person;
+import org.puyallupfamilyhistorycenter.service.models.PersonBuilder;
+import org.puyallupfamilyhistorycenter.service.models.PersonReference;
+import org.puyallupfamilyhistorycenter.service.websocket.FamilyHistoryFamilyTree;
 
 /**
  *
@@ -36,10 +45,45 @@ import org.puyallupfamilyhistorycenter.service.models.Person;
 
 public class FamilySearchPersonSource implements Source<Person> {
     private static final Gson GSON = new Gson();
+    
+    TokenProvider provider = new TokenProvider();
 
     @Override
     public Person get(String personId) {
-        return null;
+        FamilySearchFamilyTree ft = new FamilyHistoryFamilyTree(true).authenticate(provider.getToken());
+        PersonState state = ft.readPersonById(personId);
+        PersonBuilder builder = new PersonBuilder();
+        builder.withName(state.getName().getNameForm().getFullText());
+        builder.withLiving(false); //TODO: Set is living
+        
+        {
+            //TODO: set facts
+        }
+        
+        {
+            PersonParentsState parentsState = state.readParents();
+            builder.withParents(fsPersonsToPersonRefs(parentsState.getPersons()));
+        }
+        
+        {
+            PersonSpousesState spousesState = state.readSpouses();
+            builder.withSpouses(fsPersonsToPersonRefs(spousesState.getPersons()));
+        }
+        
+        {
+            PersonChildrenState childrenState = state.readChildren();
+            builder.withChildren(fsPersonsToPersonRefs(childrenState.getPersons()));
+        }
+        
+        return builder.build();
     }
-    
+
+    private PersonReference[] fsPersonsToPersonRefs(List<org.gedcomx.conclusion.Person> persons) {
+        PersonReference[] refs = new PersonReference[persons.size()];
+        for (int i = 0; i < persons.size(); i++) {
+            org.gedcomx.conclusion.Person person = persons.get(i);
+            refs[i] = new PersonReference(person.getId(), person.getName().getNameForm().getFullText(), null);
+        }
+        return refs;
+    }
 }

@@ -23,12 +23,9 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package org.puyallupfamilyhistorycenter.service.models;
+package org.puyallupfamilyhistorycenter.service.cache;
 
-import java.util.ArrayList;
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.puyallupfamilyhistorycenter.service.models.Person;
 
 /**
  *
@@ -36,38 +33,18 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
  */
 
 
-public class Person {
-    public final String id;
-    public final String name;
-    public final boolean living;
-    public final Fact[] facts;
-    public final PersonReference[] parents;
-    public final PersonReference[] spouses;
-    public final PersonReference[] children;
-    //TODO: Finish this (quickly!)
+public class AncestorsIterationStrategy implements IterationStrategy<Person> {
 
-    Person(String id, String name, Boolean living, Fact[] facts, PersonReference[] parents, PersonReference[] spouses, PersonReference[] children) {
-        this.id = id;
-        this.name = name;
-        this.living = (living == null ? true : living);
-        this.facts = facts;
-        this.parents = parents;
-        this.spouses = spouses;
-        this.children = children;
+    private final Person root;
+    private final Source<Person> source;
+    AncestorsIterationStrategy(Person root, Source<Person> source) {
+        this.root = root;
+        this.source = source;
     }
 
     @Override
-    public int hashCode() {
-        return HashCodeBuilder.reflectionHashCode(this, new ArrayList<String>());
+    public Person next(Person current) {
+        return null;
     }
-
-    @Override
-    public boolean equals(Object obj) {
-        return EqualsBuilder.reflectionEquals(this, obj, new ArrayList());
-    }
-
-    @Override
-    public String toString() {
-        return ToStringBuilder.reflectionToString(this);
-    }
+    
 }

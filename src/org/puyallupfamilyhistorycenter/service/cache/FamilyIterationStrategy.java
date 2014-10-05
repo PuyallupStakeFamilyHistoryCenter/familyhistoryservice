@@ -25,12 +25,120 @@
  */
 package org.puyallupfamilyhistorycenter.service.cache;
 
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
+import org.puyallupfamilyhistorycenter.service.models.Person;
+import org.puyallupfamilyhistorycenter.service.models.PersonReference;
+
 /**
  *
  * @author tibbitts
  */
 
 
-public class FamilyIterationStrategy {
+public class FamilyIterationStrategy implements IterationStrategy<Person> {
+
+    private static enum State {
+        PARENTS("SPOUSES") {
+            @Override
+            public Iterator<PersonReference> iterate(Person root) {
+                return Arrays.asList(root.parents).iterator();
+            }
+        },
+        SPOUSES("CHILDREN") {
+
+            @Override
+            public Iterator<PersonReference> iterate(Person root) {
+                return Arrays.asList(root.spouses).iterator();
+            }
+        },
+        CHILDREN(null) {
+
+            @Override
+            public Iterator<PersonReference> iterate(Person root) {
+                return Arrays.asList(root.children).iterator();
+            }
+        };
+
+        private final String nextStateString;
+        private State(String nextStateString) {
+            this.nextStateString = nextStateString;
+        }
+        
+        public State next() {
+            if (nextStateString == null) return null;
+            return valueOf(nextStateString);
+        }
+        
+        public abstract Iterator<PersonReference> iterate(Person root);
+    }
+    
+    private final Person root;
+    private final Source<Person> source;
+    private final Iterator<PersonReference> iterator;
+    private PersonReference innerCurrent;
+    
+    public FamilyIterationStrategy(final Person root, Source<Person> source) {
+        this.root = root;
+        this.source = source;
+        
+        iterator = new Iterator<PersonReference>() {
+            PersonReference next = new PersonReference(root.id, root.name, "self");
+            State state = State.SPOUSES;
+            Iterator<PersonReference> innerIt = state.iterate(root);
+            
+            @Override
+            public boolean hasNext() {
+                return next != null;
+            }
+
+            @Override
+            public PersonReference next() {
+                if (next == null) {
+                    throw new NoSuchElementException();
+                }
+                
+                PersonReference current = next;
+                if (innerIt.hasNext()) {
+                    next = innerIt.next();
+                } else {
+                    next = null;
+                    while (state != null && (state = state.next()) != null && next == null) {
+                        innerIt = state.iterate(root);
+                        next = innerIt.next();
+                    }
+                }
+                return current;
+            }
+
+            @Override
+            public void remove() {
+                throw new UnsupportedOperationException();
+            }
+            
+        };
+    }
+    
+    @Override
+    public Person next(Person current) {
+        if (current != null) {
+            while (iterator.hasNext() && (innerCurrent == null && !current.id.equals(innerCurrent.getId()))) {
+                innerCurrent = iterator.next();
+            }
+        }
+        
+        if (iterator.hasNext()) {
+            innerCurrent = iterator.next();
+        } else {
+            innerCurrent = null;
+        }
+        
+        if (innerCurrent != null) {
+            return source.get(innerCurrent.getId());
+        }
+        
+        return null;
+    }
     
 }
