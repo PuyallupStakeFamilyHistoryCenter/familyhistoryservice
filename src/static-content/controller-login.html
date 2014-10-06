@@ -29,10 +29,10 @@ POSSIBILITY OF SUCH DAMAGE.
     <form autocomplete="off" id="login-form">
         <div class="panel-heading"><h3>Login</h3></div>
         <div id="user-list">
-            <input type="hidden" id="userid-input" value="guest" />
         </div>
         <br>
         <div class="input-group input-group-lg" id="pin-input-div" style="max-width: 200px; display: none;">
+            <input type="hidden" id="userid-input" value="guest" />
             <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
             <input type="password" id="pin-input" pattern="[0-9]*" maxlength="6" class="form-control" placeholder="PIN" value="1234" />
         </div>
@@ -46,6 +46,7 @@ POSSIBILITY OF SUCH DAMAGE.
     settings.local = {
         verbs: {
             "user-list": function(parts) {
+                $("#user-list").html("");
                 for (var i = 1; i < parts.length; i+=2) {
                     var user = parts[i];
                     $("#user-list").append("<button class='btn btn-default btn-lg username-btn' data-user-id='"+ parts[i+1] +"'>" + decodeURI(parts[i]) + "</button>");
@@ -58,7 +59,7 @@ POSSIBILITY OF SUCH DAMAGE.
                     $(".username-btn").removeClass("btn-warning");
                     $(e.target).addClass("btn-warning");
 
-                    if (value === "guest") {
+                    if (value === "KW79-H8X") {
                         $("#pin-input-div").hide()
                         $("#pin-input").val("1234");
                     } else {
@@ -79,11 +80,13 @@ POSSIBILITY OF SUCH DAMAGE.
         var pin = $("#pin-input").val();
         
         if (!userId || !pin) {
-            error("You must choose a user and enter a valid PIN");
+            logger.error("You must choose a user and enter a valid PIN");
             return;
         }
         
         settings.userId = userId;
         settings.page.getToken(userId, pin);
     });
+    
+    asdf();
 </script>

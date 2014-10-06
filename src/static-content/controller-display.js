@@ -165,6 +165,8 @@ var defaultSettings = {
             if (!$.removeCookie("token")) {
                 logger.error("Failed to remove login cookie");
             }
+            ws.socketSend("logout " + token);
+            token = null;
             ws.socketSend("nav " + displayName + " display-login");
             navigate("controller-login");
         },

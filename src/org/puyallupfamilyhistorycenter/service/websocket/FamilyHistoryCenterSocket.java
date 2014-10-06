@@ -39,6 +39,10 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 import org.apache.commons.codec.binary.Base64;
@@ -52,8 +56,8 @@ import org.gedcomx.rs.client.PersonState;
 import org.gedcomx.rs.client.SourceDescriptionsState;
 import org.gedcomx.rs.client.StateTransitionOption;
 import org.puyallupfamilyhistorycenter.service.cache.CachingSource;
-import org.puyallupfamilyhistorycenter.service.cache.FamilySearchPersonSource;
 import org.puyallupfamilyhistorycenter.service.cache.InMemoryCache;
+import org.puyallupfamilyhistorycenter.service.cache.MockPersonSource;
 import org.puyallupfamilyhistorycenter.service.cache.Source;
 import org.puyallupfamilyhistorycenter.service.models.Person;
 
@@ -79,9 +83,15 @@ public class FamilyHistoryCenterSocket {
         }
     }
     
+    private static final long tokenInactivityTimeout = TimeUnit.MINUTES.toMillis(5);
+    private static final long userInactivityTimeout = TimeUnit.MINUTES.toMillis(60);
+    
     private static final Map<String, RemoteEndpoint> remoteDisplays = new HashMap<>();
     private static final Map<String, RemoteEndpoint> remoteControllers = new HashMap<>();
+    private static final Map<String, RemoteEndpoint> tokenControllerMap = new HashMap<>();
     private static final Map<String, String> tokenUserIdMap = new HashMap<>();
+    private static final Map<String, Long> tokenLastUse = new HashMap<>();
+    private static final Map<String, Long> userIdLastUse = new HashMap<>();
     private static final Map<String, AccessTokenInfo> userIdAccessTokenMap = new LinkedHashMap<>();
     private static final SecureRandom rand;
     static {
@@ -93,39 +103,63 @@ public class FamilyHistoryCenterSocket {
     }
     
     //TODO: Wire via configuration (Spring?)
-    private static final Source fsSource = new FamilySearchPersonSource(); //new MockPersonSource();
+//    private static final Source fsSource = new FamilySearchPersonSource(); 
+    private static final Source fsSource = new MockPersonSource();
     //private static final Source fileSource = new CachingSource(fsSource, new FileCache<>(Person.class, new File("/tmp/fhc/person-cache"), TimeUnit.DAYS.toMillis(3)));
     private static final Source inMemorySource = new CachingSource(fsSource, new InMemoryCache<String, Person>());
     private static final PersonDao personCache = new PersonDao(inMemorySource);
+    
+    
+    private static final ScheduledExecutorService tokenCleanupService = Executors.newScheduledThreadPool(1);
+    private static final ScheduledExecutorService userCleanupService = Executors.newScheduledThreadPool(1);
+    static {
+        tokenCleanupService.schedule(new Callable<Void>() {
+
+            @Override
+            public Void call() throws Exception {
+                Iterator<Map.Entry<String, Long>> it = tokenLastUse.entrySet().iterator();
+                while (it.hasNext()) {
+                    Map.Entry<String, Long> entry = it.next();
+                    if (entry.getValue() + tokenInactivityTimeout < System.currentTimeMillis()) {
+                        String token = entry.getKey();
+                        RemoteEndpoint controllerEndpoint = tokenControllerMap.remove(token);
+                        controllerEndpoint.sendString("nav controller-login");
+                        controllerEndpoint.sendString("Error: logged out due to inactivity");
+                        
+                        it.remove();
+                    }
+                }
+                
+                return null;
+            }
+        
+        }, 1, TimeUnit.MINUTES);
+        userCleanupService.schedule(new Callable<Void>() {
+
+            @Override
+            public Void call() throws Exception {
+                Iterator<Map.Entry<String, Long>> it = userIdLastUse.entrySet().iterator();
+                while (it.hasNext()) {
+                    Map.Entry<String, Long> entry = it.next();
+                    if (entry.getValue() + userInactivityTimeout < System.currentTimeMillis()) {
+                        String userId = entry.getKey();
+                        // TODO: Figure out how to invalidate access token
+                        String accessToken = userIdAccessTokenMap.remove(userId).accessToken;
+                        
+                        it.remove();
+                    }
+                }
+                
+                return null;
+            }
+        
+        }, 1, TimeUnit.MINUTES);
+    }
 
     public FamilyHistoryCenterSocket() {
         String salt = newSalt();
         userIdAccessTokenMap.put("guest", new AccessTokenInfo("KW79-H8X", "Guest%20account", hashPin("1234", salt), null));
     }
-    
-    
-//    private static final ScheduledExecutorService remoteEndpointCleanup = Executors.newScheduledThreadPool(1);
-//    {
-//        remoteEndpointCleanup.schedule(new Callable<Void>() {
-//
-//            @Override
-//            public Void call() throws Exception {
-//                Iterator<Map.Entry<String, RemoteEndpoint>> it = remoteDisplays.entrySet().iterator();
-//                while(it.hasNext()) {
-//                    Map.Entry<String, RemoteEndpoint> item = it.next();
-//                    try {
-//                        RemoteEndpoint re = item.getValue();
-//                        re.sendString("pong");
-//                    } catch (IOException ex) {
-//                        it.remove();
-//                    }
-//                }
-//                
-//                return null;
-//            }
-//        
-//        }, 1, TimeUnit.MINUTES);
-//    }
     
     @OnWebSocketConnect
     public void handleConnection(Session session) throws IOException {
@@ -138,6 +172,8 @@ public class FamilyHistoryCenterSocket {
         try {
             Scanner scanner = new Scanner(message);
             scanner.useDelimiter(" ");
+            String token = null;
+            String userId = null;
             String cmd = scanner.next();
             switch (cmd) {
                 case "ping":
@@ -197,14 +233,30 @@ public class FamilyHistoryCenterSocket {
                 }
 
                 case "login": {
-                    String userId = scanner.next();
+                    userId = scanner.next();
                     String pin = scanner.next(); //TODO: This is pretty insecure
                     
                     AccessTokenInfo tokenInfo = userIdAccessTokenMap.get(userId);
                     if (tokenInfo != null && validatePin(pin, tokenInfo.hashedPin)) {
-                        String token = Long.toHexString(rand.nextLong());
+                        token = Long.toHexString(rand.nextLong());
                         tokenUserIdMap.put(token, userId);
+                        tokenControllerMap.put(token, session.getRemote());
                         response = "token " + token + " " + tokenInfo.userName;
+                    } else {
+                        response = "Error: username and PIN do not match";
+                    }
+                    break;
+                }
+                
+                case "logout": {
+                    token = scanner.next();
+                    String pin = scanner.next();
+                    userId = tokenUserIdMap.get(token);
+                    
+                    AccessTokenInfo tokenInfo = userIdAccessTokenMap.get(userId);
+                    if (tokenInfo != null && validatePin(pin, tokenInfo.hashedPin)) {
+                        tokenUserIdMap.remove(token);
+                        tokenControllerMap.remove(token);
                     } else {
                         response = "Error: username and PIN do not match";
                     }
@@ -212,7 +264,7 @@ public class FamilyHistoryCenterSocket {
                 }
 
                 case "get-images": {
-                    String token = scanner.next();
+                    token = scanner.next();
                     String ancestorId = scanner.next();
                     String accessToken = tokenToAccessToken(token);
 
@@ -232,7 +284,7 @@ public class FamilyHistoryCenterSocket {
                 }
                 
                 case "get-person": {
-                    String token = scanner.next();
+                    token = scanner.next();
                     String personId = scanner.next();
                     String accessToken = tokenToAccessToken(token);
                     
@@ -248,7 +300,7 @@ public class FamilyHistoryCenterSocket {
                 }
                 
                 case "send-person": {
-                    String token = scanner.next();
+                    token = scanner.next();
                     String displayId = scanner.next();
                     String personId = scanner.next();
                     String accessToken = tokenToAccessToken(token);
@@ -270,7 +322,7 @@ public class FamilyHistoryCenterSocket {
                 }
                 
                 case "get-family": {
-                    String token = scanner.next();
+                    token = scanner.next();
                     String personId = scanner.next();
                     String lastPageId = null;
                     if (scanner.hasNext()) {
@@ -291,7 +343,7 @@ public class FamilyHistoryCenterSocket {
                 }
                 
                 case "get-ancestors": {
-                    String token = scanner.next();
+                    token = scanner.next();
                     String personId = scanner.next();
                     String paginationKey = null;
                     String accessToken = tokenToAccessToken(token);
@@ -309,12 +361,11 @@ public class FamilyHistoryCenterSocket {
                 }
                 
                 case "get-descendents": {
-                    String token = scanner.next();
+                    token = scanner.next();
                     String personId = scanner.next();
                     String paginationKey = null;
                     String accessToken = tokenToAccessToken(token);
                     
-                    //TODO: Check token
                     //TODO: Actually get descendents
                     Person person = personCache.getPerson(personId, accessToken);
                     if (person != null) {
@@ -363,7 +414,7 @@ public class FamilyHistoryCenterSocket {
                 }
 
                 case "access-token": {
-                    String userId = scanner.next();
+                    userId = scanner.next();
                     String userName = scanner.next();
                     String salt = newSalt();
                     String pin = hashPin(scanner.next(), salt);
@@ -421,10 +472,18 @@ public class FamilyHistoryCenterSocket {
                 default:
                     response = "Error: unrecognized command '" + message + "'";
             }
+            
+            if (token != null) {
+                tokenLastUse.put(token, System.currentTimeMillis());
+            }
+            if (userId != null) {
+                userIdLastUse.put(userId, System.currentTimeMillis());
+            }
         } catch (Throwable e) {
             e.printStackTrace(System.err);
             response = "Error: " + e.getMessage();
         }
+        
         if (session.isOpen()) {
             session.getRemote().sendString(response);
         }
@@ -466,7 +525,7 @@ public class FamilyHistoryCenterSocket {
     }
 
     protected static String hashPin(String password, String salt) {
-        return hashPin(password, salt, 1000);
+        return hashPin(password, salt, 10000);
     }
     
     protected static String hashPin(String password, String salt, int iterations) {
