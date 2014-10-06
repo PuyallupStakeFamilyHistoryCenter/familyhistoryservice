@@ -47,13 +47,15 @@ public class CachingSource<E> implements Source<E> {
     }
 
     @Override
-    public E get(String id) {
+    public E get(String id, String accessToken) {
         E cached = cache.get(id);
         if (cached != null) {
             return cached;
         }
         
-        return source.get(id);
+        E value = source.get(id, accessToken);
+        cache.put(id, value);
+        return value;
     }
     
 }

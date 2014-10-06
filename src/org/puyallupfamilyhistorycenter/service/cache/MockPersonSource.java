@@ -39,7 +39,7 @@ public class MockPersonSource implements Source<Person> {
     private static final Gson GSON = new Gson();
 
     @Override
-    public Person get(String personId) {
+    public Person get(String personId, String accessToken) {
         String personJson = null;
         switch (personId) {
         case "KWCB-HZV":
@@ -87,7 +87,8 @@ public class MockPersonSource implements Source<Person> {
                         + "\"name\":\"Merlin \\\"B\\\" Dial\","
                         + "\"relationship\":\"son\""
                         + "}"
-                        + "]"
+                        + "],"
+                        + "\"image\":\"/image-cache?ref=https%3A%2F%2Ffamilysearch.org%2Fpatron%2Fv2%2FTH-303-48402-203-71%2Fthumb200s.jpg%3Fctx%3DArtCtxPublic%26amp%3B_%3D1412535799744%5C\""
                         + "}";
             break;
         case "KWC6-X7D":

@@ -25,24 +25,33 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 -->
 
+<h2>Person detail</h2>
+<div>
+    <button id="back-button" class="btn btn-lg btn-default"><span class="glyphicon glyphicon-chevron-left glyphicon-sm"></span> Back</button>
+</div>
+<hr>
+
 <div id="data-div">
     
 </div>
-<button class="btn btn-default btn-lg send-person" data-id="KWJJ-4XH">Willis Aaron Dial</button>
-<button class="btn btn-default btn-lg send-person" data-id="KWC6-X7D">Glen "B" Dial</button>
 
 <script>
+    $("#back-button").click(function (e) {
+        navigate("controller-main");
+    });
+    
     settings.local = {
         verbs: {
             family: function(parts) {
-                var people = JSON.parse(parts[1]);
+                var people = JSON.parse(decodeURIComponent(parts[1]));
+                console.info("Got family '" + people + "'");
                 gotFamily(people);
             }
         }
     }
     
-    
-    ws.socketSend("get-family " + token + " KWJJ-4XH");
+    console.info("Sending get-family request");
+    ws.socketSend("get-family " + token + " " + settings.userId);
     
     function gotFamily(people) {
         $("#data-div").html("");

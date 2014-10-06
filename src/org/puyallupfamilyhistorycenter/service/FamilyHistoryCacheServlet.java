@@ -27,15 +27,21 @@
 package org.puyallupfamilyhistorycenter.service;
 
 
+import java.io.IOException;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import org.eclipse.jetty.http.HttpVersion;
 import org.puyallupfamilyhistorycenter.service.websocket.FamilyHistoryCenterSocket;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.HttpConfiguration;
 import org.eclipse.jetty.server.HttpConnectionFactory;
+import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.SecureRequestCustomizer;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.SslConnectionFactory;
+import org.eclipse.jetty.server.handler.AbstractHandler;
 import org.eclipse.jetty.server.handler.ContextHandler;
 import org.eclipse.jetty.server.handler.ContextHandlerCollection;
 import org.eclipse.jetty.server.handler.ResourceHandler;
@@ -74,9 +80,19 @@ public class FamilyHistoryCacheServlet {
         Handler imageCacheHandler = new FamilySearchImageCacheHandler();
         imageCacheContext.setHandler(imageCacheHandler);
         
+        ContextHandler authRedirectContext = new ContextHandler("/auth-redirect.html");
+        Handler authRedirectHandler = new AbstractHandler() {
+            @Override
+            public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+                response.setStatus(200);
+                baseRequest.setHandled(true);
+            }
+        };
+        authRedirectContext.setHandler(authRedirectHandler);
+        
         
         ContextHandlerCollection handlerCollection = new ContextHandlerCollection();
-        handlerCollection.setHandlers(new Handler[]{mouseContext, indexContext, cacheContext, imageCacheContext});
+        handlerCollection.setHandlers(new Handler[]{mouseContext, indexContext, cacheContext, imageCacheContext, authRedirectContext});
         //handlerCollection.setHandlers(new Handler[]{indexContext});
         
         // TODO: Add authentication handler
@@ -119,6 +135,11 @@ public class FamilyHistoryCacheServlet {
             new HttpConnectionFactory(https_config));
         sslConnector.setPort(8443);
         server.addConnector(sslConnector);
+        
+        ServerConnector http = new ServerConnector(server,new HttpConnectionFactory(http_config));
+        http.setPort(8000);
+        http.setIdleTimeout(30000);
+        server.addConnector(http);
         
         server.setHandler(handlerCollection);
         server.start();

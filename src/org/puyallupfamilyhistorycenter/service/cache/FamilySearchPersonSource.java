@@ -28,10 +28,14 @@ package org.puyallupfamilyhistorycenter.service.cache;
 import com.google.gson.Gson;
 import java.util.List;
 import org.familysearch.api.client.ft.FamilySearchFamilyTree;
+import org.gedcomx.conclusion.Fact;
+import org.gedcomx.conclusion.Name;
 import org.gedcomx.rs.client.PersonChildrenState;
 import org.gedcomx.rs.client.PersonParentsState;
 import org.gedcomx.rs.client.PersonSpousesState;
 import org.gedcomx.rs.client.PersonState;
+import org.gedcomx.rs.client.SourceDescriptionsState;
+import org.gedcomx.source.SourceDescription;
 import org.puyallupfamilyhistorycenter.service.models.Person;
 import org.puyallupfamilyhistorycenter.service.models.PersonBuilder;
 import org.puyallupfamilyhistorycenter.service.models.PersonReference;
@@ -45,19 +49,22 @@ import org.puyallupfamilyhistorycenter.service.websocket.FamilyHistoryFamilyTree
 
 public class FamilySearchPersonSource implements Source<Person> {
     private static final Gson GSON = new Gson();
-    
-    TokenProvider provider = new TokenProvider();
 
     @Override
-    public Person get(String personId) {
-        FamilySearchFamilyTree ft = new FamilyHistoryFamilyTree(true).authenticate(provider.getToken());
+    public Person get(String personId, String accessToken) {
+        FamilySearchFamilyTree ft = new FamilyHistoryFamilyTree(true).authenticate(accessToken);
         PersonState state = ft.readPersonById(personId);
+        
         PersonBuilder builder = new PersonBuilder();
-        builder.withName(state.getName().getNameForm().getFullText());
+        Name name = state.getName();
+        builder.withId(personId);
+        builder.withName(name.getNameForm().getFullText());
         builder.withLiving(false); //TODO: Set is living
+        builder.withGender(state.getGender().getKnownType().name());
         
         {
             //TODO: set facts
+            List<Fact> facts = null;
         }
         
         {
@@ -75,10 +82,26 @@ public class FamilySearchPersonSource implements Source<Person> {
             builder.withChildren(fsPersonsToPersonRefs(childrenState.getPersons()));
         }
         
+        {
+            SourceDescriptionsState sourceState = state.readArtifacts();
+            List<SourceDescription> sources = sourceState.getSourceDescriptions();
+            String[] imageUrls = new String[sources.size()];
+            int i = 0;
+            for (SourceDescription source : sources) {
+                //source.getAbout() is the url to the image
+                imageUrls[i++] = source.getAbout().toString();
+            }
+            builder.withImages(imageUrls);
+        }
+        
         return builder.build();
     }
 
     private PersonReference[] fsPersonsToPersonRefs(List<org.gedcomx.conclusion.Person> persons) {
+        if (persons == null) {
+            return null;
+        }
+        
         PersonReference[] refs = new PersonReference[persons.size()];
         for (int i = 0; i < persons.size(); i++) {
             org.gedcomx.conclusion.Person person = persons.get(i);

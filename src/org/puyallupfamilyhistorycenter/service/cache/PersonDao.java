@@ -47,8 +47,8 @@ public class PersonDao {
      * @param personId
      * @return
      */
-    public Person getPerson(String personId) {
-        return source.get(personId);
+    public Person getPerson(String personId, String accessToken) {
+        return source.get(personId, accessToken);
     }
     
     /**
@@ -59,8 +59,8 @@ public class PersonDao {
      *                      no previous request exists)
      * @return an iterator over the family of the given person
      */
-    public Iterator<Person> traverseImmediateFamily(String personId, int pageSize, String lastPageEndId) {
-        return traverse(personId, pageSize, lastPageEndId, new FamilyIterationStrategy(source.get(personId), source));
+    public Iterator<Person> traverseImmediateFamily(String personId, int pageSize, String lastPageEndId, String accessToken) {
+        return traverse(personId, pageSize, lastPageEndId, new FamilyIterationStrategy(source.get(personId, accessToken) /*Change this to an id or a person ref instead*/, source, accessToken), accessToken);
     }
     
     /**
@@ -71,8 +71,8 @@ public class PersonDao {
      *                      no previous request exists)
      * @return an iterator over the ancestors of the given person
      */
-    public Iterator<Person> traverseAncestors(String personId, int pageSize, String lastPageEndId) {
-        return traverse(personId, pageSize, lastPageEndId, new AncestorsIterationStrategy(source.get(personId), source));
+    public Iterator<Person> traverseAncestors(String personId, int pageSize, String lastPageEndId, String accessToken) {
+        return traverse(personId, pageSize, lastPageEndId, new AncestorsIterationStrategy(source.get(personId, accessToken), source, accessToken), accessToken);
     }
     
     /**
@@ -83,14 +83,14 @@ public class PersonDao {
      *                      no previous request exists)
      * @return an iterator over the descendants of the given person
      */
-    public Iterator<Person> traverseDescendants(String personId, int pageSize, String lastPageEndId) {
-        return traverse(personId, pageSize, lastPageEndId, new DescendantsIterationStrategy(source.get(personId), source));
+    public Iterator<Person> traverseDescendants(String personId, int pageSize, String lastPageEndId, String accessToken) {
+        return traverse(personId, pageSize, lastPageEndId, new DescendantsIterationStrategy(source.get(personId, accessToken), source, accessToken), accessToken);
     }
     
-    private Iterator<Person> traverse(String personId, int pageSize, final String currentId, final IterationStrategy<Person> strategy) {
+    private Iterator<Person> traverse(String personId, int pageSize, final String currentId, final IterationStrategy<Person> strategy, final String accessToken) {
         return new Iterator<Person>() {
             int currentPageIndex = 0;
-            Person next = strategy.next(currentId == null ? null : source.get(currentId));
+            Person next = strategy.next(currentId == null ? null : source.get(currentId, accessToken));
             
             @Override
             public boolean hasNext() {

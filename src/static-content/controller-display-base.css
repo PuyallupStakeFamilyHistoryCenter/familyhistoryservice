@@ -43,3 +43,7 @@ button .btn-nav {
     width: 200px;
     vertical-align: middle;
 }
+
+dd, dt {
+    padding-top: 10px;
+}

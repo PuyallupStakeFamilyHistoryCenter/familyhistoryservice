@@ -57,9 +57,9 @@ public class PersonDaoTest {
 //        CachingSource<Person> cachingSource = new CachingSource<>(source, cache);
         dao = new PersonDao(source);
         
-        family = Arrays.asList(source.get("KWCB-HZV"), source.get("KWCB-HZ2"), source.get("KWC6-X7D"), source.get("KWJJ-4XH"));
-        ancestors = Arrays.asList(source.get("KWZP-8K5"), source.get("KWZP-8KG"));
-        descendants = Arrays.asList(source.get("KWC6-X7D"), source.get("KJWD-Z94"), source.get("KWJJ-4XH"));
+        family = Arrays.asList(source.get("KWCB-HZV", ""), source.get("KWCB-HZ2", ""), source.get("KWC6-X7D", ""), source.get("KWJJ-4XH", ""));
+        ancestors = Arrays.asList(source.get("KWZP-8K5", ""), source.get("KWZP-8KG", ""));
+        descendants = Arrays.asList(source.get("KWC6-X7D", ""), source.get("KJWD-Z94", ""), source.get("KWJJ-4XH", ""));
     }
 
     /**
@@ -67,7 +67,7 @@ public class PersonDaoTest {
      */
     @Test
     public void testGetPerson() {
-        Person person = dao.getPerson("KWCB-HZV");
+        Person person = dao.getPerson("KWCB-HZV", "");
         assertEquals("KWCB-HZV", person.id);
         assertEquals("Willis Aaron Dial", person.name);
         assertFalse(person.living);
@@ -99,7 +99,7 @@ public class PersonDaoTest {
     @Test
     public void testTraverseFamily() {
         System.out.println("testTraverseFamily");
-        assertIteratorsEqual(dao.traverseImmediateFamily("KWCB-HZV", 10, null), family.iterator());
+        assertIteratorsEqual(dao.traverseImmediateFamily("KWCB-HZV", 10, null, ""), family.iterator());
     }
 
     /**
@@ -108,7 +108,7 @@ public class PersonDaoTest {
     //@Test
     public void testTraverseAncestors() {
         System.out.println("testTraverseAncestors");
-        assertIteratorsEqual(dao.traverseAncestors("KWCB-HZV", 10, null), ancestors.iterator());
+        assertIteratorsEqual(dao.traverseAncestors("KWCB-HZV", 10, null, ""), ancestors.iterator());
     }
 
     /**
@@ -117,7 +117,7 @@ public class PersonDaoTest {
     //@Test
     public void testTraverseDescendants() {
         System.out.println("testTraverseDescendants");
-        assertIteratorsEqual(dao.traverseDescendants("KWCB-HZV", 10, null), descendants.iterator());
+        assertIteratorsEqual(dao.traverseDescendants("KWCB-HZV", 10, null, ""), descendants.iterator());
     }
     
     

@@ -37,9 +37,11 @@ public class AncestorsIterationStrategy implements IterationStrategy<Person> {
 
     private final Person root;
     private final Source<Person> source;
-    AncestorsIterationStrategy(Person root, Source<Person> source) {
+    private final String accessToken;
+    AncestorsIterationStrategy(Person root, Source<Person> source, String accessToken) {
         this.root = root;
         this.source = source;
+        this.accessToken = accessToken;
     }
 
     @Override

@@ -28,6 +28,7 @@ package org.puyallupfamilyhistorycenter.service.cache;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+import org.gedcomx.rs.client.options.Preconditions;
 import org.puyallupfamilyhistorycenter.service.models.Person;
 import org.puyallupfamilyhistorycenter.service.models.PersonReference;
 
@@ -43,6 +44,7 @@ public class FamilyIterationStrategy implements IterationStrategy<Person> {
         PARENTS("SPOUSES") {
             @Override
             public Iterator<PersonReference> iterate(Person root) {
+                if (root.parents == null) return null;
                 return Arrays.asList(root.parents).iterator();
             }
         },
@@ -50,6 +52,7 @@ public class FamilyIterationStrategy implements IterationStrategy<Person> {
 
             @Override
             public Iterator<PersonReference> iterate(Person root) {
+                if (root.spouses == null) return null;
                 return Arrays.asList(root.spouses).iterator();
             }
         },
@@ -57,6 +60,7 @@ public class FamilyIterationStrategy implements IterationStrategy<Person> {
 
             @Override
             public Iterator<PersonReference> iterate(Person root) {
+                if (root.children == null) return null;
                 return Arrays.asList(root.children).iterator();
             }
         };
@@ -76,16 +80,22 @@ public class FamilyIterationStrategy implements IterationStrategy<Person> {
     
     private final Person root;
     private final Source<Person> source;
+    private final String accessToken;
     private final Iterator<PersonReference> iterator;
     private PersonReference innerCurrent;
     
-    public FamilyIterationStrategy(final Person root, Source<Person> source) {
+    public FamilyIterationStrategy(final Person root, Source<Person> source, String accessToken) {
+        if (root == null || source == null) {
+            throw new IllegalArgumentException("Root and source are required");
+        }
+        
         this.root = root;
         this.source = source;
+        this.accessToken = accessToken;
         
         iterator = new Iterator<PersonReference>() {
             PersonReference next = new PersonReference(root.id, root.name, "self");
-            State state = State.SPOUSES;
+            State state = State.PARENTS;
             Iterator<PersonReference> innerIt = state.iterate(root);
             
             @Override
@@ -100,13 +110,15 @@ public class FamilyIterationStrategy implements IterationStrategy<Person> {
                 }
                 
                 PersonReference current = next;
-                if (innerIt.hasNext()) {
+                if (innerIt != null && innerIt.hasNext()) {
                     next = innerIt.next();
                 } else {
                     next = null;
                     while (state != null && (state = state.next()) != null && next == null) {
                         innerIt = state.iterate(root);
-                        next = innerIt.next();
+                        if (innerIt != null) {
+                            next = innerIt.next();
+                        }
                     }
                 }
                 return current;
@@ -135,7 +147,7 @@ public class FamilyIterationStrategy implements IterationStrategy<Person> {
         }
         
         if (innerCurrent != null) {
-            return source.get(innerCurrent.getId());
+            return source.get(innerCurrent.getId(), accessToken);
         }
         
         return null;

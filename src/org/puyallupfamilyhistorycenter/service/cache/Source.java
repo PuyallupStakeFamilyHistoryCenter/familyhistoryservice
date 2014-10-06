@@ -33,5 +33,5 @@ package org.puyallupfamilyhistorycenter.service.cache;
 
 
 public interface Source<E> {
-    E get(String id);
+    E get(String id, String accessToken);
 }

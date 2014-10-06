@@ -35,7 +35,7 @@ import org.puyallupfamilyhistorycenter.service.models.Person;
 
 public class DescendantsIterationStrategy implements IterationStrategy<Person> {
 
-    DescendantsIterationStrategy(Person get, Source<Person> source) {
+    DescendantsIterationStrategy(Person get, Source<Person> source, String accessToken) {
         
     }
 

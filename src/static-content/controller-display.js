@@ -53,7 +53,7 @@ function doNothing() {}
 function getReady() {
     //Add message listener to websocket
     ws.addMessageListener(messageHandler);
-    ws.connect();
+    ws.connect("localhost:8443");
     
     content = $("#content");
     mode = getParameterByName("mode");

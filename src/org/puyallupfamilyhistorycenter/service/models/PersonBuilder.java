@@ -40,6 +40,7 @@ public class PersonBuilder {
     private PersonReference[] parents;
     private PersonReference[] spouses;
     private PersonReference[] children;
+    private String[] images;
     
     public PersonBuilder withId(String id) {
         this.id = id;
@@ -81,7 +82,12 @@ public class PersonBuilder {
         return this;
     }
     
+    public PersonBuilder withImages(String[] images) {
+        this.images = images;
+        return this;
+    }
+    
     public Person build() {
-        return new Person(id, name, gender, living, facts, parents, spouses, children);
+        return new Person(id, name, gender, living, facts, parents, spouses, children, images);
     }
 }

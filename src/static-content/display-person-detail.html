@@ -33,11 +33,15 @@ POSSIBILITY OF SUCH DAMAGE.
 
 <div class="media" id="person-bio">
     <a class="pull-left" href="#">
-        <img class="media-object" style="max-width: 500px" id="person-img" src="#" alt="#" />
+        <img class="media-object" style="max-width: 400px" id="person-img" src="#" alt="#" />
     </a>
     <div class="media-body">
         <h2 class="person-name"></h2>
         <dl class="dl-horizontal">
+            <dt>
+                Gender:
+            </dt>
+            <dd id="gender"></dd>
             <dt>
                 Birth:
             </dt>
@@ -78,17 +82,36 @@ POSSIBILITY OF SUCH DAMAGE.
     }
     
     function gotPerson(data) {
-        var person = JSON.parse(data);
+        var person = JSON.parse(decodeURI(data));
         $("#instructions").hide();
         $("#person-bio").show();
-        if (person.image) {
-            $("#person-img").attr("src", person.image).attr("alt", "Image of " + person.name).show();
+        if (person.images && person.images[0]) {
+            $("#person-img").attr("src", person.images[0]).attr("alt", "Image of " + person.name).show();
         } else {
             $("#person-img").hide();
         }
-        $(".person-name").html(decodeURI(person.name));
-        $("#birth").html(decodeURI(person.birthDate) + " - " + decodeURI(person.birthPlace));
-        $("#death").html(decodeURI(person.deathDate) + " - " + decodeURI(person.deathPlace));
+        $(".person-name").html(person.name);
+        
+        $("#gender").html(person.gender);
+        
+        if (person.facts) {
+            var factMap = {};
+            $.each(person.facts, function(index, fact) {
+                factMap[fact.type] = fact;
+            });
+
+            if (factMap["birth"]) {
+                $("#birth").html(factMap["birth"].date + " - " + factMap["birth"].place);
+            } else {
+                $("#birth").html("unknown - unknown"); //TODO: Not working
+            }
+            if (factMap["death"]) {
+                $("#death").html(factMap["death"].date + " - " + factMap["death"].place);
+            } else {
+                $("#death").html("unknown - unknown");
+            }
+        }
+        
         if (person.spouses) {
             $("#spouse-label").html(person.spouses.length > 1 ? "Spouses:" : "Spouse:");
             $("#spouse").html("");

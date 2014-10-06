@@ -128,7 +128,7 @@ POSSIBILITY OF SUCH DAMAGE.
             warn("Timeout logging into FamilySearch. Please try again.", 5000);
         }, 60000);
         
-//        FamilySearch.getAccessToken().then(function (accessToken) {
+        FamilySearch.getAccessToken().then(function (accessToken) {
             $("#messages").html("");
             clearTimeout(timeout);
             timeout = setTimeout(function () {
@@ -136,13 +136,13 @@ POSSIBILITY OF SUCH DAMAGE.
                 warn("Timeout setting PIN. Please log in again", 5000);
             }, 60000);
 
-//            FamilySearch.getCurrentUser().then(function (result) {
-//                var user = result.getUser();
-                var displayName = "Willow Ufgood"; //["Willow Ufgood", "Luke Skywalker", "Indiana Jones"][//Choose random element];
-                var userId = "AEF-2344";        //TODO
-                var accessToken = "fake-access-token-replace-with-actual";
-//                var displayName = user.displayName;
-//                var userId = user.personId;
+            FamilySearch.getCurrentUser().then(function (result) {
+                var user = result.getUser();
+                var displayName = user.displayName;
+                var userId = user.personId;
+//                var displayName = "Willow Ufgood"; //["Willow Ufgood", "Luke Skywalker", "Indiana Jones"][//Choose random element];
+//                var userId = "AEF-2344";        //TODO
+//                var accessToken = "fake-access-token-replace-with-actual";
 
                 $("#user-name").html(displayName);
 
@@ -179,9 +179,11 @@ POSSIBILITY OF SUCH DAMAGE.
             });
 
 
-//        });
+        });
 
-//    });
+    });
+    
+    asdf();
 </script>
 
 
