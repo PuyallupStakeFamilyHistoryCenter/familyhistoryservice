@@ -445,6 +445,31 @@ public class FamilyHistoryCenterSocket {
                     break;
                 }
 
+                case "destroy-access-token": {
+                    userId = scanner.next();
+                    String pin = scanner.next(); //TODO: This is pretty insecure
+                    
+                    AccessTokenInfo tokenInfo = userIdAccessTokenMap.get(userId);
+                    if (tokenInfo != null && validatePin(pin, tokenInfo.hashedPin)) {
+                        // TODO: Revoke access token
+                        userIdAccessTokenMap.remove(userId);
+                        
+                        String listUsersResponse = generateNewUserListResponse();
+                        Iterator<Map.Entry<String, RemoteEndpoint>> it = remoteControllers.entrySet().iterator();
+                        while (it.hasNext()) {
+                            RemoteEndpoint controller = it.next().getValue();
+                            try {
+                                controller.sendString(listUsersResponse);
+                            } catch (IOException ex) {
+                                it.remove();
+                            }
+                        }
+                    } else {
+                        response = "Error: username and PIN do not match";
+                    }
+                    break;
+                }
+
                 case "list-current-users": {
                     response = generateNewUserListResponse();
                     break;

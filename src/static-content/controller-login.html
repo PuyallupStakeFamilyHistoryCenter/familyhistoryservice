@@ -25,35 +25,38 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 -->
 <div class="panel panel-default">
-  <div class="panel-body">
-    <form autocomplete="off" id="login-form">
-        <div class="panel-heading"><h3>Login</h3></div>
-        <div id="user-list">
+    <div class="panel-body">
+        <div>
+            <form autocomplete="off" id="login-form">
+                <div class="panel-heading"><h3>Login</h3></div>
+                <div id="user-list">
+                </div>
+                <br>
+                <div class="input-group input-group-lg" id="pin-input-div" style="max-width: 200px; display: none;">
+                    <input type="hidden" id="userid-input" />
+                    <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
+                    <input type="password" id="pin-input" pattern="[0-9]*" maxlength="6" class="form-control" placeholder="PIN" />
+                </div>
+                <br>
+                <button type="submit" class="btn btn-primary btn-lg" >Log in</button>
+                <button type="button" class="btn btn-danger btn-sm pull-right" id="logout-btn" style="display: none;"  >Log out</button>
+            </form>
         </div>
-        <br>
-        <div class="input-group input-group-lg" id="pin-input-div" style="max-width: 200px; display: none;">
-            <input type="hidden" id="userid-input" value="guest" />
-            <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
-            <input type="password" id="pin-input" pattern="[0-9]*" maxlength="6" class="form-control" placeholder="PIN" value="1234" />
-        </div>
-        <br>
-        <button type="submit" class="btn btn-primary btn-lg" >Login</button>
-    </form>
-  </div>
+    </div>
 </div>
 
 <script>
     settings.local = {
         verbs: {
-            "user-list": function(parts) {
+            "user-list": function (parts) {
                 var selectedUser = $("#userid-input").val();
                 $("#user-list").html("");
-                for (var i = 1; i < parts.length; i+=2) {
+                for (var i = 1; i < parts.length; i += 2) {
                     var user = parts[i];
-                    $("#user-list").append("<button class='btn btn-lg btn-default username-btn" + (selectedUser === parts[i+1] ? " btn-warning" : "") + "' data-user-id='"+ parts[i+1] +"'>" + decodeURI(parts[i]) + "</button>");
+                    $("#user-list").append("<button class='btn btn-lg btn-default username-btn" + (selectedUser === parts[i + 1] ? " btn-warning" : "") + "' data-user-id='" + parts[i + 1] + "'>" + decodeURI(parts[i]) + "</button>");
                 }
 
-                $(".username-btn").click(function(e) {
+                $(".username-btn").click(function (e) {
                     e.preventDefault();
                     var value = $(e.target).attr("data-user-id");
                     $("#userid-input").val(value);
@@ -62,9 +65,11 @@ POSSIBILITY OF SUCH DAMAGE.
 
                     if (value === "KW79-H8X") {
                         $("#pin-input-div").hide()
+                        $("#logout-btn").hide()
                         $("#pin-input").val("1234");
                     } else {
                         $("#pin-input-div").show();
+                        $("#logout-btn").show()
                         $("#pin-input").val("").focus();
                     }
                 });
@@ -72,20 +77,35 @@ POSSIBILITY OF SUCH DAMAGE.
         }
     };
     ws.socketSend("list-current-users");
-    
-    $("#login-form").submit(function(event) {
+
+    $("#login-form").submit(function (event) {
         $("#messages").html("");
         event.preventDefault();
-        
+
         var userId = $("#userid-input").val();
         var pin = $("#pin-input").val();
-        
+
+        if (!userId || !pin) {
+            logger.error("You must choose a user and enter a valid PIN");
+            return;
+        }
+
+        settings.userId = userId;
+        settings.page.getToken(userId, pin);
+    });
+    
+    $("#logout-btn").click(function(event) {
+        var userId = $("#userid-input").val();
+        var pin = $("#pin-input").val();
+
         if (!userId || !pin) {
             logger.error("You must choose a user and enter a valid PIN");
             return;
         }
         
-        settings.userId = userId;
-        settings.page.getToken(userId, pin);
+        settings.page.destroyAccessToken(userId, pin);
+        
+        $("#pin-input-div").hide()
+        $("#logout-btn").hide()
     });
 </script>

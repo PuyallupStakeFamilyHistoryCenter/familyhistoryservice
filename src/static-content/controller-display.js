@@ -171,6 +171,9 @@ var defaultSettings = {
             ws.socketSend("nav " + displayName + " display-login");
             navigate("controller-login");
         },
+        destroyAccessToken: function(userId, pin) {
+            ws.socketSend("destroy-access-token " + userId + " " + pin);
+        }
     },
     kiosk: {
         title: "Kiosk",
