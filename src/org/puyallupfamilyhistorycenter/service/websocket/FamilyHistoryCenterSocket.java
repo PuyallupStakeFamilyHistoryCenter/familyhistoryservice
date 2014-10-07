@@ -56,8 +56,8 @@ import org.gedcomx.rs.client.PersonState;
 import org.gedcomx.rs.client.SourceDescriptionsState;
 import org.gedcomx.rs.client.StateTransitionOption;
 import org.puyallupfamilyhistorycenter.service.cache.CachingSource;
+import org.puyallupfamilyhistorycenter.service.cache.FamilySearchPersonSource;
 import org.puyallupfamilyhistorycenter.service.cache.InMemoryCache;
-import org.puyallupfamilyhistorycenter.service.cache.MockPersonSource;
 import org.puyallupfamilyhistorycenter.service.cache.Source;
 import org.puyallupfamilyhistorycenter.service.models.Person;
 
@@ -103,8 +103,8 @@ public class FamilyHistoryCenterSocket {
     }
     
     //TODO: Wire via configuration (Spring?)
-//    private static final Source fsSource = new FamilySearchPersonSource(); 
-    private static final Source fsSource = new MockPersonSource();
+    private static final Source fsSource = new FamilySearchPersonSource(); 
+//    private static final Source fsSource = new MockPersonSource();
     //private static final Source fileSource = new CachingSource(fsSource, new FileCache<>(Person.class, new File("/tmp/fhc/person-cache"), TimeUnit.DAYS.toMillis(3)));
     private static final Source inMemorySource = new CachingSource(fsSource, new InMemoryCache<String, Person>());
     private static final PersonDao personCache = new PersonDao(inMemorySource);
@@ -158,7 +158,7 @@ public class FamilyHistoryCenterSocket {
 
     public FamilyHistoryCenterSocket() {
         String salt = newSalt();
-        userIdAccessTokenMap.put("guest", new AccessTokenInfo("KW79-H8X", "Guest%20account", hashPin("1234", salt), null));
+        userIdAccessTokenMap.put("KW79-H8X", new AccessTokenInfo("KW79-H8X", "Guest%20account", hashPin("1234", salt), null));
     }
     
     @OnWebSocketConnect
@@ -423,28 +423,30 @@ public class FamilyHistoryCenterSocket {
                     FamilySearchFamilyTree tree = new FamilyHistoryFamilyTree(true)
                             .authenticate(accessToken);
 
-                    StateTransitionOption[] options = new StateTransitionOption[] {
-                        //new QueryParameter(cmd, value)
-                    };
-                    PersonState person = tree.readPersonForCurrentUser(options);
+                    PersonState person = tree.readPersonForCurrentUser();
 
                     if (!person.getSelfUri().getPath().endsWith(userId)) {
                         response = "Error: Access token does not match userId";
                         break;
                     }
-
+                    
                     userIdAccessTokenMap.put(userId, new AccessTokenInfo(userId, userName, pin, accessToken));
+
+                    String listUsersResponse = generateNewUserListResponse();
+                    Iterator<Map.Entry<String, RemoteEndpoint>> it = remoteControllers.entrySet().iterator();
+                    while (it.hasNext()) {
+                        RemoteEndpoint controller = it.next().getValue();
+                        try {
+                            controller.sendString(listUsersResponse);
+                        } catch (IOException ex) {
+                            it.remove();
+                        }
+                    }
                     break;
                 }
 
                 case "list-current-users": {
-                    StringBuilder userListBuilder = new StringBuilder("user-list");
-                    for (AccessTokenInfo ati : userIdAccessTokenMap.values()) {
-                        userListBuilder
-                                .append(" ").append(ati.userName)
-                                .append(" ").append(ati.userId);
-                    }
-                    response = userListBuilder.toString();
+                    response = generateNewUserListResponse();
                     break;
                 }
 
@@ -516,6 +518,16 @@ public class FamilyHistoryCenterSocket {
             builder.append(GSON.toJson(it.next()));
         }
         return builder.toString();
+    }
+    
+    protected static String generateNewUserListResponse() {
+        StringBuilder userListBuilder = new StringBuilder("user-list");
+        for (AccessTokenInfo ati : userIdAccessTokenMap.values()) {
+            userListBuilder
+                    .append(" ").append(ati.userName)
+                    .append(" ").append(ati.userId);
+        }
+        return userListBuilder.toString();
     }
     
     protected static String newSalt() {

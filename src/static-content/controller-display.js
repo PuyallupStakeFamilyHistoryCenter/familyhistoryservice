@@ -36,12 +36,13 @@ var settings = {
             pong: doNothing,
             nav: function(parts) {
                 navigate(parts[1]);
-            }
+            },
+            "user-list": doNothing
         }
     },
     page: {verbs:{}},
     local: {verbs:{}}
-}
+};
 var displayName;
 var token;
 var userName;
