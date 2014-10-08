@@ -468,26 +468,6 @@ public class FamilyHistoryCenterSocket {
                     break;
                 }
 
-                case "move-left":
-                case "move-right":
-                case "move-up":
-                case "move-down":
-                case "zoom-in":
-                case "zoom-out": {
-                    String id = scanner.next();
-                    RemoteEndpoint displayEndpoint = remoteDisplays.get(id);
-                    if (displayEndpoint != null) {
-                        try {
-                            displayEndpoint.sendString(cmd);
-                        } catch (IOException e) {
-                            response = "Error: failed to communicate with display " + id + ": " + e.getMessage();
-                        }
-                    } else {
-                        response = "Error: display not found '" + id + "'";
-                    }
-                    break;
-                }
-
 
                 default:
                     response = "Error: unrecognized command '" + message + "'";
