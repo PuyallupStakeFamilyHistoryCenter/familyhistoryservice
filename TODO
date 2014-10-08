@@ -1,0 +1,10 @@
+TODO:
+
+Set up SSL for web socket and image cache  DONE
+Delete access token on log out             DONE
+Finish caching
+Move developer id into config file (not in Git)
+Test map movement (changed to 'send' commands; removed native 'move' commands)
+Wire puzzle settings into display
+Dynamically resize puzzle
+Add person info on controller-puzzle
