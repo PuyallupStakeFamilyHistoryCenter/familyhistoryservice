@@ -86,9 +86,6 @@ var ws = {
         }
     },
     socketSend: function (message) {
-        if (!connection) {
-            throw new Error("No connection; cannot send message " + message);
-        }
         if (blocking) {
             console.info("Queueing message websocket message '" + message + "'")
             messageQueue.push(message);

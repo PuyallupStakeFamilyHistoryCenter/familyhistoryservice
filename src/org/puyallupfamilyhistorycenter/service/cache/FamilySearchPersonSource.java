@@ -85,13 +85,15 @@ public class FamilySearchPersonSource implements Source<Person> {
         {
             SourceDescriptionsState sourceState = state.readArtifacts();
             List<SourceDescription> sources = sourceState.getSourceDescriptions();
-            String[] imageUrls = new String[sources.size()];
-            int i = 0;
-            for (SourceDescription source : sources) {
-                //source.getAbout() is the url to the image
-                imageUrls[i++] = source.getAbout().toString();
+            if (sources != null) {
+                String[] imageUrls = new String[sources.size()];
+                int i = 0;
+                for (SourceDescription source : sources) {
+                    //source.getAbout() is the url to the image
+                    imageUrls[i++] = source.getAbout().toString();
+                }
+                builder.withImages(imageUrls);
             }
-            builder.withImages(imageUrls);
         }
         
         return builder.build();

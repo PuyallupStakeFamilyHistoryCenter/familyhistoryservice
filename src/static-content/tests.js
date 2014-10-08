@@ -1,23 +1,4 @@
 
-
-function configureSockete(verbResponses) {
-    Sockete.Server.reset();
-    var endpoint = "wss://" + window.location.host + "/remote-control/";
-    Sockete.Server.configure(endpoint, function () {
-        for (var i = 0; i < verbResponses.length; i++) {
-            var entry = verbResponses[i];
-            if (entry.response) {
-                this.onmessage(entry.verb).respond(entry.response);
-            } else if (entry.error) {
-                this.onmessage(entry.verb).fail(entry.error);
-            } else {
-                //We should probably throw an configuration exception here
-            }
-        };
-    });
-    Sockete.mock();
-}
-
 QUnit.module("UI testing controller", {
     setupOnce: function (assert) {
     },

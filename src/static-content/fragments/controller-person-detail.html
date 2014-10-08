@@ -39,7 +39,7 @@ POSSIBILITY OF SUCH DAMAGE.
     $("#back-button").click(function (e) {
         navigate("controller-main");
     });
-    
+
     settings.local = {
         verbs: {
             family: function(parts) {
@@ -49,16 +49,16 @@ POSSIBILITY OF SUCH DAMAGE.
             }
         }
     }
-    
+
     console.info("Sending get-family request");
     ws.socketSend("get-family " + token + " " + settings.userId);
-    
+
     function gotFamily(people) {
         $("#data-div").html("");
         $.each(people, function(index, person) {
             $("#data-div").append('<button class="btn btn-default btn-lg send-person" data-id="' + person.id + '">'+decodeURI(person.name)+'</button>')
         });
-        
+
         $(".send-person").click(function(event) {
             var personId = $(this).attr("data-id");
             console.info("Got person id " + personId)

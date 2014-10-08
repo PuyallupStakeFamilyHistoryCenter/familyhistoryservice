@@ -35,10 +35,12 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -83,13 +85,14 @@ public class FamilyHistoryCenterSocket {
         }
     }
     
-    private static final long tokenInactivityTimeout = TimeUnit.MINUTES.toMillis(5);
-    private static final long userInactivityTimeout = TimeUnit.MINUTES.toMillis(60);
+    private static final long tokenInactivityTimeout = TimeUnit.MINUTES.toMillis(1); //TODO: Reset this
+    private static final long userInactivityTimeout = TimeUnit.MINUTES.toMillis(2);
     
     private static final Map<String, RemoteEndpoint> remoteDisplays = new HashMap<>();
     private static final Map<String, RemoteEndpoint> remoteControllers = new HashMap<>();
     private static final Map<String, RemoteEndpoint> tokenControllerMap = new HashMap<>();
     private static final Map<String, String> tokenUserIdMap = new HashMap<>();
+    private static final Map<String, Set<String>> userIdTokens = new HashMap<>();
     private static final Map<String, Long> tokenLastUse = new HashMap<>();
     private static final Map<String, Long> userIdLastUse = new HashMap<>();
     private static final Map<String, AccessTokenInfo> userIdAccessTokenMap = new LinkedHashMap<>();
@@ -110,10 +113,9 @@ public class FamilyHistoryCenterSocket {
     private static final PersonDao personCache = new PersonDao(inMemorySource);
     
     
-    private static final ScheduledExecutorService tokenCleanupService = Executors.newScheduledThreadPool(1);
-    private static final ScheduledExecutorService userCleanupService = Executors.newScheduledThreadPool(1);
+    private static final ScheduledExecutorService cleanupService = Executors.newScheduledThreadPool(1);
     static {
-        tokenCleanupService.schedule(new Callable<Void>() {
+        cleanupService.schedule(new Callable<Void>() {
 
             @Override
             public Void call() throws Exception {
@@ -122,10 +124,11 @@ public class FamilyHistoryCenterSocket {
                     Map.Entry<String, Long> entry = it.next();
                     if (entry.getValue() + tokenInactivityTimeout < System.currentTimeMillis()) {
                         String token = entry.getKey();
-                        RemoteEndpoint controllerEndpoint = tokenControllerMap.remove(token);
-                        controllerEndpoint.sendString("nav controller-login");
-                        controllerEndpoint.sendString("Error: logged out due to inactivity");
-                        
+                        try {
+                            deactivateUserToken(token);
+                        } catch (IOException ex) {
+                            System.err.println("Failed to delete token " + token + " controller has probably already disconnected");
+                        }
                         it.remove();
                     }
                 }
@@ -134,7 +137,7 @@ public class FamilyHistoryCenterSocket {
             }
         
         }, 1, TimeUnit.MINUTES);
-        userCleanupService.schedule(new Callable<Void>() {
+        cleanupService.schedule(new Callable<Void>() {
 
             @Override
             public Void call() throws Exception {
@@ -150,6 +153,8 @@ public class FamilyHistoryCenterSocket {
                     }
                 }
                 
+                resendUserListToControllers();
+                
                 return null;
             }
         
@@ -159,6 +164,7 @@ public class FamilyHistoryCenterSocket {
     public FamilyHistoryCenterSocket() {
         String salt = newSalt();
         userIdAccessTokenMap.put("KW79-H8X", new AccessTokenInfo("KW79-H8X", "Guest%20account", hashPin("1234", salt), null));
+        userIdTokens.put("KW79-H8X", new HashSet<String>());
     }
     
     @OnWebSocketConnect
@@ -241,6 +247,7 @@ public class FamilyHistoryCenterSocket {
                         token = Long.toHexString(rand.nextLong());
                         tokenUserIdMap.put(token, userId);
                         tokenControllerMap.put(token, session.getRemote());
+                        userIdTokens.get(userId).add(token);
                         response = "token " + token + " " + tokenInfo.userName;
                     } else {
                         response = "Error: username and PIN do not match";
@@ -250,16 +257,13 @@ public class FamilyHistoryCenterSocket {
                 
                 case "logout": {
                     token = scanner.next();
-                    String pin = scanner.next();
                     userId = tokenUserIdMap.get(token);
                     
-                    AccessTokenInfo tokenInfo = userIdAccessTokenMap.get(userId);
-                    if (tokenInfo != null && validatePin(pin, tokenInfo.hashedPin)) {
-                        tokenUserIdMap.remove(token);
-                        tokenControllerMap.remove(token);
-                    } else {
-                        response = "Error: username and PIN do not match";
-                    }
+                    tokenUserIdMap.remove(token);
+                    tokenControllerMap.remove(token);
+                    userIdTokens.get(userId).remove(token);
+                    
+                    token = null;
                     break;
                 }
 
@@ -431,17 +435,11 @@ public class FamilyHistoryCenterSocket {
                     }
                     
                     userIdAccessTokenMap.put(userId, new AccessTokenInfo(userId, userName, pin, accessToken));
-
-                    String listUsersResponse = generateNewUserListResponse();
-                    Iterator<Map.Entry<String, RemoteEndpoint>> it = remoteControllers.entrySet().iterator();
-                    while (it.hasNext()) {
-                        RemoteEndpoint controller = it.next().getValue();
-                        try {
-                            controller.sendString(listUsersResponse);
-                        } catch (IOException ex) {
-                            it.remove();
-                        }
+                    if (!userIdTokens.containsKey(userId)) {
+                        userIdTokens.put(userId, new HashSet<String>());
                     }
+
+                    resendUserListToControllers();
                     break;
                 }
 
@@ -453,17 +451,12 @@ public class FamilyHistoryCenterSocket {
                     if (tokenInfo != null && validatePin(pin, tokenInfo.hashedPin)) {
                         // TODO: Revoke access token
                         userIdAccessTokenMap.remove(userId);
-                        
-                        String listUsersResponse = generateNewUserListResponse();
-                        Iterator<Map.Entry<String, RemoteEndpoint>> it = remoteControllers.entrySet().iterator();
-                        while (it.hasNext()) {
-                            RemoteEndpoint controller = it.next().getValue();
-                            try {
-                                controller.sendString(listUsersResponse);
-                            } catch (IOException ex) {
-                                it.remove();
-                            }
+                        for (String t : userIdTokens.remove(userId)) {
+                            deactivateUserToken(t);
                         }
+                        userId = null;
+                        
+                        resendUserListToControllers();
                     } else {
                         response = "Error: username and PIN do not match";
                     }
@@ -553,6 +546,25 @@ public class FamilyHistoryCenterSocket {
                     .append(" ").append(ati.userId);
         }
         return userListBuilder.toString();
+    }
+    
+    protected static void resendUserListToControllers() {
+        String listUsersResponse = generateNewUserListResponse();
+        Iterator<Map.Entry<String, RemoteEndpoint>> it = remoteControllers.entrySet().iterator();
+        while (it.hasNext()) {
+            RemoteEndpoint controller = it.next().getValue();
+            try {
+                controller.sendString(listUsersResponse);
+            } catch (IOException ex) {
+                it.remove();
+            }
+        }
+    }
+    
+    protected static void deactivateUserToken(String token) throws IOException {
+        RemoteEndpoint controllerEndpoint = tokenControllerMap.remove(token);
+        controllerEndpoint.sendString("nav controller-login");
+        controllerEndpoint.sendString("Error: logged out due to inactivity");
     }
     
     protected static String newSalt() {
