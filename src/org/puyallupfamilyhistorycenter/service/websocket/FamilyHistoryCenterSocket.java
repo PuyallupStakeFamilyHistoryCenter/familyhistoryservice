@@ -71,31 +71,32 @@ import org.puyallupfamilyhistorycenter.service.models.Person;
 public class FamilyHistoryCenterSocket {
     private static final Gson GSON = new Gson();
 
-    private static final class AccessTokenInfo {
+    private static final class UserContext {
         public final String userName;
         public final String userId;
         public final String hashedPin;
         public final String accessToken;
-
-        public AccessTokenInfo(String userId, String userName, String hashedPin, String accessToken) {
+        public long lastUsed;
+        public final Set<String> tokens; //TODO: Rename to prevent confusion with access token
+        public UserContext(String userId, String userName, String hashedPin, String accessToken) {
             this.userName = userName;
             this.userId = userId;
             this.hashedPin = hashedPin;
             this.accessToken = accessToken;
+            this.lastUsed = System.currentTimeMillis();
+            this.tokens = new HashSet<>();
         }
     }
     
     private static final long tokenInactivityTimeout = TimeUnit.MINUTES.toMillis(1); //TODO: Reset this
-    private static final long userInactivityTimeout = TimeUnit.MINUTES.toMillis(2);
+    private static final long userInactivityTimeout  = TimeUnit.MINUTES.toMillis(2);
     
     private static final Map<String, RemoteEndpoint> remoteDisplays = new HashMap<>();
     private static final Map<String, RemoteEndpoint> remoteControllers = new HashMap<>();
     private static final Map<String, RemoteEndpoint> tokenControllerMap = new HashMap<>();
     private static final Map<String, String> tokenUserIdMap = new HashMap<>();
-    private static final Map<String, Set<String>> userIdTokens = new HashMap<>();
     private static final Map<String, Long> tokenLastUse = new HashMap<>();
-    private static final Map<String, Long> userIdLastUse = new HashMap<>();
-    private static final Map<String, AccessTokenInfo> userIdAccessTokenMap = new LinkedHashMap<>();
+    private static final Map<String, UserContext> userContextMap = new LinkedHashMap<>();
     private static final SecureRandom rand;
     static {
         try {
@@ -141,13 +142,13 @@ public class FamilyHistoryCenterSocket {
 
             @Override
             public Void call() throws Exception {
-                Iterator<Map.Entry<String, Long>> it = userIdLastUse.entrySet().iterator();
+                Iterator<Map.Entry<String, UserContext>> it = userContextMap.entrySet().iterator();
                 while (it.hasNext()) {
-                    Map.Entry<String, Long> entry = it.next();
-                    if (entry.getValue() + userInactivityTimeout < System.currentTimeMillis()) {
+                    Map.Entry<String, UserContext> entry = it.next();
+                    if (entry.getValue().lastUsed + userInactivityTimeout < System.currentTimeMillis()) {
                         String userId = entry.getKey();
                         // TODO: Figure out how to invalidate access token
-                        String accessToken = userIdAccessTokenMap.remove(userId).accessToken;
+                        String accessToken = userContextMap.remove(userId).accessToken;
                         
                         it.remove();
                     }
@@ -163,8 +164,7 @@ public class FamilyHistoryCenterSocket {
 
     public FamilyHistoryCenterSocket() {
         String salt = newSalt();
-        userIdAccessTokenMap.put("KW79-H8X", new AccessTokenInfo("KW79-H8X", "Guest%20account", hashPin("1234", salt), null));
-        userIdTokens.put("KW79-H8X", new HashSet<String>());
+        userContextMap.put("KW79-H8X", new UserContext("KW79-H8X", "Guest%20account", hashPin("1234", salt), null));
     }
     
     @OnWebSocketConnect
@@ -242,12 +242,12 @@ public class FamilyHistoryCenterSocket {
                     userId = scanner.next();
                     String pin = scanner.next(); //TODO: This is pretty insecure
                     
-                    AccessTokenInfo tokenInfo = userIdAccessTokenMap.get(userId);
+                    UserContext tokenInfo = userContextMap.get(userId);
                     if (tokenInfo != null && validatePin(pin, tokenInfo.hashedPin)) {
                         token = Long.toHexString(rand.nextLong());
                         tokenUserIdMap.put(token, userId);
                         tokenControllerMap.put(token, session.getRemote());
-                        userIdTokens.get(userId).add(token);
+                        userContextMap.get(userId).tokens.add(token);
                         response = "token " + token + " " + tokenInfo.userName;
                     } else {
                         response = "Error: username and PIN do not match";
@@ -261,7 +261,7 @@ public class FamilyHistoryCenterSocket {
                     
                     tokenUserIdMap.remove(token);
                     tokenControllerMap.remove(token);
-                    userIdTokens.get(userId).remove(token);
+                    userContextMap.get(userId).tokens.remove(token);
                     
                     token = null;
                     break;
@@ -434,10 +434,7 @@ public class FamilyHistoryCenterSocket {
                         break;
                     }
                     
-                    userIdAccessTokenMap.put(userId, new AccessTokenInfo(userId, userName, pin, accessToken));
-                    if (!userIdTokens.containsKey(userId)) {
-                        userIdTokens.put(userId, new HashSet<String>());
-                    }
+                    userContextMap.put(userId, new UserContext(userId, userName, pin, accessToken));
 
                     resendUserListToControllers();
                     break;
@@ -447,11 +444,11 @@ public class FamilyHistoryCenterSocket {
                     userId = scanner.next();
                     String pin = scanner.next(); //TODO: This is pretty insecure
                     
-                    AccessTokenInfo tokenInfo = userIdAccessTokenMap.get(userId);
-                    if (tokenInfo != null && validatePin(pin, tokenInfo.hashedPin)) {
+                    UserContext userContext = userContextMap.get(userId);
+                    if (userContext != null && validatePin(pin, userContext.hashedPin)) {
                         // TODO: Revoke access token
-                        userIdAccessTokenMap.remove(userId);
-                        for (String t : userIdTokens.remove(userId)) {
+                        userContextMap.remove(userId);
+                        for (String t : userContext.tokens) {
                             deactivateUserToken(t);
                         }
                         userId = null;
@@ -468,7 +465,6 @@ public class FamilyHistoryCenterSocket {
                     break;
                 }
 
-
                 default:
                     response = "Error: unrecognized command '" + message + "'";
             }
@@ -477,7 +473,7 @@ public class FamilyHistoryCenterSocket {
                 tokenLastUse.put(token, System.currentTimeMillis());
             }
             if (userId != null) {
-                userIdLastUse.put(userId, System.currentTimeMillis());
+                userContextMap.get(userId).lastUsed = System.currentTimeMillis();
             }
         } catch (Throwable e) {
             e.printStackTrace(System.err);
@@ -496,7 +492,7 @@ public class FamilyHistoryCenterSocket {
             throw new IllegalStateException("Invalid token");
         }
 
-        AccessTokenInfo accessTokenInfo = userIdAccessTokenMap.get(userId);
+        UserContext accessTokenInfo = userContextMap.get(userId);
         if (accessTokenInfo == null) {
             throw new IllegalStateException("Invalid token");
         }
@@ -520,7 +516,7 @@ public class FamilyHistoryCenterSocket {
     
     protected static String generateNewUserListResponse() {
         StringBuilder userListBuilder = new StringBuilder("user-list");
-        for (AccessTokenInfo ati : userIdAccessTokenMap.values()) {
+        for (UserContext ati : userContextMap.values()) {
             userListBuilder
                     .append(" ").append(ati.userName)
                     .append(" ").append(ati.userId);
