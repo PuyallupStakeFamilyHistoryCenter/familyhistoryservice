@@ -2,9 +2,9 @@ TODO:
 
 Set up SSL for web socket and image cache  DONE
 Delete access token on log out             DONE
+Test map movement (changed to 'send' commands; removed native 'move' commands) DONE
 Finish caching
 Move developer id into config file (not in Git)
-Test map movement (changed to 'send' commands; removed native 'move' commands) DONE
 
 Puzzle:
 Wire puzzle settings into display          DONE
@@ -37,3 +37,4 @@ Rewire sockete.js to accept a response callback
 
 Project:
 Move these TODOs to the shared task board
+Set up screen with both display and controller in iframes for independant use   DONE
