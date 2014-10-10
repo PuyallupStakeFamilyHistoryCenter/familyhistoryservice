@@ -67,7 +67,12 @@ POSSIBILITY OF SUCH DAMAGE.
             },
             rotate: function (parts) {
                 config.rotate = parseBool(parts[1]);
-                init();
+                $.each(pieces, function(index, piece) {
+                    if (!piece.found) {
+                        piece.rotation = config.rotate ? rand(-Math.PI, Math.PI) : 0;
+                    }
+                });
+                draw();
             },
             "snap-on-drag": function (parts) {
                 config.snapOnDrag = parseBool(parts[1]);
@@ -91,7 +96,11 @@ POSSIBILITY OF SUCH DAMAGE.
             },
             presort: function (parts) {
                 config.presort = parseBool(parts[1]);
-                init();
+                shuffle(pieces);
+                if (config.presort) {
+                    preSort(pieces);
+                }
+                draw();
             },
             "background-transparency": function (parts) {
                 config.backgroundTransparency = parseInt(parts[1])/100.0;

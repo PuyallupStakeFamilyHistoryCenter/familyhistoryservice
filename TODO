@@ -10,7 +10,7 @@ Puzzle:
 Wire puzzle settings into display          DONE
 Dynamically resize puzzle                  DONE
 Make puzzle canvas opaque or remove header DONE
-Replace "you win" dialog                   DONE
+Remove "you win" dialog                    DONE
 Look up parseBoolean equivalent in JS (for puzzle settings) DONE
 Remove configurations from display side, send every setting from controller to reduce redundancy DONE
 Remove extra space from 'send' command     DONE
@@ -20,6 +20,9 @@ Add person info on controller-puzzle
 Set up image chooser
 Make piece shapes more interesting
 Figure out why puzzle scrolls in split mode DONE
+Fix puzzle initial config
+Rotate pieces without restarting           DONE
+Presort pieces without restarting          DONE
 
 Life map:
 Add person chooser
