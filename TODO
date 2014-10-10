@@ -13,7 +13,7 @@ Make puzzle canvas opaque or remove header DONE
 Replace "you win" dialog                   DONE
 Look up parseBoolean equivalent in JS (for puzzle settings) DONE
 Remove configurations from display side, send every setting from controller to reduce redundancy
-Remove extra space from 'send' command
+Remove extra space from 'send' command     DONE
 Figure out why image doesn't fit in frame
 Add back button on controller page
 Add person info on controller-puzzle

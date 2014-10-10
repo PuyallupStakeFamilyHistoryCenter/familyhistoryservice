@@ -48,6 +48,7 @@ import java.util.concurrent.TimeUnit;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jetty.websocket.api.RemoteEndpoint;
 
 import org.eclipse.jetty.websocket.api.Session;
@@ -386,8 +387,14 @@ public class FamilyHistoryCenterSocket {
                     RemoteEndpoint displayEndpoint = remoteDisplays.get(id);
                     if (displayEndpoint != null) {
                         StringBuilder builder = new StringBuilder();
+                        boolean isFirst = true;
                         while (scanner.hasNext()) {
-                            builder.append(scanner.next()).append(" ");
+                            if (isFirst) {
+                                isFirst = false;
+                            } else {
+                                builder.append(" ");
+                            }
+                            builder.append(scanner.next());
                         }
                         
                         try {
