@@ -162,7 +162,7 @@ POSSIBILITY OF SUCH DAMAGE.
         context = canvas.getContext("2d");
         dragging = false;
         image = new Image();
-        image.src = imagesrc ? imagesrc : "children.png";
+        image.src = imagesrc ? imagesrc : "old-game.jpg";//"children.png";
         image.crossOrigin = "Anonymous";
         image.onload = function () {
             resize();
@@ -432,7 +432,7 @@ POSSIBILITY OF SUCH DAMAGE.
                 return;
             }
         }
-        alert("You win!");
+        //TODO: Send message to controller
     }
 
     /*
