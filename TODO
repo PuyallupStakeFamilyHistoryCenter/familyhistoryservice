@@ -8,7 +8,8 @@ Test map movement (changed to 'send' commands; removed native 'move' commands)
 
 Puzzle:
 Wire puzzle settings into display          DONE
-Dynamically resize puzzle
+Dynamically resize puzzle                  DONE
+Make puzzle canvas opaque or remove header
 Add person info on controller-puzzle
 Look up parseBoolean equivalent in JS (for puzzle settings)
 Remove configurations from display side, send every setting from controller to reduce redundancy
