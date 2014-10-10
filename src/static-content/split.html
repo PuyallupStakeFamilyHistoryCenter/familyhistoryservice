@@ -31,7 +31,8 @@ POSSIBILITY OF SUCH DAMAGE.
         <style>
             .display {
                 width: 100%;
-                height: 100%
+                height: 100%;
+                overflow-y: hidden;
             }
             .controller {
                 position: fixed;
@@ -39,12 +40,13 @@ POSSIBILITY OF SUCH DAMAGE.
                 top: 0px;
                 width: 30%;
                 height: 100%;
+                z-index: 999
             }
         </style>
     </head>
     <body>
         <div class="display">
-            <iframe src="controller-display-base.html?mode=display" style="width: 100%; height: 100%; border-style: none" ></iframe>
+            <iframe src="controller-display-base.html?mode=display" style="width: 100%; height: calc(100% - 20px); border-style: none" ></iframe>
         </div>
         <div class="controller">
             <iframe src="controller-display-base.html?mode=controller" style="width: calc(100% - 10px); height: 100%; border-style: none; overflow-x: hidden; float: left;" ></iframe>
