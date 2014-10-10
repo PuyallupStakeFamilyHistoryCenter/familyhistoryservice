@@ -26,58 +26,10 @@ POSSIBILITY OF SUCH DAMAGE.
 -->
 
 <div>
-    <canvas id="canvas" width="1000" height="500"></canvas>
+    <canvas id="canvas" width="1" height="1"></canvas>
 </div>
 
 <script>
-    var configurations = {
-        easy: {
-            depth: 3,
-            protrusions: true,
-            backgroundTransparency: 0.5,
-            thumbnail: false,
-            snapThreshold: 15,
-            snapOnDrag: true,
-            presort: false,
-            rotate: false,
-            boardHeight: 500,
-        },
-        medium: {
-            depth: 4,
-            protrusions: true,
-            backgroundTransparency: 0.75,
-            thumbnail: false,
-            snapThreshold: 10,
-            snapOnDrag: false,
-            presort: true,
-            rotate: false,
-            boardHeight: 500,
-        },
-        hard: {
-            depth: 6,
-            protrusions: true,
-            backgroundTransparency: 1,
-            thumbnail: true,
-            snapThreshold: 10,
-            snapOnDrag: false,
-            presort: true,
-            rotate: true,
-            boardHeight: 500,
-        },
-        insane: {
-            depth: 7,
-            protrusions: false,
-            backgroundTransparency: 1,
-            thumbnail: true,
-            snapThreshold: 10,
-            snapOnDrag: false,
-            presort: false,
-            rotate: true,
-            boardHeight: 500,
-        }
-    }
-    settings.config = configurations.medium;
-
     var imagesrc = getParameterByName("image");
     var canvas,context,image;
     var pieces;
@@ -88,54 +40,36 @@ POSSIBILITY OF SUCH DAMAGE.
     var lastY = -1;
     var lastRotation = 0;
     var lastClicked = null;
-
-    var imageWidth;
-    var imageHeight;
+    
+    var config = {
+        depth: 4,
+        protrusions: true,
+        backgroundTransparency: 0.75,
+        thumbnail: false,
+        snapThreshold: 10,
+        snapOnDrag: false,
+        presort: true,
+        rotate: false,
+    };
     
     init();
 
     settings.local = {
         verbs: {
-            difficulty: function (parts) {
-                settings.config = configurations[parts[1]]
-                init();
-            },
             depth: function (parts) {
-                settings.config.depth = parseInt(parts[1]);
-                init();
-            },
-            "board-height": function (parts) {
-                //TODO: Make this automatic
-                if ($(this).val() === null || $(this).val() === "") {
-                    $(this).val(canvas.height);
-                }
-                var boardHeight = parseInt($(this).val());
-                if (boardHeight === NaN) {
-                    boardHeight = canvas.height;
-                    $(this).val(boardHeight);
-                }
-                if (boardHeight > canvas.height) {
-                    boardHeight = canvas.height;
-                    $(this).val(boardHeight);
-                }
-                if (boardHeight < 300) {
-                    boardHeight = 300;
-                    $(this).val(boardHeight);
-                }
-
-                settings.config.boardHeight = boardHeight;
+                config.depth = parseInt(parts[1]);
                 init();
             },
             protrusions: function (parts) {
-                settings.config.protrusions = parts[1]; //TODO: Parse boolean
+                config.protrusions = parseBool(parts[1]);
                 draw();
             },
             rotate: function (parts) {
-                settings.config.rotate = parts[1]; //TODO: Parse boolean
+                config.rotate = parseBool(parts[1]);
                 init();
             },
             "snap-on-drag": function (parts) {
-                settings.config.snapOnDrag = parts[1]; //TODO: Parse boolean
+                config.snapOnDrag = parseBool(parts[1]);
             },
             "snap-threshold": function (parts) {
                 var snapThreshold = parseInt(parts[1]);
@@ -152,22 +86,24 @@ POSSIBILITY OF SUCH DAMAGE.
                     $(this).val(snapThreshold);
                 }
 
-                settings.config.snapThreshold = snapThreshold;
+                config.snapThreshold = snapThreshold;
             },
             presort: function (parts) {
-                settings.config.presort = parts[1]; //TODO: Parse boolean
+                config.presort = parseBool(parts[1]);
                 init();
             },
             "background-transparency": function (parts) {
-                settings.config.backgroundTransparency = parseFloat(parts[1]);
+                config.backgroundTransparency = parseFloat(parts[1]);
                 draw();
             },
             thumbnail: function (parts) {
-                settings.config.thumbnail = parts[1]; //TODO: Parse boolean
+                config.thumbnail = parseBool(parts[1]);
                 draw();
             },
             reset: init
-        }
+        },
+
+
     };
 
     canvas.onmousedown = function (e) {
@@ -213,6 +149,11 @@ POSSIBILITY OF SUCH DAMAGE.
     canvas.addEventListener("gesturechange", function (e) {
         rotate(e.rotation);
     }, false);
+    
+    $(window).resize(new function() {
+        resize();
+        draw();
+    });
 
     function init() {
         pieces = new Array();
@@ -223,9 +164,10 @@ POSSIBILITY OF SUCH DAMAGE.
         image.src = imagesrc ? imagesrc : "children.png";
         image.crossOrigin = "Anonymous";
         image.onload = function () {
-            scale = settings.config.boardHeight / image.height;
+            resize();
+            
             var pieceNum = 0;
-            var piecesDeep = settings.config.depth;
+            var piecesDeep = config.depth;
             var pieceHeight = Math.floor(image.height / piecesDeep);
             imageHeight = piecesDeep * pieceHeight;
             var piecesAcross = Math.max(Math.round(image.width / pieceHeight), 1);
@@ -235,7 +177,7 @@ POSSIBILITY OF SUCH DAMAGE.
             var pWEMap = {};
             for (var x = 0; x < imageWidth; x += pieceWidth) {
                 for (var y = 0; y < imageHeight; y += pieceHeight) {
-                    var rot = settings.config.rotate ? rand(-Math.PI, Math.PI) : 0;
+                    var rot = config.rotate ? rand(-Math.PI, Math.PI) : 0;
                     var destx = rand(image.width * scale + 10, canvas.width - pieceWidth * scale - 10);
                     var desty = rand(10, canvas.height - pieceHeight * scale - 10);
                     var n = pNSMap[x + "," + y];
@@ -273,13 +215,20 @@ POSSIBILITY OF SUCH DAMAGE.
                     pieceNum++;
                 }
             }
-
+            
             shuffle(pieces);
-            if (settings.config.presort) {
+            if (config.presort) {
                 preSort(pieces);
             }
             draw();
         }
+    }
+    
+    function resize() {
+        canvas.width = window.innerWidth - 16;
+        canvas.height = window.innerHeight - 16;
+            
+        scale = Math.min(canvas.width/image.width, canvas.height/image.height);
     }
 
     function touchStart(x, y) {
@@ -295,7 +244,7 @@ POSSIBILITY OF SUCH DAMAGE.
             lastX = x;
             lastY = y;
 
-            if (settings.config.snapOnDrag) {
+            if (config.snapOnDrag) {
                 checkForCorrectPlacement();
             }
             draw();
@@ -310,7 +259,7 @@ POSSIBILITY OF SUCH DAMAGE.
     }
 
     function rotate(r) {
-        if (lastClicked != null && settings.config.rotate) {
+        if (lastClicked != null && config.rotate) {
             lastClicked.rotation += (r - lastRotation) * Math.PI / 180;
             while (lastClicked.rotation > Math.PI) {
                 lastClicked.rotation -= Math.PI * 2;
@@ -320,7 +269,7 @@ POSSIBILITY OF SUCH DAMAGE.
             }
             lastRotation = r;
 
-            if (settings.config.snapOnDrag) {
+            if (config.snapOnDrag) {
                 checkForCorrectPlacement();
             }
             draw();
@@ -330,9 +279,9 @@ POSSIBILITY OF SUCH DAMAGE.
     function checkForCorrectPlacement() {
         var shouldCheckForWin = false;
         if (lastClicked != null &&
-                Math.abs(lastClicked.actualX - lastClicked.targetX * scale) <= settings.config.snapThreshold &&
-                Math.abs(lastClicked.actualY - lastClicked.targetY * scale) <= settings.config.snapThreshold &&
-                Math.abs(lastClicked.rotation) <= settings.config.snapThreshold / 150) {
+                Math.abs(lastClicked.actualX - lastClicked.targetX * scale) <= config.snapThreshold &&
+                Math.abs(lastClicked.actualY - lastClicked.targetY * scale) <= config.snapThreshold &&
+                Math.abs(lastClicked.rotation) <= config.snapThreshold / 150) {
             lastClicked.actualX = lastClicked.targetX * scale;
             lastClicked.actualY = lastClicked.targetY * scale;
             lastClicked.rotation = 0;
@@ -393,11 +342,11 @@ POSSIBILITY OF SUCH DAMAGE.
 
     function drawBoard() {
         context.drawImage(image, 0, 0, imageWidth, imageHeight, 0, 0, imageWidth * scale, imageHeight * scale);
-        context.fillStyle = "rgba(255,255,255," + settings.config.backgroundTransparency + ")";
+        context.fillStyle = "rgba(255,255,255," + config.backgroundTransparency + ")";
         context.fillRect(0, 0, imageWidth * scale, imageHeight * scale);
         context.strokeRect(0, 0, imageWidth * scale, imageHeight * scale);
 
-        if (settings.config.thumbnail) {
+        if (config.thumbnail) {
             context.drawImage(image, 0, 0, imageWidth, imageHeight, imageWidth * scale + 10, 0, imageWidth * scale / 2, imageHeight * scale / 2);
         }
     }
@@ -414,7 +363,7 @@ POSSIBILITY OF SUCH DAMAGE.
 
         context.beginPath();
         context.moveTo(-p.width * 1 / 2 * scale, -p.height / 2 * scale);
-        if (settings.config.protrusions && p.north != 0) {
+        if (config.protrusions && p.north != 0) {
             context.lineTo(-p.width * 1 / 10 * scale, -p.height / 2 * scale);
             context.arcTo(-p.width * 1 / 10 * scale, -p.height / 2 * scale + p.north * p.height * 1 / 5 * scale,
                     0, -p.height / 2 * scale + p.north * p.height * 1 / 5 * scale,
@@ -425,7 +374,7 @@ POSSIBILITY OF SUCH DAMAGE.
             context.lineTo(p.width * 1 / 10 * scale, -p.height / 2 * scale);
         }
         context.lineTo(p.width * 1 / 2 * scale, -p.height / 2 * scale);
-        if (settings.config.protrusions && p.east != 0) {
+        if (config.protrusions && p.east != 0) {
             context.lineTo(p.width * 1 / 2 * scale, -p.height * 1 / 10 * scale);
             context.arcTo((p.width * 1 / 2 + p.east * p.width * 1 / 5) * scale, -p.height * 1 / 10 * scale,
                     (p.width * 1 / 2 + p.east * p.width * 1 / 5) * scale, 0,
@@ -436,7 +385,7 @@ POSSIBILITY OF SUCH DAMAGE.
             context.lineTo(p.width * 1 / 2 * scale, p.height * 1 / 10 * scale);
         }
         context.lineTo(p.width * 1 / 2 * scale, p.height * 1 / 2 * scale);
-        if (settings.config.protrusions && p.south != 0) {
+        if (config.protrusions && p.south != 0) {
             context.lineTo(p.width * 1 / 10 * scale, p.height * 1 / 2 * scale);
             context.arcTo(p.width * 1 / 10 * scale, (p.height * 1 / 2 + p.south * p.height * 1 / 5) * scale,
                     0, (p.height * 1 / 2 + p.south * p.height * 1 / 5) * scale,
@@ -447,7 +396,7 @@ POSSIBILITY OF SUCH DAMAGE.
             context.lineTo(-p.width * 1 / 10 * scale, p.height * 1 / 2 * scale);
         }
         context.lineTo(-p.width * 1 / 2 * scale, p.height * 1 / 2 * scale);
-        if (settings.config.protrusions && p.west != 0) {
+        if (config.protrusions && p.west != 0) {
             context.lineTo(-p.width * 1 / 2 * scale, p.height * 1 / 10 * scale);
             context.arcTo((-p.width * 1 / 2 + p.west * p.width * 1 / 5) * scale, p.height * 1 / 10 * scale,
                     (-p.width * 1 / 2 + p.west * p.width * 1 / 5) * scale, 0,
@@ -532,4 +481,6 @@ POSSIBILITY OF SUCH DAMAGE.
         var clone = window.JSON.parse(serialized);
         return clone;
     }
+    
+    asdf();
 </script>

@@ -12,3 +12,7 @@ Dynamically resize puzzle
 Add person info on controller-puzzle
 Look up parseBoolean equivalent in JS (for puzzle settings)
 Remove configurations from display side, send every setting from controller to reduce redundancy
+Remove extra space from 'send' command
+
+Display main:
+Put sample content into carousel: http://getbootstrap.com/javascript/#carousel

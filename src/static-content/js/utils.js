@@ -55,3 +55,7 @@ function getUrlVars(hashes)
 function getParameterByName(name) {
     return getUrlVars()[name];
 }
+
+function parseBool(b) {
+    return b === "true";
+}

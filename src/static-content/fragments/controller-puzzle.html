@@ -46,13 +46,6 @@ POSSIBILITY OF SUCH DAMAGE.
             </select>
         </dd>
 
-        <dt>
-        Board height
-        </dt>
-        <dd>
-            <input name="boardHeight">
-        </dd>
-
         <dd>
             <input type="checkbox" name="protrusions" id="protrusions"><label for="protrusions">Show protrusions</label>
         </dd>
@@ -94,7 +87,8 @@ POSSIBILITY OF SUCH DAMAGE.
     </dl>
 </div>
 
-<script>    var configurations = {
+<script>    
+    var configurations = {
         easy: {
             depth: 3,
             protrusions: true,
@@ -104,7 +98,6 @@ POSSIBILITY OF SUCH DAMAGE.
             snapOnDrag: true,
             presort: false,
             rotate: false,
-            boardHeight: 500,
         },
         medium: {
             depth: 4,
@@ -115,7 +108,6 @@ POSSIBILITY OF SUCH DAMAGE.
             snapOnDrag: false,
             presort: true,
             rotate: false,
-            boardHeight: 500,
         },
         hard: {
             depth: 6,
@@ -126,7 +118,6 @@ POSSIBILITY OF SUCH DAMAGE.
             snapOnDrag: false,
             presort: true,
             rotate: true,
-            boardHeight: 500,
         },
         insane: {
             depth: 7,
@@ -137,24 +128,20 @@ POSSIBILITY OF SUCH DAMAGE.
             snapOnDrag: false,
             presort: false,
             rotate: true,
-            boardHeight: 500,
         }
     }
     settings.config = configurations.medium;
     
     $('input[name=difficulty]:radio').click(function () {
-        sendToDisplay("difficulty " + $(this).val());
         $("#customControls").hide();
+        
+        settings.config = configurations[$(this).val()];
+        sendFullConfiguration(settings.config);
     });
 
     $("input[name=difficulty][value='custom']:radio").unbind().click(function () {
-        //TODO: Set this up and test
-        if (settings.config === null || settings.config === undefined) {
-            settings.config = configurations['medium'];
-        }
         settings.config = cloneObject(settings.config);
         $("[name=depth]").val(settings.config.depth);
-        $("[name=boardHeight]").val(settings.config.boardHeight);
         $("[name=protrusions]").prop('checked', settings.config.protrusions);
         $("[name=rotate]").prop('checked', settings.config.rotate);
         $("[name=snapOnDrag]").prop('checked', settings.config.snapOnDrag);
@@ -163,6 +150,7 @@ POSSIBILITY OF SUCH DAMAGE.
         $("[name=backgroundTransparency]").val(settings.config.backgroundTransparency);
         $("[name=thumbnail]").prop('checked', settings.config.thumbnail);
         $("#customControls").show();
+        sendFullConfiguration(config);
     });
 
     $("[name=depth]").change(function () {
@@ -225,6 +213,17 @@ POSSIBILITY OF SUCH DAMAGE.
     $("input[name='difficulty'][value='medium']:radio").click();
     
     
+    
+    function sendFullConfiguration(config) {
+        sendToDisplay("depth " + config.depth);
+        sendToDisplay("protrusions " + config.protrusions);
+        sendToDisplay("rotate " + config.rotate);
+        sendToDisplay("snap-on-drag " + config.snapOnDrag);
+        sendToDisplay("snap-threshold " + config.snapThreshold);
+        sendToDisplay("presort " + config.presort);
+        sendToDisplay("background-transparency " + config.backgroundTransparency);
+        sendToDisplay("thumbnail " + config.thumbnail);
+    }
 
     function cloneObject(obj) {
         var serialized = window.JSON.stringify(obj);
