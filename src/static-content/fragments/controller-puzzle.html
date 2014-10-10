@@ -25,74 +25,133 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 -->
 
-<button id="resetButton" type="button">Reset</button>
-<div>
-    <input type="radio" name="difficulty" value="easy">Easy
-    <input type="radio" name="difficulty" value="medium">Medium
-    <input type="radio" name="difficulty" value="hard">Hard
-    <input type="radio" name="difficulty" value="insane">Insane
-    <input type="radio" name="difficulty" value="custom">Custom
+<button class="btn btn-danger btn-lg" id="resetButton" type="button">Reset</button>
+<div class="btn-group" data-toggle="buttons">
+    <label class="btn btn-lg btn-default">
+        <input type="radio" name="difficulty" value="easy">Easy
+    </label>
+    <label class="btn btn-lg btn-default active">
+        <input type="radio" name="difficulty" value="medium" checked="">Medium
+    </label>
+    <label class="btn btn-lg btn-default">
+        <input type="radio" name="difficulty" value="hard">Hard
+    </label>
+    <label class="btn btn-lg btn-default">
+        <input type="radio" name="difficulty" value="insane">Insane
+    </label>
+    <label class="btn btn-lg btn-warning">
+        <input type="radio" name="difficulty" value="custom">Custom
+    </label>
 </div>
 <div id="customControls" style="display: none;">
-    <dl>
+    <dl class="dl-horizontal">
         <dt>Piece size</dt>
         <dd>
-            <select name="depth">
-                <option value="3">Extra large</option>
-                <option value="4">Large</option>
-                <option value="5">Medium</option>
-                <option value="6">Small</option>
-                <option value="7">Extra small</option>
-            </select>
+            <div class="btn-group" data-toggle="buttons">
+                <label class="btn btn-lg btn-default">
+                    <input type="radio" name="depth" value="3">XL
+                </label>
+                <label class="btn btn-lg btn-default active">
+                    <input type="radio" name="depth" value="4" checked="">L
+                </label>
+                <label class="btn btn-lg btn-default">
+                    <input type="radio" name="depth" value="5">M
+                </label>
+                <label class="btn btn-lg btn-default">
+                    <input type="radio" name="depth" value="6">S
+                </label>
+                <label class="btn btn-lg btn-default">
+                    <input type="radio" name="depth" value="7">XS
+                </label>
+            </div>
         </dd>
 
         <dd>
-            <input type="checkbox" name="protrusions" id="protrusions"><label for="protrusions">Show protrusions</label>
+            <div class="btn-group" data-toggle="buttons">
+                <label class="btn btn-lg btn-default">
+                    <input type="checkbox" name="protrusions" id="protrusions">Show protrusions
+                </label>
+            </div>
         </dd>
 
         <dd>
-            <input type="checkbox" name="thumbnail">Show thumbnail
+            <div class="btn-group" data-toggle="buttons">
+                <label class="btn btn-lg btn-default">
+                    <input type="checkbox" name="thumbnail">Show thumbnail
+                </label>
+            </div>
         </dd>
 
         <dd>
-            <input type="checkbox" name="presort" id="presort"><label for="presort">Pre-sort pieces</label>
+            <div class="btn-group" data-toggle="buttons">
+                <label class="btn btn-lg btn-default">
+                    <input type="checkbox" name="presort" id="presort">Pre-sort pieces
+                </label>
+            </div>
         </dd>
 
         <dd>
-            <input type="checkbox" name="rotate" id="rotate"><label for="rotate">Rotate pieces</label>
+            <div class="btn-group" data-toggle="buttons">
+                <label class="btn btn-lg btn-default">
+                    <input type="checkbox" name="rotate" id="rotate">Rotate pieces
+                </label>
+            </div>
         </dd>
 
         <dd>
-            <input type="checkbox" name="snapOnDrag" id="snapOnDrag"><label for="snapOnDrag">Snap on drag</label>
+            <div class="btn-group" data-toggle="buttons">
+                <label class="btn btn-lg btn-default">
+                    <input type="checkbox" name="snapOnDrag" id="snapOnDrag">Snap on drag
+                </label>
+            </div>
         </dd>
 
-        <dt>
-        Snap threshold
-        </dt>
+        <dt>Snap radius</dt>
         <dd>
-            <input name="snapThreshold">
+            <div class="btn-group" data-toggle="buttons">
+                <label class="btn btn-lg btn-default">
+                    <input type="radio" name="snapThreshold" value="5">S
+                </label>
+                <label class="btn btn-lg btn-default active">
+                    <input type="radio" name="snapThreshold" value="10" checked="">M
+                </label>
+                <label class="btn btn-lg btn-default">
+                    <input type="radio" name="snapThreshold" value="15">L
+                </label>
+                <label class="btn btn-lg btn-default">
+                    <input type="radio" name="snapThreshold" value="20">XL
+                </label>
+            </div>
         </dd>
 
         <dt>
         Background
         </dt>
         <dd>
-            <select name="backgroundTransparency">
-                <option value="1">Invisible</option>
-                <option value="0.75">..</option>
-                <option value="0.5">...</option>
-                <option value="0.25">....</option>
-            </select>
+            <div class="btn-group" data-toggle="buttons">
+                <label class="btn btn-lg btn-default">
+                    <input type="radio" name="backgroundTransparency" value="100">Invisible
+                </label>
+                <label class="btn btn-lg btn-default active">
+                    <input type="radio" name="backgroundTransparency" value="75" checked="">..
+                </label>
+                <label class="btn btn-lg btn-default">
+                    <input type="radio" name="backgroundTransparency" value="50">...
+                </label>
+                <label class="btn btn-lg btn-default">
+                    <input type="radio" name="backgroundTransparency" value="25">Solid
+                </label>
+            </div>
         </dd>
     </dl>
 </div>
 
-<script>    
+<script>
     var configurations = {
         easy: {
             depth: 3,
             protrusions: true,
-            backgroundTransparency: 0.5,
+            backgroundTransparency: 50,
             thumbnail: false,
             snapThreshold: 15,
             snapOnDrag: true,
@@ -102,7 +161,7 @@ POSSIBILITY OF SUCH DAMAGE.
         medium: {
             depth: 4,
             protrusions: true,
-            backgroundTransparency: 0.75,
+            backgroundTransparency: 75,
             thumbnail: false,
             snapThreshold: 10,
             snapOnDrag: false,
@@ -112,7 +171,7 @@ POSSIBILITY OF SUCH DAMAGE.
         hard: {
             depth: 6,
             protrusions: true,
-            backgroundTransparency: 1,
+            backgroundTransparency: 100,
             thumbnail: true,
             snapThreshold: 10,
             snapOnDrag: false,
@@ -122,7 +181,7 @@ POSSIBILITY OF SUCH DAMAGE.
         insane: {
             depth: 7,
             protrusions: false,
-            backgroundTransparency: 1,
+            backgroundTransparency: 100,
             thumbnail: true,
             snapThreshold: 10,
             snapOnDrag: false,
@@ -131,70 +190,53 @@ POSSIBILITY OF SUCH DAMAGE.
         }
     }
     settings.config = configurations.medium;
-    
-    $('input[name=difficulty]:radio').click(function () {
+
+    $('input[name=difficulty]:radio').change(function () {
         $("#customControls").hide();
-        
+
         settings.config = configurations[$(this).val()];
         sendFullConfiguration(settings.config);
     });
 
-    $("input[name=difficulty][value='custom']:radio").unbind().click(function () {
+    $("input[name=difficulty][value='custom']:radio").unbind().change(function () {
         settings.config = cloneObject(settings.config);
-        $("[name=depth]").val(settings.config.depth);
-        $("[name=protrusions]").prop('checked', settings.config.protrusions);
-        $("[name=rotate]").prop('checked', settings.config.rotate);
-        $("[name=snapOnDrag]").prop('checked', settings.config.snapOnDrag);
-        $("[name=snapThreshold]").val(settings.config.snapThreshold);
-        $("[name=presort]").prop('checked', settings.config.presort);
-        $("[name=backgroundTransparency]").val(settings.config.backgroundTransparency);
-        $("[name=thumbnail]").prop('checked', settings.config.thumbnail);
+        initRadio("[name=depth]", settings.config.depth);
+        initCheckbox("[name=protrusions]", settings.config.protrusions);
+        initCheckbox("[name=rotate]", settings.config.rotate);
+        initCheckbox("[name=snapOnDrag]", settings.config.snapOnDrag);
+        setRadioEnabled("[name=snapThreshold", settings.config.snapOnDrag);
+        initRadio("[name=snapThreshold]", settings.config.snapThreshold);
+        initCheckbox("[name=presort]", settings.config.presort);
+        initRadio("[name=backgroundTransparency]", settings.config.backgroundTransparency);
+        initCheckbox("[name=thumbnail]", settings.config.thumbnail);
         $("#customControls").show();
-        sendFullConfiguration(config);
+        sendFullConfiguration(settings.config);
     });
 
     $("[name=depth]").change(function () {
+        //TODO: This isn't working
         sendToDisplay("depth " + $(this).val());
     })
 
-    $("[name=boardHeight]").change(function () {
-        sendToDisplay("board-height " + $(this).val());
-    })
-
-    $("[name=protrusions]").click(function () {
+    $("[name=protrusions]").change(function () {
         sendToDisplay("protrusions " + $(this).prop('checked'));
     })
 
-    $("[name=rotate]").click(function () {
+    $("[name=rotate]").change(function () {
         sendToDisplay("rotate " + $(this).prop('checked'));
     })
 
-    $("[name=snapOnDrag]").click(function () {
-        sendToDisplay("snap-on-drag " + $(this).prop('checked'));
+    $("[name=snapOnDrag]").change(function () {
+        var snapOnDrag = $(this).prop('checked');
+        sendToDisplay("snap-on-drag " + snapOnDrag);
+        setRadioEnabled("[name=snapThreshold]", snapOnDrag);
     })
 
     $("[name=snapThreshold]").change(function () {
-        if ($(this).val() === null || $(this).val() === "") {
-            $(this).val(15);
-        }
-        var snapThreshold = parseInt($(this).val());
-        if (snapThreshold === NaN) {
-            snapThreshold = 15;
-            $(this).val(snapThreshold);
-        }
-        if (snapThreshold > 20) {
-            snapThreshold = 20;
-            $(this).val(snapThreshold);
-        }
-        if (snapThreshold < 0) {
-            snapThreshold = 0;
-            $(this).val(snapThreshold);
-        }
-
-        sendToDisplay("snap-threshold " + snapThreshold);
+        sendToDisplay("snap-threshold " + parseInt($(this).val()));
     })
 
-    $("[name=presort]").click(function () {
+    $("[name=presort]").change(function () {
         sendToDisplay("presort " + $(this).prop('checked'));
     })
 
@@ -202,18 +244,18 @@ POSSIBILITY OF SUCH DAMAGE.
         sendToDisplay("background-transparency " + $(this).val());
     })
 
-    $("[name=thumbnail]").click(function () {
+    $("[name=thumbnail]").change(function () {
         sendToDisplay("thumbnail " + $(this).prop('checked'));
     })
-    
-    $("#resetButton").click(function() {
+
+    $("#resetButton").click(function () {
         sendToDisplay("reset")
     })
 
     $("input[name='difficulty'][value='medium']:radio").click();
-    
-    
-    
+
+
+
     function sendFullConfiguration(config) {
         sendToDisplay("depth " + config.depth);
         sendToDisplay("protrusions " + config.protrusions);
@@ -230,5 +272,31 @@ POSSIBILITY OF SUCH DAMAGE.
         var clone = window.JSON.parse(serialized);
         return clone;
     }
+    
+    function initCheckbox(selector, value) {
+        var checkbox = $(selector);
+        if (value) {
+            checkbox.prop('checked',"");
+            checkbox.parent().addClass("active");
+        } else {
+            checkbox.removeProp('checked');
+            checkbox.parent().removeClass("active");
+        }
+    }
+    
+    function initRadio(selector, value) {
+        $(selector).removeProp('checked').parent().removeClass("active");
+        $(selector + "[value="+value+"]").prop('checked','').parent().addClass("active");
+    }
+    
+    function setRadioEnabled(selector, value) {
+        var parent = $(selector).prop("disabled",!value).parent();
+        if (value) {
+            parent.removeClass("disabled");
+        } else {
+            parent.addClass("disabled");
+        }
+    }
+    
     asdf();
 </script>

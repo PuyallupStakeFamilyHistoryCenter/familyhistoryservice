@@ -12,11 +12,13 @@ Dynamically resize puzzle                  DONE
 Make puzzle canvas opaque or remove header DONE
 Replace "you win" dialog                   DONE
 Look up parseBoolean equivalent in JS (for puzzle settings) DONE
-Remove configurations from display side, send every setting from controller to reduce redundancy
+Remove configurations from display side, send every setting from controller to reduce redundancy DONE
 Remove extra space from 'send' command     DONE
-Figure out why image doesn't fit in frame
+Fix styling of controls                    DONE
+Figure out why image doesn't fit in frame (this may be limited to children.png)
 Add person info on controller-puzzle
 Set up image chooser
+Make piece shapes more interesting
 
 Life map:
 Add person chooser
@@ -31,3 +33,7 @@ Consistent frame between screens without redundancy
 
 Library:
 Separate query params for page and fragment
+Rewire sockete.js to accept a response callback
+
+Project:
+Move these TODOs to the shared task board

@@ -45,7 +45,7 @@ POSSIBILITY OF SUCH DAMAGE.
     var config = {
         depth: 4,
         protrusions: true,
-        backgroundTransparency: 0.75,
+        backgroundTransparency: 75,
         thumbnail: false,
         snapThreshold: 10,
         snapOnDrag: false,
@@ -94,7 +94,7 @@ POSSIBILITY OF SUCH DAMAGE.
                 init();
             },
             "background-transparency": function (parts) {
-                config.backgroundTransparency = parseFloat(parts[1]);
+                config.backgroundTransparency = parseInt(parts[1])/100.0;
                 draw();
             },
             thumbnail: function (parts) {
