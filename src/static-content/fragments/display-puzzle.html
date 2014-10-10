@@ -34,6 +34,7 @@ POSSIBILITY OF SUCH DAMAGE.
     var canvas,context,image;
     var pieces;
     var tolerance = 10;
+    var imageWidth, imageHeight;
     var scale;
 
     var lastX = -1;
@@ -341,6 +342,8 @@ POSSIBILITY OF SUCH DAMAGE.
     }
 
     function drawBoard() {
+        context.fillStyle = "white";
+        context.fillRect(0,0,canvas.width,canvas.height);
         context.drawImage(image, 0, 0, imageWidth, imageHeight, 0, 0, imageWidth * scale, imageHeight * scale);
         context.fillStyle = "rgba(255,255,255," + config.backgroundTransparency + ")";
         context.fillRect(0, 0, imageWidth * scale, imageHeight * scale);

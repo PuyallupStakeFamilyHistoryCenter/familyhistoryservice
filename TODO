@@ -9,11 +9,12 @@ Test map movement (changed to 'send' commands; removed native 'move' commands)
 Puzzle:
 Wire puzzle settings into display          DONE
 Dynamically resize puzzle                  DONE
-Make puzzle canvas opaque or remove header
+Make puzzle canvas opaque or remove header DONE
 Add person info on controller-puzzle
 Look up parseBoolean equivalent in JS (for puzzle settings)
 Remove configurations from display side, send every setting from controller to reduce redundancy
 Remove extra space from 'send' command
+Figure out why image doesn't fit in frame
 
 Display main:
 Put sample content into carousel: http://getbootstrap.com/javascript/#carousel
