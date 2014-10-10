@@ -5,6 +5,10 @@ Delete access token on log out             DONE
 Finish caching
 Move developer id into config file (not in Git)
 Test map movement (changed to 'send' commands; removed native 'move' commands)
-Wire puzzle settings into display
+
+Puzzle:
+Wire puzzle settings into display          DONE
 Dynamically resize puzzle
 Add person info on controller-puzzle
+Look up parseBoolean equivalent in JS (for puzzle settings)
+Remove configurations from display side, send every setting from controller to reduce redundancy

@@ -93,3 +93,143 @@ POSSIBILITY OF SUCH DAMAGE.
         </dd>
     </dl>
 </div>
+
+<script>    var configurations = {
+        easy: {
+            depth: 3,
+            protrusions: true,
+            backgroundTransparency: 0.5,
+            thumbnail: false,
+            snapThreshold: 15,
+            snapOnDrag: true,
+            presort: false,
+            rotate: false,
+            boardHeight: 500,
+        },
+        medium: {
+            depth: 4,
+            protrusions: true,
+            backgroundTransparency: 0.75,
+            thumbnail: false,
+            snapThreshold: 10,
+            snapOnDrag: false,
+            presort: true,
+            rotate: false,
+            boardHeight: 500,
+        },
+        hard: {
+            depth: 6,
+            protrusions: true,
+            backgroundTransparency: 1,
+            thumbnail: true,
+            snapThreshold: 10,
+            snapOnDrag: false,
+            presort: true,
+            rotate: true,
+            boardHeight: 500,
+        },
+        insane: {
+            depth: 7,
+            protrusions: false,
+            backgroundTransparency: 1,
+            thumbnail: true,
+            snapThreshold: 10,
+            snapOnDrag: false,
+            presort: false,
+            rotate: true,
+            boardHeight: 500,
+        }
+    }
+    settings.config = configurations.medium;
+    
+    $('input[name=difficulty]:radio').click(function () {
+        sendToDisplay("difficulty " + $(this).val());
+        $("#customControls").hide();
+    });
+
+    $("input[name=difficulty][value='custom']:radio").unbind().click(function () {
+        //TODO: Set this up and test
+        if (settings.config === null || settings.config === undefined) {
+            settings.config = configurations['medium'];
+        }
+        settings.config = cloneObject(settings.config);
+        $("[name=depth]").val(settings.config.depth);
+        $("[name=boardHeight]").val(settings.config.boardHeight);
+        $("[name=protrusions]").prop('checked', settings.config.protrusions);
+        $("[name=rotate]").prop('checked', settings.config.rotate);
+        $("[name=snapOnDrag]").prop('checked', settings.config.snapOnDrag);
+        $("[name=snapThreshold]").val(settings.config.snapThreshold);
+        $("[name=presort]").prop('checked', settings.config.presort);
+        $("[name=backgroundTransparency]").val(settings.config.backgroundTransparency);
+        $("[name=thumbnail]").prop('checked', settings.config.thumbnail);
+        $("#customControls").show();
+    });
+
+    $("[name=depth]").change(function () {
+        sendToDisplay("depth " + $(this).val());
+    })
+
+    $("[name=boardHeight]").change(function () {
+        sendToDisplay("board-height " + $(this).val());
+    })
+
+    $("[name=protrusions]").click(function () {
+        sendToDisplay("protrusions " + $(this).prop('checked'));
+    })
+
+    $("[name=rotate]").click(function () {
+        sendToDisplay("rotate " + $(this).prop('checked'));
+    })
+
+    $("[name=snapOnDrag]").click(function () {
+        sendToDisplay("snap-on-drag " + $(this).prop('checked'));
+    })
+
+    $("[name=snapThreshold]").change(function () {
+        if ($(this).val() === null || $(this).val() === "") {
+            $(this).val(15);
+        }
+        var snapThreshold = parseInt($(this).val());
+        if (snapThreshold === NaN) {
+            snapThreshold = 15;
+            $(this).val(snapThreshold);
+        }
+        if (snapThreshold > 20) {
+            snapThreshold = 20;
+            $(this).val(snapThreshold);
+        }
+        if (snapThreshold < 0) {
+            snapThreshold = 0;
+            $(this).val(snapThreshold);
+        }
+
+        sendToDisplay("snap-threshold " + snapThreshold);
+    })
+
+    $("[name=presort]").click(function () {
+        sendToDisplay("presort " + $(this).prop('checked'));
+    })
+
+    $("[name=backgroundTransparency]").change(function () {
+        sendToDisplay("background-transparency " + $(this).val());
+    })
+
+    $("[name=thumbnail]").click(function () {
+        sendToDisplay("thumbnail " + $(this).prop('checked'));
+    })
+    
+    $("#resetButton").click(function() {
+        sendToDisplay("reset")
+    })
+
+    $("input[name='difficulty'][value='medium']:radio").click();
+    
+    
+
+    function cloneObject(obj) {
+        var serialized = window.JSON.stringify(obj);
+        var clone = window.JSON.parse(serialized);
+        return clone;
+    }
+    asdf();
+</script>

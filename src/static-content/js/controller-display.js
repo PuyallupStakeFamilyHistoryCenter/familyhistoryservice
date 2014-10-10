@@ -269,3 +269,7 @@ function navigate(dest) {
 function navigateDisplay(dest) {
     ws.socketSend("nav " + displayName + " " + dest);
 }
+
+function sendToDisplay(message) {
+    ws.socketSend("send " + displayName + " " + message);
+}
