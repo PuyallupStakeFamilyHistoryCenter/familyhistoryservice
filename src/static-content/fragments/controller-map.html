@@ -56,21 +56,21 @@ POSSIBILITY OF SUCH DAMAGE.
         navigate("controller-main");
     });
     $("#left-btn").click(function (e) {
-        ws.socketSend("send " + displayName + "move-left");
+        sendToDisplay("move-left");
     });
     $("#right-btn").click(function (e) {
-        ws.socketSend("send " + displayName + "move-right");
+        sendToDisplay("move-right");
     });
     $("#up-btn").click(function (e) {
-        ws.socketSend("send " + displayName + "move-up");
+        sendToDisplay("move-up");
     });
     $("#down-btn").click(function (e) {
-        ws.socketSend("send " + displayName + "move-down");
+        sendToDisplay("move-down");
     });
     $("#zoom-out-btn").click(function (e) {
-        ws.socketSend("send " + displayName + "zoom-out");
+        sendToDisplay("zoom-out");
     });
     $("#zoom-in-btn").click(function (e) {
-        ws.socketSend("send " + displayName + "zoom-in");
+        sendToDisplay("zoom-in");
     });
 </script>

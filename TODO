@@ -4,7 +4,7 @@ Set up SSL for web socket and image cache  DONE
 Delete access token on log out             DONE
 Finish caching
 Move developer id into config file (not in Git)
-Test map movement (changed to 'send' commands; removed native 'move' commands)
+Test map movement (changed to 'send' commands; removed native 'move' commands) DONE
 
 Puzzle:
 Wire puzzle settings into display          DONE
@@ -15,6 +15,8 @@ Look up parseBoolean equivalent in JS (for puzzle settings)
 Remove configurations from display side, send every setting from controller to reduce redundancy
 Remove extra space from 'send' command
 Figure out why image doesn't fit in frame
+Add back button on controller page
+Replace "you win" dialog
 
 Display main:
 Put sample content into carousel: http://getbootstrap.com/javascript/#carousel
