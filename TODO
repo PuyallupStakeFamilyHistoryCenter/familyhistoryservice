@@ -15,7 +15,6 @@ Look up parseBoolean equivalent in JS (for puzzle settings) DONE
 Remove configurations from display side, send every setting from controller to reduce redundancy
 Remove extra space from 'send' command     DONE
 Figure out why image doesn't fit in frame
-Add back button on controller page
 Add person info on controller-puzzle
 Set up image chooser
 
@@ -24,7 +23,8 @@ Add person chooser
 Add person info
 
 Display main:
-Put sample content into carousel: http://getbootstrap.com/javascript/#carousel
+Put sample content into carousel           DONE
+Make carousel content configurable
 
 Controller:
 Consistent frame between screens without redundancy

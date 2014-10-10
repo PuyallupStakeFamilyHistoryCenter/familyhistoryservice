@@ -47,3 +47,9 @@ button .btn-nav {
 dd, dt {
     padding-top: 10px;
 }
+
+.carousel-caption {
+    color: #222;
+    background-color: rgba(255,255,255,.75);
+    border-radius: 20px;
+}
