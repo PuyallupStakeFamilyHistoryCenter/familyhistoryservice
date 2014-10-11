@@ -23,6 +23,7 @@ Figure out why puzzle scrolls in split mode DONE
 Fix puzzle initial config
 Rotate pieces without restarting           DONE
 Presort pieces without restarting          DONE
+Snap radius shouldn't be disabled by snap-on-drag
 
 Color:
 Add coloring game to menu                  DONE
@@ -39,7 +40,9 @@ Put sample content into carousel           DONE
 Make carousel content configurable
 
 Controller:
-Consistent frame between screens without redundancy
+Consistent frame between screens without redundancy DONE
+Turn off log-out button when logged out
+Disable navigation when logged out
 
 Library:
 Separate query params for page and fragment

@@ -87,8 +87,17 @@ function getReady() {
 
 function setup() {
     document.title = settings.page.title;
-    var pageHeader = $("#page-header"); //TODO: This isn't working
-    pageHeader.html("<h1>" + settings.page.header + "</h1>");
+    var pageHeader = $("#page-header");
+    if (settings.page.header) {
+        pageHeader.html("<h1>" + settings.page.header + "</h1>");
+    } else if (settings.page.headerFile) {
+        $.ajax("fragments/"+ settings.page.headerFile)
+        .done(function(data) {
+            pageHeader.html(data);
+        }).fail(function() {
+            logger.error("Failed to load header from " + settings.page.headerFile);
+        });
+    }
     if (settings.page.contentPadding) {
         $("#messages").addClass("content-padding");
     } else {
@@ -131,6 +140,7 @@ var defaultSettings = {
     controller: {
         title: "Controller",
         header: '',
+        headerFile: 'controller-header.html',
         contentPadding: true,
         verbs: {
             attached: function(parts) {
