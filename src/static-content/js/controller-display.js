@@ -153,6 +153,7 @@ var defaultSettings = {
                 settings.page.gotNewDisplayName(parts[1]);
             },
             token: function(parts) {
+                setUsername(userName);
                 token = parts[1];
                 $.cookie("token", token);
                 ws.socketSend("nav " + displayName + " " + "display-main");

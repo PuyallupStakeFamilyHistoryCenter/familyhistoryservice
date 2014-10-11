@@ -40,8 +40,8 @@ POSSIBILITY OF SUCH DAMAGE.
             </div>
 
             <!-- Collect the nav links, forms, and other content for toggling -->
-            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-                <ul class="nav navbar-nav navbar-right">
+            <div class="collapse navbar-collapse" >
+                <ul class="nav navbar-nav navbar-right" >
                     <li><span class="disabled" style="padding: 15px; display: block; line-height: 20px">You are logged in as <span class="username"></span></span></li>
                     <li><a href="#" id="logout-link">Log out</a></li>
                 </ul>
@@ -56,12 +56,15 @@ POSSIBILITY OF SUCH DAMAGE.
         settings.page.logOut();
     });
     
-    $(".username").html(decodeURI(userName));
     
     $("#logo").click(function(event) {
         event.preventDefault();
         
         $(".navbar-toggle").click();
         navigate("controller-main");
-    })
+    });
+    
+    function setUsername(userName) {
+        $(".username").html(userName);
+    }
 </script>  

@@ -62,6 +62,7 @@ POSSIBILITY OF SUCH DAMAGE.
                     $("#userid-input").val(value);
                     $(".username-btn").removeClass("btn-warning");
                     $(e.target).addClass("btn-warning");
+                    userName = $(this).html();
 
                     if (value === "KW79-H8X") {
                         $("#pin-input-div").hide()
