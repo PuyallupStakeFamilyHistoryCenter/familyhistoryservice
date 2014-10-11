@@ -52,4 +52,5 @@ dd, dt {
     color: #222;
     background-color: rgba(255,255,255,.75);
     border-radius: 20px;
+    padding: 20px;
 }
