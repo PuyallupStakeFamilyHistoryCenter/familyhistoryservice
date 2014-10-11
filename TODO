@@ -24,6 +24,12 @@ Fix puzzle initial config
 Rotate pieces without restarting           DONE
 Presort pieces without restarting          DONE
 
+Color:
+Add coloring game to menu                  DONE
+Set up print function
+Use image chooser
+Fix brush
+
 Life map:
 Add person chooser
 Add person info
@@ -42,3 +48,4 @@ Rewire sockete.js to accept a response callback
 Project:
 Move these TODOs to the shared task board
 Set up screen with both display and controller in iframes for independant use   DONE
+Turn features on/off for split/normal mode
