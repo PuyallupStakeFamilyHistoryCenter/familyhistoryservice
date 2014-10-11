@@ -41,6 +41,8 @@ Make carousel content configurable
 
 Controller:
 Consistent frame between screens without redundancy DONE
+Collapse menu when log out pressed         DONE
+Set logged-in name when logged in
 Turn off log-out button when logged out
 Disable navigation when logged out
 
