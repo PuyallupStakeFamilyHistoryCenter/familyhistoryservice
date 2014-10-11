@@ -1,0 +1,214 @@
+<html>
+    <head>
+        <script>
+            var swatches = ["#FFDCB2", "#FF0066", "#00CC00", "#FF0000", "#00FF00", "#0000FF", "SkyBlue", "LightGreen", "SaddleBrown", "Tomato", "OrangeRed"]
+
+            var imagesrc = "children.png"; //"family-map.jpg"; //
+            var canvas, context, canvas2, context2, image;
+            var r, g, b, brushSize;
+            var scale;
+            var pressed = false;
+            var firstSegment = false;
+
+            function init() {
+                r = g = b = 0;
+                g = 20;
+                brushSize = 10;
+                canvas = document.getElementById("canvas");
+                context = canvas.getContext("2d");
+                canvas2 = document.getElementById("canvas2");
+                context2 = canvas2.getContext("2d");
+                image = new Image();
+                image.src = imagesrc;
+                image.crossOrigin = "Anonymous";
+                image.onload = function () {
+                    scale = 500 / image.height;
+                    context2.drawImage(image, 0, 0, image.width, image.height, 0, 0, image.width * scale, image.height * scale);
+
+                    var imageData = context2.getImageData(0, 0, image.width * scale, image.height * scale);
+                    var data = imageData.data;
+
+                    for (var i = 0; i < data.length; i += 4) {
+                        var brightness = 0.34 * data[i] + 0.5 * data[i + 1] + 0.16 * data[i + 2];
+                        // red
+                        data[i] = brightness;
+                        // green
+                        data[i + 1] = brightness;
+                        // blue
+                        data[i + 2] = brightness;
+                    }
+
+                    context.putImageData(imageData, 0, 0);
+
+                    drawSwatches();
+                }
+
+                canvas.onmousedown = function (e) {
+                    touchStart(e.pageX - canvas.offsetLeft, e.pageY - canvas.offsetTop);
+                }
+
+                canvas.onmousemove = function (e) {
+                    touchMove(e.pageX - canvas.offsetLeft, e.pageY - canvas.offsetTop);
+                }
+
+                canvas.onmouseup = function (e) {
+                    touchEnd(e.pageX - canvas.offsetLeft, e.pageY - canvas.offsetTop);
+                }
+
+                canvas.addEventListener("touchstart", function (e) {
+                    if (e.touches.length > 1)
+                        return;
+                    touchStart(e.changedTouches[0].pageX - canvas.offsetLeft, e.changedTouches[0].pageY - canvas.offsetTop);
+                    e.preventDefault();
+                }, false);
+
+                canvas.addEventListener("touchmove", function (e) {
+                    if (e.touches.length > 1)
+                        return;
+                    touchMove(e.changedTouches[0].pageX - canvas.offsetLeft, e.changedTouches[0].pageY - canvas.offsetTop);
+                    e.preventDefault();
+                }, false);
+
+                canvas.addEventListener("touchend", function (e) {
+                    touchEnd(e.changedTouches[0].pageX - canvas.offsetLeft, e.changedTouches[0].pageY - canvas.offsetTop);
+                }, false)
+            }
+
+            var startX, startY;
+            function touchStart(x, y) {
+                if (x > image.width * scale) {
+                    changeBrush(x, y);
+                } else {
+                    pressed = true;
+                    firstSegment = true
+                    applyBrush(x, y);
+                    startX = x;
+                    startY = y;
+                }
+            }
+
+            function touchMove(x, y) {
+                if (!pressed)
+                    return;
+                if (x <= image.width * scale) {
+                    applyBrush(x,y);
+                    //drawLineSegment(startX, startY, x, y);
+                    startX = x;
+                    startY = y;
+                    firstSegment = false;
+                }
+            }
+
+            function touchEnd(x, y) {
+                if (!pressed)
+                    return;
+                pressed = false;
+                drawLineSegment(startX, startY, x, y);
+            }
+
+            function changeBrush(x, y) {
+                var pixels = context.getImageData(x, y, 1, 1);
+                var d = pixels.data;
+                if (d[3] === 0) {
+                    r = 255;
+                    g = 255;
+                    b = 255;
+                } else {
+                    r = d[0];
+                    g = d[1];
+                    b = d[2];
+                }
+                context.fillStyle = "rgba(" + r + "," + g + "," + b + ",.01)";
+                context.fillRect(image.width * scale + 60, 10, 50, 50);
+            }
+
+            function applyBrush(x, y) {
+                var imageData = context.getImageData(x-brushSize, y-brushSize, brushSize * 2 + 1, brushSize * 2 + 1);
+                var data = imageData.data;
+                var imageData2 = context2.getImageData(x-brushSize, y-brushSize, brushSize * 2 + 1, brushSize * 2 + 1);
+                var data2 = imageData2.data;
+
+                var py = -brushSize - 1;
+                var px = -brushSize;
+                for (var i = 0; i < data.length; i += 4) {
+                    //TODO: Eliminate pixels that are outside the radius
+                    px++;
+                    if (px > brushSize) {
+                        py++;
+                        px = -brushSize;
+                    }
+                    if (Math.sqrt(py * py + px * px) > brushSize) continue;
+                    
+                    var colorAvg = (r + g + b)/3;
+                    var avg = (data2[i] + data2[i+1] + data2[i+2]) / 3;
+                    data[i] = r * avg / 255;
+                    data[i+1] = g * avg / 255;
+                    data[i+2] = b * avg / 255;
+//                    data[i] = r * avg / colorAvg;
+//                    data[i+1] = g * avg / colorAvg;
+//                    data[i+2] = b * avg / colorAvg;
+                }
+                
+                context.putImageData(imageData, x-brushSize, y-brushSize);
+                
+//                context.beginPath();
+//                context.fillStyle = "rgba(" + r + "," + g + "," + b + ",.01";
+//                context.moveTo(x, y - brushSize);
+//                context.arc(x, y, brushSize, 0, 2 * Math.PI);
+//                context.fill();
+            }
+
+            function drawLineSegment(sx, sy, ex, ey) {
+                var radius = 10;
+                var angle = Math.atan((ey - sy) / (ex - sx));
+                if (sx > ex)
+                    angle += Math.PI;
+                var orthAngle = angle + Math.PI / 2;
+                var c1x = sx - Math.cos(orthAngle) * radius;
+                var c1y = sy - Math.sin(orthAngle) * radius;
+                var c2x = sx + Math.cos(orthAngle) * radius;
+                var c2y = sy + Math.sin(orthAngle) * radius;
+                var c3x = ex + Math.cos(orthAngle) * radius;
+                var c3y = ey + Math.sin(orthAngle) * radius;
+                var c35x = ex + Math.cos(angle) * radius * 3;
+                var c35y = ey + Math.sin(angle) * radius * 3;
+                var c4x = ex - Math.cos(orthAngle) * radius;
+                var c4y = ey - Math.sin(orthAngle) * radius;
+
+                //context.getImageData()
+
+                context.beginPath();
+                context.fillStyle = "rgba(" + r + "," + g + "," + b + ",.1";
+
+                context.moveTo(c1x, c1y);
+                context.lineTo(c2x, c2y);
+                context.lineTo(c3x, c3y);
+//                context.arcTo(c3x,c3y,c35x,c35y,radius);
+//                context.arcTo(c35x,c35y,c4x,c4y,radius);
+                context.arc(ex, ey, radius, startAngle, endAngle);
+                context.lineTo(c4x, c4y);
+                context.lineTo(c1x, c1y);
+
+                var startAngle = orthAngle;
+                var endAngle = orthAngle + Math.PI;
+                context.arc(sx, sy, radius, startAngle, endAngle, true);
+                context.fill();
+            }
+
+            function drawSwatches() {
+                for (i = 0; i < swatches.length; i++) {
+                    context.strokeStyle = swatches[i];
+                    context.fillStyle = swatches[i];
+                    context.fillRect(image.width * scale + 10, 10 * (i + 1) + 30 * i, 30, 30);
+                }
+            }
+        </script>
+    </head>
+
+    <body onload="init()">
+        <h1>Color</h1>
+        <canvas id="canvas" width="1000" height="500"/>
+        <canvas id="canvas2" width="1000" height="500" style="visibility: hidden"/>
+    </body>
+
+</html>

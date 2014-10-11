@@ -136,11 +136,6 @@ public class FamilyHistoryCacheServlet {
         sslConnector.setPort(8443);
         server.addConnector(sslConnector);
         
-        ServerConnector http = new ServerConnector(server,new HttpConnectionFactory(http_config));
-        http.setPort(8000);
-        http.setIdleTimeout(30000);
-        server.addConnector(http);
-        
         server.setHandler(handlerCollection);
         server.start();
         server.join();
