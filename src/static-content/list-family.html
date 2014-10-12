@@ -16,8 +16,7 @@
               save_access_token: true
             });
             FamilySearch.getAccessToken().then(function (response) {
-                var urlVars = getUrlVars();
-                var person = urlVars["person"];
+                var person = getParameterByName("person");
                 
                 if (person == null) {
                     FamilySearch.getCurrentUser().then(function (response) {
@@ -65,23 +64,6 @@
                         $("#results").append('<dl><dt>'+person.$getDisplayName()+' ('+person.$getDisplayLifeSpan()+')</dt><dd><a href="list-family.html?person='+person.id+'">list</a> <a href="maps-test.html?person='+person.id+'">map</a></dd></dl>');
                     });
                 });
-        }
-        
-        function getUrlVars()
-        {
-            var vars = [], hash;
-            var hashes = window.location.search.substring(1).split('&');
-            for(var i = 0; i < hashes.length; i++)
-            {
-                hash = hashes[i].split('=');
-                vars.push(hash[0]);
-                if (hash.length == 2) {
-                    vars[hash[0]] = decodeURIComponent(hash[1]);
-                } else {
-                    vars[hash[0]] = true;
-                }
-            }
-            return vars;
         }
         
         var ahnentafel = ['',

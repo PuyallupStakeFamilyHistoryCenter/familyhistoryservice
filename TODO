@@ -28,12 +28,14 @@ Presort pieces without restarting          DONE
 Snap radius setting shouldn't be disabled by snap-on-drag DONE
 Fix piece rotation in split mode
 Don't reset game on size change if the size doesn't actually change DONE
+Thumbnail should fit in remaining space
 
 Color:
 Add coloring game to menu                  DONE
 Set up print function
 Use image chooser
 Fix brush
+Move image to opposite side from menu
 
 Life map:
 Show life events on map
@@ -42,6 +44,9 @@ Fix buttons in split mode
 Add person chooser
 Add person info
 Maybe add spiral effect from RootsMapper
+
+Statistics:
+Implement basic family statistics
 
 Display main:
 Put sample content into carousel           DONE
@@ -54,8 +59,9 @@ Set logged-in name when logged in          DONE
 Clear logged-in name when logged out
 Turn off log-out button when logged out
 Disable navigation when logged out
-Add back button to standard header
+Add back button to standard header         DONE
 Set up accordian for groups of controls
+Make header opaque so scrolling doesn't look weird
 
 Library:
 Separate query params for page and fragment
@@ -70,3 +76,5 @@ Delay loading of controller in split mode
 Misc:
 Move css files into folder
 Move test files into folder
+Get facts into person
+Location cache

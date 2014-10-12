@@ -27,20 +27,15 @@
 // Read a page's GET URL variables and return them as an associative array.
 // Courtesy of http://jquery-howto.blogspot.com/2009/09/get-url-parameters-values-with-jquery.html
 var urlVars;
+var fragmentVars;
 
 function getUrlVars(hashes)
 {
-    if (urlVars) {
-        return urlVars;
-    }
-    
-    var vars = [], hash;
-    if (!hashes) {
-        hashes = window.location.search.substring(1).split('&');
-    }   
-    for(var i = 0; i < hashes.length; i++)
+    var vars = [];
+    var split = hashes.split('&');
+    for(var i = 0; i < split.length; i++)
     {
-        hash = hashes[i].split('=');
+        var hash = split[i].split('=');
         vars.push(hash[0]);
         if (hash.length === 2) {
             vars[hash[0]] = decodeURIComponent(hash[1].replace(/\+/g, " "));
@@ -48,12 +43,16 @@ function getUrlVars(hashes)
             vars[hash[0]] = true;
         }
     }
-//    urlVars = vars;
     return vars;
 }
 
 function getParameterByName(name) {
-    return getUrlVars()[name];
+    if (fragmentVars && fragmentVars[name]) {
+        return fragmentVars[name];
+    } else if (urlVars && urlVars[name]) {
+        return urlVars[name];
+    }
+    return null;
 }
 
 function parseBool(b) {

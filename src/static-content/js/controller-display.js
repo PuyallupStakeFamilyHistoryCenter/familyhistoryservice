@@ -51,6 +51,8 @@ function doNothing() {}
 
 
 function getReady() {
+    urlVars = getUrlVars(window.location.search.substr(1));
+    
     //Add message listener to websocket
     ws.addMessageListener(messageHandler);
     ws.connect("localhost:8443");
@@ -157,6 +159,7 @@ var defaultSettings = {
                 token = parts[1];
                 $.cookie("token", token);
                 ws.socketSend("nav " + displayName + " " + "display-main");
+                clearHistory();
                 navigate("controller-main");
             }
         },
@@ -253,7 +256,7 @@ function navigate(dest) {
     var tempVars = null;
     if (split.length > 1) {
         actualDest += "?" + split[1];
-        getUrlVars(split[1].split("&"));
+        tempVars = getUrlVars(split[1]);
     }
     var deferred = new $.Deferred();
     
@@ -262,10 +265,12 @@ function navigate(dest) {
         .done(
             function(data) {
                 settings.local = {verbs: {}};
+                fragmentVars = tempVars;
                 content.html(data);
-                if (tempVars) {
-                    urlVars = tempVars;
+                if (pushHistory !== undefined) {
+                    pushHistory(dest);
                 }
+                
                 deferred.resolve();
             }
         ).fail(
@@ -275,6 +280,29 @@ function navigate(dest) {
             }
         );
     return deferred.promise();
+}
+    
+var navHistory = [];
+function pushHistory(item) {
+    if (navHistory[navHistory.length - 1] !== item) {
+        navHistory.push(item);
+    }
+    if (navHistory.length > 1) {
+        $("#back-btn").show();
+    }
+}
+
+function popHistory() {
+    var item = navHistory.pop();
+    if (navHistory.length <= 1) {
+        $("#back-btn").hide();
+    }
+    return item;
+}
+
+function clearHistory() {
+    $("#back-btn").hide();
+    navHistory = [];
 }
 
 function navigateDisplay(dest) {

@@ -25,12 +25,6 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 -->
 
-<h2>Map</h2>
-<div>
-    <button id="back-button" class="btn btn-lg btn-default"><span class="glyphicon glyphicon-chevron-left glyphicon-sm"></span> Back</button>
-</div>
-<hr>
-
 <div>
     <button class="btn btn-primary btn-lg invisible"><span class="glyphicon glyphicon-arrow-left"></span></button>
     <button id="up-btn" class="btn btn-primary btn-lg"><span class="glyphicon glyphicon-arrow-up"></span></button>
@@ -52,9 +46,6 @@ POSSIBILITY OF SUCH DAMAGE.
 </div>
 
 <script>
-    $("#back-button").click(function (e) {
-        navigate("controller-main");
-    });
     $("#left-btn").click(function (e) {
         sendToDisplay("move-left");
     });
@@ -73,4 +64,6 @@ POSSIBILITY OF SUCH DAMAGE.
     $("#zoom-in-btn").click(function (e) {
         sendToDisplay("zoom-in");
     });
+    
+    setHeaderName("Map");
 </script>

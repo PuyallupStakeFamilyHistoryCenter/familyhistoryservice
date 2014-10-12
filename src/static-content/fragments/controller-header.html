@@ -50,9 +50,18 @@ POSSIBILITY OF SUCH DAMAGE.
     </nav>
 </div>
 
-<script>
+<div style="margin-top: 80px">
+    <h3 id="header"></h3>
+    <button id="back-btn" class="btn btn-default" style="display: none;" >Back</button>
+    <hr>
+</div>
+
+<script>;
+    
     $("#logout-link").click(function() {
         $(".navbar-toggle").click();
+        clearHistory();
+        setHeaderName("");
         settings.page.logOut();
     });
     
@@ -67,4 +76,13 @@ POSSIBILITY OF SUCH DAMAGE.
     function setUsername(userName) {
         $(".username").html(userName);
     }
+    
+    function setHeaderName(headerName) {
+        $("#header").html(headerName);
+    }
+    
+    $("#back-btn").click(function(e) {
+        popHistory();
+        navigate(navHistory[navHistory.length - 1]);
+    });
 </script>  

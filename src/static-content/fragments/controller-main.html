@@ -163,6 +163,11 @@ POSSIBILITY OF SUCH DAMAGE.
         $("#messages").html("");
         
         var group = buttonGroups[groupName];
+        
+        if (group.label) {
+            setHeaderName(group.label);
+        }
+        
         if (!group || !group.buttons) {
             logger.error("Button group " + groupName + " not found");
             return;
@@ -170,20 +175,6 @@ POSSIBILITY OF SUCH DAMAGE.
         
         var navButtons = $("#nav-buttons");
         navButtons.html("");
-        
-        if (group.label) {
-            navButtons.append("<h2>" + group.label + "</h2>");
-        }
-        
-        if (group.parent) {
-            navButtons.append('<button id="back-button" class="btn btn-lg btn-default"><span class="glyphicon glyphicon-chevron-left glyphicon-sm"></span> Back</button>');
-            $("#back-button").click(function(e) {
-                setButtons(group.parent);
-                e.preventDefault();
-            });
-        }
-        
-        navButtons.append('<hr>');
         
         $.each(group.buttons, function(i, buttonInfo) {
             navButtons.append('<button id="'+buttonInfo.name+'-button" class="btn btn-lg btn-default" style="margin: 5px;" '
@@ -195,7 +186,7 @@ POSSIBILITY OF SUCH DAMAGE.
                     navigateDisplay("display-" + buttonInfo.nav);
                     navigate("controller-" + buttonInfo.nav);
                 } else if (buttonInfo.child) {
-                    setButtons(buttonInfo.child);
+                    navigate("controller-main?group="+buttonInfo.child);
                 }
                 
                 e.preventDefault();
