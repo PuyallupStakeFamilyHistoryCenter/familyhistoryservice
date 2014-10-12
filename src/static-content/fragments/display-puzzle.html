@@ -58,8 +58,11 @@ POSSIBILITY OF SUCH DAMAGE.
     settings.local = {
         verbs: {
             depth: function (parts) {
-                config.depth = parseInt(parts[1]);
-                init();
+                var newDepth = parseInt(parts[1]);
+                if (config.depth !== newDepth) { 
+                    config.depth = newDepth;
+                    init();
+                }
             },
             protrusions: function (parts) {
                 config.protrusions = parseBool(parts[1]);

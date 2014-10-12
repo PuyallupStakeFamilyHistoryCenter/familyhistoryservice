@@ -23,9 +23,9 @@ Figure out why puzzle scrolls in split mode DONE
 Fix puzzle initial config
 Rotate pieces without restarting           DONE
 Presort pieces without restarting          DONE
-Snap radius shouldn't be disabled by snap-on-drag
+Snap radius setting shouldn't be disabled by snap-on-drag DONE
 Fix piece rotation in split mode
-Don't reset game on size change if the size doesn't actually change
+Don't reset game on size change if the size doesn't actually change DONE
 
 Color:
 Add coloring game to menu                  DONE
@@ -34,9 +34,12 @@ Use image chooser
 Fix brush
 
 Life map:
+Show life events on map
+Fix mouse zoom (pinch) in split mode
 Fix buttons in split mode
 Add person chooser
 Add person info
+Maybe add spiral effect from RootsMapper
 
 Display main:
 Put sample content into carousel           DONE
@@ -46,9 +49,11 @@ Controller:
 Consistent frame between screens without redundancy DONE
 Collapse menu when log out pressed         DONE
 Set logged-in name when logged in          DONE
-Clear logged-in name whe logged out
+Clear logged-in name when logged out
 Turn off log-out button when logged out
 Disable navigation when logged out
+Add back button to standard header
+Set up accordian for groups of controls
 
 Library:
 Separate query params for page and fragment
@@ -58,3 +63,7 @@ Project:
 Move these TODOs to the shared task board
 Set up screen with both display and controller in iframes for independant use   DONE
 Turn features on/off for split/normal mode
+
+Misc:
+Move css files into folder
+Move test files into folder

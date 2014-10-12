@@ -204,7 +204,6 @@ POSSIBILITY OF SUCH DAMAGE.
         initCheckbox("[name=protrusions]", settings.config.protrusions);
         initCheckbox("[name=rotate]", settings.config.rotate);
         initCheckbox("[name=snapOnDrag]", settings.config.snapOnDrag);
-        setRadioEnabled("[name=snapThreshold", settings.config.snapOnDrag);
         initRadio("[name=snapThreshold]", settings.config.snapThreshold);
         initCheckbox("[name=presort]", settings.config.presort);
         initRadio("[name=backgroundTransparency]", settings.config.backgroundTransparency);
@@ -227,9 +226,7 @@ POSSIBILITY OF SUCH DAMAGE.
     })
 
     $("[name=snapOnDrag]").change(function () {
-        var snapOnDrag = $(this).prop('checked');
-        sendToDisplay("snap-on-drag " + snapOnDrag);
-        setRadioEnabled("[name=snapThreshold]", snapOnDrag);
+        sendToDisplay("snap-on-drag " + $(this).prop('checked'));
     })
 
     $("[name=snapThreshold]").change(function () {
@@ -287,15 +284,6 @@ POSSIBILITY OF SUCH DAMAGE.
     function initRadio(selector, value) {
         $(selector).removeProp('checked').parent().removeClass("active");
         $(selector + "[value="+value+"]").prop('checked','').parent().addClass("active");
-    }
-    
-    function setRadioEnabled(selector, value) {
-        var parent = $(selector).prop("disabled",!value).parent();
-        if (value) {
-            parent.removeClass("disabled");
-        } else {
-            parent.addClass("disabled");
-        }
     }
     
     asdf();
