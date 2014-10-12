@@ -20,7 +20,7 @@ Add person info on controller-puzzle
 Set up image chooser
 Make piece shapes more interesting
 Figure out why puzzle scrolls in split mode DONE
-Fix puzzle initial config
+Fix puzzle initial config                  DONE
 Rotate pieces without restarting           DONE
 Presort pieces without restarting          DONE
 Snap radius setting shouldn't be disabled by snap-on-drag DONE

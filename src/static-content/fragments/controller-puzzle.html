@@ -189,7 +189,6 @@ POSSIBILITY OF SUCH DAMAGE.
             rotate: true,
         }
     }
-    settings.config = configurations.medium;
 
     $('input[name=difficulty]:radio').change(function () {
         $("#customControls").hide();
@@ -199,6 +198,9 @@ POSSIBILITY OF SUCH DAMAGE.
     });
 
     $("input[name=difficulty][value='custom']:radio").unbind().change(function () {
+        if (!settings.config) {
+            settings.config = configurations.medium;
+        }
         settings.config = cloneObject(settings.config);
         initRadio("[name=depth]", settings.config.depth);
         initCheckbox("[name=protrusions]", settings.config.protrusions);

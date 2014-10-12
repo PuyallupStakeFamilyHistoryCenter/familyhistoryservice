@@ -69,13 +69,16 @@ POSSIBILITY OF SUCH DAMAGE.
                 draw();
             },
             rotate: function (parts) {
-                config.rotate = parseBool(parts[1]);
-                $.each(pieces, function(index, piece) {
-                    if (!piece.found) {
-                        piece.rotation = config.rotate ? rand(-Math.PI, Math.PI) : 0;
-                    }
-                });
-                draw();
+                var newRotate = parseBool(parts[1]);
+                if (newRotate !== config.rotate) {
+                    config.rotate = newRotate;
+                    $.each(pieces, function(index, piece) {
+                        if (!piece.found) {
+                            piece.rotation = config.rotate ? rand(-Math.PI, Math.PI) : 0;
+                        }
+                    });
+                    draw();
+                }
             },
             "snap-on-drag": function (parts) {
                 config.snapOnDrag = parseBool(parts[1]);
@@ -98,12 +101,15 @@ POSSIBILITY OF SUCH DAMAGE.
                 config.snapThreshold = snapThreshold;
             },
             presort: function (parts) {
-                config.presort = parseBool(parts[1]);
-                shuffle(pieces);
-                if (config.presort) {
-                    preSort(pieces);
+                var newPresort = parseBool(parts[1]);
+                if (newPresort !== config.presort) {
+                    config.presort = newPresort;
+                    shuffle(pieces);
+                    if (config.presort) {
+                        preSort(pieces);
+                    }
+                    draw();
                 }
-                draw();
             },
             "background-transparency": function (parts) {
                 config.backgroundTransparency = parseInt(parts[1])/100.0;
@@ -174,7 +180,7 @@ POSSIBILITY OF SUCH DAMAGE.
         context = canvas.getContext("2d");
         dragging = false;
         image = new Image();
-        image.src = imagesrc ? imagesrc : "old-game.jpg";//"children.png";
+        image.src = imagesrc ? imagesrc : "elsa.jpg";//"children.png";
         image.crossOrigin = "Anonymous";
         image.onload = function () {
             resize();
