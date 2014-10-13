@@ -156,17 +156,17 @@ POSSIBILITY OF SUCH DAMAGE.
             snapThreshold: 15,
             snapOnDrag: true,
             presort: false,
-            rotate: false,
+            rotate: false
         },
         medium: {
-            depth: 4,
+            depth: 10,
             protrusions: true,
             backgroundTransparency: 75,
             thumbnail: false,
             snapThreshold: 10,
             snapOnDrag: false,
             presort: true,
-            rotate: false,
+            rotate: false
         },
         hard: {
             depth: 6,
@@ -176,7 +176,7 @@ POSSIBILITY OF SUCH DAMAGE.
             snapThreshold: 10,
             snapOnDrag: false,
             presort: true,
-            rotate: true,
+            rotate: true
         },
         insane: {
             depth: 7,
@@ -186,9 +186,9 @@ POSSIBILITY OF SUCH DAMAGE.
             snapThreshold: 10,
             snapOnDrag: false,
             presort: false,
-            rotate: true,
+            rotate: true
         }
-    }
+    };
 
     $('input[name=difficulty]:radio').change(function () {
         $("#customControls").hide();
@@ -217,39 +217,39 @@ POSSIBILITY OF SUCH DAMAGE.
     $("[name=depth]").change(function () {
         //TODO: This isn't working
         sendToDisplay("depth " + $(this).val());
-    })
+    });
 
     $("[name=protrusions]").change(function () {
         sendToDisplay("protrusions " + $(this).prop('checked'));
-    })
+    });
 
     $("[name=rotate]").change(function () {
         sendToDisplay("rotate " + $(this).prop('checked'));
-    })
+    });
 
     $("[name=snapOnDrag]").change(function () {
         sendToDisplay("snap-on-drag " + $(this).prop('checked'));
-    })
+    });
 
     $("[name=snapThreshold]").change(function () {
         sendToDisplay("snap-threshold " + parseInt($(this).val()));
-    })
+    });
 
     $("[name=presort]").change(function () {
         sendToDisplay("presort " + $(this).prop('checked'));
-    })
+    });
 
     $("[name=backgroundTransparency]").change(function () {
         sendToDisplay("background-transparency " + $(this).val());
-    })
+    });
 
     $("[name=thumbnail]").change(function () {
         sendToDisplay("thumbnail " + $(this).prop('checked'));
-    })
+    });
 
     $("#resetButton").click(function () {
-        sendToDisplay("reset")
-    })
+        sendToDisplay("reset");
+    });
 
     sendFullConfiguration(configurations.medium);
 

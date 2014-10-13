@@ -50,7 +50,7 @@ POSSIBILITY OF SUCH DAMAGE.
         snapThreshold: 10,
         snapOnDrag: false,
         presort: true,
-        rotate: false,
+        rotate: false
     };
     
     init();
@@ -120,14 +120,14 @@ POSSIBILITY OF SUCH DAMAGE.
                 draw();
             },
             reset: init
-        },
+        }
 
 
     };
 
     canvas.onmousedown = function (e) {
         touchStart(e.pageX - canvas.offsetLeft, e.pageY - canvas.offsetTop);
-    }
+    };
 
     canvas.onmousemove = function (e) {
         if (e.ctrlKey) {
@@ -135,11 +135,11 @@ POSSIBILITY OF SUCH DAMAGE.
         } else {
             touchMove(e.pageX - canvas.offsetLeft, e.pageY - canvas.offsetTop);
         }
-    }
+    };
 
     canvas.onmouseup = function (e) {
         touchEnd();
-    }
+    };
 
     canvas.addEventListener("touchstart", function (e) {
         if (e.touches.length > 1)
@@ -230,7 +230,7 @@ POSSIBILITY OF SUCH DAMAGE.
                         height: pieceHeight,
                         rotation: rot,
                         found: false
-                    }
+                    };
                     pieceNum++;
                 }
             }
@@ -240,7 +240,7 @@ POSSIBILITY OF SUCH DAMAGE.
                 preSort(pieces);
             }
             draw();
-        }
+        };
     }
     
     function resize() {
@@ -257,7 +257,7 @@ POSSIBILITY OF SUCH DAMAGE.
     }
 
     function touchMove(x, y) {
-        if (lastClicked != null) {
+        if (lastClicked !== null) {
             lastClicked.actualX += x - lastX;
             lastClicked.actualY += y - lastY;
             lastX = x;
@@ -278,7 +278,7 @@ POSSIBILITY OF SUCH DAMAGE.
     }
 
     function rotate(r) {
-        if (lastClicked != null && config.rotate) {
+        if (lastClicked !== null && config.rotate) {
             lastClicked.rotation += (r - lastRotation) * Math.PI / 180;
             while (lastClicked.rotation > Math.PI) {
                 lastClicked.rotation -= Math.PI * 2;
@@ -297,7 +297,7 @@ POSSIBILITY OF SUCH DAMAGE.
 
     function checkForCorrectPlacement() {
         var shouldCheckForWin = false;
-        if (lastClicked != null &&
+        if (lastClicked !== null &&
                 Math.abs(lastClicked.actualX - lastClicked.targetX * scale) <= config.snapThreshold &&
                 Math.abs(lastClicked.actualY - lastClicked.targetY * scale) <= config.snapThreshold &&
                 Math.abs(lastClicked.rotation) <= config.snapThreshold / 150) {
@@ -325,7 +325,7 @@ POSSIBILITY OF SUCH DAMAGE.
         var lastIndex;
         for (i = 0; i < pieces.length; i++) {
             var piece = pieces[i];
-            if (piece != null &&
+            if (piece !== null &&
                     x >= piece.actualX && x < piece.actualX + piece.width * scale &&
                     y >= piece.actualY && y < piece.actualY + piece.height * scale &&
                     !piece.found) {
@@ -333,7 +333,7 @@ POSSIBILITY OF SUCH DAMAGE.
                 lastClicked = pieces[i];
             }
         }
-        if (lastClicked != null) {
+        if (lastClicked !== null) {
             for (i = lastIndex; i < pieces.length - 1; i++) {
                 pieces[i] = pieces[i + 1];
             }
@@ -368,23 +368,25 @@ POSSIBILITY OF SUCH DAMAGE.
         context.strokeRect(0, 0, imageWidth * scale, imageHeight * scale);
 
         if (config.thumbnail) {
-            context.drawImage(image, 0, 0, imageWidth, imageHeight, imageWidth * scale + 10, 0, imageWidth * scale / 2, imageHeight * scale / 2);
+            var thumbnailWidth = canvas.width - image.width*scale - 10;
+            var thumbnailScale = thumbnailWidth / imageWidth;
+            context.drawImage(image, 0, 0, imageWidth, imageHeight, imageWidth * scale + 10, 0, thumbnailWidth, imageHeight * thumbnailScale);
         }
     }
 
     function drawPiece(p) {
-        if (p == null)
+        if (p === null)
             return;
 
         context.save();
         context.translate(p.actualX + p.width / 2 * scale, p.actualY + p.height / 2 * scale);
-        if (p.rotation != 0) {
+        if (p.rotation !== 0) {
             context.rotate(p.rotation);
         }
 
         context.beginPath();
         context.moveTo(-p.width * 1 / 2 * scale, -p.height / 2 * scale);
-        if (config.protrusions && p.north != 0) {
+        if (config.protrusions && p.north !== 0) {
             context.lineTo(-p.width * 1 / 10 * scale, -p.height / 2 * scale);
             context.arcTo(-p.width * 1 / 10 * scale, -p.height / 2 * scale + p.north * p.height * 1 / 5 * scale,
                     0, -p.height / 2 * scale + p.north * p.height * 1 / 5 * scale,
@@ -395,7 +397,7 @@ POSSIBILITY OF SUCH DAMAGE.
             context.lineTo(p.width * 1 / 10 * scale, -p.height / 2 * scale);
         }
         context.lineTo(p.width * 1 / 2 * scale, -p.height / 2 * scale);
-        if (config.protrusions && p.east != 0) {
+        if (config.protrusions && p.east !== 0) {
             context.lineTo(p.width * 1 / 2 * scale, -p.height * 1 / 10 * scale);
             context.arcTo((p.width * 1 / 2 + p.east * p.width * 1 / 5) * scale, -p.height * 1 / 10 * scale,
                     (p.width * 1 / 2 + p.east * p.width * 1 / 5) * scale, 0,
@@ -406,7 +408,7 @@ POSSIBILITY OF SUCH DAMAGE.
             context.lineTo(p.width * 1 / 2 * scale, p.height * 1 / 10 * scale);
         }
         context.lineTo(p.width * 1 / 2 * scale, p.height * 1 / 2 * scale);
-        if (config.protrusions && p.south != 0) {
+        if (config.protrusions && p.south !== 0) {
             context.lineTo(p.width * 1 / 10 * scale, p.height * 1 / 2 * scale);
             context.arcTo(p.width * 1 / 10 * scale, (p.height * 1 / 2 + p.south * p.height * 1 / 5) * scale,
                     0, (p.height * 1 / 2 + p.south * p.height * 1 / 5) * scale,
@@ -417,7 +419,7 @@ POSSIBILITY OF SUCH DAMAGE.
             context.lineTo(-p.width * 1 / 10 * scale, p.height * 1 / 2 * scale);
         }
         context.lineTo(-p.width * 1 / 2 * scale, p.height * 1 / 2 * scale);
-        if (config.protrusions && p.west != 0) {
+        if (config.protrusions && p.west !== 0) {
             context.lineTo(-p.width * 1 / 2 * scale, p.height * 1 / 10 * scale);
             context.arcTo((-p.width * 1 / 2 + p.west * p.width * 1 / 5) * scale, p.height * 1 / 10 * scale,
                     (-p.width * 1 / 2 + p.west * p.width * 1 / 5) * scale, 0,
@@ -446,7 +448,7 @@ POSSIBILITY OF SUCH DAMAGE.
 
     function checkForWin() {
         for (i = 0; i < pieces.length; i++) {
-            if (pieces[i] != null && !pieces[i].found) {
+            if (pieces[i] !== null && !pieces[i].found) {
                 return;
             }
         }
@@ -484,7 +486,7 @@ POSSIBILITY OF SUCH DAMAGE.
 
         while (currentIndex < currentEdge) {
             var temp = pieces[currentIndex];
-            if (temp.north == 0 || temp.south == 0 || temp.east == 0 || temp.west == 0) {
+            if (temp.north === 0 || temp.south === 0 || temp.east === 0 || temp.west === 0) {
                 pieces[currentIndex] = pieces[currentEdge];
                 pieces[currentEdge--] = temp;
             } else {
