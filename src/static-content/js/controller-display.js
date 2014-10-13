@@ -55,7 +55,7 @@ function getReady() {
     
     //Add message listener to websocket
     ws.addMessageListener(messageHandler);
-    ws.connect("localhost:8443");
+    ws.connect();
     
     content = $("#content");
     mode = getParameterByName("mode");
@@ -290,6 +290,7 @@ function pushHistory(item) {
     if (navHistory.length > 1) {
         $("#back-btn").show();
     }
+    console.info("History: " + navHistory);
 }
 
 function popHistory() {
@@ -297,6 +298,7 @@ function popHistory() {
     if (navHistory.length <= 1) {
         $("#back-btn").hide();
     }
+    console.info("History: " + navHistory);
     return item;
 }
 

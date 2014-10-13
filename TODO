@@ -3,7 +3,7 @@ TODO:
 Set up SSL for web socket and image cache  DONE
 Delete access token on log out             DONE
 Test map movement (changed to 'send' commands; removed native 'move' commands) DONE
-Set up pre-caching
+Set up pre-caching                         PENDING DEPENDENCY WIRING
 Finish wiring dependencies via Spring
 Figure out why log4j via Ivy isn't working
 Move developer id into config file (not in Git)
@@ -29,6 +29,7 @@ Snap radius setting shouldn't be disabled by snap-on-drag DONE
 Fix piece rotation in split mode
 Don't reset game on size change if the size doesn't actually change DONE
 Thumbnail should fit in remaining space
+Back button in puzzle goes back to main screen instead of games screen
 
 Color:
 Add coloring game to menu                  DONE
