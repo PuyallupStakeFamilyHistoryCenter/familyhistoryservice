@@ -26,20 +26,20 @@ POSSIBILITY OF SUCH DAMAGE.
 -->
 
 <button class="btn btn-danger btn-lg" id="resetButton" type="button">Reset</button>
-<div class="btn-group" data-toggle="buttons">
-    <label class="btn btn-lg btn-default">
+<div class="btn-group btn-group-lg" data-toggle="buttons">
+    <label class="btn btn-default">
         <input type="radio" name="difficulty" value="easy">Easy
     </label>
-    <label class="btn btn-lg btn-default active">
+    <label class="btn btn-default active">
         <input type="radio" name="difficulty" value="medium" checked="">Medium
     </label>
-    <label class="btn btn-lg btn-default">
+    <label class="btn btn-default">
         <input type="radio" name="difficulty" value="hard">Hard
     </label>
-    <label class="btn btn-lg btn-default">
+    <label class="btn btn-default">
         <input type="radio" name="difficulty" value="insane">Insane
     </label>
-    <label class="btn btn-lg btn-warning">
+    <label class="btn btn-warning">
         <input type="radio" name="difficulty" value="custom">Custom
     </label>
 </div>
@@ -47,60 +47,60 @@ POSSIBILITY OF SUCH DAMAGE.
     <dl class="dl-horizontal">
         <dt>Piece size</dt>
         <dd>
-            <div class="btn-group" data-toggle="buttons">
-                <label class="btn btn-lg btn-default">
+            <div class="btn-group btn-group-lg" data-toggle="buttons">
+                <label class="btn btn-default">
                     <input type="radio" name="depth" value="3">XL
                 </label>
-                <label class="btn btn-lg btn-default active">
+                <label class="btn btn-default active">
                     <input type="radio" name="depth" value="4" checked="">L
                 </label>
-                <label class="btn btn-lg btn-default">
+                <label class="btn btn-default">
                     <input type="radio" name="depth" value="5">M
                 </label>
-                <label class="btn btn-lg btn-default">
+                <label class="btn btn-default">
                     <input type="radio" name="depth" value="6">S
                 </label>
-                <label class="btn btn-lg btn-default">
+                <label class="btn btn-default">
                     <input type="radio" name="depth" value="7">XS
                 </label>
             </div>
         </dd>
 
         <dd>
-            <div class="btn-group" data-toggle="buttons">
-                <label class="btn btn-lg btn-default">
+            <div class="btn-group btn-group-lg" data-toggle="buttons">
+                <label class="btn btn-default">
                     <input type="checkbox" name="protrusions" id="protrusions">Show protrusions
                 </label>
             </div>
         </dd>
 
         <dd>
-            <div class="btn-group" data-toggle="buttons">
-                <label class="btn btn-lg btn-default">
+            <div class="btn-group btn-group-lg" data-toggle="buttons">
+                <label class="btn btn-default">
                     <input type="checkbox" name="thumbnail">Show thumbnail
                 </label>
             </div>
         </dd>
 
         <dd>
-            <div class="btn-group" data-toggle="buttons">
-                <label class="btn btn-lg btn-default">
+            <div class="btn-group btn-group-lg" data-toggle="buttons">
+                <label class="btn btn-default">
                     <input type="checkbox" name="presort" id="presort">Pre-sort pieces
                 </label>
             </div>
         </dd>
 
         <dd>
-            <div class="btn-group" data-toggle="buttons">
-                <label class="btn btn-lg btn-default">
+            <div class="btn-group btn-group-lg" data-toggle="buttons">
+                <label class="btn btn-default">
                     <input type="checkbox" name="rotate" id="rotate">Rotate pieces
                 </label>
             </div>
         </dd>
 
         <dd>
-            <div class="btn-group" data-toggle="buttons">
-                <label class="btn btn-lg btn-default">
+            <div class="btn-group btn-group-lg" data-toggle="buttons">
+                <label class="btn btn-default">
                     <input type="checkbox" name="snapOnDrag" id="snapOnDrag">Snap on drag
                 </label>
             </div>
@@ -108,17 +108,17 @@ POSSIBILITY OF SUCH DAMAGE.
 
         <dt>Snap radius</dt>
         <dd>
-            <div class="btn-group" data-toggle="buttons">
-                <label class="btn btn-lg btn-default">
+            <div class="btn-group btn-group-lg" data-toggle="buttons">
+                <label class="btn btn-default">
                     <input type="radio" name="snapThreshold" value="5">S
                 </label>
-                <label class="btn btn-lg btn-default active">
-                    <input type="radio" name="snapThreshold" value="10" checked="">M
+                <label class="btn btn-default">
+                    <input type="radio" name="snapThreshold" value="10">M
                 </label>
-                <label class="btn btn-lg btn-default">
+                <label class="btn btn-default">
                     <input type="radio" name="snapThreshold" value="15">L
                 </label>
-                <label class="btn btn-lg btn-default">
+                <label class="btn btn-default">
                     <input type="radio" name="snapThreshold" value="20">XL
                 </label>
             </div>
@@ -128,17 +128,17 @@ POSSIBILITY OF SUCH DAMAGE.
         Background
         </dt>
         <dd>
-            <div class="btn-group" data-toggle="buttons">
-                <label class="btn btn-lg btn-default">
+            <div class="btn-group btn-group-lg" data-toggle="buttons">
+                <label class="btn btn-default">
                     <input type="radio" name="backgroundTransparency" value="100">Invisible
                 </label>
-                <label class="btn btn-lg btn-default active">
+                <label class="btn btn-default active">
                     <input type="radio" name="backgroundTransparency" value="75" checked="">..
                 </label>
-                <label class="btn btn-lg btn-default">
+                <label class="btn btn-default">
                     <input type="radio" name="backgroundTransparency" value="50">...
                 </label>
-                <label class="btn btn-lg btn-default">
+                <label class="btn btn-default">
                     <input type="radio" name="backgroundTransparency" value="25">Solid
                 </label>
             </div>
@@ -251,7 +251,7 @@ POSSIBILITY OF SUCH DAMAGE.
         sendToDisplay("reset")
     })
 
-    $("input[name='difficulty'][value='medium']:radio").click();
+    sendFullConfiguration(configurations.medium);
 
 
 
