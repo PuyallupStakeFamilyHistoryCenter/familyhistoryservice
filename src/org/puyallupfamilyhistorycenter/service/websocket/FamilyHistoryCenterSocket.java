@@ -60,6 +60,7 @@ import org.gedcomx.rs.client.PersonState;
 import org.gedcomx.rs.client.SourceDescriptionsState;
 import org.gedcomx.rs.client.StateTransitionOption;
 import org.puyallupfamilyhistorycenter.service.SpringContextInitializer;
+import org.puyallupfamilyhistorycenter.service.cache.Precacher;
 import org.puyallupfamilyhistorycenter.service.models.Person;
 
 /**
@@ -83,13 +84,15 @@ public class FamilyHistoryCenterSocket {
         public final String accessToken;
         public long lastUsed;
         public final Set<String> tokens; //TODO: Rename to prevent confusion with access token
-        public UserContext(String userId, String userName, String hashedPin, String accessToken) {
+        public final Precacher precacher;
+        public UserContext(String userId, String userName, String hashedPin, String accessToken, Precacher precacher) {
             this.userName = userName;
             this.userId = userId;
             this.hashedPin = hashedPin;
             this.accessToken = accessToken;
             this.lastUsed = System.currentTimeMillis();
             this.tokens = new HashSet<>();
+            this.precacher = precacher;
         }
     }
     
@@ -162,7 +165,7 @@ public class FamilyHistoryCenterSocket {
 
     public FamilyHistoryCenterSocket() {
         String salt = newSalt();
-        userContextMap.put("KW79-H8X", new UserContext("KW79-H8X", "Guest%20account", hashPin("1234", salt), null));
+        userContextMap.put("KW79-H8X", new UserContext("KW79-H8X", "Guest%20account", hashPin("1234", salt), null, null));
     }
     
     @OnWebSocketConnect
@@ -439,8 +442,11 @@ public class FamilyHistoryCenterSocket {
                         break;
                     }
                     
-                    userContextMap.put(userId, new UserContext(userId, userName, pin, accessToken));
-
+                    Precacher precacher = new Precacher(accessToken);
+                    precacher.precache();
+                    
+                    userContextMap.put(userId, new UserContext(userId, userName, pin, accessToken, precacher));
+                    
                     resendUserListToControllers();
                     break;
                 }
@@ -457,6 +463,10 @@ public class FamilyHistoryCenterSocket {
                             deactivateUserToken(t);
                         }
                         userId = null;
+                        
+                        if (userContext.precacher != null) {
+                            userContext.precacher.cancel();
+                        }
                         
                         resendUserListToControllers();
                     } else {
