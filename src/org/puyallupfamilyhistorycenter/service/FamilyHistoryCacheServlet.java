@@ -51,6 +51,8 @@ import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.jetty.websocket.server.WebSocketHandler;
 import org.puyallupfamilyhistorycenter.service.cache.FamilySearchCacheHandler;
 import org.puyallupfamilyhistorycenter.service.cache.FamilySearchImageCacheHandler;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 
 /**
@@ -60,6 +62,9 @@ import org.puyallupfamilyhistorycenter.service.cache.FamilySearchImageCacheHandl
 public class FamilyHistoryCacheServlet {
     
     public static void main(String[] args) throws ClassNotFoundException, InstantiationException, IllegalAccessException, Exception {
+        ApplicationContext context = new ClassPathXmlApplicationContext("classpath:org/puyallupfamilyhistorycenter/config/application-context.xml");
+        
+        
         WebSocketHandler mouseHandler = new WebSocketHandler.Simple(FamilyHistoryCenterSocket.class);
         ContextHandler mouseContext = new ContextHandler("/remote-control");
         mouseContext.setHandler(mouseHandler);
@@ -80,19 +85,9 @@ public class FamilyHistoryCacheServlet {
         Handler imageCacheHandler = new FamilySearchImageCacheHandler();
         imageCacheContext.setHandler(imageCacheHandler);
         
-        ContextHandler authRedirectContext = new ContextHandler("/auth-redirect.html");
-        Handler authRedirectHandler = new AbstractHandler() {
-            @Override
-            public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-                response.setStatus(200);
-                baseRequest.setHandled(true);
-            }
-        };
-        authRedirectContext.setHandler(authRedirectHandler);
-        
         
         ContextHandlerCollection handlerCollection = new ContextHandlerCollection();
-        handlerCollection.setHandlers(new Handler[]{mouseContext, indexContext, cacheContext, imageCacheContext, authRedirectContext});
+        handlerCollection.setHandlers(new Handler[]{mouseContext, indexContext, cacheContext, imageCacheContext});
         //handlerCollection.setHandlers(new Handler[]{indexContext});
         
         // TODO: Add authentication handler

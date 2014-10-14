@@ -4,6 +4,8 @@ Set up SSL for web socket and image cache  DONE
 Delete access token on log out             DONE
 Test map movement (changed to 'send' commands; removed native 'move' commands) DONE
 Set up pre-caching
+Finish wiring dependencies via Spring
+Figure out why log4j via Ivy isn't working
 Move developer id into config file (not in Git)
 
 Puzzle:

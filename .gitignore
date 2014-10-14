@@ -4,3 +4,4 @@ nbproject/private/
 report/
 .jacocoverage/
 keystore
+src/org/puyallupfamilyhistorycenter/config/app.properties

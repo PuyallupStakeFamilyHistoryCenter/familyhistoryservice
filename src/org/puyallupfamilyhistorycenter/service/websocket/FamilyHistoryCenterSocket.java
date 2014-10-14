@@ -48,7 +48,7 @@ import java.util.concurrent.TimeUnit;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Logger;
 import org.eclipse.jetty.websocket.api.RemoteEndpoint;
 
 import org.eclipse.jetty.websocket.api.Session;
@@ -70,6 +70,7 @@ import org.puyallupfamilyhistorycenter.service.models.Person;
  */
 @WebSocket(maxTextMessageSize = 64 * 1024)
 public class FamilyHistoryCenterSocket {
+    private static final Logger logger = Logger.getLogger(FamilyHistoryCenterSocket.class);
     private static final Gson GSON = new Gson();
 
     private static final class UserContext {
@@ -129,7 +130,7 @@ public class FamilyHistoryCenterSocket {
                         try {
                             deactivateUserToken(token);
                         } catch (IOException ex) {
-                            System.err.println("Failed to delete token " + token + " controller has probably already disconnected");
+                            logger.error("Failed to delete token " + token + " controller has probably already disconnected", ex);
                         }
                         it.remove();
                     }
@@ -175,6 +176,7 @@ public class FamilyHistoryCenterSocket {
     
     @OnWebSocketMessage
     public void handleMessage(Session session, String message) throws IOException, URISyntaxException {
+        logger.debug("Got websocket request " + message);
         String response = "ok";
         try {
             Scanner scanner = new Scanner(message);
@@ -483,7 +485,7 @@ public class FamilyHistoryCenterSocket {
                 userContextMap.get(userId).lastUsed = System.currentTimeMillis();
             }
         } catch (Throwable e) {
-            e.printStackTrace(System.err);
+            logger.error("Unexpected exception: " + e, e);
             response = "Error: " + e.getMessage();
         }
         

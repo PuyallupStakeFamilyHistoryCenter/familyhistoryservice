@@ -17,7 +17,9 @@
         <dependency org="org.apache.commons" name="commons-lang3" rev="3.1"/>
         <dependency org="org.gedcomx.extensions.familysearch" name="familysearch-api-client" rev="latest.revision"/>
         <dependency org="org.springframework" name="spring-beans" rev="4.1.0.RELEASE"/>
-
+        <dependency org="org.springframework" name="spring-context" rev="4.1.0.RELEASE"/>
+        <dependency org="org.springframework" name="spring-expression" rev="4.1.0.RELEASE"/>
+        <dependency org="log4j" name="log4j" rev="1.2.16"/>
         
         <!--runtime-->
         

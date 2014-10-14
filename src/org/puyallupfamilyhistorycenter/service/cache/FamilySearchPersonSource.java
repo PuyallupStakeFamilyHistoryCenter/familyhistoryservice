@@ -26,7 +26,12 @@
 package org.puyallupfamilyhistorycenter.service.cache;
 
 import com.google.gson.Gson;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
+import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.familysearch.api.client.ft.FamilySearchFamilyTree;
 import org.gedcomx.conclusion.Fact;
 import org.gedcomx.conclusion.Name;
@@ -40,6 +45,7 @@ import org.puyallupfamilyhistorycenter.service.models.Person;
 import org.puyallupfamilyhistorycenter.service.models.PersonBuilder;
 import org.puyallupfamilyhistorycenter.service.models.PersonReference;
 import org.puyallupfamilyhistorycenter.service.websocket.FamilyHistoryFamilyTree;
+import org.springframework.beans.factory.annotation.Value;
 
 /**
  *
@@ -49,10 +55,29 @@ import org.puyallupfamilyhistorycenter.service.websocket.FamilyHistoryFamilyTree
 
 public class FamilySearchPersonSource implements Source<Person> {
     private static final Gson GSON = new Gson();
+    private URI uri;
+    
+    @Value("${endpoint}")
+    String endpoint;
+
+    public FamilySearchPersonSource() {
+    }
+    
+    private URI getURI() {
+        if (uri != null) {
+            try {
+                uri = new URI("https://" + endpoint + "/org/platform/collections/tree");
+            } catch (URISyntaxException ex) {
+                throw new IllegalStateException("Failed to create FamilySearch URI", ex);
+            }
+        }
+        
+        return uri;
+    }
 
     @Override
     public Person get(String personId, String accessToken) {
-        FamilySearchFamilyTree ft = new FamilyHistoryFamilyTree(true).authenticate(accessToken);
+        FamilySearchFamilyTree ft = new FamilyHistoryFamilyTree(getURI()).authenticate(accessToken);
         PersonState state = ft.readPersonById(personId);
         
         PersonBuilder builder = new PersonBuilder();
