@@ -65,6 +65,7 @@ Project:
 Move these TODOs to the shared task board
 Set up screen with both display and controller in iframes for independant use   DONE
 Turn features on/off for split/normal mode
+Delay loading of controller in split mode
 
 Misc:
 Move css files into folder

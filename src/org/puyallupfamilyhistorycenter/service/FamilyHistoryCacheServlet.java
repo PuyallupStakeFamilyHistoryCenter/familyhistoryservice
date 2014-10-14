@@ -27,21 +27,16 @@
 package org.puyallupfamilyhistorycenter.service;
 
 
-import java.io.IOException;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import java.net.MalformedURLException;
 import org.eclipse.jetty.http.HttpVersion;
 import org.puyallupfamilyhistorycenter.service.websocket.FamilyHistoryCenterSocket;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.HttpConfiguration;
 import org.eclipse.jetty.server.HttpConnectionFactory;
-import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.SecureRequestCustomizer;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.SslConnectionFactory;
-import org.eclipse.jetty.server.handler.AbstractHandler;
 import org.eclipse.jetty.server.handler.ContextHandler;
 import org.eclipse.jetty.server.handler.ContextHandlerCollection;
 import org.eclipse.jetty.server.handler.ResourceHandler;
@@ -51,6 +46,8 @@ import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.jetty.websocket.server.WebSocketHandler;
 import org.puyallupfamilyhistorycenter.service.cache.FamilySearchCacheHandler;
 import org.puyallupfamilyhistorycenter.service.cache.FamilySearchImageCacheHandler;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
@@ -60,16 +57,11 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
  * @author tibbitts
  */
 public class FamilyHistoryCacheServlet {
+    @Autowired
+    @Qualifier("web-socket-context")
+    ContextHandler webSocketContext;
     
-    public static void main(String[] args) throws ClassNotFoundException, InstantiationException, IllegalAccessException, Exception {
-        ApplicationContext context = new ClassPathXmlApplicationContext("classpath:org/puyallupfamilyhistorycenter/config/application-context.xml");
-        
-        
-        WebSocketHandler mouseHandler = new WebSocketHandler.Simple(FamilyHistoryCenterSocket.class);
-        ContextHandler mouseContext = new ContextHandler("/remote-control");
-        mouseContext.setHandler(mouseHandler);
-        mouseContext.setBaseResource(Resource.newResource(""));
-        
+    public void run() throws MalformedURLException, Exception {
         ContextHandler indexContext = new ContextHandler("/static-content");
         ResourceHandler resourceHandler = new ResourceHandler();
         resourceHandler.setDirectoriesListed(true);
@@ -87,10 +79,8 @@ public class FamilyHistoryCacheServlet {
         
         
         ContextHandlerCollection handlerCollection = new ContextHandlerCollection();
-        handlerCollection.setHandlers(new Handler[]{mouseContext, indexContext, cacheContext, imageCacheContext});
-        //handlerCollection.setHandlers(new Handler[]{indexContext});
-        
-        // TODO: Add authentication handler
+        handlerCollection.setHandlers(new Handler[]{webSocketContext, indexContext, cacheContext, imageCacheContext});
+
         
         // SSL Context Factory
         SslContextFactory sslContextFactory = new SslContextFactory();
@@ -134,5 +124,9 @@ public class FamilyHistoryCacheServlet {
         server.setHandler(handlerCollection);
         server.start();
         server.join();
+    }
+    
+    public static void main(String[] args) throws ClassNotFoundException, InstantiationException, IllegalAccessException, Exception {
+        ApplicationContext context = new ClassPathXmlApplicationContext("classpath:org/puyallupfamilyhistorycenter/config/application-context.xml");
     }
 }

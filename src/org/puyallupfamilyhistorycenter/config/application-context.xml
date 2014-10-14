@@ -53,6 +53,21 @@ POSSIBILITY OF SUCH DAMAGE.
         <constructor-arg ref="file-source" />
         <constructor-arg ref="in-memory-cache" />
     </bean>
+    <bean id="person-dao" class="org.puyallupfamilyhistorycenter.service.cache.PersonDao" >
+        <constructor-arg ref="in-memory-source" />
+    </bean>
+    
+    <bean id="web-socket-handler" class="org.puyallupfamilyhistorycenter.service.websocket.FamilyHistoryCenterWebSocketHandler" />
+    <bean id="web-socket-resource" class="org.eclipse.jetty.util.resource.Resource" factory-method="newResource" >
+        <constructor-arg value="" />
+    </bean>
+    <bean id="web-socket-context" class="org.eclipse.jetty.server.handler.ContextHandler">
+        <property name="handler" ref="web-socket-handler" />
+        <property name="baseResource" ref="web-socket-resource" />
+    </bean>
 
+    <bean id="servlet" class="org.puyallupfamilyhistorycenter.service.FamilyHistoryCacheServlet" init-method="run">
+        
+    </bean>
 
 </beans>

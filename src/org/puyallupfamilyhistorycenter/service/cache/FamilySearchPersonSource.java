@@ -64,7 +64,7 @@ public class FamilySearchPersonSource implements Source<Person> {
     }
     
     private URI getURI() {
-        if (uri != null) {
+        if (uri == null) {
             try {
                 uri = new URI("https://" + endpoint + "/org/platform/collections/tree");
             } catch (URISyntaxException ex) {

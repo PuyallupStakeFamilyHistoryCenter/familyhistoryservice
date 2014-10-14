@@ -28,6 +28,8 @@ package org.puyallupfamilyhistorycenter.service.cache;
 
 import java.util.Iterator;
 import org.puyallupfamilyhistorycenter.service.models.Person;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 /**
  *
@@ -36,7 +38,7 @@ import org.puyallupfamilyhistorycenter.service.models.Person;
 
 
 public class PersonDao {
-    public final Source<Person> source;
+    private final Source<Person> source;
 
     public PersonDao(Source<Person> source) {
         this.source = source;
