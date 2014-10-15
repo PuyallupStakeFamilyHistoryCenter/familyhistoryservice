@@ -154,7 +154,4 @@ POSSIBILITY OF SUCH DAMAGE.
         <property name="port" value="8443" />
     </bean>
 
-    <bean id="servlet" class="org.puyallupfamilyhistorycenter.service.FamilyHistoryCacheServlet" init-method="run">
-    </bean>
-
 </beans>

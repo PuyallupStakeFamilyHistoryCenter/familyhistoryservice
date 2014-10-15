@@ -26,18 +26,26 @@
 
 package org.puyallupfamilyhistorycenter.service;
 
-
-import org.eclipse.jetty.server.Server;
-
-
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
  *
  * @author tibbitts
  */
-public class FamilyHistoryCacheServlet {
-    public static void main(String[] args) throws ClassNotFoundException, InstantiationException, IllegalAccessException, Exception {
-        Server server = SpringContextInitializer.getContext().getBean(Server.class);
-        server.join();
+
+
+public class SpringContextInitializer {
+    private static final Object lock = new Object();
+    private static ApplicationContext context;
+    
+    public static ApplicationContext getContext() {
+        synchronized (lock) {
+            if (context == null) {
+                context = new ClassPathXmlApplicationContext("classpath:org/puyallupfamilyhistorycenter/config/application-context.xml");
+            }
+        }
+        
+        return context;
     }
 }

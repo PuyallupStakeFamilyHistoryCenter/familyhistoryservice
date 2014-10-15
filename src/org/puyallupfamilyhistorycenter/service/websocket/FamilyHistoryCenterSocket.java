@@ -48,6 +48,7 @@ import java.util.concurrent.TimeUnit;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.eclipse.jetty.websocket.api.RemoteEndpoint;
 
@@ -58,10 +59,7 @@ import org.familysearch.api.client.memories.FamilySearchMemories;
 import org.gedcomx.rs.client.PersonState;
 import org.gedcomx.rs.client.SourceDescriptionsState;
 import org.gedcomx.rs.client.StateTransitionOption;
-import org.puyallupfamilyhistorycenter.service.cache.CachingSource;
-import org.puyallupfamilyhistorycenter.service.cache.FamilySearchPersonSource;
-import org.puyallupfamilyhistorycenter.service.cache.InMemoryCache;
-import org.puyallupfamilyhistorycenter.service.cache.Source;
+import org.puyallupfamilyhistorycenter.service.SpringContextInitializer;
 import org.puyallupfamilyhistorycenter.service.models.Person;
 
 /**
@@ -72,6 +70,11 @@ import org.puyallupfamilyhistorycenter.service.models.Person;
 public class FamilyHistoryCenterSocket {
     private static final Logger logger = Logger.getLogger(FamilyHistoryCenterSocket.class);
     private static final Gson GSON = new Gson();
+    private static final PersonDao personDao;
+    static {
+        personDao = (PersonDao) SpringContextInitializer.getContext().getBean("person-dao");
+    }
+    
 
     private static final class UserContext {
         public final String userName;
@@ -107,13 +110,6 @@ public class FamilyHistoryCenterSocket {
             throw new IllegalStateException("Failed to create SecureRand instance", ex);
         }
     }
-    
-    //TODO: Wire via configuration (Spring?)
-    private static final Source fsSource = new FamilySearchPersonSource(); 
-//    private static final Source fsSource = new MockPersonSource();
-    //private static final Source fileSource = new CachingSource(fsSource, new FileCache<>(Person.class, new File("/tmp/fhc/person-cache"), TimeUnit.DAYS.toMillis(3)));
-    private static final Source inMemorySource = new CachingSource(fsSource, new InMemoryCache<String, Person>());
-    private static final PersonDao personCache = new PersonDao(inMemorySource);
     
     
     private static final ScheduledExecutorService cleanupService = Executors.newScheduledThreadPool(1);
@@ -176,7 +172,7 @@ public class FamilyHistoryCenterSocket {
     
     @OnWebSocketMessage
     public void handleMessage(Session session, String message) throws IOException, URISyntaxException {
-        logger.debug("Got websocket request " + message);
+        logger.debug("Got websocket request '" + message + "'");
         String response = "ok";
         try {
             Scanner scanner = new Scanner(message);
@@ -296,7 +292,7 @@ public class FamilyHistoryCenterSocket {
                     String accessToken = tokenToAccessToken(token);
                     
                     //TODO: Check token
-                    Person person = personCache.getPerson(personId, accessToken);
+                    Person person = personDao.getPerson(personId, accessToken);
                     if (person != null) {
                         response = "person " + GSON.toJson(person).replaceAll(" ", "%20");
                     } else {
@@ -318,7 +314,7 @@ public class FamilyHistoryCenterSocket {
                         break;
                     }
                     
-                    Person person = personCache.getPerson(personId, accessToken);
+                    Person person = personDao.getPerson(personId, accessToken);
                     try {
                         displayEndpoint.sendString("person " + GSON.toJson(person).replaceAll(" ", "%20"));
                     } catch (IOException e) {
@@ -339,7 +335,7 @@ public class FamilyHistoryCenterSocket {
                     
                     //TODO: Check token
                     //TODO: Actually get family
-                    Iterator<Person> it = personCache.traverseImmediateFamily(personId, 10, lastPageId, accessToken);
+                    Iterator<Person> it = personDao.traverseImmediateFamily(personId, 10, lastPageId, accessToken);
                     if (it != null && it.hasNext()) {
                         response = "family [" + toString(it).replaceAll(" ", "%20") + "]";
                     } else {
@@ -357,7 +353,7 @@ public class FamilyHistoryCenterSocket {
                     
                     //TODO: Check token
                     //TODO: Actually get family
-                    Person person = personCache.getPerson(personId, accessToken);
+                    Person person = personDao.getPerson(personId, accessToken);
                     if (person != null) {
                         response = "family [" + GSON.toJson(person) + "]";
                     } else {
@@ -374,7 +370,7 @@ public class FamilyHistoryCenterSocket {
                     String accessToken = tokenToAccessToken(token);
                     
                     //TODO: Actually get descendents
-                    Person person = personCache.getPerson(personId, accessToken);
+                    Person person = personDao.getPerson(personId, accessToken);
                     if (person != null) {
                         response = "family [" + GSON.toJson(person) + "]";
                     } else {
@@ -490,6 +486,7 @@ public class FamilyHistoryCenterSocket {
         }
         
         if (session.isOpen()) {
+            logger.debug("Sending web socket response '" + StringUtils.abbreviate(response, 100) + "'");
             session.getRemote().sendString(response);
         }
     }
