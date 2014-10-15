@@ -5,4 +5,4 @@ report/
 .jacocoverage/
 keystore
 log/*
-src/org/puyallupfamilyhistorycenter/config/app.properties
+src/org/puyallupfamilyhistorycenter/config/*.properties

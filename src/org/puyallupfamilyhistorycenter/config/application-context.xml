@@ -35,6 +35,8 @@ POSSIBILITY OF SUCH DAMAGE.
     <context:annotation-config />
     <context:property-placeholder location="classpath:org/puyallupfamilyhistorycenter/config/app.properties" />
     
+    <bean id="app-key-config" class="org.puyallupfamilyhistorycenter.service.websocket.AppKeyConfig" />
+    
     <bean id="family-search-person-source" class="org.puyallupfamilyhistorycenter.service.cache.FamilySearchPersonSource" />
     <bean id="person-class" class="java.lang.Class" factory-method="forName">
         <constructor-arg value="org.puyallupfamilyhistorycenter.service.models.Person" />

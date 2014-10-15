@@ -72,8 +72,10 @@ public class FamilyHistoryCenterSocket {
     private static final Logger logger = Logger.getLogger(FamilyHistoryCenterSocket.class);
     private static final Gson GSON = new Gson();
     private static final PersonDao personDao;
+    private static final AppKeyConfig appKeyConfig;
     static {
         personDao = (PersonDao) SpringContextInitializer.getContext().getBean("person-dao");
+        appKeyConfig = (AppKeyConfig) SpringContextInitializer.getContext().getBean("app-key-config");
     }
     
 
@@ -422,6 +424,12 @@ public class FamilyHistoryCenterSocket {
                     } else {
                         response = "Error: display not found '" + id + "'";
                     }
+                    break;
+                }
+                
+                case "get-app-key": {
+                    response = "app-key " + appKeyConfig.appKey + " " + appKeyConfig.environment;
+                    
                     break;
                 }
 

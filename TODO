@@ -6,7 +6,7 @@ Test map movement (changed to 'send' commands; removed native 'move' commands) D
 Set up pre-caching                         PENDING DEPENDENCY WIRING
 Finish wiring dependencies via Spring
 Figure out why log4j via Ivy isn't working
-Move developer id into config file (not in Git)
+Move developer id into config file (not in Git) DONE
 
 Puzzle:
 Wire puzzle settings into display          DONE
@@ -45,6 +45,7 @@ Fix buttons in split mode
 Add person chooser
 Add person info
 Maybe add spiral effect from RootsMapper
+Load Google Maps API only once
 
 Statistics:
 Implement basic family statistics

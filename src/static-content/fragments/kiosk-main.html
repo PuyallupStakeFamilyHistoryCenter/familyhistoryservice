@@ -102,26 +102,33 @@ POSSIBILITY OF SUCH DAMAGE.
 <script src="js/familysearch-javascript-sdk.min.js"></script>
 
 <script>
+    settings.local = {
+        verbs: {
+            "app-key": function(parts) {
+                FamilySearch.init({
+                    app_key: parts[1],
+                    environment: parts[2],
+                    auth_callback: 'https://localhost:8443/auth-redirect.html',
+                    http_function: $.ajax,
+                    deferred_function: $.Deferred,
+                    save_access_token: false
+                });
+                $("#login-start").show();
+            }
+        }
+    };
 
+    $("#login-start").hide();
     $("#login-wait").hide();
     $("#login-continue").hide();
     $("#login-success").hide();
+    ws.socketSend("get-app-key");
 
     $("#show-login-screen").click(function (event) {
         event.preventDefault();
         
         $("#login-start").hide();
         $("#login-wait").show();
-
-        FamilySearch.init({
-            app_key: 'WCQY-7J1Q-GKVV-7DNM-SQ5M-9Q5H-JX3H-CMJK',
-            environment: 'sandbox',
-            auth_callback: 'https://localhost:8443/auth-redirect.html',
-            http_function: $.ajax,
-            deferred_function: $.Deferred,
-            save_access_token: false
-        });
-
 
         var timeout = setTimeout(function () {
             navigate("kiosk-main");

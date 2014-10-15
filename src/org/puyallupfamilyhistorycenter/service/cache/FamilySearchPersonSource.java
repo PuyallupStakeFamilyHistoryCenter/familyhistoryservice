@@ -57,8 +57,8 @@ public class FamilySearchPersonSource implements Source<Person> {
     private static final Gson GSON = new Gson();
     private URI uri;
     
-    @Value("${endpoint}")
-    String endpoint;
+    @Value("${environment}")
+    String environment;
 
     public FamilySearchPersonSource() {
     }
@@ -66,7 +66,7 @@ public class FamilySearchPersonSource implements Source<Person> {
     private URI getURI() {
         if (uri == null) {
             try {
-                uri = new URI("https://" + endpoint + "/org/platform/collections/tree");
+                uri = new URI("https://" + environment + ".familysearch.org/org/platform/collections/tree");
             } catch (URISyntaxException ex) {
                 throw new IllegalStateException("Failed to create FamilySearch URI", ex);
             }
