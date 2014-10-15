@@ -113,6 +113,25 @@ POSSIBILITY OF SUCH DAMAGE.
         <property name="excludeCipherSuites" value="SSL_RSA_WITH_DES_CBC_SHA,SSL_DHE_RSA_WITH_DES_CBC_SHA,SSL_DHE_DSS_WITH_DES_CBC_SHA,SSL_RSA_EXPORT_WITH_RC4_40_MD5,SSL_RSA_EXPORT_WITH_DES40_CBC_SHA,SSL_DHE_RSA_EXPORT_WITH_DES40_CBC_SHA,SSL_DHE_DSS_EXPORT_WITH_DES40_CBC_SHA" />
     </bean>
     
+    <!--SSL connector-->
+    <bean id="ssl-connection-factory" class="org.eclipse.jetty.server.SslConnectionFactory">
+        <constructor-arg ref="ssl-context-factory" />
+        <constructor-arg value="HTTP/1.1" />
+    </bean>
+    <bean id="http-connection-factory" class="org.eclipse.jetty.server.HttpConnectionFactory">
+        <constructor-arg ref="https-config" />
+    </bean>
+    <bean id="ssl-connector" class="org.eclipse.jetty.server.ServerConnector">
+        <constructor-arg name="server" ref="server" />
+        <constructor-arg name="factories">
+            <array>
+                <ref bean="ssl-connection-factory" />
+                <ref bean="http-connection-factory" />
+            </array>
+        </constructor-arg>
+        <property name="port" value="8443" />
+    </bean>
+    
     <!--HTTP config-->
     <bean id="https-config" class="org.eclipse.jetty.server.HttpConfiguration" >
         <property name="secureScheme" value="https" />

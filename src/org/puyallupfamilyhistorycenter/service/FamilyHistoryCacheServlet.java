@@ -28,13 +28,11 @@ package org.puyallupfamilyhistorycenter.service;
 
 
 import java.net.MalformedURLException;
-import org.eclipse.jetty.http.HttpVersion;
 import org.eclipse.jetty.server.HttpConfiguration;
 import org.eclipse.jetty.server.HttpConnectionFactory;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.SslConnectionFactory;
-import org.eclipse.jetty.server.handler.ContextHandlerCollection;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,22 +45,13 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
  * @author tibbitts
  */
 public class FamilyHistoryCacheServlet {
+    @Autowired
+    private Server server;
     
     @Autowired
-    Server server;
-    
-    @Autowired
-    SslContextFactory sslContextFactory;
-    
-    @Autowired
-    HttpConfiguration httpsConfig;
+    private ServerConnector sslConnector;
     
     public void run() throws MalformedURLException, Exception {
-        // SSL Connector
-        ServerConnector sslConnector = new ServerConnector(server,
-            new SslConnectionFactory(sslContextFactory,HttpVersion.HTTP_1_1.asString()),
-            new HttpConnectionFactory(httpsConfig));
-        sslConnector.setPort(8443);
         server.addConnector(sslConnector);
         
         server.start();
