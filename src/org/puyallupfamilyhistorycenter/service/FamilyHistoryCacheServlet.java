@@ -49,7 +49,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 public class FamilyHistoryCacheServlet {
     
     @Autowired
-    ContextHandlerCollection handlerCollection;
+    Server server;
     
     @Autowired
     SslContextFactory sslContextFactory;
@@ -58,8 +58,6 @@ public class FamilyHistoryCacheServlet {
     HttpConfiguration httpsConfig;
     
     public void run() throws MalformedURLException, Exception {
-        Server server = new Server();
-
         // SSL Connector
         ServerConnector sslConnector = new ServerConnector(server,
             new SslConnectionFactory(sslContextFactory,HttpVersion.HTTP_1_1.asString()),
@@ -67,7 +65,6 @@ public class FamilyHistoryCacheServlet {
         sslConnector.setPort(8443);
         server.addConnector(sslConnector);
         
-        server.setHandler(handlerCollection);
         server.start();
         server.join();
     }

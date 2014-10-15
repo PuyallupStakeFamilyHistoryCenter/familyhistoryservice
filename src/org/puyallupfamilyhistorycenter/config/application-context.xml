@@ -99,6 +99,10 @@ POSSIBILITY OF SUCH DAMAGE.
         </property>
     </bean>
     
+    <bean id="server" class="org.eclipse.jetty.server.Server">
+        <property name="handler" ref="context-handlers" />
+    </bean>
+    
     <!--SSL context factory-->
     <bean id="ssl-context-factory" class="org.eclipse.jetty.util.ssl.SslContextFactory" >
         <property name="keyStorePath" value="keystore" />
