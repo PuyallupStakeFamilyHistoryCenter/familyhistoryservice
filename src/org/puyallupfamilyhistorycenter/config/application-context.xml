@@ -88,6 +88,17 @@ POSSIBILITY OF SUCH DAMAGE.
         <property name="handler" ref="image-cache-handler" />
     </bean>
     
+    <!--Handler collection-->
+    <bean id="context-handlers" class="org.eclipse.jetty.server.handler.ContextHandlerCollection">
+        <property name="handlers">
+            <array>
+                <ref bean="web-socket-context" />
+                <ref bean="static-context" />
+                <ref bean="image-cache-context" />
+            </array>
+        </property>
+    </bean>
+    
     <!--SSL context factory-->
     <bean id="ssl-context-factory" class="org.eclipse.jetty.util.ssl.SslContextFactory" >
         <property name="keyStorePath" value="keystore" />
@@ -96,6 +107,22 @@ POSSIBILITY OF SUCH DAMAGE.
         <property name="trustStorePath" value="keystore" />
         <property name="trustStorePassword" value="${trust-store-password}" />
         <property name="excludeCipherSuites" value="SSL_RSA_WITH_DES_CBC_SHA,SSL_DHE_RSA_WITH_DES_CBC_SHA,SSL_DHE_DSS_WITH_DES_CBC_SHA,SSL_RSA_EXPORT_WITH_RC4_40_MD5,SSL_RSA_EXPORT_WITH_DES40_CBC_SHA,SSL_DHE_RSA_EXPORT_WITH_DES40_CBC_SHA,SSL_DHE_DSS_EXPORT_WITH_DES40_CBC_SHA" />
+    </bean>
+    
+    <!--HTTP config-->
+    <bean id="https-config" class="org.eclipse.jetty.server.HttpConfiguration" >
+        <property name="secureScheme" value="https" />
+        <property name="securePort" value="8443" />
+        <property name="outputBufferSize" value="${http-output=buffer-size:32768}" />
+        <property name="requestHeaderSize" value="${http-request-header-size:8192}" />
+        <property name="responseHeaderSize" value="${http-response-header-size:8192}" />
+        <property name="sendServerVersion" value="${http-send-server-version:true}" />
+        <property name="sendDateHeader" value="${http-send-date-header:false}" />
+        <property name="customizers">
+            <list>
+                <bean class="org.eclipse.jetty.server.SecureRequestCustomizer" />
+            </list>
+        </property>
     </bean>
 
     <bean id="servlet" class="org.puyallupfamilyhistorycenter.service.FamilyHistoryCacheServlet" init-method="run">

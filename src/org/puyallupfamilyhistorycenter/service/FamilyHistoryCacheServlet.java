@@ -29,19 +29,15 @@ package org.puyallupfamilyhistorycenter.service;
 
 import java.net.MalformedURLException;
 import org.eclipse.jetty.http.HttpVersion;
-import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.HttpConfiguration;
 import org.eclipse.jetty.server.HttpConnectionFactory;
-import org.eclipse.jetty.server.SecureRequestCustomizer;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.SslConnectionFactory;
-import org.eclipse.jetty.server.handler.ContextHandler;
 import org.eclipse.jetty.server.handler.ContextHandlerCollection;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
@@ -51,62 +47,23 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
  * @author tibbitts
  */
 public class FamilyHistoryCacheServlet {
-    @Autowired
-    @Qualifier("web-socket-context")
-    ContextHandler webSocketContext;
     
     @Autowired
-    @Qualifier("static-context")
-    ContextHandler staticContext;
-    
-    @Autowired
-    @Qualifier("image-cache-context")
-    ContextHandler imageCacheContext;
+    ContextHandlerCollection handlerCollection;
     
     @Autowired
     SslContextFactory sslContextFactory;
     
+    @Autowired
+    HttpConfiguration httpsConfig;
+    
     public void run() throws MalformedURLException, Exception {
-        ContextHandlerCollection handlerCollection = new ContextHandlerCollection();
-        handlerCollection.setHandlers(new Handler[]{webSocketContext, staticContext, imageCacheContext});
-
-        
-        // SSL Context Factory
-//        SslContextFactory sslContextFactory = new SslContextFactory();
-//        sslContextFactory.setKeyStorePath("keystore");
-//        sslContextFactory.setKeyStorePassword("OBF:1k111x8m1u2g1u9n1u9v1u2u1x881jyx");
-//        sslContextFactory.setKeyManagerPassword("OBF:1k111x8m1u2g1u9n1u9v1u2u1x881jyx");
-//        sslContextFactory.setTrustStorePath("keystore");
-//        sslContextFactory.setTrustStorePassword("OBF:1k111x8m1u2g1u9n1u9v1u2u1x881jyx");
-//        sslContextFactory.setExcludeCipherSuites(
-//                "SSL_RSA_WITH_DES_CBC_SHA",
-//                "SSL_DHE_RSA_WITH_DES_CBC_SHA",
-//                "SSL_DHE_DSS_WITH_DES_CBC_SHA",
-//                "SSL_RSA_EXPORT_WITH_RC4_40_MD5",
-//                "SSL_RSA_EXPORT_WITH_DES40_CBC_SHA",
-//                "SSL_DHE_RSA_EXPORT_WITH_DES40_CBC_SHA",
-//                "SSL_DHE_DSS_EXPORT_WITH_DES40_CBC_SHA");
-        
         Server server = new Server();
-        
-        // HTTP Configuration
-        HttpConfiguration http_config = new HttpConfiguration();
-        http_config.setSecureScheme("https");
-        http_config.setSecurePort(8443);
-        http_config.setOutputBufferSize(32768);
-        http_config.setRequestHeaderSize(8192);
-        http_config.setResponseHeaderSize(8192);
-        http_config.setSendServerVersion(true);
-        http_config.setSendDateHeader(false);
-        
-        // SSL HTTP Configuration
-        HttpConfiguration https_config = new HttpConfiguration(http_config);
-        https_config.addCustomizer(new SecureRequestCustomizer());
 
         // SSL Connector
         ServerConnector sslConnector = new ServerConnector(server,
             new SslConnectionFactory(sslContextFactory,HttpVersion.HTTP_1_1.asString()),
-            new HttpConnectionFactory(https_config));
+            new HttpConnectionFactory(httpsConfig));
         sslConnector.setPort(8443);
         server.addConnector(sslConnector);
         
