@@ -60,12 +60,11 @@ public class FamilyHistoryCacheServlet {
     @Qualifier("static-context")
     ContextHandler staticContext;
     
+    @Autowired
+    @Qualifier("image-cache-context")
+    ContextHandler imageCacheContext;
+    
     public void run() throws MalformedURLException, Exception {
-        ContextHandler imageCacheContext = new ContextHandler("/image-cache");
-        Handler imageCacheHandler = new FamilySearchImageCacheHandler();
-        imageCacheContext.setHandler(imageCacheHandler);
-        
-        
         ContextHandlerCollection handlerCollection = new ContextHandlerCollection();
         handlerCollection.setHandlers(new Handler[]{webSocketContext, staticContext, imageCacheContext});
 

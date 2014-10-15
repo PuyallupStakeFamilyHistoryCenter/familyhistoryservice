@@ -80,6 +80,13 @@ POSSIBILITY OF SUCH DAMAGE.
         <constructor-arg value="/static-content" />
         <property name="handler" ref="static-handler" />
     </bean>
+    
+    <!--Image cache-->
+    <bean id="image-cache-handler" class="org.puyallupfamilyhistorycenter.service.cache.FamilySearchImageCacheHandler" />
+    <bean id="image-cache-context" class="org.eclipse.jetty.server.handler.ContextHandler" >
+        <constructor-arg value="/image-cache" />
+        <property name="handler" ref="image-cache-handler" />
+    </bean>
 
     <bean id="servlet" class="org.puyallupfamilyhistorycenter.service.FamilyHistoryCacheServlet" init-method="run">
     </bean>
