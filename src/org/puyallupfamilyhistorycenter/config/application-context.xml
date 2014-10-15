@@ -87,6 +87,16 @@ POSSIBILITY OF SUCH DAMAGE.
         <constructor-arg value="/image-cache" />
         <property name="handler" ref="image-cache-handler" />
     </bean>
+    
+    <!--SSL context factory-->
+    <bean id="ssl-context-factory" class="org.eclipse.jetty.util.ssl.SslContextFactory" >
+        <property name="keyStorePath" value="keystore" />
+        <property name="keyStorePassword" value="${key-store-password}" />
+        <property name="keyManagerPassword" value="${key-manager-password}" />
+        <property name="trustStorePath" value="keystore" />
+        <property name="trustStorePassword" value="${trust-store-password}" />
+        <property name="excludeCipherSuites" value="SSL_RSA_WITH_DES_CBC_SHA,SSL_DHE_RSA_WITH_DES_CBC_SHA,SSL_DHE_DSS_WITH_DES_CBC_SHA,SSL_RSA_EXPORT_WITH_RC4_40_MD5,SSL_RSA_EXPORT_WITH_DES40_CBC_SHA,SSL_DHE_RSA_EXPORT_WITH_DES40_CBC_SHA,SSL_DHE_DSS_EXPORT_WITH_DES40_CBC_SHA" />
+    </bean>
 
     <bean id="servlet" class="org.puyallupfamilyhistorycenter.service.FamilyHistoryCacheServlet" init-method="run">
     </bean>
