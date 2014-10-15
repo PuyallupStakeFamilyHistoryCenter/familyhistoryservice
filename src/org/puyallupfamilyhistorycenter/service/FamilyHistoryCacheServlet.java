@@ -29,7 +29,6 @@ package org.puyallupfamilyhistorycenter.service;
 
 import java.net.MalformedURLException;
 import org.eclipse.jetty.http.HttpVersion;
-import org.puyallupfamilyhistorycenter.service.websocket.FamilyHistoryCenterSocket;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.HttpConfiguration;
 import org.eclipse.jetty.server.HttpConnectionFactory;
@@ -39,12 +38,8 @@ import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.SslConnectionFactory;
 import org.eclipse.jetty.server.handler.ContextHandler;
 import org.eclipse.jetty.server.handler.ContextHandlerCollection;
-import org.eclipse.jetty.server.handler.ResourceHandler;
-import org.eclipse.jetty.util.resource.Resource;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 
-import org.eclipse.jetty.websocket.server.WebSocketHandler;
-import org.puyallupfamilyhistorycenter.service.cache.FamilySearchCacheHandler;
 import org.puyallupfamilyhistorycenter.service.cache.FamilySearchImageCacheHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -61,25 +56,18 @@ public class FamilyHistoryCacheServlet {
     @Qualifier("web-socket-context")
     ContextHandler webSocketContext;
     
+    @Autowired
+    @Qualifier("static-context")
+    ContextHandler staticContext;
+    
     public void run() throws MalformedURLException, Exception {
-        ContextHandler indexContext = new ContextHandler("/static-content");
-        ResourceHandler resourceHandler = new ResourceHandler();
-        resourceHandler.setDirectoriesListed(true);
-        resourceHandler.setBaseResource(Resource.newClassPathResource("static-content"));
-        resourceHandler.setCacheControl("private, max-age=0, no-cache");
-        indexContext.setHandler(resourceHandler);
-        
-        ContextHandler cacheContext = new ContextHandler("/family-search-cache");
-        Handler cacheHandler = new FamilySearchCacheHandler();
-        cacheContext.setHandler(cacheHandler);
-        
         ContextHandler imageCacheContext = new ContextHandler("/image-cache");
         Handler imageCacheHandler = new FamilySearchImageCacheHandler();
         imageCacheContext.setHandler(imageCacheHandler);
         
         
         ContextHandlerCollection handlerCollection = new ContextHandlerCollection();
-        handlerCollection.setHandlers(new Handler[]{webSocketContext, indexContext, cacheContext, imageCacheContext});
+        handlerCollection.setHandlers(new Handler[]{webSocketContext, staticContext, imageCacheContext});
 
         
         // SSL Context Factory

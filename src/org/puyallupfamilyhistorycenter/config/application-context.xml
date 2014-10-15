@@ -57,6 +57,7 @@ POSSIBILITY OF SUCH DAMAGE.
         <constructor-arg ref="in-memory-source" />
     </bean>
     
+    <!--Web socket-->
     <bean id="web-socket-handler" class="org.puyallupfamilyhistorycenter.service.websocket.FamilyHistoryCenterWebSocketHandler" />
     <bean id="web-socket-resource" class="org.eclipse.jetty.util.resource.Resource" factory-method="newResource" >
         <constructor-arg value="" />
@@ -65,9 +66,22 @@ POSSIBILITY OF SUCH DAMAGE.
         <property name="handler" ref="web-socket-handler" />
         <property name="baseResource" ref="web-socket-resource" />
     </bean>
+    
+    <!--Static content-->
+    <bean id="static-resource" class="org.eclipse.jetty.util.resource.Resource" factory-method="newClassPathResource">
+        <constructor-arg value="/static-content" />
+    </bean>
+    <bean id="static-handler" class="org.eclipse.jetty.server.handler.ResourceHandler" >
+        <property name="directoriesListed" value="true" />
+        <property name="baseResource" ref="static-resource" />
+        <property name="cacheControl" value="private, max-age=0, no-cache" />
+    </bean>
+    <bean id="static-context" class="org.eclipse.jetty.server.handler.ContextHandler" >
+        <constructor-arg value="/static-content" />
+        <property name="handler" ref="static-handler" />
+    </bean>
 
     <bean id="servlet" class="org.puyallupfamilyhistorycenter.service.FamilyHistoryCacheServlet" init-method="run">
-        
     </bean>
 
 </beans>
