@@ -51,62 +51,42 @@ import org.springframework.beans.factory.annotation.Value;
  *
  * @author tibbitts
  */
-
-
 public class FamilySearchPersonSource implements Source<Person> {
-    private static final Gson GSON = new Gson();
-    private URI uri;
-    
-    @Value("${environment}")
-    String environment;
 
-    public FamilySearchPersonSource() {
-    }
-    
-    private URI getURI() {
-        if (uri == null) {
-            try {
-                uri = new URI("https://" + environment + ".familysearch.org/org/platform/collections/tree");
-            } catch (URISyntaxException ex) {
-                throw new IllegalStateException("Failed to create FamilySearch URI", ex);
-            }
-        }
-        
-        return uri;
-    }
+    private static final Gson GSON = new Gson();
 
     @Override
     public Person get(String personId, String accessToken) {
-        FamilySearchFamilyTree ft = new FamilyHistoryFamilyTree(getURI()).authenticate(accessToken);
+        FamilySearchFamilyTree ft = FamilyHistoryFamilyTree.getInstance(accessToken);
         PersonState state = ft.readPersonById(personId);
-        
+
         PersonBuilder builder = new PersonBuilder();
         Name name = state.getName();
         builder.withId(personId);
         builder.withName(name.getNameForm().getFullText());
         builder.withLiving(false); //TODO: Set is living
         builder.withGender(state.getGender().getKnownType().name());
-        
+
         {
             //TODO: set facts
             List<Fact> facts = null;
         }
-        
+
         {
             PersonParentsState parentsState = state.readParents();
             builder.withParents(fsPersonsToPersonRefs(parentsState.getPersons()));
         }
-        
+
         {
             PersonSpousesState spousesState = state.readSpouses();
             builder.withSpouses(fsPersonsToPersonRefs(spousesState.getPersons()));
         }
-        
+
         {
             PersonChildrenState childrenState = state.readChildren();
             builder.withChildren(fsPersonsToPersonRefs(childrenState.getPersons()));
         }
-        
+
         {
             SourceDescriptionsState sourceState = state.readArtifacts();
             List<SourceDescription> sources = sourceState.getSourceDescriptions();
@@ -120,7 +100,7 @@ public class FamilySearchPersonSource implements Source<Person> {
                 builder.withImages(imageUrls);
             }
         }
-        
+
         return builder.build();
     }
 
@@ -128,7 +108,7 @@ public class FamilySearchPersonSource implements Source<Person> {
         if (persons == null) {
             return null;
         }
-        
+
         PersonReference[] refs = new PersonReference[persons.size()];
         for (int i = 0; i < persons.size(); i++) {
             org.gedcomx.conclusion.Person person = persons.get(i);

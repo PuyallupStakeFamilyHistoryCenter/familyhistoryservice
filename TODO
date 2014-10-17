@@ -3,8 +3,8 @@ TODO:
 Set up SSL for web socket and image cache  DONE
 Delete access token on log out             DONE
 Test map movement (changed to 'send' commands; removed native 'move' commands) DONE
-Set up pre-caching                         PENDING DEPENDENCY WIRING
-Finish wiring dependencies via Spring
+Set up pre-caching                         DONE (it's really slow; test)
+Finish wiring dependencies via Spring      DONE
 Figure out why log4j via Ivy isn't working
 Move developer id into config file (not in Git) DONE
 
@@ -60,13 +60,14 @@ Collapse menu when log out pressed         DONE
 Set logged-in name when logged in          DONE
 Clear logged-in name when logged out
 Turn off log-out button when logged out
+Fix log-out button; it doesn't show up
 Disable navigation when logged out
 Add back button to standard header         DONE
 Set up accordian for groups of controls
 Make header opaque so scrolling doesn't look weird
 
 Library:
-Separate query params for page and fragment
+Separate query params for page and fragment DONE
 Rewire sockete.js to accept a response callback
 
 Project:
@@ -80,3 +81,4 @@ Move css files into folder
 Move test files into folder
 Get facts into person
 Location cache
+Get unit tests working again

@@ -32,6 +32,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import org.familysearch.api.client.ft.FamilySearchFamilyTree;
+import org.puyallupfamilyhistorycenter.service.SpringContextInitializer;
 import org.puyallupfamilyhistorycenter.service.models.Person;
 import org.puyallupfamilyhistorycenter.service.models.PersonReference;
 import org.puyallupfamilyhistorycenter.service.websocket.FamilyHistoryFamilyTree;
@@ -43,8 +44,12 @@ import org.puyallupfamilyhistorycenter.service.websocket.FamilyHistoryFamilyTree
 
 
 public class Precacher {
-    private static final Source<Person> source = new CachingSource<>(new FamilySearchPersonSource(), new InMemoryCache<String, Person>());
+    private static final Source<Person> source;
     private static final ExecutorService executor = Executors.newCachedThreadPool();
+    
+    static {
+        source = (Source<Person>) SpringContextInitializer.getContext().getBean("in-memory-source");
+    }
     
     private final String accessToken;
     private Future future;
@@ -55,7 +60,7 @@ public class Precacher {
     
     public void precache() {
         future = executor.submit(new Runnable() {
-            FamilySearchFamilyTree tree = new FamilyHistoryFamilyTree(true).authenticate(accessToken);
+            FamilySearchFamilyTree tree = FamilyHistoryFamilyTree.getInstance(accessToken);
             Queue<String> frontier = new LinkedList<>();
             Queue<String> leafNodes = new LinkedList<>();
             

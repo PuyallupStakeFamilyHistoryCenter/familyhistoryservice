@@ -1,7 +1,9 @@
 package org.puyallupfamilyhistorycenter.service.websocket;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 import org.familysearch.api.client.ft.FamilySearchFamilyTree;
+import org.puyallupfamilyhistorycenter.service.SpringContextInitializer;
 
 /**
  *
@@ -11,15 +13,21 @@ import org.familysearch.api.client.ft.FamilySearchFamilyTree;
 
 public class FamilyHistoryFamilyTree extends FamilySearchFamilyTree {
 
-    public FamilyHistoryFamilyTree(boolean sandbox) {
-        super(sandbox);
-    }
-    
-    public FamilyHistoryFamilyTree(URI uri) {
+    private FamilyHistoryFamilyTree(URI uri) {
         super(uri);
     }
     
-    public FamilySearchFamilyTree authenticate(String accessToken) {
-        return (FamilySearchFamilyTree) authenticateWithAccessToken(accessToken);
+    private static final URI uri;
+    static {
+            String environment = (String) SpringContextInitializer.getContext().getBean("family-search-env");
+        try {
+            uri = new URI("https://"+environment+".familysearch.org/platform/collections/tree");
+        } catch (URISyntaxException ex) {
+            throw new IllegalStateException("Failed to create FamilySearch URI", ex);
+        }
+    }
+    
+    public static FamilySearchFamilyTree getInstance(String accessToken) {
+        return (FamilySearchFamilyTree) new FamilySearchFamilyTree(uri).authenticateWithAccessToken(accessToken);
     }
 }

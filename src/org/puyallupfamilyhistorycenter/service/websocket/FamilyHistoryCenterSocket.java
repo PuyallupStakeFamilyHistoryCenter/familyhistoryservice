@@ -440,12 +440,11 @@ public class FamilyHistoryCenterSocket {
                     String pin = hashPin(scanner.next(), salt);
                     String accessToken = scanner.next();
 
-                    FamilySearchFamilyTree tree = new FamilyHistoryFamilyTree(true)
-                            .authenticate(accessToken);
+                    FamilySearchFamilyTree tree = FamilyHistoryFamilyTree.getInstance(accessToken);
 
                     PersonState person = tree.readPersonForCurrentUser();
 
-                    if (!person.getSelfUri().getPath().endsWith(userId)) {
+                    if (person == null || !person.getSelfUri().getPath().endsWith(userId)) {
                         response = "Error: Access token does not match userId";
                         break;
                     }
@@ -495,7 +494,7 @@ public class FamilyHistoryCenterSocket {
             if (token != null) {
                 tokenLastUse.put(token, System.currentTimeMillis());
             }
-            if (userId != null) {
+            if (userId != null && userContextMap.containsKey(userId)) {
                 userContextMap.get(userId).lastUsed = System.currentTimeMillis();
             }
         } catch (Throwable e) {
