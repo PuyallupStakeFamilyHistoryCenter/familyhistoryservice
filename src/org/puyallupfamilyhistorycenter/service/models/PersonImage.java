@@ -23,9 +23,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package org.puyallupfamilyhistorycenter.service.cache;
-
-import org.puyallupfamilyhistorycenter.service.models.Person;
+package org.puyallupfamilyhistorycenter.service.models;
 
 /**
  *
@@ -33,15 +31,12 @@ import org.puyallupfamilyhistorycenter.service.models.Person;
  */
 
 
-public class DescendantsIterationStrategy implements IterationStrategy<Person> {
+public class PersonImage {
+    public final String id;
+    public final String url;
 
-    DescendantsIterationStrategy(Person get, Source<Person> source, String accessToken) {
-        
+    public PersonImage(String id, String url) {
+        this.id = id;
+        this.url = url;
     }
-
-    @Override
-    public Person next(Person current) {
-        return null;
-    }
-    
 }

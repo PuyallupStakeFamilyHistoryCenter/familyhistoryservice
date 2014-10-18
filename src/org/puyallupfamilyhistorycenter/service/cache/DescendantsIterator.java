@@ -23,12 +23,10 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package org.puyallupfamilyhistorycenter.service.models;
+package org.puyallupfamilyhistorycenter.service.cache;
 
-import java.util.ArrayList;
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.apache.commons.lang3.builder.ToStringBuilder;
+import java.util.Iterator;
+import org.puyallupfamilyhistorycenter.service.models.Person;
 
 /**
  *
@@ -36,57 +34,25 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
  */
 
 
-public class PersonReference {
-    private String id;
-    private String name;
-    private String relationship;
-    private int depth;
+public class DescendantsIterator implements Iterator<Person> {
 
-    public PersonReference(String id, String name, String relationship) {
-        this.id = id;
-        this.name = name;
-        this.relationship = relationship;
+    DescendantsIterator(String personId, int maxDepth, Source<Person> source, String accessToken) {
+        
     }
 
-    public PersonReference(String id, String name, int depth) {
-        this.id = id;
-        this.name = name;
-        this.depth = depth;
+    @Override
+    public boolean hasNext() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
-    public String getId() {
-        return id;
+    @Override
+    public Person next() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public String getRelationship() {
-        return relationship;
+    @Override
+    public void remove() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     
-    public PersonReference withDepth(int depth) {
-        this.depth = depth;
-        return this;
-    }
-
-    public int getDepth() {
-        return depth;
-    }
-
-    @Override
-    public int hashCode() {
-        return HashCodeBuilder.reflectionHashCode(this, new ArrayList<String>());
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        return EqualsBuilder.reflectionEquals(this, obj, new ArrayList());
-    }
-
-    @Override
-    public String toString() {
-        return ToStringBuilder.reflectionToString(this);
-    }
 }

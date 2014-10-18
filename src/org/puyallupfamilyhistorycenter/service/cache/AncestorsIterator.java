@@ -25,7 +25,11 @@
  */
 package org.puyallupfamilyhistorycenter.service.cache;
 
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.Queue;
 import org.puyallupfamilyhistorycenter.service.models.Person;
+import org.puyallupfamilyhistorycenter.service.models.PersonReference;
 
 /**
  *
@@ -33,20 +37,50 @@ import org.puyallupfamilyhistorycenter.service.models.Person;
  */
 
 
-public class AncestorsIterationStrategy implements IterationStrategy<Person> {
+public class AncestorsIterator implements Iterator<Person> {
 
-    private final Person root;
+    private final String personId;
+    private final int maxDepth;
     private final Source<Person> source;
     private final String accessToken;
-    AncestorsIterationStrategy(Person root, Source<Person> source, String accessToken) {
-        this.root = root;
+    private final Queue<PersonReference> frontier = new LinkedList<>();
+    
+    AncestorsIterator(String personId, int maxDepth, Source<Person> source, String accessToken) {
+        this.personId = personId;
+        this.maxDepth = maxDepth;
         this.source = source;
         this.accessToken = accessToken;
+        
+        Person root = source.get(personId, accessToken);
+        if (root != null) {
+            frontier.add(new PersonReference(personId, root.name, 0));
+        }
     }
 
     @Override
-    public Person next(Person current) {
-        return null;
+    public boolean hasNext() {
+        return !frontier.isEmpty();
+    }
+
+    @Override
+    public Person next() {
+        PersonReference next = frontier.remove();
+        Person person = source.get(next.getId(), accessToken);
+        
+        if (next.getDepth() < maxDepth) {
+            if (person.parents != null) {
+                for (PersonReference parent : person.parents) {
+                    frontier.add(parent.withDepth(next.getDepth() + 1));
+                }
+            }
+        }
+        
+        return person;
+    }
+
+    @Override
+    public void remove() {
+        throw new UnsupportedOperationException("Not supported");
     }
     
 }

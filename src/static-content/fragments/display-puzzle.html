@@ -119,7 +119,12 @@ POSSIBILITY OF SUCH DAMAGE.
                 config.thumbnail = parseBool(parts[1]);
                 draw();
             },
-            reset: init
+            reset: init,
+            "person-image": function (parts) {
+                var data = JSON.parse(parts[1]);
+                imagesrc = data.url;
+                init();
+            }
         }
 
 
@@ -180,7 +185,11 @@ POSSIBILITY OF SUCH DAMAGE.
         context = canvas.getContext("2d");
         dragging = false;
         image = new Image();
-        image.src = imagesrc ? imagesrc : "elsa.jpg";//"children.png";
+        image.src = imagesrc;
+        if (!imagesrc) {
+            return;
+        }
+        
         image.crossOrigin = "Anonymous";
         image.onload = function () {
             resize();

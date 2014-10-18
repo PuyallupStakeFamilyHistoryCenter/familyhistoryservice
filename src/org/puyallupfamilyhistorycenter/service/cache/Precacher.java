@@ -26,8 +26,10 @@
 
 package org.puyallupfamilyhistorycenter.service.cache;
 
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Queue;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -51,49 +53,69 @@ public class Precacher {
         source = (Source<Person>) SpringContextInitializer.getContext().getBean("in-memory-source");
     }
     
+    private static class PrecacheObject {
+        public final String id;
+        public final int depth;
+
+        public PrecacheObject(String id, int depth) {
+            this.id = id;
+            this.depth = depth;
+        }
+    }
+    
     private final String accessToken;
+    private final int maxDepth;
     private Future future;
     
-    public Precacher(String accessToken) {
+    public Precacher(String accessToken, int maxDepth) {
         this.accessToken = accessToken;
+        this.maxDepth = maxDepth;
     }
     
     public void precache() {
         future = executor.submit(new Runnable() {
             FamilySearchFamilyTree tree = FamilyHistoryFamilyTree.getInstance(accessToken);
-            Queue<String> frontier = new LinkedList<>();
-            Queue<String> leafNodes = new LinkedList<>();
+            Queue<PrecacheObject> frontier = new LinkedList<>();
+            Queue<PrecacheObject> leafNodes = new LinkedList<>();
+            Set<String> currentLeafs = new HashSet<>();
             
             {
-                frontier.add(tree.readPersonForCurrentUser().getPerson().getId());
+                frontier.add(new PrecacheObject(tree.readPersonForCurrentUser().getPerson().getId(), 0));
             }
             
             @Override
             public void run() {
                 try {
                     while (!frontier.isEmpty()) {
-                        String id = frontier.remove();
-                        Person person = source.get(id, accessToken);
-                        if (person.parents != null) {
+                        PrecacheObject precacheObject = frontier.remove();
+                        Person person = source.get(precacheObject.id, accessToken);
+                        if (person.parents != null && precacheObject.depth < maxDepth) {
                             for (PersonReference parent : person.parents) {
                                 System.out.println("Adding parent " + parent.getName() + " to frontier");
-                                frontier.add(parent.getId());
+                                frontier.add(new PrecacheObject(parent.getId(), precacheObject.depth + 1));
                             }
                         } else {
-                            leafNodes.add(id);
+                            System.out.println("Adding self " + person.name + " to leaf nodes");
+                            leafNodes.add(precacheObject);
                         }
                     }
 
-                    while(!leafNodes.isEmpty()) {
-                        String id = leafNodes.remove();
-                        Person person = source.get(id, accessToken);
-                        if (person.children != null) {
-                            for (PersonReference child : person.children) {
-                                System.out.println("Adding child " + child.getName() + " to frontier");
-                                frontier.add(child.getId());
-                            }
-                        }
-                    }
+//                    while(!leafNodes.isEmpty()) {
+//                        PrecacheObject precacheObject = leafNodes.remove();
+//                        currentLeafs.remove(precacheObject.id);
+//                        Person person = source.get(precacheObject.id, accessToken);
+//                        if (person.children != null) {
+//                            for (PersonReference child : person.children) {
+//                                if (!currentLeafs.contains(child.getId())) {
+//                                    System.out.println("Adding child " + child.getName() + " to frontier");
+//                                    leafNodes.add(new PrecacheObject(child.getId(), precacheObject.depth - 1));
+//                                    currentLeafs.add(child.getId());
+//                                }
+//                            }
+//                        } else {
+//                            System.out.println("Person " + person.name + " has no children on record");
+//                        }
+//                    }
                 } catch (Exception ex) {
                     ex.printStackTrace(System.err);
                 }

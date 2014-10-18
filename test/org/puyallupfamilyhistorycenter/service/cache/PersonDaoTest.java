@@ -99,16 +99,16 @@ public class PersonDaoTest {
     @Test
     public void testTraverseFamily() {
         System.out.println("testTraverseFamily");
-        assertIteratorsEqual(dao.traverseImmediateFamily("KWCB-HZV", 10, null, ""), family.iterator());
+        assertEquals(dao.listImmediateFamily("KWCB-HZV", ""), family);
     }
 
     /**
      * Test of traverseAncestors method, of class PersonCache.
      */
-    //@Test
+    @Test
     public void testTraverseAncestors() {
         System.out.println("testTraverseAncestors");
-        assertIteratorsEqual(dao.traverseAncestors("KWCB-HZV", 10, null, ""), ancestors.iterator());
+        assertEquals(dao.listAncestors("KWCB-HZV", 10, ""), ancestors);
     }
 
     /**
@@ -117,54 +117,6 @@ public class PersonDaoTest {
     //@Test
     public void testTraverseDescendants() {
         System.out.println("testTraverseDescendants");
-        assertIteratorsEqual(dao.traverseDescendants("KWCB-HZV", 10, null, ""), descendants.iterator());
-    }
-    
-    
-    
-    <E> void assertIteratorsEqual(Iterator<E> it1, Iterator<E> it2) {
-        try {
-            int elementCount = 0;
-            while (true) {
-                if (it1.hasNext() != it2.hasNext()) {
-                    throw new AssertionFailedError("Iterators don't have the same number of elements at " + elementCount);
-                }
-                if (!it1.hasNext()) break;
-
-                E e1 = it1.next();
-                E e2 = it2.next();
-                
-                System.out.println("Expected: " + GSON.toJson(e1));
-                System.out.println("Actual: " + GSON.toJson(e2));
-
-                if (!e1.equals(e2)) {
-                    throw new AssertionFailedError("Iterators differ at element " + elementCount);
-                }
-                elementCount++;
-            }
-        } catch (AssertionFailedError ex) {
-            String message = "\nExpected: " + dumpIterator(it1) + "\nActual: " + dumpIterator(it2);
-            throw new AssertionFailedError(ex.getMessage() + message);
-        }
-        
-
-    }
-    
-    private <E> String dumpIterator(Iterator<E> it) {
-        StringBuilder builder = new StringBuilder();
-        if (it.hasNext()) {
-            boolean first = true;
-            while (it.hasNext() && builder.length() < 1024 * 1024) {
-                if (!first) {
-                    builder.append(",\n");
-                } else {
-                    first = false;
-                }
-                builder.append(GSON.toJson(it.next()));
-            }
-        } else {
-            builder.append("No elements remaining");
-        }
-        return builder.toString();
+        assertEquals(dao.listDescendants("KWCB-HZV", 10, ""), descendants);
     }
 }

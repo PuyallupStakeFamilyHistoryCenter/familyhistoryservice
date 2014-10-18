@@ -3,9 +3,19 @@
 <canvas id="canvas2" width="1" height="1" style="position:fixed; top: 0px; left: 0px; visibility: hidden"/>
 
 <script>
+    settings.local = {
+        verbs: {
+            "person-image": function (parts) {
+                var data = JSON.parse(parts[1]);
+                imagesrc = data.url;
+                init();
+            }
+        }
+    }
+    
     var swatches = ["#FFDCB2", "#FF0066", "#00CC00", "#FF0000", "#00FF00", "#0000FF", "SkyBlue", "LightGreen", "SaddleBrown", "Tomato", "OrangeRed"]
 
-    var imagesrc = "woman.jpg"; //"family-map.jpg"; //
+    var imagesrc;
     var canvas, context, canvas2, context2, image;
     var r, g, b, brushSize;
     var scale;
@@ -21,8 +31,11 @@
         canvas2 = document.getElementById("canvas2");
         context2 = canvas2.getContext("2d");
         image = new Image();
+        if (!imagesrc) {
+            return;
+        }
         image.src = imagesrc;
-        image.crossOrigin = "Anonymous";
+        
         image.onload = function () {
             resize()
             context.fillStyle = "white";

@@ -26,26 +26,23 @@
 package org.puyallupfamilyhistorycenter.service.cache;
 
 import com.google.gson.Gson;
-import java.net.URI;
-import java.net.URISyntaxException;
+import com.sun.istack.logging.Logger;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
-import java.util.Properties;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.familysearch.api.client.ft.FamilySearchFamilyTree;
+import org.familysearch.api.client.ft.FamilyTreePersonState;
 import org.gedcomx.conclusion.Fact;
 import org.gedcomx.conclusion.Name;
 import org.gedcomx.rs.client.PersonChildrenState;
 import org.gedcomx.rs.client.PersonParentsState;
 import org.gedcomx.rs.client.PersonSpousesState;
-import org.gedcomx.rs.client.PersonState;
 import org.gedcomx.rs.client.SourceDescriptionsState;
 import org.gedcomx.source.SourceDescription;
 import org.puyallupfamilyhistorycenter.service.models.Person;
 import org.puyallupfamilyhistorycenter.service.models.PersonBuilder;
 import org.puyallupfamilyhistorycenter.service.models.PersonReference;
 import org.puyallupfamilyhistorycenter.service.websocket.FamilyHistoryFamilyTree;
-import org.springframework.beans.factory.annotation.Value;
 
 /**
  *
@@ -53,55 +50,63 @@ import org.springframework.beans.factory.annotation.Value;
  */
 public class FamilySearchPersonSource implements Source<Person> {
 
+    private static final Logger logger = Logger.getLogger(FamilySearchPersonSource.class);
     private static final Gson GSON = new Gson();
 
     @Override
     public Person get(String personId, String accessToken) {
-        FamilySearchFamilyTree ft = FamilyHistoryFamilyTree.getInstance(accessToken);
-        PersonState state = ft.readPersonById(personId);
+        try {
+            FamilySearchFamilyTree ft = FamilyHistoryFamilyTree.getInstance(accessToken);
+            FamilyTreePersonState state = ft.readPersonById(personId);
 
-        PersonBuilder builder = new PersonBuilder();
-        Name name = state.getName();
-        builder.withId(personId);
-        builder.withName(name.getNameForm().getFullText());
-        builder.withLiving(false); //TODO: Set is living
-        builder.withGender(state.getGender().getKnownType().name());
-
-        {
-            //TODO: set facts
-            List<Fact> facts = null;
-        }
-
-        {
-            PersonParentsState parentsState = state.readParents();
-            builder.withParents(fsPersonsToPersonRefs(parentsState.getPersons()));
-        }
-
-        {
-            PersonSpousesState spousesState = state.readSpouses();
-            builder.withSpouses(fsPersonsToPersonRefs(spousesState.getPersons()));
-        }
-
-        {
-            PersonChildrenState childrenState = state.readChildren();
-            builder.withChildren(fsPersonsToPersonRefs(childrenState.getPersons()));
-        }
-
-        {
-            SourceDescriptionsState sourceState = state.readArtifacts();
-            List<SourceDescription> sources = sourceState.getSourceDescriptions();
-            if (sources != null) {
-                String[] imageUrls = new String[sources.size()];
-                int i = 0;
-                for (SourceDescription source : sources) {
-                    //source.getAbout() is the url to the image
-                    imageUrls[i++] = source.getAbout().toString();
-                }
-                builder.withImages(imageUrls);
+            PersonBuilder builder = new PersonBuilder();
+            Name name = state.getName();
+            builder.withId(personId);
+            if (name != null) {
+                builder.withName(name.getNameForm().getFullText());
             }
-        }
+            builder.withLiving(false); //TODO: Set is living
+            builder.withGender(state.getGender().getKnownType().name());
 
-        return builder.build();
+            {
+                //TODO: set facts
+                List<Fact> facts = null;
+            }
+
+            {
+                PersonParentsState parentsState = state.readParents();
+                builder.withParents(fsPersonsToPersonRefs(parentsState.getPersons()));
+            }
+
+            {
+                PersonSpousesState spousesState = state.readSpouses();
+                builder.withSpouses(fsPersonsToPersonRefs(spousesState.getPersons()));
+            }
+
+            {
+                PersonChildrenState childrenState = state.readChildren();
+                builder.withChildren(fsPersonsToPersonRefs(childrenState.getPersons()));
+            }
+
+            {
+                SourceDescriptionsState sourceState = state.readArtifacts();
+                List<SourceDescription> sources = sourceState.getSourceDescriptions();
+                if (sources != null) {
+                    String[] imageUrls = new String[sources.size()];
+                    int i = 0;
+                    for (SourceDescription source : sources) {
+                        //source.getAbout() is the url to the image
+                        imageUrls[i++] = "/image-cache?ref=" + URLEncoder.encode(source.getAbout().toString(), StandardCharsets.UTF_8.name());
+                    }
+                    builder.withImages(imageUrls);
+                }
+            }
+
+            return builder.build();
+        } catch (Exception e) {
+            logger.warning("Failed to load person for id " + personId, e);
+            return null;
+        }
     }
 
     private PersonReference[] fsPersonsToPersonRefs(List<org.gedcomx.conclusion.Person> persons) {

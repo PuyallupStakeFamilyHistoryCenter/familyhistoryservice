@@ -36,10 +36,6 @@ POSSIBILITY OF SUCH DAMAGE.
     <!--<context:property-placeholder location="classpath:org/puyallupfamilyhistorycenter/config/sandbox.properties" />-->
     <context:property-placeholder location="classpath:org/puyallupfamilyhistorycenter/config/app.properties" />
     
-    <bean id="family-search-env" class="java.lang.String">
-        <constructor-arg value="${environment}" />
-    </bean>
-    
     <bean id="app-key-config" class="org.puyallupfamilyhistorycenter.service.websocket.AppKeyConfig" />
     
     <bean id="family-search-person-source" class="org.puyallupfamilyhistorycenter.service.cache.FamilySearchPersonSource" />

@@ -26,10 +26,12 @@
 
 package org.puyallupfamilyhistorycenter.service.cache;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
+import org.apache.commons.collections4.IteratorUtils;
 import org.puyallupfamilyhistorycenter.service.models.Person;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
+import org.puyallupfamilyhistorycenter.service.models.PersonImage;
 
 /**
  *
@@ -47,6 +49,7 @@ public class PersonDao {
     /**
      * Gets a person by id from the underlying cache
      * @param personId
+     * @param accessToken
      * @return
      */
     public Person getPerson(String personId, String accessToken) {
@@ -56,61 +59,53 @@ public class PersonDao {
     /**
      * Get an iterator over family records for the given person
      * @param personId The person whose family to get
-     * @param pageSize The number of records to return wit each request
-     * @param lastPageEndId The id of the final record in the previous request
-     *                      no previous request exists)
+     * @param accessToken 
      * @return an iterator over the family of the given person
      */
-    public Iterator<Person> traverseImmediateFamily(String personId, int pageSize, String lastPageEndId, String accessToken) {
-        return traverse(personId, pageSize, lastPageEndId, new FamilyIterationStrategy(source.get(personId, accessToken) /*Change this to an id or a person ref instead*/, source, accessToken), accessToken);
+    public List<Person> listImmediateFamily(String personId, String accessToken) {
+        return traverse(new FamilyIterator(personId, source, accessToken));
     }
     
     /**
      * Get an iterator over ancestor records for the given person
      * @param personId The person whose ancestry to get
-     * @param pageSize The number of records to return wit each request
-     * @param lastPageEndId The id of the final record in the previous request
-     *                      no previous request exists)
+     * @param maxDepth The number of levels to descend into the tree
+     * @param accessToken 
      * @return an iterator over the ancestors of the given person
      */
-    public Iterator<Person> traverseAncestors(String personId, int pageSize, String lastPageEndId, String accessToken) {
-        return traverse(personId, pageSize, lastPageEndId, new AncestorsIterationStrategy(source.get(personId, accessToken), source, accessToken), accessToken);
+    public List<Person> listAncestors(String personId, int maxDepth, String accessToken) {
+        return traverse(new AncestorsIterator(personId, maxDepth, source, accessToken));
+    }
+    
+    public List<PersonImage> listAncestorImages(String personId, int maxDepth, String accessToken) {
+        return extractImages(new AncestorsIterator(personId, maxDepth, source, accessToken));
     }
     
     /**
      * Get an iterator over descendant records for the given person
      * @param personId The person whose descendants to get
-     * @param pageSize The number of records to return wit each request
-     * @param lastPageEndId The id of the final record in the previous request
-     *                      no previous request exists)
+     * @param maxDepth The number of levels to descend into the tree
+     * @param accessToken 
      * @return an iterator over the descendants of the given person
      */
-    public Iterator<Person> traverseDescendants(String personId, int pageSize, String lastPageEndId, String accessToken) {
-        return traverse(personId, pageSize, lastPageEndId, new DescendantsIterationStrategy(source.get(personId, accessToken), source, accessToken), accessToken);
+    public List<Person> listDescendants(String personId, int maxDepth, String accessToken) {
+        return traverse(new DescendantsIterator(personId, maxDepth, source, accessToken));
     }
     
-    private Iterator<Person> traverse(String personId, int pageSize, final String currentId, final IterationStrategy<Person> strategy, final String accessToken) {
-        return new Iterator<Person>() {
-            int currentPageIndex = 0;
-            Person next = strategy.next(currentId == null ? null : source.get(currentId, accessToken));
-            
-            @Override
-            public boolean hasNext() {
-                return next != null;
-            }
-
-            @Override
-            public Person next() {
-                Person current = next;
-                next = strategy.next(current);
-                return current;
-            }
-
-            @Override
-            public void remove() {
-                throw new UnsupportedOperationException();
-            }
-            
-        };
+    private List<Person> traverse(final Iterator<Person> iterator) {
+        return IteratorUtils.toList(iterator);
     }
+    
+    private List<PersonImage> extractImages(final Iterator<Person> it) {
+        List<PersonImage> images = new ArrayList<>();
+        while (it.hasNext()) {
+            Person p = it.next();
+            if (p.images != null) {
+                for (String url : p.images) {
+                    images.add(new PersonImage(p.id, url));
+                }
+            }
+        }
+        return images;
+    } 
 }

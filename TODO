@@ -4,6 +4,8 @@ Set up SSL for web socket and image cache  DONE
 Delete access token on log out             DONE
 Test map movement (changed to 'send' commands; removed native 'move' commands) DONE
 Set up pre-caching                         DONE (it's really slow; test)
+Limit precaching to a configurable depth
+Create clean-up script to clear cache occasionally
 Finish wiring dependencies via Spring      DONE
 Figure out why log4j via Ivy isn't working
 Move developer id into config file (not in Git) DONE
@@ -30,6 +32,9 @@ Fix piece rotation in split mode
 Don't reset game on size change if the size doesn't actually change DONE
 Thumbnail should fit in remaining space
 Back button in puzzle goes back to main screen instead of games screen
+
+Image chooser:
+Add get people with images call
 
 Color:
 Add coloring game to menu                  DONE
@@ -60,11 +65,11 @@ Collapse menu when log out pressed         DONE
 Set logged-in name when logged in          DONE
 Clear logged-in name when logged out
 Turn off log-out button when logged out
-Fix log-out button; it doesn't show up
+Fix log-out button in split mode
 Disable navigation when logged out
 Add back button to standard header         DONE
 Set up accordian for groups of controls
-Make header opaque so scrolling doesn't look weird
+Make header opaque so scrolling doesn't look weird DONE
 
 Library:
 Separate query params for page and fragment DONE

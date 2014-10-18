@@ -28,7 +28,6 @@ package org.puyallupfamilyhistorycenter.service.cache;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
-import org.gedcomx.rs.client.options.Preconditions;
 import org.puyallupfamilyhistorycenter.service.models.Person;
 import org.puyallupfamilyhistorycenter.service.models.PersonReference;
 
@@ -38,7 +37,7 @@ import org.puyallupfamilyhistorycenter.service.models.PersonReference;
  */
 
 
-public class FamilyIterationStrategy implements IterationStrategy<Person> {
+public class FamilyIterator implements Iterator<Person> {
 
     private static enum State {
         PARENTS("SPOUSES") {
@@ -78,20 +77,22 @@ public class FamilyIterationStrategy implements IterationStrategy<Person> {
         public abstract Iterator<PersonReference> iterate(Person root);
     }
     
-    private final Person root;
+    private final String personId;
     private final Source<Person> source;
     private final String accessToken;
     private final Iterator<PersonReference> iterator;
     private PersonReference innerCurrent;
     
-    public FamilyIterationStrategy(final Person root, Source<Person> source, String accessToken) {
-        if (root == null || source == null) {
+    public FamilyIterator(final String personId, Source<Person> source, String accessToken) {
+        if (personId == null || source == null) {
             throw new IllegalArgumentException("Root and source are required");
         }
         
-        this.root = root;
+        this.personId = personId;
         this.source = source;
         this.accessToken = accessToken;
+        
+        final Person root = source.get(personId, accessToken);
         
         iterator = new Iterator<PersonReference>() {
             PersonReference next = new PersonReference(root.id, root.name, "self");
@@ -132,14 +133,14 @@ public class FamilyIterationStrategy implements IterationStrategy<Person> {
         };
     }
     
+
     @Override
-    public Person next(Person current) {
-        if (current != null) {
-            while (iterator.hasNext() && (innerCurrent == null && !current.id.equals(innerCurrent.getId()))) {
-                innerCurrent = iterator.next();
-            }
-        }
-        
+    public boolean hasNext() {
+        return iterator.hasNext();
+    }
+    
+    @Override
+    public Person next() {
         if (iterator.hasNext()) {
             innerCurrent = iterator.next();
         } else {
@@ -153,4 +154,8 @@ public class FamilyIterationStrategy implements IterationStrategy<Person> {
         return null;
     }
     
+    @Override
+    public void remove() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
 }

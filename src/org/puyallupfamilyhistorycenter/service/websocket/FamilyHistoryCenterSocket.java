@@ -38,6 +38,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
@@ -62,6 +63,7 @@ import org.gedcomx.rs.client.StateTransitionOption;
 import org.puyallupfamilyhistorycenter.service.SpringContextInitializer;
 import org.puyallupfamilyhistorycenter.service.cache.Precacher;
 import org.puyallupfamilyhistorycenter.service.models.Person;
+import org.puyallupfamilyhistorycenter.service.models.PersonImage;
 
 /**
  *
@@ -340,9 +342,9 @@ public class FamilyHistoryCenterSocket {
                     
                     //TODO: Check token
                     //TODO: Actually get family
-                    Iterator<Person> it = personDao.traverseImmediateFamily(personId, 10, lastPageId, accessToken);
-                    if (it != null && it.hasNext()) {
-                        response = "family [" + toString(it).replaceAll(" ", "%20") + "]";
+                    List<Person> family = personDao.listImmediateFamily(personId, accessToken);
+                    if (!family.isEmpty()) {
+                        response = "family " + GSON.toJson(family);
                     } else {
                         response = "Error: person " + personId + " not found";
                     }
@@ -381,6 +383,16 @@ public class FamilyHistoryCenterSocket {
                     } else {
                         response = "Error: person " + personId + " not found";
                     }
+                    
+                    break;
+                }
+                
+                case "get-ancestor-images": {
+                    token = scanner.next();
+                    String personId = scanner.next();
+                    List<PersonImage> images = personDao.listAncestorImages(personId, 5, token);
+                    
+                    response = "images " + GSON.toJson(images);
                     
                     break;
                 }
@@ -449,7 +461,7 @@ public class FamilyHistoryCenterSocket {
                         break;
                     }
                     
-                    Precacher precacher = new Precacher(accessToken);
+                    Precacher precacher = new Precacher(accessToken, 10);
                     precacher.precache();
                     
                     userContextMap.put(userId, new UserContext(userId, userName, pin, accessToken, precacher));

@@ -145,13 +145,15 @@ POSSIBILITY OF SUCH DAMAGE.
                     name: "puzzle",
                     label: "Puzzle",
                     image: "puzzle.jpg",
-                    nav: "puzzle" //"image-chooser?target=puzzle"
+                    nav: "image-chooser?target=puzzle",
+                    display: "puzzle"
                 },
                 {
                     name: "color",
                     label: "Color",
                     image: "crayon.jpg",
-                    nav: "color" //"image-chooser?target=color"
+                    nav: "image-chooser?target=color",
+                    display: "color"
                 }
             ]
         }
@@ -182,7 +184,11 @@ POSSIBILITY OF SUCH DAMAGE.
                     buttonInfo.label + '</strong></button>');
             $("#" + buttonInfo.name + "-button").click(function(e) {
                 if (buttonInfo.nav) {
-                    navigateDisplay("display-" + buttonInfo.nav);
+                    if (buttonInfo.display) {
+                        navigateDisplay("display-" + buttonInfo.display);
+                    } else {
+                        navigateDisplay("display-" + buttonInfo.nav);
+                    }
                     navigate("controller-" + buttonInfo.nav);
                 } else if (buttonInfo.child) {
                     navigate("controller-main?group="+buttonInfo.child);
