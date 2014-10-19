@@ -32,13 +32,13 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import org.familysearch.api.client.ft.FamilySearchFamilyTree;
 import org.familysearch.api.client.ft.FamilyTreePersonState;
-import org.gedcomx.conclusion.Fact;
 import org.gedcomx.conclusion.Name;
 import org.gedcomx.rs.client.PersonChildrenState;
 import org.gedcomx.rs.client.PersonParentsState;
 import org.gedcomx.rs.client.PersonSpousesState;
 import org.gedcomx.rs.client.SourceDescriptionsState;
 import org.gedcomx.source.SourceDescription;
+import org.puyallupfamilyhistorycenter.service.models.Fact;
 import org.puyallupfamilyhistorycenter.service.models.Person;
 import org.puyallupfamilyhistorycenter.service.models.PersonBuilder;
 import org.puyallupfamilyhistorycenter.service.models.PersonReference;
@@ -59,18 +59,32 @@ public class FamilySearchPersonSource implements Source<Person> {
             FamilySearchFamilyTree ft = FamilyHistoryFamilyTree.getInstance(accessToken);
             FamilyTreePersonState state = ft.readPersonById(personId);
 
+            org.gedcomx.conclusion.Person originalPerson = state.getEntity().getPerson();
             PersonBuilder builder = new PersonBuilder();
             Name name = state.getName();
             builder.withId(personId);
             if (name != null) {
                 builder.withName(name.getNameForm().getFullText());
             }
-            builder.withLiving(false); //TODO: Set is living
-            builder.withGender(state.getGender().getKnownType().name());
+            builder.withLiving(originalPerson.getLiving()); //TODO: Set is living
+            builder.withGender(originalPerson.getGender().getKnownType().name());
 
             {
                 //TODO: set facts
-                List<Fact> facts = null;
+                List<org.gedcomx.conclusion.Fact> originalFacts = originalPerson.getFacts();
+                Fact[] facts = new Fact[originalFacts.size()];
+                int index = 0;
+                for (org.gedcomx.conclusion.Fact originalFact : originalFacts) {
+                    String date = originalFact.getDate() == null ? null : originalFact.getDate().getOriginal();
+                    String place = originalFact.getPlace() == null ? null : originalFact.getPlace().getOriginal();
+                    facts[index++] = new Fact(
+                            originalFact.getKnownType().name(), 
+                            date, 
+                            null, //TODO: Extract real timestamp from this
+                            place);
+                }
+                
+                builder.withFacts(facts);
             }
 
             {
@@ -104,8 +118,7 @@ public class FamilySearchPersonSource implements Source<Person> {
 
             return builder.build();
         } catch (Exception e) {
-            logger.warning("Failed to load person for id " + personId, e);
-            return null;
+            throw new NotFoundException("Failed to load person for id " + personId, e);
         }
     }
 

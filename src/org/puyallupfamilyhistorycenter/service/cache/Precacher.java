@@ -23,7 +23,6 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-
 package org.puyallupfamilyhistorycenter.service.cache;
 
 import java.util.HashSet;
@@ -34,6 +33,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import org.familysearch.api.client.ft.FamilySearchFamilyTree;
+import org.gedcomx.rs.client.PersonSpousesState;
+import org.gedcomx.rs.client.PersonState;
 import org.puyallupfamilyhistorycenter.service.SpringContextInitializer;
 import org.puyallupfamilyhistorycenter.service.models.Person;
 import org.puyallupfamilyhistorycenter.service.models.PersonReference;
@@ -43,17 +44,17 @@ import org.puyallupfamilyhistorycenter.service.websocket.FamilyHistoryFamilyTree
  *
  * @author tibbitts
  */
-
-
 public class Precacher {
+
     private static final Source<Person> source;
     private static final ExecutorService executor = Executors.newCachedThreadPool();
-    
+
     static {
         source = (Source<Person>) SpringContextInitializer.getContext().getBean("in-memory-source");
     }
-    
+
     private static class PrecacheObject {
+
         public final String id;
         public final int depth;
 
@@ -62,43 +63,52 @@ public class Precacher {
             this.depth = depth;
         }
     }
-    
+
     private final String accessToken;
     private final int maxDepth;
     private Future future;
-    
+
     public Precacher(String accessToken, int maxDepth) {
         this.accessToken = accessToken;
         this.maxDepth = maxDepth;
     }
-    
+
     public void precache() {
         future = executor.submit(new Runnable() {
             FamilySearchFamilyTree tree = FamilyHistoryFamilyTree.getInstance(accessToken);
             Queue<PrecacheObject> frontier = new LinkedList<>();
             Queue<PrecacheObject> leafNodes = new LinkedList<>();
             Set<String> currentLeafs = new HashSet<>();
-            
+
             {
-                frontier.add(new PrecacheObject(tree.readPersonForCurrentUser().getPerson().getId(), 0));
+                PersonState person = tree.readPersonForCurrentUser();
+                frontier.add(new PrecacheObject(person.getPerson().getId(), 0));
+                
+                PersonSpousesState spouses = person.readSpouses();
+                for (org.gedcomx.conclusion.Person spouse : spouses.getPersons()) {
+                    frontier.add(new PrecacheObject(spouse.getId(), 0));
+                }
             }
-            
+
             @Override
             public void run() {
-                try {
-                    while (!frontier.isEmpty()) {
+                while (!frontier.isEmpty()) {
+                    try {
                         PrecacheObject precacheObject = frontier.remove();
                         Person person = source.get(precacheObject.id, accessToken);
                         if (person.parents != null && precacheObject.depth < maxDepth) {
                             for (PersonReference parent : person.parents) {
-                                System.out.println("Adding parent " + parent.getName() + " to frontier");
+                                System.out.println("Adding parent " + parent.getName() + " to frontier level " + (precacheObject.depth + 1));
                                 frontier.add(new PrecacheObject(parent.getId(), precacheObject.depth + 1));
                             }
                         } else {
                             System.out.println("Adding self " + person.name + " to leaf nodes");
                             leafNodes.add(precacheObject);
                         }
+                    } catch (Exception ex) {
+                        ex.printStackTrace(System.err);
                     }
+                }
 
 //                    while(!leafNodes.isEmpty()) {
 //                        PrecacheObject precacheObject = leafNodes.remove();
@@ -116,13 +126,10 @@ public class Precacher {
 //                            System.out.println("Person " + person.name + " has no children on record");
 //                        }
 //                    }
-                } catch (Exception ex) {
-                    ex.printStackTrace(System.err);
-                }
             }
         });
     }
-    
+
     public void cancel() {
         future.cancel(true);
         System.out.println("Cancelling precaching");

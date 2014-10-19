@@ -42,6 +42,7 @@ POSSIBILITY OF SUCH DAMAGE.
     <bean id="person-class" class="java.lang.Class" factory-method="forName">
         <constructor-arg value="org.puyallupfamilyhistorycenter.service.models.Person" />
     </bean>
+    <bean id="exclude-living-decider" class="org.puyallupfamilyhistorycenter.service.cache.ExcludeLivingDecider" />
     <bean id="file-cache" class="org.puyallupfamilyhistorycenter.service.cache.FileCache" >
         <constructor-arg ref="person-class" />
         <constructor-arg value="${person-cache-dir}" />
@@ -50,11 +51,13 @@ POSSIBILITY OF SUCH DAMAGE.
     <bean id="file-source" class="org.puyallupfamilyhistorycenter.service.cache.CachingSource">
         <constructor-arg ref="family-search-person-source" />
         <constructor-arg ref="file-cache" />
+        <!--<property name="decider" ref="exclude-living-decider" />-->
     </bean>
     <bean id="in-memory-cache" class="org.puyallupfamilyhistorycenter.service.cache.InMemoryCache" />
     <bean id="in-memory-source" class="org.puyallupfamilyhistorycenter.service.cache.CachingSource">
         <constructor-arg ref="file-source" />
         <constructor-arg ref="in-memory-cache" />
+        <property name="decider" ref="exclude-living-decider" />
     </bean>
     <bean id="person-dao" class="org.puyallupfamilyhistorycenter.service.cache.PersonDao" >
         <constructor-arg ref="in-memory-source" />

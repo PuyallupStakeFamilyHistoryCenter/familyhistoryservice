@@ -4,11 +4,14 @@ Set up SSL for web socket and image cache  DONE
 Delete access token on log out             DONE
 Test map movement (changed to 'send' commands; removed native 'move' commands) DONE
 Set up pre-caching                         DONE (it's really slow; test)
-Limit precaching to a configurable depth
-Create clean-up script to clear cache occasionally
+Limit precaching to a configurable depth   DONE
 Finish wiring dependencies via Spring      DONE
-Figure out why log4j via Ivy isn't working
 Move developer id into config file (not in Git) DONE
+Create clean-up script to clear cache occasionally
+Figure out why log4j via Ivy isn't working
+Partition living person in-memory cache
+Speed up caching
+Maybe wrap FamilySearch JS library for use in Java
 
 Puzzle:
 Wire puzzle settings into display          DONE
@@ -19,29 +22,31 @@ Look up parseBoolean equivalent in JS (for puzzle settings) DONE
 Remove configurations from display side, send every setting from controller to reduce redundancy DONE
 Remove extra space from 'send' command     DONE
 Fix styling of controls                    DONE
-Figure out why image doesn't fit in frame (this may be limited to children.png)
-Add person info on controller-puzzle
-Set up image chooser
-Make piece shapes more interesting
-Figure out why puzzle scrolls in split mode DONE
 Fix puzzle initial config                  DONE
 Rotate pieces without restarting           DONE
 Presort pieces without restarting          DONE
 Snap radius setting shouldn't be disabled by snap-on-drag DONE
-Fix piece rotation in split mode
 Don't reset game on size change if the size doesn't actually change DONE
+Figure out why puzzle scrolls in split mode DONE
+Fix piece rotation in split mode
+Figure out why image doesn't fit in frame (this may be limited to children.png)
+Add person info on controller-puzzle
+Set up image chooser
+Make piece shapes more interesting
 Thumbnail should fit in remaining space
 Back button in puzzle goes back to main screen instead of games screen
 
 Image chooser:
-Add get people with images call
+Add get people with images call            DONE
 
 Color:
 Add coloring game to menu                  DONE
+Use image chooser                          DONE
 Set up print function
-Use image chooser
 Fix brush
 Move image to opposite side from menu
+Limit coloring to inside image
+Undo feature?
 
 Life map:
 Show life events on map

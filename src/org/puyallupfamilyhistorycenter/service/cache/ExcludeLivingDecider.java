@@ -26,46 +26,19 @@
 
 package org.puyallupfamilyhistorycenter.service.cache;
 
-import org.apache.jena.atlas.lib.Cache;
+import org.puyallupfamilyhistorycenter.service.models.Person;
 
 /**
  *
  * @author tibbitts
  */
 
-/**
- *
- * @author tibbitts
- */
-public class CachingSource<E> implements Source<E> {
-    
-    private final Source<E> source;
-    private final Cache<String, E> cache;
-    private ShouldCacheDecider<E> decider;
-    public CachingSource(Source<E> source, Cache<String, E> cache) {
-        this.source = source;
-        this.cache = cache;
-    }
+
+public class ExcludeLivingDecider implements CachingSource.ShouldCacheDecider<Person> {
 
     @Override
-    public E get(String id, String accessToken) {
-        E cached = cache.get(id);
-        if (cached != null) {
-            return cached;
-        }
-        
-        E value = source.get(id, accessToken);
-        if (decider == null || decider.shouldCache(value)) {
-            cache.put(id, value);
-        }
-        return value;
-    }
-
-    public void setDecider(ShouldCacheDecider<E> decider) {
-        this.decider = decider;
+    public boolean shouldCache(Person person) {
+        return !person.living;
     }
     
-    public static interface ShouldCacheDecider<E> {
-        boolean shouldCache(E value);
-    }
 }
