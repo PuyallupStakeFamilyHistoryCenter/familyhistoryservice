@@ -92,13 +92,13 @@ POSSIBILITY OF SUCH DAMAGE.
                 factMap[fact.type] = fact;
             });
 
-            if (factMap["birth"]) {
-                $("#birth").html(factMap["birth"].date + " - " + factMap["birth"].place);
+            if (factMap["Birth"]) {
+                $("#birth").html(factMap["Birth"].date + " - " + factMap["Death"].place);
             } else {
                 $("#birth").html("unknown - unknown"); //TODO: Not working
             }
-            if (factMap["death"]) {
-                $("#death").html(factMap["death"].date + " - " + factMap["death"].place);
+            if (factMap["Death"]) {
+                $("#death").html(factMap["Death"].date + " - " + factMap["Death"].place);
             } else {
                 $("#death").html("unknown - unknown");
             }

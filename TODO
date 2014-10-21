@@ -30,6 +30,7 @@ Snap radius setting shouldn't be disabled by snap-on-drag DONE
 Don't reset game on size change if the size doesn't actually change DONE
 Figure out why puzzle scrolls in split mode DONE
 Fix piece rotation in split mode
+Test on iPad in split mode
 Figure out why image doesn't fit in frame (this may be limited to children.png)
 Add person info on controller-puzzle
 Set up image chooser
@@ -65,8 +66,8 @@ Maybe add spiral effect from RootsMapper
 Load Google Maps API only once
 
 Person detail:
+Fix birth and death dates                  DONE
 Add parents
-Fix birth and death dates
 Display more/all facts
 
 Statistics:
@@ -105,3 +106,4 @@ Get facts into person                      DONE
 Location cache
 Get unit tests working again
 Reload display causes "display * is already connected"
+Add method for authenticating with devices
