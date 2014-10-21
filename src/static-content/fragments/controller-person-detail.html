@@ -45,7 +45,7 @@ POSSIBILITY OF SUCH DAMAGE.
     }
 
     console.info("Sending get-family request");
-    ws.socketSend("get-family " + token + " " + settings.userId);
+    ws.socketSend("get-ancestors " + token + " " + settings.userId);
 
     function gotFamily(people) {
         $("#data-div").html("");

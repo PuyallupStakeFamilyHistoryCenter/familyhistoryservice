@@ -3,7 +3,7 @@ TODO:
 Set up SSL for web socket and image cache  DONE
 Delete access token on log out             DONE
 Test map movement (changed to 'send' commands; removed native 'move' commands) DONE
-Set up pre-caching                         DONE (it's really slow; test)
+Set up pre-caching                         DONE
 Limit precaching to a configurable depth   DONE
 Finish wiring dependencies via Spring      DONE
 Move developer id into config file (not in Git) DONE
@@ -12,6 +12,7 @@ Figure out why log4j via Ivy isn't working
 Partition living person in-memory cache
 Speed up caching
 Maybe wrap FamilySearch JS library for use in Java
+Speed up hosting (e.g. zip/minify resources, add threads)
 
 Puzzle:
 Wire puzzle settings into display          DONE
@@ -38,6 +39,12 @@ Back button in puzzle goes back to main screen instead of games screen
 
 Image chooser:
 Add get people with images call            DONE
+Make app controls a tab
+
+Person chooser:
+Move person-chooser from controller-person-detail
+Load the tree instead of just the family   DONE
+Make app controls a tab
 
 Color:
 Add coloring game to menu                  DONE
@@ -94,7 +101,7 @@ Delay loading of controller in split mode
 Misc:
 Move css files into folder
 Move test files into folder
-Get facts into person
+Get facts into person                      DONE
 Location cache
 Get unit tests working again
 Reload display causes "display * is already connected"
