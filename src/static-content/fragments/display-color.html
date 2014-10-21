@@ -5,8 +5,8 @@
 <script>
     settings.local = {
         verbs: {
-            "person-image": function (parts) {
-                var data = JSON.parse(parts[1]);
+            personImage: function (obj) {
+                var data = obj.personImage;
                 imagesrc = data.url;
                 init();
             }

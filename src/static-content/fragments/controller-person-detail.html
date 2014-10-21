@@ -36,8 +36,8 @@ POSSIBILITY OF SUCH DAMAGE.
 
     settings.local = {
         verbs: {
-            family: function(parts) {
-                var people = JSON.parse(decodeURIComponent(parts[1]));
+            people: function(obj) {
+                var people = obj.people;
                 console.info("Got family '" + people + "'");
                 gotFamily(people);
             }

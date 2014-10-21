@@ -34,8 +34,8 @@ var settings = {
             connected: doNothing,
             ok: doNothing,
             pong: doNothing,
-            nav: function(parts) {
-                navigate(parts[1]);
+            nav: function(cmd) {
+                navigate(cmd.dest);
             },
             "user-list": doNothing
         }
@@ -115,7 +115,7 @@ function getDisplayName() {
         settings.page.getNewDisplayName();
     } else {
         console.info("Found display name " + displayName);
-        settings.page.verbs.name(["name",displayName]);
+        settings.page.verbs.name({name:displayName});
     }
 }
 
@@ -125,13 +125,15 @@ var defaultSettings = {
         header: '<img src="logo.png" alt="Puyallup Family History Center logo" />',
         contentPadding: false,
         verbs: {
-            standby: function(parts) {
+            standby: function() {
                 navigate("display-ready");
             },
-            name: function(parts) {
-                displayName = parts[1];
-                $.cookie("display-name", displayName);
-                ws.socketSend("display " + displayName);
+            name: function(obj) {
+                displayName = obj.name;
+                if (displayName) {
+                    $.cookie("display-name", displayName);
+                    ws.socketSend("display " + displayName);
+                }
             }
         },
         begin: getDisplayName,
@@ -145,18 +147,18 @@ var defaultSettings = {
         headerFile: 'controller-header.html',
         contentPadding: true,
         verbs: {
-            attached: function(parts) {
+            attached: function() {
                 $.cookie("display-name", displayName);
                 console.info("Found token '" + token + "'");
                 ws.socketSend("nav " + displayName + " " + "display-login");
                 navigate("controller-login");
             },
-            name: function(parts) {
-                settings.page.gotNewDisplayName(parts[1]);
+            name: function(obj) {
+                settings.page.gotNewDisplayName(obj.name);
             },
-            token: function(parts) {
-                setUsername(userName);
-                token = parts[1];
+            token: function(response) {
+                setUsername(response.username);
+                token = response.token;
                 $.cookie("token", token);
                 ws.socketSend("nav " + displayName + " " + "display-main");
                 clearHistory();
@@ -205,19 +207,23 @@ var defaultSettings = {
 function messageHandler(message) {
     $("#messages").html("");
     
-    var parts = message.data.split(" ");
-    if (settings.local.verbs[parts[0]]) {
-        settings.local.verbs[parts[0]](parts);
-    } else if (settings.page.verbs[parts[0]]) {
-        settings.page.verbs[parts[0]](parts);
-    } else if (settings.global.verbs[parts[0]]) {
-        settings.global.verbs[parts[0]](parts);
+    if (message.data === "connected") {
+        return;
+    }
+    
+    var obj=JSON.parse(message.data);
+    if (settings.local.verbs[obj.responseType]) {
+        settings.local.verbs[obj.responseType](obj);
+    } else if (settings.page.verbs[obj.responseType]) {
+        settings.page.verbs[obj.responseType](obj);
+    } else if (settings.global.verbs[obj.responseType]) {
+        settings.global.verbs[obj.responseType](obj);
     } else {
         var errorMessage;
-        if (parts[0] === "Error:") {
-            errorMessage = message.data.substring(6);
+        if (obj.responseType === "error") {
+            errorMessage = obj.message;
         } else {
-            errorMessage = "unrecognized command '" + message.data + "'";
+            errorMessage = "unrecognized command '" + obj.responseType + "'";
         }
         logger.error(errorMessage);
         //throw new Error(errorMessage);

@@ -216,39 +216,39 @@ POSSIBILITY OF SUCH DAMAGE.
 
     $("[name=depth]").change(function () {
         //TODO: This isn't working
-        sendToDisplay("depth " + $(this).val());
+        sendToDisplay("{\"responseType\":\"depth\",\"value\":" + $(this).val() + "}");
     });
 
     $("[name=protrusions]").change(function () {
-        sendToDisplay("protrusions " + $(this).prop('checked'));
+        sendToDisplay("{\"responseType\":\"protrusions\",\"value\":" + $(this).prop('checked') + "}");
     });
 
     $("[name=rotate]").change(function () {
-        sendToDisplay("rotate " + $(this).prop('checked'));
+        sendToDisplay("{\"responseType\":\"rotate\",\"value\":" + $(this).prop('checked') + "}");
     });
 
     $("[name=snapOnDrag]").change(function () {
-        sendToDisplay("snap-on-drag " + $(this).prop('checked'));
+        sendToDisplay("{\"responseType\":\"snapOnDrag\",\"value\":" + $(this).prop('checked') + "}");
     });
 
     $("[name=snapThreshold]").change(function () {
-        sendToDisplay("snap-threshold " + parseInt($(this).val()));
+        sendToDisplay("{\"responseType\":\"snapThreshold\",\"value\":" + $(this).val() + "}");
     });
 
     $("[name=presort]").change(function () {
-        sendToDisplay("presort " + $(this).prop('checked'));
+        sendToDisplay("{\"responseType\":\"presort\",\"value\":" + $(this).prop('checked') + "}");
     });
 
     $("[name=backgroundTransparency]").change(function () {
-        sendToDisplay("background-transparency " + $(this).val());
+        sendToDisplay("{\"responseType\":\"backgroundTransparency\",\"value\":" + $(this).val() + "}");
     });
 
     $("[name=thumbnail]").change(function () {
-        sendToDisplay("thumbnail " + $(this).prop('checked'));
+        sendToDisplay("{\"responseType\":\"thumbnail\",\"value\":" + $(this).prop('checked') + "}");
     });
 
     $("#resetButton").click(function () {
-        sendToDisplay("reset");
+        sendToDisplay("{\"responseType\":\"reset\"}");
     });
 
     sendFullConfiguration(configurations.medium);
@@ -256,14 +256,14 @@ POSSIBILITY OF SUCH DAMAGE.
 
 
     function sendFullConfiguration(config) {
-        sendToDisplay("depth " + config.depth);
-        sendToDisplay("protrusions " + config.protrusions);
-        sendToDisplay("rotate " + config.rotate);
-        sendToDisplay("snap-on-drag " + config.snapOnDrag);
-        sendToDisplay("snap-threshold " + config.snapThreshold);
-        sendToDisplay("presort " + config.presort);
-        sendToDisplay("background-transparency " + config.backgroundTransparency);
-        sendToDisplay("thumbnail " + config.thumbnail);
+        sendToDisplay("{\"responseType\":\"depth\",\"value\":" + config.depth + "}");
+        sendToDisplay("{\"responseType\":\"protrusions\",\"value\":" + config.protrusions + "}");
+        sendToDisplay("{\"responseType\":\"rotate\",\"value\":" + config.rotate + "}");
+        sendToDisplay("{\"responseType\":\"snapOnDrag\",\"value\":" + config.snapOnDrag + "}");
+        sendToDisplay("{\"responseType\":\"snapThreshold\",\"value\":" + config.snapThreshold + "}");
+        sendToDisplay("{\"responseType\":\"presort\",\"value\":" + config.presort + "}");
+        sendToDisplay("{\"responseType\":\"backgroundTransparency\",\"value\":" + config.backgroundTransparency + "}");
+        sendToDisplay("{\"responseType\":\"thumbnail\",\"value\":" + config.thumbnail + "}");
     }
 
     function cloneObject(obj) {

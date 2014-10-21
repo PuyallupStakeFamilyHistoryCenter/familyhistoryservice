@@ -130,7 +130,9 @@ public class FamilySearchPersonSource implements Source<Person> {
         PersonReference[] refs = new PersonReference[persons.size()];
         for (int i = 0; i < persons.size(); i++) {
             org.gedcomx.conclusion.Person person = persons.get(i);
-            refs[i] = new PersonReference(person.getId(), person.getName().getNameForm().getFullText(), null);
+            Name name = person.getName();
+            String stringName = name == null ? null : name.getNameForm().getFullText();
+            refs[i] = new PersonReference(person.getId(), stringName, null);
         }
         return refs;
     }

@@ -104,10 +104,10 @@ POSSIBILITY OF SUCH DAMAGE.
 <script>
     settings.local = {
         verbs: {
-            "app-key": function(parts) {
+            "app-key": function(obj) {
                 FamilySearch.init({
-                    app_key: parts[1],
-                    environment: parts[2],
+                    app_key: obj.key,
+                    environment: obj.environment,
                     auth_callback: 'https://localhost:8443/auth-redirect.html',
                     http_function: $.ajax,
                     deferred_function: $.Deferred,
@@ -166,7 +166,7 @@ POSSIBILITY OF SUCH DAMAGE.
 
                     if (pin !== pinConfirm) {
                         //TODO: Replace this with actual validation
-                        error("PINs don't match");
+                        logger.error("PINs don't match");
                         timeout = setTimeout(function () {
                             navigate("kiosk-main");
                             warn("Timeout creating PIN. Please log in again.", 5000);

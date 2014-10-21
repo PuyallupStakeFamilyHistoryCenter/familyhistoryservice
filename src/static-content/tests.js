@@ -94,8 +94,8 @@ QUnit.cases([
     assert.expect(1);
 
     if (params.level) {
-        settings[params.level].verbs[params.verb] = function (parts) {
-            assert.equal(parts[0], params.verb);
+        settings[params.level].verbs[params.verb] = function (obj) {
+            assert.equal(obj.responseType, params.verb);
         };
     }
 

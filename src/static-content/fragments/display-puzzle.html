@@ -57,19 +57,19 @@ POSSIBILITY OF SUCH DAMAGE.
 
     settings.local = {
         verbs: {
-            depth: function (parts) {
-                var newDepth = parseInt(parts[1]);
+            depth: function (obj) {
+                var newDepth = obj.value;
                 if (config.depth !== newDepth) { 
                     config.depth = newDepth;
                     init();
                 }
             },
-            protrusions: function (parts) {
-                config.protrusions = parseBool(parts[1]);
+            protrusions: function (obj) {
+                config.protrusions = obj.value;
                 draw();
             },
-            rotate: function (parts) {
-                var newRotate = parseBool(parts[1]);
+            rotate: function (obj) {
+                var newRotate = obj.value;
                 if (newRotate !== config.rotate) {
                     config.rotate = newRotate;
                     $.each(pieces, function(index, piece) {
@@ -80,11 +80,11 @@ POSSIBILITY OF SUCH DAMAGE.
                     draw();
                 }
             },
-            "snap-on-drag": function (parts) {
-                config.snapOnDrag = parseBool(parts[1]);
+            snapOnDrag: function (obj) {
+                config.snapOnDrag = obj.value;
             },
-            "snap-threshold": function (parts) {
-                var snapThreshold = parseInt(parts[1]);
+            snapThreshold: function (obj) {
+                var snapThreshold = obj.value;
                 if (snapThreshold === NaN) {
                     snapThreshold = 15;
                     $(this).val(snapThreshold);
@@ -100,8 +100,8 @@ POSSIBILITY OF SUCH DAMAGE.
 
                 config.snapThreshold = snapThreshold;
             },
-            presort: function (parts) {
-                var newPresort = parseBool(parts[1]);
+            presort: function (obj) {
+                var newPresort = obj.value;
                 if (newPresort !== config.presort) {
                     config.presort = newPresort;
                     shuffle(pieces);
@@ -111,17 +111,17 @@ POSSIBILITY OF SUCH DAMAGE.
                     draw();
                 }
             },
-            "background-transparency": function (parts) {
-                config.backgroundTransparency = parseInt(parts[1])/100.0;
+            backgroundTransparency: function (obj) {
+                config.backgroundTransparency = obj.value/100.0;
                 draw();
             },
-            thumbnail: function (parts) {
-                config.thumbnail = parseBool(parts[1]);
+            thumbnail: function (obj) {
+                config.thumbnail = obj.value
                 draw();
             },
             reset: init,
-            "person-image": function (parts) {
-                var data = JSON.parse(parts[1]);
+            personImage: function (obj) {
+                var data = obj.personImage;
                 imagesrc = data.url;
                 init();
             }

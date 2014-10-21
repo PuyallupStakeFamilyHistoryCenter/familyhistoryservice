@@ -48,12 +48,12 @@ POSSIBILITY OF SUCH DAMAGE.
 <script>
     settings.local = {
         verbs: {
-            "user-list": function (parts) {
+            "user-list": function (response) {
                 var selectedUser = $("#userid-input").val();
                 $("#user-list").html("");
-                for (var i = 1; i < parts.length; i += 2) {
-                    var user = parts[i];
-                    $("#user-list").append("<button class='btn btn-lg btn-default username-btn" + (selectedUser === parts[i + 1] ? " btn-warning" : "") + "' data-user-id='" + parts[i + 1] + "'>" + decodeURI(parts[i]) + "</button>");
+                for (var i = 0; i < response.users.length; i++) {
+                    var user = response.users[i];
+                    $("#user-list").append("<button class='btn btn-lg username-btn" + (selectedUser === user.id ? " btn-warning" : " btn-default") + "' data-user-id='" + user.id + "'>" + user.name + "</button>");
                 }
 
                 $(".username-btn").click(function (e) {
@@ -64,7 +64,7 @@ POSSIBILITY OF SUCH DAMAGE.
                     $(e.target).addClass("btn-warning");
                     userName = $(this).html();
 
-                    if (value === "KW79-H8X") {
+                    if (value === "KWJH-B6Z") {
                         $("#pin-input-div").hide()
                         $("#logout-btn").hide()
                         $("#pin-input").val("1234");
@@ -109,4 +109,6 @@ POSSIBILITY OF SUCH DAMAGE.
         $("#pin-input-div").hide()
         $("#logout-btn").hide()
     });
+    
+    asdf()
 </script>

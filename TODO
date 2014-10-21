@@ -57,6 +57,11 @@ Add person info
 Maybe add spiral effect from RootsMapper
 Load Google Maps API only once
 
+Person detail:
+Add parents
+Fix birth and death dates
+Display more/all facts
+
 Statistics:
 Implement basic family statistics
 
@@ -92,3 +97,4 @@ Move test files into folder
 Get facts into person
 Location cache
 Get unit tests working again
+Reload display causes "display * is already connected"

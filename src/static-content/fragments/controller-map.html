@@ -47,22 +47,22 @@ POSSIBILITY OF SUCH DAMAGE.
 
 <script>
     $("#left-btn").click(function (e) {
-        sendToDisplay("move-left");
+        sendToDisplay("{\"responseType\":\"move-left\"}");
     });
     $("#right-btn").click(function (e) {
-        sendToDisplay("move-right");
+        sendToDisplay("{\"responseType\":\"move-right\"}");
     });
     $("#up-btn").click(function (e) {
-        sendToDisplay("move-up");
+        sendToDisplay("{\"responseType\":\"move-up\"}");
     });
     $("#down-btn").click(function (e) {
-        sendToDisplay("move-down");
+        sendToDisplay("{\"responseType\":\"move-down\"}");
     });
     $("#zoom-out-btn").click(function (e) {
-        sendToDisplay("zoom-out");
+        sendToDisplay("{\"responseType\":\"zoom-out\"}");
     });
     $("#zoom-in-btn").click(function (e) {
-        sendToDisplay("zoom-in");
+        sendToDisplay("{\"responseType\":\"zoom-in\"}");
     });
     
     setHeaderName("Map");

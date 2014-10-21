@@ -29,8 +29,9 @@ package org.puyallupfamilyhistorycenter.service.websocket;
 import com.google.gson.Gson;
 import org.puyallupfamilyhistorycenter.service.cache.PersonDao;
 import java.io.IOException;
-import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
@@ -56,10 +57,7 @@ import org.eclipse.jetty.websocket.api.RemoteEndpoint;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.*;
 import org.familysearch.api.client.ft.FamilySearchFamilyTree;
-import org.familysearch.api.client.memories.FamilySearchMemories;
 import org.gedcomx.rs.client.PersonState;
-import org.gedcomx.rs.client.SourceDescriptionsState;
-import org.gedcomx.rs.client.StateTransitionOption;
 import org.puyallupfamilyhistorycenter.service.SpringContextInitializer;
 import org.puyallupfamilyhistorycenter.service.cache.Precacher;
 import org.puyallupfamilyhistorycenter.service.models.Person;
@@ -169,7 +167,7 @@ public class FamilyHistoryCenterSocket {
 
     public FamilyHistoryCenterSocket() {
         String salt = newSalt();
-        userContextMap.put("KW79-H8X", new UserContext("KW79-H8X", "Guest%20account", hashPin("1234", salt), null, null));
+        userContextMap.put("KWJH-B6Z", new UserContext("KWJH-B6Z", "Guest account", hashPin("1234", salt), null, null));
     }
     
     @OnWebSocketConnect
@@ -180,7 +178,7 @@ public class FamilyHistoryCenterSocket {
     @OnWebSocketMessage
     public void handleMessage(Session session, String message) throws IOException, URISyntaxException {
         logger.debug("Got websocket request '" + message + "'");
-        String response = "ok";
+        String response = "{\"responseType\":\"ok\"}";
         try {
             Scanner scanner = new Scanner(message);
             scanner.useDelimiter(" ");
@@ -189,20 +187,20 @@ public class FamilyHistoryCenterSocket {
             String cmd = scanner.next();
             switch (cmd) {
                 case "ping":
-                    response = "pong";
+                    response = "{\"responseType\":\"pong\"}";
                     break;
 
                 case "controller": {
                     String id = scanner.next();
                     RemoteEndpoint displayEndpoint = remoteDisplays.get(id);
                     if (displayEndpoint == null) {
-                        response = "Error: display not found '" + id + "'";
+                        response = "{\"responseType\":\"error\",\"message\":\"display not found '" + id + "'\"}";
                         break;
                     }
                     boolean alreadyConnected = false;
                     if (remoteControllers.containsKey(id)) {
                         try {
-                            remoteControllers.get(id).sendString("pong");
+                            remoteControllers.get(id).sendString("{\"responseType\":\"pong\"}");
                             alreadyConnected = true;
                         } catch (IOException ex) {
                             //DO NOTHING
@@ -210,10 +208,10 @@ public class FamilyHistoryCenterSocket {
                     }
                     if (!alreadyConnected) {
                         remoteControllers.put(id, session.getRemote());
-                        response = "attached";
+                        response = "{\"responseType\":\"attached\"}";
                     } else {
-                        session.getRemote().sendString("nav controller-attach");
-                        response = "Error: display " + id + " is already connected to another controller";
+                        session.getRemote().sendString("{\"responseType\":\"nav\",\"fragment\":\"controller-attach\"}");
+                        response = "{\"responseType\":\"error\",\"message\":\"display " + id + " is already connected to another controller\"}";
                     }
                     break;
                 }
@@ -223,7 +221,7 @@ public class FamilyHistoryCenterSocket {
                     boolean alreadyConnected = false;
                     if (remoteDisplays.containsKey(id)) {
                         try {
-                            remoteDisplays.get(id).sendString("pong");
+                            remoteControllers.get(id).sendString("{\"responseType\":\"pong\"}");
                             alreadyConnected = true;
                         } catch (IOException ex) {
                             //DO NOTHING
@@ -231,16 +229,16 @@ public class FamilyHistoryCenterSocket {
                     }
                     if (!alreadyConnected) {
                         remoteDisplays.put(id, session.getRemote());
-                        response = "standby";
+                        response = "{\"responseType\":\"standby\"}";
                     } else {
-                        response = "Error: display " + id + " is already connected";
+                        response = "{\"responseType\":\"error\",\"message\":\"display " + id + " is already connected\"}";
                     }
                     break;
                 }
 
                 case "display-name": {
                     String id = Integer.toHexString(rand.nextInt());
-                    response = "name " + id;
+                    response = "{\"responseType\":\"name\",\"name\":\""+id+"\"}";
                     break;
                 }
 
@@ -254,9 +252,9 @@ public class FamilyHistoryCenterSocket {
                         tokenUserIdMap.put(token, userId);
                         tokenControllerMap.put(token, session.getRemote());
                         userContextMap.get(userId).tokens.add(token);
-                        response = "token " + token + " " + tokenInfo.userName;
+                        response = "{\"responseType\":\"token\",\"token\":\""+token+"\",\"username\":\""+tokenInfo.userName+"\"}";
                     } else {
-                        response = "Error: username and PIN do not match";
+                        response = getErrorResponse("username and PIN do not match");
                     }
                     break;
                 }
@@ -272,26 +270,6 @@ public class FamilyHistoryCenterSocket {
                     token = null;
                     break;
                 }
-
-                case "get-images": {
-                    token = scanner.next();
-                    String ancestorId = scanner.next();
-                    String accessToken = tokenToAccessToken(token);
-
-                    FamilySearchMemories memories = new FamilyHistoryMemories(true)
-                            .authenticate(accessToken);
-
-
-                    StateTransitionOption[] options = new StateTransitionOption[] {
-                        //new QueryParameter(cmd, value)
-                    };
-                    PersonState person = memories.readPerson(new URI("http://gedcomx.org/Person/KWWQ-NCT"), options);
-                    person.loadMediaReferences(options);
-
-                    SourceDescriptionsState ref = person.readArtifacts(options);
-
-                    break;
-                }
                 
                 case "get-person": {
                     token = scanner.next();
@@ -301,9 +279,9 @@ public class FamilyHistoryCenterSocket {
                     //TODO: Check token
                     Person person = personDao.getPerson(personId, accessToken);
                     if (person != null) {
-                        response = "person " + GSON.toJson(person).replaceAll(" ", "%20");
+                        response = getPersonResponse(person);
                     } else {
-                        response = "Error: person " + personId + " not found";
+                        response = getErrorResponse("person " + personId + " not found");
                     }
                     
                     break;
@@ -317,15 +295,15 @@ public class FamilyHistoryCenterSocket {
                     
                     RemoteEndpoint displayEndpoint = remoteDisplays.get(displayId);
                     if (displayEndpoint == null) {
-                        response = "Error: token '" + token + "' has no attached display";
+                        response = getErrorResponse("token '" + token + "' has no attached display");
                         break;
                     }
                     
                     Person person = personDao.getPerson(personId, accessToken);
                     try {
-                        displayEndpoint.sendString("person " + GSON.toJson(person).replaceAll(" ", "%20"));
+                        displayEndpoint.sendString(getPersonResponse(person));
                     } catch (IOException e) {
-                        response = "Error: failed to send person '" + personId + "' to display " + displayId + ": " + e.getMessage();
+                        response = getErrorResponse("failed to send person '" + personId + "' to display " + displayId + ": " + e.getMessage());
                     }
                     
                     break;
@@ -344,9 +322,9 @@ public class FamilyHistoryCenterSocket {
                     //TODO: Actually get family
                     List<Person> family = personDao.listImmediateFamily(personId, accessToken);
                     if (!family.isEmpty()) {
-                        response = "family " + GSON.toJson(family);
+                        response = getPeopleResponse(family);
                     } else {
-                        response = "Error: person " + personId + " not found";
+                        response = getErrorResponse("person " + personId + " not found");
                     }
                     
                     break;
@@ -355,16 +333,15 @@ public class FamilyHistoryCenterSocket {
                 case "get-ancestors": {
                     token = scanner.next();
                     String personId = scanner.next();
-                    String paginationKey = null;
                     String accessToken = tokenToAccessToken(token);
                     
                     //TODO: Check token
                     //TODO: Actually get family
-                    Person person = personDao.getPerson(personId, accessToken);
-                    if (person != null) {
-                        response = "family [" + GSON.toJson(person) + "]";
+                    List<Person> family = personDao.listAncestors(personId, 4, accessToken);
+                    if (!family.isEmpty()) {
+                        response = getPeopleResponse(family);
                     } else {
-                        response = "Error: person " + personId + " not found";
+                        response = getErrorResponse("person " + personId + " not found");
                     }
                     
                     break;
@@ -377,11 +354,11 @@ public class FamilyHistoryCenterSocket {
                     String accessToken = tokenToAccessToken(token);
                     
                     //TODO: Actually get descendents
-                    Person person = personDao.getPerson(personId, accessToken);
-                    if (person != null) {
-                        response = "family [" + GSON.toJson(person) + "]";
+                    List<Person> family = personDao.listDescendants(personId, 2, accessToken);
+                    if (!family.isEmpty()) {
+                        response = getPeopleResponse(family);
                     } else {
-                        response = "Error: person " + personId + " not found";
+                        response = getErrorResponse("person " + personId + " not found");
                     }
                     
                     break;
@@ -392,33 +369,23 @@ public class FamilyHistoryCenterSocket {
                     String personId = scanner.next();
                     List<PersonImage> images = personDao.listAncestorImages(personId, 5, token);
                     
-                    response = "images " + GSON.toJson(images);
+                    response = getImagesResponse(images);
                     
                     break;
                 }
                 
                 case "send": {
                     String id = scanner.next();
+                    String toSend = scanner.next(".*");
                     RemoteEndpoint displayEndpoint = remoteDisplays.get(id);
                     if (displayEndpoint != null) {
-                        StringBuilder builder = new StringBuilder();
-                        boolean isFirst = true;
-                        while (scanner.hasNext()) {
-                            if (isFirst) {
-                                isFirst = false;
-                            } else {
-                                builder.append(" ");
-                            }
-                            builder.append(scanner.next());
-                        }
-                        
                         try {
-                            displayEndpoint.sendString(builder.toString());
+                            displayEndpoint.sendString(toSend);
                         } catch (IOException e) {
-                            response = "Error: failed to communicate with display " + id + ": " + e.getMessage();
+                            response = getErrorResponse("failed to communicate with display " + id + ": " + e.getMessage());
                         }
                     } else {
-                        response = "Error: display not found '" + id + "'";
+                        response = getErrorResponse("display not found '" + id + "'");
                     }
                     break;
                 }
@@ -429,25 +396,25 @@ public class FamilyHistoryCenterSocket {
                     RemoteEndpoint displayEndpoint = remoteDisplays.get(id);
                     if (displayEndpoint != null) {
                         try {
-                            displayEndpoint.sendString("nav " + dest);
+                            displayEndpoint.sendString("{\"responseType\":\"nav\",\"dest\":\"" + dest + "\"}");
                         } catch (IOException e) {
-                            response = "Error: failed to communicate with display " + id + ": " + e.getMessage();
+                            response = getErrorResponse("failed to communicate with display " + id + ": " + e.getMessage());
                         }
                     } else {
-                        response = "Error: display not found '" + id + "'";
+                        response = getErrorResponse("display not found '" + id + "'");
                     }
                     break;
                 }
                 
                 case "get-app-key": {
-                    response = "app-key " + appKeyConfig.appKey + " " + appKeyConfig.environment;
+                    response = "{\"responseType\":\"app-key\",\"key\":\"" + appKeyConfig.appKey + "\",\"environment\":\"" + appKeyConfig.environment + "\"}";
                     
                     break;
                 }
 
                 case "access-token": {
                     userId = scanner.next();
-                    String userName = scanner.next();
+                    String userName = URLDecoder.decode(scanner.next(), StandardCharsets.UTF_8.name());
                     String salt = newSalt();
                     String pin = hashPin(scanner.next(), salt);
                     String accessToken = scanner.next();
@@ -457,7 +424,7 @@ public class FamilyHistoryCenterSocket {
                     PersonState person = tree.readPersonForCurrentUser();
 
                     if (person == null || !person.getSelfUri().getPath().endsWith(userId)) {
-                        response = "Error: Access token does not match userId";
+                        response = getErrorResponse("Access token does not match userId");
                         break;
                     }
                     
@@ -489,7 +456,7 @@ public class FamilyHistoryCenterSocket {
                         
                         resendUserListToControllers();
                     } else {
-                        response = "Error: username and PIN do not match";
+                        response = getErrorResponse("username and PIN do not match");
                     }
                     break;
                 }
@@ -500,7 +467,7 @@ public class FamilyHistoryCenterSocket {
                 }
 
                 default:
-                    response = "Error: unrecognized command '" + message + "'";
+                    response = getErrorResponse("unrecognized command '" + message + "'");
             }
             
             if (token != null) {
@@ -511,7 +478,7 @@ public class FamilyHistoryCenterSocket {
             }
         } catch (Throwable e) {
             logger.error("Unexpected exception: " + e, e);
-            response = "Error: " + e.getMessage();
+            response = getErrorResponse(e.getMessage());
         }
         
         if (session.isOpen()) {
@@ -550,12 +517,19 @@ public class FamilyHistoryCenterSocket {
     }
     
     protected static String generateNewUserListResponse() {
-        StringBuilder userListBuilder = new StringBuilder("user-list");
+        StringBuilder userListBuilder = new StringBuilder("{\"responseType\":\"user-list\",\"users\":[");
+        boolean first = true;
         for (UserContext ati : userContextMap.values()) {
+            if (first) {
+                first = false;
+            } else {
+                userListBuilder.append(",");
+            }
             userListBuilder
-                    .append(" ").append(ati.userName)
-                    .append(" ").append(ati.userId);
+                    .append("{\"id\":\"").append(ati.userId).append("\",")
+                    .append("\"name\":\"").append(ati.userName).append("\"}");
         }
+        userListBuilder.append("]}");
         return userListBuilder.toString();
     }
     
@@ -575,7 +549,7 @@ public class FamilyHistoryCenterSocket {
     protected static void deactivateUserToken(String token) throws IOException {
         RemoteEndpoint controllerEndpoint = tokenControllerMap.remove(token);
         controllerEndpoint.sendString("nav controller-login");
-        controllerEndpoint.sendString("Error: logged out due to inactivity");
+        controllerEndpoint.sendString(getErrorResponse("logged out due to inactivity"));
     }
     
     protected static String newSalt() {
@@ -609,5 +583,21 @@ public class FamilyHistoryCenterSocket {
         
         String secondHash = hashPin(pin, salt, iterations);
         return secondHash.equals(hashedPin);
+    }
+    
+    protected static String getErrorResponse(String message) {
+        return "{\"responseType\":\"error\",\"message\":\""+message+"\"}";
+    }
+    
+    protected static String getPersonResponse(Person person) {
+        return "{\"responseType\":\"person\",\"person\":"+GSON.toJson(person)+"}";
+    }
+    
+    protected static String getPeopleResponse(List<Person> people) {
+        return "{\"responseType\":\"people\",\"people\":"+GSON.toJson(people)+"}";
+    }
+    
+    protected static String getImagesResponse(List<PersonImage> images) {
+        return "{\"responseType\":\"images\",\"images\":"+GSON.toJson(images)+"}";
     }
 }

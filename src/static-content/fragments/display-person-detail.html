@@ -68,21 +68,13 @@ POSSIBILITY OF SUCH DAMAGE.
     
     settings.local = {
         verbs: {
-            "person": function(parts) {
-                gotPerson(parts[1]);
-            },
-            "person-id": function(parts) {
-                getPerson(parts[1]);
+            person: function(obj) {
+                gotPerson(obj.person);
             }
         }
     };
     
-    function getPerson(personId) {
-        ws.socketSend("get-person " + personId);
-    }
-    
-    function gotPerson(data) {
-        var person = JSON.parse(decodeURI(data));
+    function gotPerson(person) {
         $("#instructions").hide();
         $("#person-bio").show();
         if (person.images && person.images[0]) {
