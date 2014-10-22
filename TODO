@@ -52,7 +52,7 @@ Add coloring game to menu                  DONE
 Use image chooser                          DONE
 Set up print function
 Fix brush
-Move image to opposite side from menu
+Move image to opposite side from menu      DONE
 Limit coloring to inside image
 Undo feature?
 
@@ -98,6 +98,9 @@ Move these TODOs to the shared task board
 Set up screen with both display and controller in iframes for independant use   DONE
 Turn features on/off for split/normal mode
 Delay loading of controller in split mode
+
+Socket:
+Move display name check to function
 
 Misc:
 Move css files into folder

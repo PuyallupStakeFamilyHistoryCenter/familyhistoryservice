@@ -36,7 +36,7 @@ POSSIBILITY OF SUCH DAMAGE.
             }
             .controller {
                 position: fixed;
-                left: 0px;
+                right: 0px;
                 top: 0px;
                 width: 30%;
                 height: 100%;
@@ -49,10 +49,10 @@ POSSIBILITY OF SUCH DAMAGE.
             <iframe src="controller-display-base.html?mode=display" style="width: 100%; height: calc(100% - 20px); border-style: none" ></iframe>
         </div>
         <div class="controller">
-            <iframe src="controller-display-base.html?mode=controller" style="width: calc(100% - 10px); height: 100%; border-style: none; overflow-x: hidden; float: left;" ></iframe>
-            <div style="width:10px; height:100%; float: left;">
+            <iframe src="controller-display-base.html?mode=controller" style="width: calc(100% - 10px); height: 100%; border-style: none; overflow-x: hidden; float: right;" ></iframe>
+            <div style="width:10px; height:100%; float: right;">
                 <div style="height: calc(50% - 15px);"></div>
-                <div id="handle" style="width: 10px; height: 30px; background-color: grey; border-radius: 0px 10px 10px 0px"></div>
+                <div id="handle" style="width: 10px; height: 30px; background-color: grey; border-radius: 10px 0px 0px 10px"></div>
             </div>
         </div>
         
@@ -63,12 +63,12 @@ POSSIBILITY OF SUCH DAMAGE.
                 var width = $(".controller").width();
                 if (hidden) {
                     $(".controller").animate({
-                        left: 0
+                        right: 0
                     }, 500, function() {});
                     hidden = false;
                 } else {
                     $(".controller").animate({
-                        left: (-width + 10)
+                        right: (-width + 10)
                     }, 500, function() {});
                     hidden = true;
                 }
