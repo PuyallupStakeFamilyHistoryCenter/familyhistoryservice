@@ -99,7 +99,7 @@ public class FamilyHistoryCenterSocket {
     }
     
     private static final long tokenInactivityTimeout = TimeUnit.MINUTES.toMillis(1); //TODO: Reset this
-    private static final long userInactivityTimeout  = TimeUnit.MINUTES.toMillis(2);
+    private static final long userInactivityTimeout  = TimeUnit.MINUTES.toMillis(60);
     
     private static final Map<String, RemoteEndpoint> remoteDisplays = new HashMap<>();
     private static final Map<String, RemoteEndpoint> remoteControllers = new HashMap<>();
@@ -115,7 +115,6 @@ public class FamilyHistoryCenterSocket {
             throw new IllegalStateException("Failed to create SecureRand instance", ex);
         }
     }
-    
     
     private static final ScheduledExecutorService cleanupService = Executors.newScheduledThreadPool(1);
     static {
@@ -223,7 +222,7 @@ public class FamilyHistoryCenterSocket {
                         try {
                             remoteControllers.get(id).sendString("{\"responseType\":\"pong\"}");
                             alreadyConnected = true;
-                        } catch (IOException ex) {
+                        } catch (Exception ex) {
                             //DO NOTHING
                         }
                     }
@@ -302,7 +301,7 @@ public class FamilyHistoryCenterSocket {
                     Person person = personDao.getPerson(personId, accessToken);
                     try {
                         displayEndpoint.sendString(getPersonResponse(person));
-                    } catch (IOException e) {
+                    } catch (Exception e) {
                         response = getErrorResponse("failed to send person '" + personId + "' to display " + displayId + ": " + e.getMessage());
                     }
                     
@@ -381,7 +380,7 @@ public class FamilyHistoryCenterSocket {
                     if (displayEndpoint != null) {
                         try {
                             displayEndpoint.sendString(toSend);
-                        } catch (IOException e) {
+                        } catch (Exception e) {
                             response = getErrorResponse("failed to communicate with display " + id + ": " + e.getMessage());
                         }
                     } else {
@@ -397,7 +396,7 @@ public class FamilyHistoryCenterSocket {
                     if (displayEndpoint != null) {
                         try {
                             displayEndpoint.sendString("{\"responseType\":\"nav\",\"dest\":\"" + dest + "\"}");
-                        } catch (IOException e) {
+                        } catch (Exception e) {
                             response = getErrorResponse("failed to communicate with display " + id + ": " + e.getMessage());
                         }
                     } else {
@@ -540,7 +539,7 @@ public class FamilyHistoryCenterSocket {
             RemoteEndpoint controller = it.next().getValue();
             try {
                 controller.sendString(listUsersResponse);
-            } catch (IOException ex) {
+            } catch (Exception ex) {
                 it.remove();
             }
         }

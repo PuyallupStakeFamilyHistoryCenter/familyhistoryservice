@@ -88,13 +88,16 @@ var ws = {
             ws.socketSend("ping");
             pingTimeout = setTimeout(ping, 60000);
         }
+        $(window).unload(function() {
+            close();
+        });
     },
     socketSend: function (message) {
         if (blocking) {
-            console.info("Queueing message '" + message + "'")
+            console.info("Queueing message '" + message + "'");
             messageQueue.push(message);
         } else {
-            console.info("Sending message '" + message + "'")
+            console.info("Sending message '" + message + "'");
             blocking = true;
             connection.send(message);
         }
