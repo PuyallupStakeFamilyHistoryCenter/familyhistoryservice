@@ -220,7 +220,7 @@ public class FamilyHistoryCenterSocket {
                     boolean alreadyConnected = false;
                     if (remoteDisplays.containsKey(id)) {
                         try {
-                            remoteControllers.get(id).sendString("{\"responseType\":\"pong\"}");
+                            remoteDisplays.get(id).sendString("{\"responseType\":\"pong\"}");
                             alreadyConnected = true;
                         } catch (Exception ex) {
                             //DO NOTHING
@@ -253,7 +253,7 @@ public class FamilyHistoryCenterSocket {
                         userContextMap.get(userId).tokens.add(token);
                         response = "{\"responseType\":\"token\",\"token\":\""+token+"\",\"username\":\""+tokenInfo.userName+"\"}";
                     } else {
-                        response = getErrorResponse("username and PIN do not match");
+                        throw new IllegalStateException("username and PIN do not match");
                     }
                     break;
                 }
@@ -280,7 +280,7 @@ public class FamilyHistoryCenterSocket {
                     if (person != null) {
                         response = getPersonResponse(person);
                     } else {
-                        response = getErrorResponse("person " + personId + " not found");
+                        throw new IllegalStateException("person " + personId + " not found");
                     }
                     
                     break;
@@ -294,15 +294,14 @@ public class FamilyHistoryCenterSocket {
                     
                     RemoteEndpoint displayEndpoint = remoteDisplays.get(displayId);
                     if (displayEndpoint == null) {
-                        response = getErrorResponse("token '" + token + "' has no attached display");
-                        break;
+                        throw new IllegalStateException("token '" + token + "' has no attached display");
                     }
                     
                     Person person = personDao.getPerson(personId, accessToken);
                     try {
                         displayEndpoint.sendString(getPersonResponse(person));
                     } catch (Exception e) {
-                        response = getErrorResponse("failed to send person '" + personId + "' to display " + displayId + ": " + e.getMessage());
+                        throw new IllegalStateException("failed to send person '" + personId + "' to display " + displayId + ": " + e.getMessage());
                     }
                     
                     break;
@@ -323,7 +322,7 @@ public class FamilyHistoryCenterSocket {
                     if (!family.isEmpty()) {
                         response = getPeopleResponse(family);
                     } else {
-                        response = getErrorResponse("person " + personId + " not found");
+                        throw new IllegalStateException("person " + personId + " not found");
                     }
                     
                     break;
@@ -340,7 +339,7 @@ public class FamilyHistoryCenterSocket {
                     if (!family.isEmpty()) {
                         response = getPeopleResponse(family);
                     } else {
-                        response = getErrorResponse("person " + personId + " not found");
+                        throw new IllegalStateException("person " + personId + " not found");
                     }
                     
                     break;
@@ -357,7 +356,7 @@ public class FamilyHistoryCenterSocket {
                     if (!family.isEmpty()) {
                         response = getPeopleResponse(family);
                     } else {
-                        response = getErrorResponse("person " + personId + " not found");
+                        throw new IllegalStateException("person " + personId + " not found");
                     }
                     
                     break;
@@ -381,10 +380,10 @@ public class FamilyHistoryCenterSocket {
                         try {
                             displayEndpoint.sendString(toSend);
                         } catch (Exception e) {
-                            response = getErrorResponse("failed to communicate with display " + id + ": " + e.getMessage());
+                            throw new IllegalStateException("failed to communicate with display " + id + ": " + e.getMessage());
                         }
                     } else {
-                        response = getErrorResponse("display not found '" + id + "'");
+                        throw new IllegalStateException("display not found '" + id + "'");
                     }
                     break;
                 }
@@ -397,10 +396,10 @@ public class FamilyHistoryCenterSocket {
                         try {
                             displayEndpoint.sendString("{\"responseType\":\"nav\",\"dest\":\"" + dest + "\"}");
                         } catch (Exception e) {
-                            response = getErrorResponse("failed to communicate with display " + id + ": " + e.getMessage());
+                            throw new IllegalStateException("failed to communicate with display " + id + ": " + e.getMessage());
                         }
                     } else {
-                        response = getErrorResponse("display not found '" + id + "'");
+                        throw new IllegalStateException("display not found '" + id + "'");
                     }
                     break;
                 }
@@ -423,8 +422,7 @@ public class FamilyHistoryCenterSocket {
                     PersonState person = tree.readPersonForCurrentUser();
 
                     if (person == null || !person.getSelfUri().getPath().endsWith(userId)) {
-                        response = getErrorResponse("Access token does not match userId");
-                        break;
+                        throw new IllegalStateException("Access token does not match userId");
                     }
                     
                     Precacher precacher = new Precacher(accessToken, 10);
@@ -455,7 +453,7 @@ public class FamilyHistoryCenterSocket {
                         
                         resendUserListToControllers();
                     } else {
-                        response = getErrorResponse("username and PIN do not match");
+                        throw new IllegalStateException("username and PIN do not match");
                     }
                     break;
                 }
@@ -466,7 +464,7 @@ public class FamilyHistoryCenterSocket {
                 }
 
                 default:
-                    response = getErrorResponse("unrecognized command '" + message + "'");
+                    throw new IllegalStateException("unrecognized command '" + message + "'");
             }
             
             if (token != null) {

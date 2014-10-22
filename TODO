@@ -108,7 +108,7 @@ Move test files into folder
 Get facts into person                      DONE
 Location cache
 Get unit tests working again
-Reload display causes "display * is already connected"
+Reload display causes "display * is already connected" DONE
 Add method for authenticating with devices
 Unit tests should use JSON responses       DONE
 Apps should auto-reconnect to websockets
