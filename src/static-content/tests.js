@@ -4,7 +4,7 @@ QUnit.module("UI testing controller", {
     },
     setup: function (assert) {
         configureSockete([
-            { verb: "ping", response: "pong" }
+            { verb: "ping", response: "{\"responseType\":\"pong\"}" }
         ]);
         $("#qunit-fixture").append("<div id='messages'></div><div id='page-header'></div><div id='content'></div>");
         //NOTE: Don't try to change location.search from within the test; it causes a page refresh
@@ -24,7 +24,6 @@ QUnit.module("UI testing controller", {
         userName = null;
         urlVars = null;
         $.cookie("display-name", "336f7a86");
-        $.cookie("token", "336f7a86336f7a86");
     },
     teardown: function() {
         ws.close();
@@ -57,14 +56,14 @@ QUnit.cases([
 
 QUnit.cases([
     {
-        title: "ok",
-        message: {data: "ok"}
+        title: "{\"responseType\":\"ok\"}",
+        message: {data: "{\"responseType\":\"ok\"}"}
     }, {
         title: "connected",
-        message: {data: "connected"}
+        message: {data: "{\"responseType\":\"connected\"}"}
     }, {
-        title: "pong",
-        message: {data: "pong"}
+        title: "{\"responseType\":\"pong\"}",
+        message: {data: "{\"responseType\":\"pong\"}"}
     }
 ]).test("Test web-socket message handling", function (params, assert) {
     assert.expect(0);
@@ -74,16 +73,16 @@ QUnit.cases([
 QUnit.cases([
     {
         title: "global",
-        message: {data: "spam 5"},
+        message: {data: "{\"responseType\":\"spam\",\"data\":5}"},
         level: "global"
     }, {
         title: "page",
-        message: {data: "spam 3"},
+        message: {data: "{\"responseType\":\"spam\",\"data\":5}"},
         toInject: "page",
         level: "page"
     }, {
         title: "local",
-        message: {data: "spam 9"},
+        message: {data: "{\"responseType\":\"spam\",\"data\":5}"},
         level: "local"
     }
 ]).combinatorial([
@@ -105,10 +104,10 @@ QUnit.cases([
 QUnit.cases([
     {
         title: "none",
-        message: {data: "spam 9"}
+        message: {data: "{\"responseType\":\"spam\",\"data\":5}"}
     }, {
         title: "error message",
-        message: {data: "Error: 9"}
+        message: {data: "{\"responseType\":\"error\",\"data\":5}"}
     }
 ]).combinatorial([
     {
@@ -173,7 +172,7 @@ QUnit.test("Test websocket ping on connect", function (assert) {
     QUnit.stop();
     assert.expect(1);
     ws.addMessageListener(function (message) {
-        assert.equal("pong", message.data);
+        assert.equal("{\"responseType\":\"pong\"}", message.data);
     });
     ws.connect();
     
@@ -203,7 +202,6 @@ QUnit.module("Test navigation with UI changes", {
         userName = null;
         urlVars = null;
         $.cookie("display-name", "336f7a86");
-        $.cookie("token", "336f7a86336f7a86");
     },
     teardown: function() {
         ws.close();
@@ -212,23 +210,23 @@ QUnit.module("Test navigation with UI changes", {
 
 QUnit.cases([
     { title: "controller-login", page: "controller-login", waitForVerb: "user-list", searchFor: ".username-btn", verbResponses: [
-            { verb: "ping", response: "pong" },
-            { verb: "list-current-users", response: "user-list userid1 username1 userid2 username2" }
+            { verb: "ping", response: "{\"responseType\":\"pong\"}" },
+            { verb: "list-current-users", response: "{\"responseType\":\"user-list\",\"users\":[{\"id\":\"userid1\",\"name\":\"username1\"},{\"id\":\"userid2\",\"name\":\"username2\"}]}" }
     ]},
     { title: "display-login", page: "display-login", searchFor: ".jumbotron", verbResponses: [
-            { verb: "ping", response: "pong" }
+            { verb: "ping", response: "{\"responseType\":\"pong\"}" }
     ]},
     { title: "controller-attach", page: "controller-attach", searchFor: "#display-name-input", verbResponses: [
-            { verb: "ping", response: "pong" }
+            { verb: "ping", response: "{\"responseType\":\"pong\"}" }
     ]},
     { title: "display-ready", page: "display-ready", searchFor: "#display-name-output", verbResponses: [
-            { verb: "ping", response: "pong" }
+            { verb: "ping", response: "{\"responseType\":\"pong\"}" }
     ]},
     { title: "display-main", page: "display-main", searchFor: ".carousel", verbResponses: [
-            { verb: "ping", response: "pong" }
+            { verb: "ping", response: "{\"responseType\":\"pong\"}" }
     ]},
     { title: "controller-main", page: "controller-main", searchFor: "#nav-buttons", verbResponses: [
-            { verb: "ping", response: "pong" }
+            { verb: "ping", response: "{\"responseType\":\"pong\"}" }
     ]}
 ]).test("Test load", function (params, assert) {
     QUnit.stop();
@@ -239,7 +237,8 @@ QUnit.cases([
     var verbPromise = new $.Deferred();
     if (params.waitForVerb) {
         ws.addMessageListener(function(message) {
-            if (message.data.split(" ")[0] === params.waitForVerb) {
+            var obj = JSON.parse(message.data);
+            if (obj.responseType === params.waitForVerb) {
                 verbPromise.resolve();
             }
         });
@@ -262,25 +261,25 @@ QUnit.cases([
 });
 
 QUnit.cases([
-    { title: "controller-attached-and-logged-in", targetPage: "controller-main", targetVerb: "ok",
+    { title: "controller-attached-and-logged-in", targetPage: "controller-main", targetVerb: "{\"responseType\":\"ok\"}",
         searchFor: "#nav-buttons", noDisplay: false, noToken: false, verbResponses: [
-            { verb: "ping", response: "pong" },
-            { verb: "controller 336f7a86", response: "attached" },
-            { verb: "nav 336f7a86 display-main", response: "ok" }
+            { verb: "ping", response: "{\"responseType\":\"pong\"}" },
+            { verb: "controller 336f7a86", response: "{\"responseType\":\"attached\"}" },
+            { verb: "nav 336f7a86 display-main", response: "{\"responseType\":\"ok\"}" }
     ]},
-    { title: "controller-not-attached", targetPage: "controller-attach", targetVerb: "pong",
+    { title: "controller-not-attached", targetPage: "controller-attach", targetVerb: "{\"responseType\":\"pong\"}",
         searchFor: "#display-name-input", noDisplay: true, noToken: false, verbResponses: [
-            { verb: "ping", response: "pong" },
-            { verb: "controller 336f7a86", response: "attached" },
-            { verb: "nav 336f7a86 display-main", response: "ok" }
+            { verb: "ping", response: "{\"responseType\":\"pong\"}" },
+            { verb: "controller 336f7a86", response: "{\"responseType\":\"attached\"}" },
+            { verb: "nav 336f7a86 display-main", response: "{\"responseType\":\"ok\"}" }
     ]},
-    { title: "controller-not-logged-in", targetPage: "controller-login", targetVerb: "ok",
+    { title: "controller-not-logged-in", targetPage: "controller-login", targetVerb: "{\"responseType\":\"ok\"}",
         searchFor: ".username-btn", noDisplay: false, noToken: true, verbResponses: [
-            { verb: "ping", response: "pong" },
-            { verb: "controller 336f7a86", response: "attached" },
-            { verb: "nav 336f7a86 display-login", response: "ok" },
-            { verb: "list-current-users", response: "user-list userid1 username1 userid2 username2" }
-    ]},
+            { verb: "ping", response: "{\"responseType\":\"pong\"}" },
+            { verb: "controller 336f7a86", response: "{\"responseType\":\"attached\"}" },
+            { verb: "nav 336f7a86 display-login", response: "{\"responseType\":\"ok\"}" },
+            { verb: "list-current-users", response: "{\"responseType\":\"user-list\",\"users\":[{\"id\":\"userid1\",\"name\":\"username1\"},{\"id\":\"userid2\",\"name\":\"username2\"}]}" }
+    ]}
 ]).test("Test get display name", function(params, assert) {
     console.info("Starting test " + params.title);
     assert.expect(1);
@@ -300,9 +299,10 @@ QUnit.cases([
     
     var timeout = setTimeout(function() {
         QUnit.start();
-    }, 1000)
+    }, 1000);
     ws.addMessageListener(function(message) {
-        if (message.data.split(" ")[0] === params.targetVerb) {
+        var obj = JSON.parse(message.data);
+        if (obj.responseType === params.targetVerb) {
             clearTimeout(timeout);
             setTimeout(function() {
                 assert.ok($(params.searchFor).length, "Did not navigate to " + params.targetPage);
@@ -316,18 +316,18 @@ QUnit.cases([
 QUnit.cases([
     { title: "nav-controller", mode: "controller", targetPage: "controller-main", targetVerb: "nav",
         searchFor: "#nav-buttons", verbResponses: [
-            { verb: "ping", response: "pong" },
-            { verb: "trigger", response: "nav controller-main" }
+            { verb: "ping", response: "{\"responseType\":\"pong\"}" },
+            { verb: "trigger", response: "{\"responseType\":\"nav\",\"dest\":\"controller-main\"}" }
     ]},
     { title: "nav-display", mode: "display", targetPage: "display-main", targetVerb: "nav",
         searchFor: ".carousel", verbResponses: [
-            { verb: "ping", response: "pong" },
-            { verb: "trigger", response: "nav display-main" }
+            { verb: "ping", response: "{\"responseType\":\"pong\"}" },
+            { verb: "trigger", response: "{\"responseType\":\"nav\",\"dest\":\"display-main\"}" }
     ]},
     { title: "standby", mode: "display", targetPage: "display-ready", targetVerb: "standby",
         searchFor: "#display-name-output", verbResponses: [
-            { verb: "ping", response: "pong" },
-            { verb: "trigger", response: "standby" }
+            { verb: "ping", response: "{\"responseType\":\"pong\"}" },
+            { verb: "trigger", response: "{\"responseType\":\"standby\"}" }
     ]}
 ]).combinatorial([
     {
@@ -348,7 +348,8 @@ QUnit.cases([
         QUnit.start();
     }, 1000);
     ws.addMessageListener(function(message) {
-        if (message.data.split(" ")[0] === params.targetVerb) {
+        var obj = JSON.parse(message.data);
+        if (obj.responseType === params.targetVerb) {
             clearTimeout(timeout);
             setTimeout(function() {
                 assert.ok($(params.searchFor).length, "Did not navigate to " + params.targetPage);
@@ -364,8 +365,8 @@ QUnit.cases([
 
 QUnit.cases([
     { title: "display-person-detail", mode:"display", page: "display-person-detail", targetVerb: "person", searchFor: "#person-img", verbResponses: [
-            { verb: "ping", response: "pong" },
-            { verb: "trigger", response: "person {\"person_id\":\"asdf\",\"name\":\"John%20Smith\",\"image\":\"life-map.jpg\"}" }
+            { verb: "ping", response: "{\"responseType\":\"pong\"}" },
+            { verb: "trigger", response: "{\"responseType\":\"person\",\"person\":{\"id\":\"asdf\",\"name\":\"John Smith\",\"image\":\"life-map.jpg\"}}" }
     ]}
 ]).test("Test verb", function(params, assert) {
     console.info("Starting test " + params.title);
@@ -384,7 +385,8 @@ QUnit.cases([
         QUnit.start();
     }, 1000);
     ws.addMessageListener(function(message) {
-        if (message.data.split(" ")[0] === params.targetVerb) {
+        var obj = JSON.parse(message.data);
+        if (obj.responseType === params.targetVerb) {
             clearTimeout(timeout);
             setTimeout(function() {
                 assert.ok($(params.searchFor).length, "Did not navigate to " + params.targetPage);
@@ -402,11 +404,11 @@ QUnit.test("Test log out", function (assert) {
     QUnit.stop();
     assert.expect(2);
     configureSockete([
-        { verb: "ping", response: "pong"},
-        { verb: "controller 336f7a86", response: "attached"},
-        { verb: "nav 336f7a86 display-main", response: "ok" },
-        { verb: "nav 336f7a86 display-login", response: "ok" },
-        { verb: "list-current-users", response: "user-list userid1 username1 userid2 username2" }
+        { verb: "ping", response: "{\"responseType\":\"pong\"}"},
+        { verb: "controller 336f7a86", response: "{\"responseType\":\"attached\"}"},
+        { verb: "nav 336f7a86 display-main", response: "{\"responseType\":\"ok\"}" },
+        { verb: "nav 336f7a86 display-login", response: "{\"responseType\":\"ok\"}" },
+        { verb: "list-current-users", response: "{\"responseType\":\"user-list\",\"users\":[{\"id\":\"userid1\",\"name\":\"username1\"},{\"id\":\"userid2\",\"name\":\"username2\"}]}" }
     ]);
     
     urlVars = {mode: "controller"};
@@ -414,7 +416,6 @@ QUnit.test("Test log out", function (assert) {
     
     setTimeout(function() {
         setTimeout(function() {
-            assert.ok(!$.cookie("token"), "Token cookie should be empty");
             assert.ok(!$(".username-btn").length, "Did not navigate to controller-login");
             QUnit.start();
         }, 30);

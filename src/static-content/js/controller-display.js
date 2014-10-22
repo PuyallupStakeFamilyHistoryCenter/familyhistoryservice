@@ -51,7 +51,9 @@ function doNothing() {}
 
 
 function getReady() {
-    urlVars = getUrlVars(window.location.search.substr(1));
+    if (!urlVars) {
+        urlVars = getUrlVars(window.location.search.substr(1));
+    }
     
     //Add message listener to websocket
     ws.addMessageListener(messageHandler);
@@ -159,7 +161,6 @@ var defaultSettings = {
             token: function(response) {
                 setUsername(response.username);
                 token = response.token;
-                $.cookie("token", token);
                 ws.socketSend("nav " + displayName + " " + "display-main");
                 clearHistory();
                 navigate("controller-main");
@@ -177,10 +178,6 @@ var defaultSettings = {
             ws.socketSend("login " + userId + " " + pin);
         },
         logOut: function() {
-            //TODO: This doesn't appear to be working
-            if (!$.removeCookie("token")) {
-                logger.error("Failed to remove login cookie");
-            }
             ws.socketSend("logout " + token);
             token = null;
             ws.socketSend("nav " + displayName + " display-login");
@@ -256,7 +253,10 @@ function log(level, message) {
             message + '</div>');
 }
 
-function navigate(dest) {
+function navigate(dest, timeout) {
+    if (!timeout) {
+        timeout = 1000;
+    }
     var split = dest.split("?");
     var actualDest = "fragments/" + split[0] + ".html";
     var tempVars = null;
@@ -285,6 +285,11 @@ function navigate(dest) {
                 deferred.reject();
             }
         );
+    setTimeout(function() {
+        deferred.reject();
+        //throw new Error("Timed out while loading " + dest);
+    }, timeout);
+
     return deferred.promise();
 }
     
@@ -320,3 +325,5 @@ function navigateDisplay(dest) {
 function sendToDisplay(message) {
     ws.socketSend("send " + displayName + " " + message);
 }
+
+function setHeaderName(headerName) {}

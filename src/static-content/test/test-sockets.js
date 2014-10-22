@@ -27,7 +27,7 @@
 
 function configureSockete(verbResponses) {
     Sockete.Server.reset();
-    var endpoint = "wss://localhost:8443/remote-control/";
+    var endpoint = "wss://" + window.location.host + "/remote-control/";
     Sockete.Server.configure(endpoint, function () {
         for (var i = 0; i < verbResponses.length; i++) {
             var entry = verbResponses[i];

@@ -107,3 +107,4 @@ Location cache
 Get unit tests working again
 Reload display causes "display * is already connected"
 Add method for authenticating with devices
+Unit tests should use JSON responses
