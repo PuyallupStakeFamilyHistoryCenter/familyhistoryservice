@@ -50,6 +50,10 @@ POSSIBILITY OF SUCH DAMAGE.
                 Death:
             </dt>
             <dd id="death"></dd>
+            <dt id="parents-label">
+                Parents:
+            </dt>
+            <dd id="parents"></dd>
             <dt id="spouse-label">
                 Spouse:
             </dt>
@@ -104,6 +108,14 @@ POSSIBILITY OF SUCH DAMAGE.
             }
         }
         
+        if (person.parents) {
+            $("#parents").html("");
+            $.each(person.parents, function(index, value) {
+                $("#parents").append(decodeURI(value.name) + "<br>");
+            });
+        } else {
+            $("#parents").html("none");
+        }
         if (person.spouses) {
             $("#spouse-label").html(person.spouses.length > 1 ? "Spouses:" : "Spouse:");
             $("#spouse").html("");

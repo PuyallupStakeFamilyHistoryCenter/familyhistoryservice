@@ -88,6 +88,7 @@ Disable navigation when logged out
 Add back button to standard header         DONE
 Set up accordian for groups of controls
 Make header opaque so scrolling doesn't look weird DONE
+Add picture to the individual page
 
 Library:
 Separate query params for page and fragment DONE
