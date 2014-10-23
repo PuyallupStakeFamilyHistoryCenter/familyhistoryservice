@@ -36,11 +36,12 @@ Test on iPad in split mode
 Add person info on controller-puzzle       DONE
 Make piece shapes more interesting
 Back button in puzzle goes back to main screen instead of games screen
+Allow display to signal to controller when puzzle is finished
 
 Image chooser:
 Add get people with images call            DONE
 Make app controls a tab                    DONE
-Style tabs correctly
+Style tabs correctly                       DONE
 
 Person chooser:
 Move person-chooser from controller-person-detail
@@ -99,6 +100,7 @@ Move these TODOs to the shared task board
 Set up screen with both display and controller in iframes for independant use   DONE
 Turn features on/off for split/normal mode
 Delay loading of controller in split mode
+Show and hide controller in split mode should respond to swipe gesture
 
 Socket:
 Move display name check to function
@@ -113,3 +115,6 @@ Reload display causes "display * is already connected" DONE
 Add method for authenticating with devices
 Unit tests should use JSON responses       DONE
 Apps should auto-reconnect to websockets
+Choose a better Guest user and keep the cache up-to-date
+File cacher should fall back to cached file even if expired
+Filter living children out of person

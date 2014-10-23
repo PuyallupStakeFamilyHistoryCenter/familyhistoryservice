@@ -47,8 +47,9 @@ POSSIBILITY OF SUCH DAMAGE.
                     innerNavigate("controller-" + target, "#controls");
                     innerNavigate("display-person-detail?hide_image=true&person_id=" + obj.id, "#person-info");
 
-                    $("#person-info-btn").removeProp("disabled").click();
-                    $("#controls-btn").removeProp("disabled");
+                    $("#images-btn").removeClass("active");
+                    $("#person-info-btn").show().click().addClass("active");
+                    $("#controls-btn").show();
                 });
             }
         }
@@ -57,11 +58,11 @@ POSSIBILITY OF SUCH DAMAGE.
     ws.socketSend("get-ancestor-images " + token + " " + settings.userId);
 </script>
 
-<div id="tabs">
-    <button id="images-btn" >Images</button>
-    <button id="person-info-btn" disabled="" >Person</button>
-    <button id="controls-btn" disabled="" >Controls</button>
-</div>
+<ul class="nav nav-tabs" id="tabs" role="tablist">
+    <li class="active" id="images-btn" ><a href="#images" role="tab" data-toggle="tab">Images</a></li>
+    <li id="person-info-btn" style="display: none" ><a href="#person-info" role="tab" data-toggle="tab">Person</a></li>
+    <li id="controls-btn" style="display: none" ><a href="#controls" role="tab" data-toggle="tab">Controls</a></li>
+</ul>
 <div id="images">
 
 </div>
@@ -111,9 +112,6 @@ POSSIBILITY OF SUCH DAMAGE.
                             settings.local = {verbs: {}};
                             fragmentVars = tempVars;
                             $(selector).html(data);
-                            if (pushHistory !== undefined) {
-                                pushHistory(dest);
-                            }
 
                             deferred.resolve();
                         }
