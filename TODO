@@ -1,18 +1,41 @@
 TODO:
 
+Maybe wrap FamilySearch JS library for use in Java
+
+Server:
 Set up SSL for web socket and image cache  DONE
 Delete access token on log out             DONE
-Test map movement (changed to 'send' commands; removed native 'move' commands) DONE
+Speed up hosting
+    zip/minify resources
+    allow caching of some resources
+    add server threads
+Add method for authenticating with devices
+
+
+Socket:
+Move display name check to function
+Apps should auto-reconnect to websockets
+
+
+Caching:
+Get facts into person                      DONE
 Set up pre-caching                         DONE
 Limit precaching to a configurable depth   DONE
-Finish wiring dependencies via Spring      DONE
-Move developer id into config file (not in Git) DONE
 Create clean-up script to clear cache occasionally
-Figure out why log4j via Ivy isn't working
-Partition living person in-memory cache
+Add progress bar for caching
+Location cache
+File cacher should fall back to cached file even if expired
+Ensure security of living person data
+    Filter living children out of person
+    Partition living person in-memory cache
+        OR
+    Don't display/cache living people
+        OR
+    Show only placeholder for living people
 Speed up caching
-Maybe wrap FamilySearch JS library for use in Java
-Speed up hosting (e.g. zip/minify resources, add threads)
+    Add thread(s)
+    Use getAncestory function to get several generations at once
+
 
 Puzzle:
 Wire puzzle settings into display          DONE
@@ -42,11 +65,13 @@ Image chooser:
 Add get people with images call            DONE
 Make app controls a tab                    DONE
 Style tabs correctly                       DONE
+Figure out why image choice persists from puzzle to color
 
 Person chooser:
 Move person-chooser from controller-person-detail
 Load the tree instead of just the family   DONE
 Make app controls a tab
+Allow searching and sorting of ancestors
 
 Color:
 Add coloring game to menu                  DONE
@@ -58,6 +83,7 @@ Limit coloring to inside image
 Undo feature?
 
 Life map:
+Test map movement (changed to 'send' commands; removed native 'move' commands) DONE
 Show life events on map
 Fix mouse zoom (pinch) in split mode
 Fix buttons in split mode
@@ -96,25 +122,18 @@ Separate query params for page and fragment DONE
 Rewire sockete.js to accept a response callback
 
 Project:
+Set up screen with both display and controller in iframes for independent use   DONE
+Reload display causes "display * is already connected" DONE
+Unit tests should use JSON responses       DONE
+Finish wiring dependencies via Spring      DONE
+Move developer id into config file (not in Git) DONE
+Figure out why log4j via Ivy isn't working
+Move css files into folder
+Move test files into folder
 Move these TODOs to the shared task board
-Set up screen with both display and controller in iframes for independant use   DONE
 Turn features on/off for split/normal mode
 Delay loading of controller in split mode
 Show and hide controller in split mode should respond to swipe gesture
-
-Socket:
-Move display name check to function
-
-Misc:
-Move css files into folder
-Move test files into folder
-Get facts into person                      DONE
-Location cache
 Get unit tests working again
-Reload display causes "display * is already connected" DONE
-Add method for authenticating with devices
-Unit tests should use JSON responses       DONE
-Apps should auto-reconnect to websockets
-Choose a better Guest user and keep the cache up-to-date
-File cacher should fall back to cached file even if expired
-Filter living children out of person
+Add search feature (to search for ancestors)
+Allow members to see ordinance information
