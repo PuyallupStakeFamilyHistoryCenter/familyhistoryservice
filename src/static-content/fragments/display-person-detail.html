@@ -81,7 +81,8 @@ POSSIBILITY OF SUCH DAMAGE.
     function gotPerson(person) {
         $("#instructions").hide();
         $("#person-bio").show();
-        if (person.images && person.images[0]) {
+        var hideImage = parseBool(getParameterByName("hide_image"));
+        if (person.images && person.images[0] && !hideImage) {
             $("#person-img").attr("src", person.images[0]).attr("alt", "Image of " + person.name).show();
         } else {
             $("#person-img").hide();
@@ -137,4 +138,17 @@ POSSIBILITY OF SUCH DAMAGE.
             $("#children").html("none");
         }
     }
+    
+    var personId = getParameterByName("person_id");
+    if (personId) {
+        ws.socketSend("get-person " + token + " " + personId);
+    }
+    
+    var hideImage = getParameterByName("hide_image");
+    if (hideImage) {
+        console.info("Hiding image in display-person-detail");
+        $("#person-img").hide();
+    }
+    
+    asdf();
 </script>

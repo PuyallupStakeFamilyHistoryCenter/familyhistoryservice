@@ -27,30 +27,107 @@ POSSIBILITY OF SUCH DAMAGE.
 
 <script>
     var target = getParameterByName("target");
-    
+
     settings.local = {
         verbs: {
-            images: function(obj) {
+            images: function (obj) {
                 var images = obj.images;
-                $.each(images, function(index, image) {
-                    $("#images").append("<button class='btn btn-default img-btn' style='display: none;' data-image='"+ JSON.stringify(image) +"'><img style='max-width:100px; max-height: 100px;' src='"+image.url+"' /></button>")
+                $.each(images, function (index, image) {
+                    $("#images").append("<button class='btn btn-default img-btn' style='display: none;' data-image='" + JSON.stringify(image) + "'><img style='max-width:100px; max-height: 100px;' src='" + image.url + "' /></button>")
                 });
-                $(".img-btn img").load(function(e) {
+                $(".img-btn img").load(function (e) {
                     $(this).parent().show();
                 });
-                $(".img-btn").click(function(e) {
+                $(".img-btn").click(function (e) {
                     var data = $(this).attr("data-image");
+                    var obj = JSON.parse(data);
                     sendToDisplay("{\"responseType\":\"personImage\",\"personImage\":" + data + "}");
-                    
-                    navigate("controller-" + target);
+
+                    //navigate("controller-" + target);
+                    innerNavigate("controller-" + target, "#controls");
+                    innerNavigate("display-person-detail?hide_image=true&person_id=" + obj.id, "#person-info");
+
+                    $("#person-info-btn").removeProp("disabled").click();
+                    $("#controls-btn").removeProp("disabled");
                 });
             }
         }
     }
-    
+
     ws.socketSend("get-ancestor-images " + token + " " + settings.userId);
 </script>
 
-<div id="images">
-    
+<div id="tabs">
+    <button id="images-btn" >Images</button>
+    <button id="person-info-btn" disabled="" >Person</button>
+    <button id="controls-btn" disabled="" >Controls</button>
 </div>
+<div id="images">
+
+</div>
+<div id="person-info" style="display: none;">
+
+</div>
+<div id="controls" style="display: none;">
+
+</div>
+
+<script>
+    $("#images-btn").click(function (e) {
+        $("#images").show();
+        $("#person-info").hide();
+        $("#controls").hide();
+    });
+
+    $("#person-info-btn").click(function (e) {
+        $("#images").hide();
+        $("#person-info").show();
+        $("#controls").hide();
+    });
+
+    $("#controls-btn").click(function (e) {
+        $("#images").hide();
+        $("#person-info").hide();
+        $("#controls").show();
+    });
+
+    function innerNavigate(dest, selector, timeout) {
+        if (!timeout) {
+            timeout = 1000;
+        }
+        var split = dest.split("?");
+        var actualDest = "fragments/" + split[0] + ".html";
+        var tempVars = null;
+        if (split.length > 1) {
+            actualDest += "?" + split[1];
+            tempVars = getUrlVars(split[1]);
+        }
+        var deferred = new $.Deferred();
+
+        console.info("Navigating to " + actualDest);
+        $.ajax(actualDest)
+                .done(
+                        function (data) {
+                            settings.local = {verbs: {}};
+                            fragmentVars = tempVars;
+                            $(selector).html(data);
+                            if (pushHistory !== undefined) {
+                                pushHistory(dest);
+                            }
+
+                            deferred.resolve();
+                        }
+                ).fail(
+                function (response) {
+                    logger.error("Could not load " + actualDest + " - " + response.statusText);
+                    deferred.reject();
+                }
+        );
+        setTimeout(function () {
+            deferred.reject();
+            //throw new Error("Timed out while loading " + dest);
+        }, timeout);
+
+        return deferred.promise();
+    }
+</script>

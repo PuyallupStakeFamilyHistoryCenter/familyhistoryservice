@@ -26,21 +26,21 @@ Fix styling of controls                    DONE
 Fix puzzle initial config                  DONE
 Rotate pieces without restarting           DONE
 Presort pieces without restarting          DONE
+Thumbnail should fit in remaining space    DONE
 Snap radius setting shouldn't be disabled by snap-on-drag DONE
 Don't reset game on size change if the size doesn't actually change DONE
 Figure out why puzzle scrolls in split mode DONE
+Set up image chooser                       DONE
 Fix piece rotation in split mode
 Test on iPad in split mode
-Figure out why image doesn't fit in frame (this may be limited to children.png)
-Add person info on controller-puzzle
-Set up image chooser
+Add person info on controller-puzzle       DONE
 Make piece shapes more interesting
-Thumbnail should fit in remaining space    DONE
 Back button in puzzle goes back to main screen instead of games screen
 
 Image chooser:
 Add get people with images call            DONE
-Make app controls a tab
+Make app controls a tab                    DONE
+Style tabs correctly
 
 Person chooser:
 Move person-chooser from controller-person-detail
