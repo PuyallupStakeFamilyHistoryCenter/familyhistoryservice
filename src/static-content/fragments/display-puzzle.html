@@ -377,7 +377,7 @@ POSSIBILITY OF SUCH DAMAGE.
         context.strokeRect(0, 0, imageWidth * scale, imageHeight * scale);
 
         if (config.thumbnail) {
-            var thumbnailWidth = canvas.width - image.width*scale - 10;
+            var thumbnailWidth = Math.min(canvas.width - image.width*scale - 10, image.width*scale/2);
             var thumbnailScale = thumbnailWidth / imageWidth;
             context.drawImage(image, 0, 0, imageWidth, imageHeight, imageWidth * scale + 10, 0, thumbnailWidth, imageHeight * thumbnailScale);
         }

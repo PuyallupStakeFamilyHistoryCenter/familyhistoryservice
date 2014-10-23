@@ -35,7 +35,7 @@ Figure out why image doesn't fit in frame (this may be limited to children.png)
 Add person info on controller-puzzle
 Set up image chooser
 Make piece shapes more interesting
-Thumbnail should fit in remaining space
+Thumbnail should fit in remaining space    DONE
 Back button in puzzle goes back to main screen instead of games screen
 
 Image chooser:
