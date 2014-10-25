@@ -6,14 +6,16 @@ Server:
 Set up SSL for web socket and image cache  DONE
 Delete access token on log out             DONE
 Speed up hosting
-    zip/minify resources
-    allow caching of some resources
+    zip/minify resources (static-resources)
+    zip/minify resources (image-cache)
+    allow client-side caching (static-resources images)
+    allow client-side caching (image-cache)
     add server threads
 Add method for authenticating with devices
 
 
 Socket:
-Move display name check to function
+Move display name check to function        DONE
 Apps should auto-reconnect to websockets
 
 
@@ -56,6 +58,7 @@ Figure out why puzzle scrolls in split mode DONE
 Set up image chooser                       DONE
 Fix piece rotation in split mode
 Test on iPad in split mode
+Fix z-order in split mode
 Add person info on controller-puzzle       DONE
 Make piece shapes more interesting
 Back button in puzzle goes back to main screen instead of games screen

@@ -217,16 +217,7 @@ public class FamilyHistoryCenterSocket {
 
                 case "display": {
                     String id = scanner.next();
-                    boolean alreadyConnected = false;
-                    if (remoteDisplays.containsKey(id)) {
-                        try {
-                            remoteDisplays.get(id).sendString("{\"responseType\":\"pong\"}");
-                            alreadyConnected = true;
-                        } catch (Exception ex) {
-                            //DO NOTHING
-                        }
-                    }
-                    if (!alreadyConnected) {
+                    if (!isDisplayActive(id)) {
                         remoteDisplays.put(id, session.getRemote());
                         response = "{\"responseType\":\"standby\"}";
                     } else {
@@ -291,18 +282,9 @@ public class FamilyHistoryCenterSocket {
                     String displayId = scanner.next();
                     String personId = scanner.next();
                     String accessToken = tokenToAccessToken(token);
-                    
-                    RemoteEndpoint displayEndpoint = remoteDisplays.get(displayId);
-                    if (displayEndpoint == null) {
-                        throw new IllegalStateException("token '" + token + "' has no attached display");
-                    }
-                    
                     Person person = personDao.getPerson(personId, accessToken);
-                    try {
-                        displayEndpoint.sendString(getPersonResponse(person));
-                    } catch (Exception e) {
-                        throw new IllegalStateException("failed to send person '" + personId + "' to display " + displayId + ": " + e.getMessage());
-                    }
+                    
+                    sendToDisplay(displayId, getPersonResponse(person));
                     
                     break;
                 }
@@ -375,32 +357,14 @@ public class FamilyHistoryCenterSocket {
                 case "send": {
                     String id = scanner.next();
                     String toSend = scanner.next(".*");
-                    RemoteEndpoint displayEndpoint = remoteDisplays.get(id);
-                    if (displayEndpoint != null) {
-                        try {
-                            displayEndpoint.sendString(toSend);
-                        } catch (Exception e) {
-                            throw new IllegalStateException("failed to communicate with display " + id + ": " + e.getMessage());
-                        }
-                    } else {
-                        throw new IllegalStateException("display not found '" + id + "'");
-                    }
+                    sendToDisplay(id, toSend);
                     break;
                 }
 
                 case "nav": {
                     String id = scanner.next();
                     String dest = scanner.next();
-                    RemoteEndpoint displayEndpoint = remoteDisplays.get(id);
-                    if (displayEndpoint != null) {
-                        try {
-                            displayEndpoint.sendString("{\"responseType\":\"nav\",\"dest\":\"" + dest + "\"}");
-                        } catch (Exception e) {
-                            throw new IllegalStateException("failed to communicate with display " + id + ": " + e.getMessage());
-                        }
-                    } else {
-                        throw new IllegalStateException("display not found '" + id + "'");
-                    }
+                    sendToDisplay(id, "{\"responseType\":\"nav\",\"dest\":\"" + dest + "\"}");
                     break;
                 }
                 
@@ -596,5 +560,28 @@ public class FamilyHistoryCenterSocket {
     
     protected static String getImagesResponse(List<PersonImage> images) {
         return "{\"responseType\":\"images\",\"images\":"+GSON.toJson(images)+"}";
+    }
+    
+    protected static boolean isDisplayActive(String displayId) {
+        boolean alreadyConnected = true;
+        try {
+            sendToDisplay(displayId, "{\"responseType\":\"pong\"}");
+        } catch (IllegalStateException ex) {
+            alreadyConnected = false; 
+        }
+        return alreadyConnected;
+    }
+    
+    protected static void sendToDisplay(String id, String message) {
+        RemoteEndpoint displayEndpoint = remoteDisplays.get(id);
+        if (displayEndpoint != null) {
+            try {
+                displayEndpoint.sendString(message);
+            } catch (Exception e) {
+                throw new IllegalStateException("failed to communicate with display " + id + ": " + e.getMessage());
+            }
+        } else {
+            throw new IllegalStateException("display not found '" + id + "'");
+        }
     }
 }
