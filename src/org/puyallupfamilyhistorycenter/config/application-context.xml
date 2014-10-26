@@ -89,13 +89,36 @@ POSSIBILITY OF SUCH DAMAGE.
                 <value>text/html</value>
                 <value>text/css</value>
                 <value>application/javascript</value>
-                <value>image/png</value>
             </set>
         </property>
     </bean>
     <bean id="static-context" class="org.eclipse.jetty.server.handler.ContextHandler" >
         <constructor-arg value="/static-content" />
         <property name="handler" ref="static-handler-gzip" />
+    </bean>
+    
+    <!--Media-->
+    <bean id="media-resource" class="org.eclipse.jetty.util.resource.Resource" factory-method="newClassPathResource">
+        <constructor-arg value="/media" />
+    </bean>
+    <bean id="media-handler" class="org.eclipse.jetty.server.handler.ResourceHandler" >
+        <property name="directoriesListed" value="true" />
+        <property name="baseResource" ref="media-resource" />
+        <property name="cacheControl" value="public, max-age=86400" />
+    </bean>
+    <bean id="media-handler-gzip" class="org.eclipse.jetty.servlets.gzip.GzipHandler">
+        <property name="handler" ref="media-handler" />
+        <property name="mimeTypes" >
+            <set>
+                <value>image/png</value>
+                <value>image/jpg</value>
+                <value>image/gif</value>
+            </set>
+        </property>
+    </bean>
+    <bean id="media-context" class="org.eclipse.jetty.server.handler.ContextHandler" >
+        <constructor-arg value="/media" />
+        <property name="handler" ref="media-handler-gzip" />
     </bean>
     
     <!--Image cache-->
@@ -110,6 +133,7 @@ POSSIBILITY OF SUCH DAMAGE.
         <property name="handlers">
             <array>
                 <ref bean="web-socket-context" />
+                <ref bean="media-context" />
                 <ref bean="static-context" />
                 <ref bean="image-cache-context" />
             </array>
