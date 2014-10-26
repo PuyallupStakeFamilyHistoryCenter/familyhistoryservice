@@ -95,8 +95,8 @@ public class FamilySearchImageCacheHandler extends AbstractHandler {
                                 writer.write(headerName + ":" + connection.getHeaderField(headerName) + '\n');
                             }
                         }
-                        writer.write("Content-Encoding:gzip");
-                        writer.write("Content-Length:" + cachedFile.length());
+                        writer.write("Content-Encoding:gzip\n");
+                        writer.write("Content-Length:" + cachedFile.length() + '\n');
                     }
                 } else {
                     response.sendError(connection.getResponseCode(), connection.getResponseMessage());
