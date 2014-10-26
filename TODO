@@ -7,7 +7,7 @@ Set up SSL for web socket and image cache  DONE
 Delete access token on log out             DONE
 Speed up hosting
     zip/minify resources (static-resources) DONE
-    zip/minify resources (image-cache)
+    zip/minify resources (image-cache)      DONE
     allow client-side caching (static-resources images)
     allow client-side caching (image-cache)
     add server threads

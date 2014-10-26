@@ -34,6 +34,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.Writer;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -41,6 +42,7 @@ import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.zip.GZIPOutputStream;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -75,15 +77,17 @@ public class FamilySearchImageCacheHandler extends AbstractHandler {
             response.sendError(400, "Query parameter 'ref' required");
         }
         
-        File cachedFile = new File(cacheDir, ref);
+        File cachedFile = new File(cacheDir, ref + ".gz");
         File metadataFile = new File(cacheDir, ref + ".meta");
         
         if (!cachedFile.exists()) {
             URL refUrl = new URL(URLDecoder.decode(ref, StandardCharsets.US_ASCII.name()));
             HttpURLConnection connection = (HttpURLConnection) refUrl.openConnection();
             try {
-                if (connection.getResponseCode() / 100 == 2) { // Shorthand for 'is response successful'
-                    IOUtils.copy(connection.getInputStream(), new FileOutputStream(cachedFile));
+                if (connection.getResponseCode() / 100 == 2) { // Shorthand for 'is response successful?'
+                    try (OutputStream out = new GZIPOutputStream(new FileOutputStream(cachedFile))) {
+                        IOUtils.copy(connection.getInputStream(), out);
+                    }
                     
                     try (Writer writer = new FileWriter(metadataFile)) {
                         for (String headerName : connection.getHeaderFields().keySet()) {
@@ -91,6 +95,8 @@ public class FamilySearchImageCacheHandler extends AbstractHandler {
                                 writer.write(headerName + ":" + connection.getHeaderField(headerName) + '\n');
                             }
                         }
+                        writer.write("Content-Encoding:gzip");
+                        writer.write("Content-Length:" + cachedFile.length());
                     }
                 } else {
                     response.sendError(connection.getResponseCode(), connection.getResponseMessage());
@@ -122,7 +128,6 @@ public class FamilySearchImageCacheHandler extends AbstractHandler {
     }
 
     private static final Set<String> keepHeaders = new HashSet<String>() {{
-        add("Content-Length");
         add("Content-Type");
         add("Last-Modified");
         add("Etag");
