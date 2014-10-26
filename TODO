@@ -35,7 +35,7 @@ Ensure security of living person data
         OR
     Show only placeholder for living people
 Speed up caching
-    Add thread(s)
+    Add thread(s)                          DONE
     Use getAncestory function to get several generations at once
 
 
