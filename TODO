@@ -8,7 +8,7 @@ Delete access token on log out             DONE
 Speed up hosting
     zip/minify resources (static-resources) DONE
     zip/minify resources (image-cache)      DONE
-    allow client-side caching (static-resources images)
+    allow client-side caching (static-resources images) DONE
     allow client-side caching (image-cache)
     add server threads
 Add method for authenticating with devices
@@ -87,7 +87,8 @@ Undo feature?
 
 Life map:
 Test map movement (changed to 'send' commands; removed native 'move' commands) DONE
-Show life events on map
+Show life events on map for single person  DONE
+Show life events for family
 Fix mouse zoom (pinch) in split mode
 Fix buttons in split mode
 Add person chooser

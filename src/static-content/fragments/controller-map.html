@@ -44,6 +44,12 @@ POSSIBILITY OF SUCH DAMAGE.
     <button id="down-btn" class="btn btn-primary btn-lg"><span class="glyphicon glyphicon-arrow-down"></span></button>
     <button class="btn btn-primary btn-lg invisible"><span class="glyphicon glyphicon-arrow-right"></span></button>
 </div>
+<div>
+    <button class="btn btn-primary btn-lg invisible"><span class="glyphicon glyphicon-arrow-left"></span></button>
+    <button class="btn btn-primary btn-lg invisible"><span class="glyphicon glyphicon-arrow-right"></span></button>
+    <button class="btn btn-primary btn-lg invisible"><span class="glyphicon glyphicon-arrow-right"></span></button>
+    <button id="send-person" class="btn btn-primary btn-lg">Send</button>
+</div>
 
 <script>
     $("#left-btn").click(function (e) {
@@ -63,6 +69,9 @@ POSSIBILITY OF SUCH DAMAGE.
     });
     $("#zoom-in-btn").click(function (e) {
         sendToDisplay("{\"responseType\":\"zoom-in\"}");
+    });
+    $("#send-person").click(function (e) {
+        ws.socketSend("send-person " + token + " " + displayName + " KWJH-B6Z");
     });
     
     setHeaderName("Map");
