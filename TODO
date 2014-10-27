@@ -37,6 +37,7 @@ Ensure security of living person data
 Speed up caching
     Add thread(s)                          DONE
     Use getAncestory function to get several generations at once
+Allow timeouts on requests
 
 
 Puzzle:
@@ -69,21 +70,24 @@ Add get people with images call            DONE
 Make app controls a tab                    DONE
 Style tabs correctly                       DONE
 Figure out why image choice persists from puzzle to color
+Spacing between tabs and controls
 
 Person chooser:
 Move person-chooser from controller-person-detail
 Load the tree instead of just the family   DONE
 Make app controls a tab
 Allow searching and sorting of ancestors
+Spacing between tabs and controls
 
 Color:
 Add coloring game to menu                  DONE
 Use image chooser                          DONE
+Move image to opposite side from menu      DONE
 Set up print function
 Fix brush
-Move image to opposite side from menu      DONE
 Limit coloring to inside image
 Undo feature?
+Move palate and brushes to controller?
 
 Life map:
 Test map movement (changed to 'send' commands; removed native 'move' commands) DONE
@@ -100,8 +104,10 @@ Add multi-generation map mode
 
 Person detail:
 Fix birth and death dates                  DONE
-Add parents
+Add parents                                DONE
 Display more/all facts
+Add marriage date/place to spouse          DONE
+Filter marriage details
 
 Statistics:
 Implement basic family statistics
@@ -113,15 +119,16 @@ Make carousel content configurable
 Controller:
 Consistent frame between screens without redundancy DONE
 Collapse menu when log out pressed         DONE
+Add back button to standard header         DONE
 Set logged-in name when logged in          DONE
+Add back button to standard header         DONE
+Make header opaque so scrolling doesn't look weird DONE
+Add picture to the individual page         DONE
 Clear logged-in name when logged out
 Turn off log-out button when logged out
 Fix log-out button in split mode
 Disable navigation when logged out
-Add back button to standard header         DONE
 Set up accordian for groups of controls
-Make header opaque so scrolling doesn't look weird DONE
-Add picture to the individual page         DONE
 
 Library:
 Separate query params for page and fragment DONE

@@ -40,7 +40,8 @@ public class PersonReference {
     private String id;
     private String name;
     private String relationship;
-    private int depth;
+    private Fact[] facts;
+    private Integer depth;
 
     public PersonReference(String id, String name, String relationship) {
         this.id = id;
@@ -73,6 +74,15 @@ public class PersonReference {
 
     public int getDepth() {
         return depth;
+    }
+    
+    public PersonReference withFacts(Fact[] facts) {
+        this.facts = facts;
+        return this;
+    }
+    
+    public Fact[] getFacts() {
+        return facts;
     }
 
     @Override

@@ -33,6 +33,7 @@ import java.util.List;
 import org.familysearch.api.client.ft.FamilySearchFamilyTree;
 import org.familysearch.api.client.ft.FamilyTreePersonState;
 import org.gedcomx.conclusion.Name;
+import org.gedcomx.conclusion.Relationship;
 import org.gedcomx.rs.client.PersonChildrenState;
 import org.gedcomx.rs.client.PersonParentsState;
 import org.gedcomx.rs.client.PersonSpousesState;
@@ -70,7 +71,6 @@ public class FamilySearchPersonSource implements Source<Person> {
             builder.withGender(originalPerson.getGender().getKnownType().name());
 
             {
-                //TODO: set facts
                 List<org.gedcomx.conclusion.Fact> originalFacts = originalPerson.getFacts();
                 Fact[] facts = new Fact[originalFacts.size()];
                 int index = 0;
@@ -89,17 +89,17 @@ public class FamilySearchPersonSource implements Source<Person> {
 
             {
                 PersonParentsState parentsState = state.readParents();
-                builder.withParents(fsPersonsToPersonRefs(parentsState.getPersons()));
+                builder.withParents(fsPersonsToPersonRefs(parentsState.getPersons(), null));
             }
 
             {
                 PersonSpousesState spousesState = state.readSpouses();
-                builder.withSpouses(fsPersonsToPersonRefs(spousesState.getPersons()));
+                builder.withSpouses(fsPersonsToPersonRefs(spousesState.getPersons(), spousesState.getRelationships()));
             }
 
             {
                 PersonChildrenState childrenState = state.readChildren();
-                builder.withChildren(fsPersonsToPersonRefs(childrenState.getPersons()));
+                builder.withChildren(fsPersonsToPersonRefs(childrenState.getPersons(), null));
             }
 
             {
@@ -122,7 +122,7 @@ public class FamilySearchPersonSource implements Source<Person> {
         }
     }
 
-    private PersonReference[] fsPersonsToPersonRefs(List<org.gedcomx.conclusion.Person> persons) {
+    private PersonReference[] fsPersonsToPersonRefs(List<org.gedcomx.conclusion.Person> persons, List<Relationship> relationships) {
         if (persons == null) {
             return null;
         }
@@ -133,6 +133,26 @@ public class FamilySearchPersonSource implements Source<Person> {
             Name name = person.getName();
             String stringName = name == null ? null : name.getNameForm().getFullText();
             refs[i] = new PersonReference(person.getId(), stringName, null);
+            
+            if (relationships != null && relationships.size() > i) {
+                Relationship relationship = relationships.get(i);
+                if (relationship.getFacts() != null) {
+                    List<org.gedcomx.conclusion.Fact> originalFacts = relationship.getFacts();
+                    Fact[] facts = new Fact[originalFacts.size()];
+                    int index = 0;
+                    for (org.gedcomx.conclusion.Fact originalFact : originalFacts) {
+                        String date = originalFact.getDate() == null ? null : originalFact.getDate().getOriginal();
+                        String place = originalFact.getPlace() == null ? null : originalFact.getPlace().getOriginal();
+                        facts[index++] = new Fact(
+                                originalFact.getKnownType().name(), 
+                                date, 
+                                null, //TODO: Extract real timestamp from this
+                                place);
+                    }
+
+                    refs[i].withFacts(facts);
+                }
+            }
         }
         return refs;
     }

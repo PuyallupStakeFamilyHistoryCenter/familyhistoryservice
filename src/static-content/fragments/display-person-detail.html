@@ -120,8 +120,13 @@ POSSIBILITY OF SUCH DAMAGE.
         if (person.spouses) {
             $("#spouse-label").html(person.spouses.length > 1 ? "Spouses:" : "Spouse:");
             $("#spouse").html("");
-            $.each(person.spouses, function(index, value) {
-                $("#spouse").append(decodeURI(value.name) + "<br>");
+            $.each(person.spouses, function(index, spouse) {
+                $("#spouse").append(decodeURI(spouse.name) + "<br>");
+                if (spouse.facts) {
+                    $.each(spouse.facts, function(index, fact) {
+                        $("#spouse").append("<span style='margin-left:10px'><emph>" + fact.type + "</emph>" + fact.date + " - " + fact.place + "</span><br>");
+                    });
+                }
             });
         } else {
             $("#spouse-label").html("Spouse:");
