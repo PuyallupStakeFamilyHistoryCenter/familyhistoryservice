@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<!--
+Copyright (c) 2014, tibbitts
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+* Redistributions of source code must retain the above copyright notice, this
+  list of conditions and the following disclaimer.
+* Redistributions in binary form must reproduce the above copyright notice,
+  this list of conditions and the following disclaimer in the documentation
+  and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+POSSIBILITY OF SUCH DAMAGE.
+-->
+
+<script>
+    var target = getParameterByName("target");
+
+    settings.local = {
+        verbs: {
+            people: function(obj) {
+                var people = obj.people;
+                $.each(people, function (index, person) {
+                    $("#people").append("<button class='btn btn-default person-btn' data-id='" + person.id + "'>"+person.name+"</button>")
+                });
+                
+                var choiceType = getParameterByName("type");
+                $(".person-btn").click(function (e) {
+                    var id = $(this).attr("data-id");
+                    switch (choiceType) {
+                        case "person": {
+                            ws.socketSend("send-person " + token + " " + displayName + " " + id);
+                            break;
+                        }
+                        case "family": {
+                            ws.socketSend("send-family " + token + " " + displayName + " " + id);
+                            break;
+                        }
+                        case "ancestors": {
+                            ws.socketSend("send-ancestors " + token + " " + displayName + " " + id);
+                            break;
+                        }
+                        case "descendants": {
+                            ws.socketSend("send-ancestors " + token + " " + displayName + " " + id);
+                            break;
+                        }
+                    }
+
+                    //navigate("controller-" + target);
+                    innerNavigate("controller-" + target, "#controls");
+                    innerNavigate("display-person-detail?hide_image=true&person_id=" + id, "#person-info");
+
+                    $("#images-btn").removeClass("active");
+                    $("#person-info-btn").show().click().addClass("active");
+                    $("#controls-btn").show();
+                });
+            }
+        }
+    }
+
+    ws.socketSend("get-ancestors " + token + " " + settings.userId);
+</script>
+
+<ul class="nav nav-tabs" id="tabs" role="tablist">
+    <li class="active" id="people-btn" ><a href="#people" role="tab" data-toggle="tab">People</a></li>
+    <li id="person-info-btn" style="display: none" ><a href="#person-info" role="tab" data-toggle="tab">Person</a></li>
+    <li id="controls-btn" style="display: none" ><a href="#controls" role="tab" data-toggle="tab">Controls</a></li>
+</ul>
+<div id="people">
+
+</div>
+<div id="person-info" style="display: none;">
+
+</div>
+<div id="controls" style="display: none;">
+
+</div>
+
+<script>
+    $("#people-btn").click(function (e) {
+        $("#people").show();
+        $("#person-info").hide();
+        $("#controls").hide();
+    });
+
+    $("#person-info-btn").click(function (e) {
+        $("#people").hide();
+        $("#person-info").show();
+        $("#controls").hide();
+    });
+
+    $("#controls-btn").click(function (e) {
+        $("#people").hide();
+        $("#person-info").hide();
+        $("#controls").show();
+    });
+
+    function innerNavigate(dest, selector, timeout) {
+        if (!timeout) {
+            timeout = 1000;
+        }
+        var split = dest.split("?");
+        var actualDest = "fragments/" + split[0] + ".html";
+        var tempVars = null;
+        if (split.length > 1) {
+            actualDest += "?" + split[1];
+            tempVars = getUrlVars(split[1]);
+        }
+        var deferred = new $.Deferred();
+
+        console.info("Navigating to " + actualDest);
+        $.ajax(actualDest)
+                .done(
+                        function (data) {
+                            settings.local = {verbs: {}};
+                            fragmentVars = tempVars;
+                            $(selector).html(data);
+
+                            deferred.resolve();
+                        }
+                ).fail(
+                function (response) {
+                    logger.error("Could not load " + actualDest + " - " + response.statusText);
+                    deferred.reject();
+                }
+        );
+        setTimeout(function () {
+            deferred.reject();
+            //throw new Error("Timed out while loading " + dest);
+        }, timeout);
+
+        return deferred.promise();
+    }
+</script>

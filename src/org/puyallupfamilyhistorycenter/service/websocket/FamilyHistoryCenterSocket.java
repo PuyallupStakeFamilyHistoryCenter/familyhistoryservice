@@ -310,6 +310,18 @@ public class FamilyHistoryCenterSocket {
                     break;
                 }
                 
+                case "send-family": {
+                    token = scanner.next();
+                    String displayId = scanner.next();
+                    String personId = scanner.next();
+                    String accessToken = tokenToAccessToken(token);
+                    List<Person> family = personDao.listImmediateFamily(personId, accessToken);
+                    
+                    sendToDisplay(displayId, getPeopleResponse(family));
+                    
+                    break;
+                }
+                
                 case "get-ancestors": {
                     token = scanner.next();
                     String personId = scanner.next();

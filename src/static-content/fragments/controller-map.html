@@ -71,7 +71,7 @@ POSSIBILITY OF SUCH DAMAGE.
         sendToDisplay("{\"responseType\":\"zoom-in\"}");
     });
     $("#send-person").click(function (e) {
-        ws.socketSend("send-person " + token + " " + displayName + " KWJH-B6Z");
+        ws.socketSend("send-family " + token + " " + displayName + " KWJH-B6Z");
     });
     
     setHeaderName("Map");

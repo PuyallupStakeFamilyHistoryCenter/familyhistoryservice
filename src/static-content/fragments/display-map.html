@@ -31,33 +31,33 @@ POSSIBILITY OF SUCH DAMAGE.
 <script>
     settings.local = {
         verbs: {
-            "move-left": function() {
-                map.panBy(-100,0);
+            "move-left": function () {
+                map.panBy(-100, 0);
             },
-            "move-right": function() {
-                map.panBy(100,0);
+            "move-right": function () {
+                map.panBy(100, 0);
             },
-            "move-up": function() {
-                map.panBy(0,-100);
+            "move-up": function () {
+                map.panBy(0, -100);
             },
-            "move-down": function() {
-                map.panBy(0,100);
+            "move-down": function () {
+                map.panBy(0, 100);
             },
-            "zoom-out": function() {
-                map.setZoom(map.zoom-1);
+            "zoom-out": function () {
+                map.setZoom(map.zoom - 1);
             },
-            "zoom-in": function() {
-                map.setZoom(map.zoom+1);
+            "zoom-in": function () {
+                map.setZoom(map.zoom + 1);
             },
-            person: function(obj) {
+            person: function (obj) {
                 graphPerson(obj.person);
             },
-            people: function(obj) {
+            people: function (obj) {
                 graphPeople(obj.people);
             }
         }
     };
-    
+
     var map, geocoder;
     function initialize() {                // Create an array of styles.
         var styles = [
@@ -148,7 +148,7 @@ POSSIBILITY OF SUCH DAMAGE.
         //Associate the styled map with the MapTypeId and set it to display.
         map.mapTypes.set('ancestor_map', styledMap);
         map.setMapTypeId('ancestor_map');
-        
+
         geocoder = new google.maps.Geocoder();
     }
 
@@ -160,70 +160,100 @@ POSSIBILITY OF SUCH DAMAGE.
                 'callback=initialize';
         $("#content").append(script);
     }
-    
+
     function resize() {
         $("#map-container").height($(document).height());
         $("#map-container").width($(document).width());
     }
-    
+
     function graphPerson(person) {
         graphFacts(person.facts);
     }
-    
+
     function graphPeople(people) {
-        //TODO
+        var facts = [];
+
+        $.each(people, function (index, person) {
+            if (person.facts) {
+                $.each(person.facts, function (index, fact) {
+                    if (fact.type === "Birth" || index === 0) {
+                        facts.push(fact);
+                    }
+                });
+            }
+        });
+
+        graphFacts(facts);
     }
-    
+
+    var flightPath;
+    var markers;
     function graphFacts(facts) {
-        var flightPath = new google.maps.Polyline({
+        console.info("Graphing facts " + facts);
+        if (markers) {
+            $.each(markers, function(index, marker) {
+                marker.setMap(null);
+            });
+        }
+        markers = [];
+        if (flightPath) {
+            flightPath.setMap(null);
+        }
+        flightPath = new google.maps.Polyline({
             geodesic: true,
             strokeColor: '#FF0000',
             strokeOpacity: 1.0,
             strokeWeight: 2,
         });
         flightPath.setMap(map);
-            
+
         var promises = [];
-        $.each(facts, function(index, fact) {
+        $.each(facts, function (index, fact) {
             var promise = getLocationForAddress(fact.place);
             promises.push(promise);
         });
 
         Promise.all(promises).then(
-            function(results) {
-                $.each(results, function(index, result) {
-                    if (result) {
-                        flightPath.getPath().push(result);
-                        var fact = facts[index];
-                        var marker = new google.maps.Marker({
-                            position: result,
-                            map: map,                        
-                            //title: (factPersonMap[fact.id] ? factPersonMap[fact.id].$getDisplayName() + "  " : "") + fact.$getNormalizedPlace() + ": " + fact.type + " " + fact.$getNormalizedDate()
-                        });
-                    }
-                });
-                var bounds = new google.maps.LatLngBounds();
-                flightPath.getPath().forEach(function(latLng) {
-                    bounds.extend(latLng);
-                });
-                map.fitBounds(bounds);  
-            },
-            function(error) {
-                console.log(error);
-            }
+                function (results) {
+                    $.each(results, function (index, result) {
+                        if (result) {
+                            flightPath.getPath().push(result);
+                            var fact = facts[index];
+                            var marker = new google.maps.Marker({
+                                position: result,
+                                map: map,
+                                title: fact.place + ": " + fact.type + " " + fact.date
+                            });
+                            markers.push(marker);
+                        }
+                    });
+                    var bounds = new google.maps.LatLngBounds();
+                    flightPath.getPath().forEach(function (latLng) {
+                        bounds.extend(latLng);
+                    });
+                    map.fitBounds(bounds);
+                },
+                function (error) {
+                    console.log(error);
+                }
         );
 
-           
+
     }
-    
-    
-        
+
+    function clearOverlays() {
+        for (var i = 0; i < markersArray.length; i++) {
+            markersArray[i].setMap(null);
+        }
+        markersArray.length = 0;
+    }
+
     /*
      * Returns a promise that returns the location
      */
     function getLocationForAddress(address) {
-        return new Promise(function(resolve, reject) {
-            geocoder.geocode({address: address}, function(results, status) {
+        return new Promise(function (resolve, reject) {
+            geocoder.geocode({address: address}, function (results, status) {
                 if (status == google.maps.GeocoderStatus.OK) {
                     resolve(results[0].geometry.location);
                 } else if (status == google.maps.GeocoderStatus.OVER_QUERY_LIMIT) {
