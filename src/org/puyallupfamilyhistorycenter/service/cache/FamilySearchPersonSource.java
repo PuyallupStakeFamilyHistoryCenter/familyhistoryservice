@@ -67,7 +67,7 @@ public class FamilySearchPersonSource implements Source<Person> {
             if (name != null) {
                 builder.withName(name.getNameForm().getFullText());
             }
-            builder.withLiving(originalPerson.getLiving()); //TODO: Set is living
+            builder.withLiving(originalPerson.getLiving());
             builder.withGender(originalPerson.getGender().getKnownType().name());
 
             {
@@ -76,11 +76,12 @@ public class FamilySearchPersonSource implements Source<Person> {
                 int index = 0;
                 for (org.gedcomx.conclusion.Fact originalFact : originalFacts) {
                     String date = originalFact.getDate() == null ? null : originalFact.getDate().getOriginal();
+                    String sortableDate = originalFact.getDate() == null ? null : originalFact.getDate().getFormal();
                     String place = originalFact.getPlace() == null ? null : originalFact.getPlace().getOriginal();
                     facts[index++] = new Fact(
                             originalFact.getKnownType().name(), 
                             date, 
-                            null, //TODO: Extract real timestamp from this
+                            sortableDate,
                             place);
                 }
                 

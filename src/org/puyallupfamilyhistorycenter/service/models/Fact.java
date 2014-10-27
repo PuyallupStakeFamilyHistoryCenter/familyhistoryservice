@@ -39,13 +39,13 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 public class Fact {
     public final String type;
     public final String date;
-    public final Long timestamp;
+    public final String sortableDate;
     public final String place;
 
-    public Fact(String type, String date, Long timestamp, String place) {
+    public Fact(String type, String date, String sortableDate, String place) {
         this.type = type;
         this.date = date;
-        this.timestamp = timestamp;
+        this.sortableDate = sortableDate;
         this.place = place;
     }
 

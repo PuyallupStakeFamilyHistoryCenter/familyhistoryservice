@@ -50,8 +50,8 @@ public class PersonTest {
             { "{\"name\":\"Graham Trey Tibbitts\",\"living\":true}", new PersonBuilder().withName("Graham Trey Tibbitts").build() },
             { "{\"gender\":\"male\",\"living\":true}", new PersonBuilder().withGender("male").build() },
             { 
-                "{\"living\":true,\"facts\":[{\"type\":\"birth\",\"date\":\"23 December 1897\",\"timestamp\":1234,\"place\":\"San Jacinto, Riverside, California, United States\"}]}", 
-                new PersonBuilder().withFacts(new Fact[] {new Fact("birth", "23 December 1897", 1234l, "San Jacinto, Riverside, California, United States")}).build() 
+                "{\"living\":true,\"facts\":[{\"type\":\"birth\",\"date\":\"23 December 1897\",\"sortableDate\":\"18971223\",\"place\":\"San Jacinto, Riverside, California, United States\"}]}", 
+                new PersonBuilder().withFacts(new Fact[] {new Fact("birth", "23 December 1897", "18971223", "San Jacinto, Riverside, California, United States")}).build() 
             },
             { 
                 "{\"living\":true,\"parents\":[{\"id\":\"asdf-sdf\",\"name\":\"William Datus Tibbitts\",\"relationship\":\"father\"}]}", 
@@ -69,14 +69,14 @@ public class PersonTest {
                     + "\"name\":\"Graham Trey Tibbitts\","
                     + "\"gender\":\"male\","
                     + "\"living\":true,"
-                    + "\"facts\":[{\"type\":\"birth\",\"date\":\"23 December 1897\",\"timestamp\":1234,\"place\":\"San Jacinto, Riverside, California, United States\"}],"
+                    + "\"facts\":[{\"type\":\"birth\",\"date\":\"23 December 1897\",\"sortableDate\":\"18971223\",\"place\":\"San Jacinto, Riverside, California, United States\"}],"
                     + "\"parents\":[{\"id\":\"asdf-sdf\",\"name\":\"William Datus Tibbitts\",\"relationship\":\"father\"}],"
                     + "\"spouses\":[{\"id\":\"asdf-sdf\",\"name\":\"Katrina Kay Huffman\",\"relationship\":\"wife\"}],"
                     + "\"children\":[{\"id\":\"asdf-sdf\",\"name\":\"Allison Kay Huffman\",\"relationship\":\"daughter\"}]}", 
                 new PersonBuilder().withId("asdf-sdf")
                         .withName("Graham Trey Tibbitts")
                         .withGender("male")
-                        .withFacts(new Fact[] {new Fact("birth", "23 December 1897", 1234l, "San Jacinto, Riverside, California, United States")})
+                        .withFacts(new Fact[] {new Fact("birth", "23 December 1897", "18971223", "San Jacinto, Riverside, California, United States")})
                         .withParents(new PersonReference[] {new PersonReference("asdf-sdf", "William Datus Tibbitts", "father")})
                         .withSpouses(new PersonReference[] {new PersonReference("asdf-sdf", "Katrina Kay Huffman", "wife")})
                         .withChildren(new PersonReference[] {new PersonReference("asdf-sdf", "Allison Kay Huffman", "daughter")})

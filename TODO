@@ -78,6 +78,8 @@ Load the tree instead of just the family   DONE
 Make app controls a tab
 Allow searching and sorting of ancestors
 Spacing between tabs and controls
+Arrange people by family?
+Fix spacing between buttons
 
 Color:
 Add coloring game to menu                  DONE
@@ -93,14 +95,15 @@ Life map:
 Test map movement (changed to 'send' commands; removed native 'move' commands) DONE
 Show life events on map for single person  DONE
 Show life events for family                DONE
-Fix mouse zoom (pinch) in split mode
-Fix buttons in split mode
+Add timestamp to facts and sort            DONE
 Add person chooser                         DONE
 Add person info                            DONE
+Fix mouse zoom (pinch) in split mode
+Fix buttons in split mode
 Maybe add spiral effect from RootsMapper
 Load Google Maps API only once
-Add timestamp to facts and sort
 Add multi-generation map mode
+Remove parents from family mode
 
 Person detail:
 Fix birth and death dates                  DONE
