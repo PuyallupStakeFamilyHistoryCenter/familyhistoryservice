@@ -42,14 +42,10 @@ POSSIBILITY OF SUCH DAMAGE.
                 Gender:
             </dt>
             <dd id="gender"></dd>
-            <dt>
-                Birth:
-            </dt>
-            <dd id="birth"></dd>
-            <dt>
-                Death:
-            </dt>
-            <dd id="death"></dd>
+        </dl>
+        <dl class="dl-horizontal" id="facts-list">
+        </dl>
+        <dl class="dl-horizontal">
             <dt id="parents-label">
                 Parents:
             </dt>
@@ -92,21 +88,17 @@ POSSIBILITY OF SUCH DAMAGE.
         $("#gender").html(person.gender);
         
         if (person.facts) {
-            var factMap = {};
-            $.each(person.facts, function(index, fact) {
-                factMap[fact.type] = fact;
+            $("#facts-list").html("");
+            
+            var facts = sortFacts(person.facts);
+            
+            $.each(facts, function(index, fact) {
+                if (fact.type !== "OTHER") {
+                    $("#facts-list").append("<dt>" + fact.type + "</dt><dd>" + fact.date + " - " + fact.place + "</dd>")
+                }
             });
-
-            if (factMap["Birth"]) {
-                $("#birth").html(factMap["Birth"].date + " - " + factMap["Birth"].place);
-            } else {
-                $("#birth").html("unknown - unknown"); //TODO: Not working
-            }
-            if (factMap["Death"]) {
-                $("#death").html(factMap["Death"].date + " - " + factMap["Death"].place);
-            } else {
-                $("#death").html("unknown - unknown");
-            }
+            
+            console.info("All facts: " + JSON.stringify(facts));
         }
         
         if (person.parents) {

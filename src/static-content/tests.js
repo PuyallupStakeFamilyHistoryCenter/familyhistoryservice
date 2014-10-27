@@ -429,3 +429,62 @@ QUnit.test("Test log out", function (assert) {
 //QUnit.test("Test controller log in");
 //QUnit.test("Test controller log out");
 //QUnit.test("Test Object.toType (or remove)")
+
+QUnit.module("Test utils");
+
+QUnit.cases([
+    { title: "Empty", input:[], expected:[] },
+    { title: "By type", input:[
+            {type:"Burial"},
+            {type:"Death"},
+            {type:"Residence"},
+            {type:"Birth"}
+    ], expected:[
+            {type:"Birth"},
+            {type:"Residence"},
+            {type:"Death"},
+            {type:"Burial"}
+    ] },
+    { title: "By date", input:[
+            {type:"Residence", sortableDate:"+1920-10"},
+            {type:"Residence", sortableDate:"+1910-11-20"},
+            {type:"Residence", sortableDate:"+1900"}
+    ], expected:[
+            {type:"Residence", sortableDate:"+1900"},
+            {type:"Residence", sortableDate:"+1910-11-20"},
+            {type:"Residence", sortableDate:"+1920-10"}
+    ] },
+    { title: "By date and type", input:[
+            {type:"Burial"},
+            {type:"Death"},
+            {type:"Birth"},
+            {type:"Residence", sortableDate:"+1920-10"},
+            {type:"Residence", sortableDate:"+1910-11-20"},
+            {type:"Residence", sortableDate:"+1900"}
+    ], expected:[
+            {type:"Birth"},
+            {type:"Residence", sortableDate:"+1900"},
+            {type:"Residence", sortableDate:"+1910-11-20"},
+            {type:"Residence", sortableDate:"+1920-10"},
+            {type:"Death"},
+            {type:"Burial"},
+    ] },
+    { title: "By type fallback to date", input:[
+            {type:"Birth",place:"before"},
+            {type:"Birth", sortableDate:"+1910"},
+            {type:"Birth", sortableDate:"+1900-03"},
+            {type:"Birth", sortableDate:"+1900-01-31"},
+            {type:"Birth", sortableDate:"+1900"},
+            {type:"Birth",place:"after"},
+    ], expected:[
+            {type:"Birth", sortableDate:"+1900"},
+            {type:"Birth", sortableDate:"+1900-01-31"},
+            {type:"Birth", sortableDate:"+1900-03"},
+            {type:"Birth", sortableDate:"+1910"},
+            {type:"Birth",place:"before"},
+            {type:"Birth",place:"after"},
+    ] },
+]).test("Test sort facts", function(params, assert) {
+    var actual = sortFacts(params.input);
+    assert.deepEqual(params.expected, actual);
+});

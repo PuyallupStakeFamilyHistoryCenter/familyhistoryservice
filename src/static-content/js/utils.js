@@ -58,3 +58,35 @@ function getParameterByName(name) {
 function parseBool(b) {
     return b === "true";
 }
+
+
+function sortFacts(facts) {
+    facts.sort(function (a, b) {
+        //TODO: Smart sorting based on some fact types (e.g. Birth comes before all other events, Death comes before Burial, Burial comes after all other events"
+        if (a.type === b.type) {
+            //Sort identical types by date
+        } else if (a.type === "Birth") {
+            return -1;
+        } else if (b.type === "Birth") {
+            return 1;
+        } else if (a.type === "Burial") {
+            return 1;
+        } else if (b.type === "Burial") {
+            return -1
+        } else if (a.type === "Death") {
+            return 1;
+        } else if (a.type === "Death") {
+            return -1;
+        }
+        
+        var aDate = a.sortableDate;
+        var bDate = b.sortableDate;
+        if (bDate == null)
+            return -1;
+        if (aDate == null)
+            return 1;
+
+        return aDate < bDate ? -1 : 1;
+    });
+    return facts;
+}
