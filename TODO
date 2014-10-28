@@ -75,7 +75,7 @@ Spacing between tabs and controls
 Person chooser:
 Move person-chooser from controller-person-detail
 Load the tree instead of just the family   DONE
-Make app controls a tab
+Make app controls a tab                    DONE
 Allow searching and sorting of ancestors
 Spacing between tabs and controls
 Arrange people by family?
@@ -114,6 +114,12 @@ Filter marriage details
 
 Statistics:
 Implement basic family statistics
+
+Quiz:
+Implement basic quiz                       DONE
+Add more questions
+Allow answers to be pulled from random people
+Shuffle answers
 
 Display main:
 Put sample content into carousel           DONE

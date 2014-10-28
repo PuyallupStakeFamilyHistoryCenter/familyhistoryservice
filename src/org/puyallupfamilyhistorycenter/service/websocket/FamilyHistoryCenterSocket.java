@@ -368,7 +368,7 @@ public class FamilyHistoryCenterSocket {
                 
                 case "send": {
                     String id = scanner.next();
-                    String toSend = scanner.next(".*");
+                    String toSend = scanner.nextLine();
                     sendToDisplay(id, toSend);
                     break;
                 }

@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<!--
+Copyright (c) 2014, tibbitts
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+* Redistributions of source code must retain the above copyright notice, this
+  list of conditions and the following disclaimer.
+* Redistributions in binary form must reproduce the above copyright notice,
+  this list of conditions and the following disclaimer in the documentation
+  and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+POSSIBILITY OF SUCH DAMAGE.
+-->
+
+<h4>Answers</h4>
+<div id="answers">
+</div>
+
+<div id="hint" >
+</div>
+
+<button id="new-question" style="display: none;" class="btn btn-lg btn-primary">New question</button>
+
+<script>
+    var people;
+    settings.local = {
+        verbs: {
+            person: function(obj) {
+                people = [obj.person];
+                askQuestion();
+            },
+            people: function(obj) {
+                people = obj.people;
+                askQuestion();
+            }
+        }
+    }
+    
+    var personQuestionTemplates = [
+        {
+            prerequisites: [
+                'name',
+                'facts.Birth.date',
+                'facts.Death.date'
+            ],
+            question: "When was ${name} born?",
+            answers: [
+                { 
+                    text: '${facts.Birth.date}', 
+                    hint: "Correct! ${name} was born on ${facts.Birth.date} in ${facts.Birth.place} to ${parents.0.name} and ${parents.1.name}" 
+                },
+                { 
+                    text: '${facts.Death.date}', 
+                    hint: "No, but ${name} died on ${facts.Death.date} in ${facts.Death.place}" 
+                },
+//                { 
+//                    text: '${*.facts.*.date}'
+//                },
+            ],
+        },
+        {
+            prerequisites: [
+                'name',
+                'parents.0.name',
+                'parents.1.name',
+                'children.0.name',
+                'children.1.name',
+            ],
+            question: "Who were ${name}'s parents?",
+            answers: [
+                { 
+                    text: '${parents.0.name} and ${parents.1.name}', 
+                    hint: "Correct! ${name} was born on ${facts.Birth.date} in ${facts.Birth.place} to ${parents.0.name} and ${parents.1.name}" 
+                },
+                { 
+                    text: '${children.0.name} and ${children.1.name}', 
+                    hint: "No, those are his/her children!" 
+                },
+//                { 
+//                    text: '${*.name} and ${*.name}', 
+//                    hint: "No, those are his/her children!" 
+//                },
+            ],
+        },
+    ];
+    
+    function askQuestion() {
+        $("#new-question").show();
+        
+        var questionAndAnswers;
+        var maxTries = 100;
+        var currentTry = 0;
+        while (!questionAndAnswers && currentTry < maxTries) {
+            var person = getRandomElement(people);
+            var template = getRandomElement(personQuestionTemplates);
+            
+            if (satisfiesPrerequisites(person, template.prerequisites)) {
+                questionAndAnswers = createQuestion(person, template);
+            }
+            currentTry++;
+        }
+        
+        if (!questionAndAnswers) {
+            logger.error("Failed to create question");
+            return;
+        }
+        
+        sendQuestion(questionAndAnswers.question);
+        setAnswers(questionAndAnswers.answers);
+    }
+    
+    function createQuestion(person, template) {
+        var questionAndAnswers = {};
+            
+        console.info("Trying to create question " + JSON.stringify(template) + " for person " + JSON.stringify(person));
+        
+        questionAndAnswers.question = replaceVariables(person, template.question);
+        questionAndAnswers.answers = [];
+        
+        console.info("Got question '" + questionAndAnswers.question + "'")
+        
+        $.each(template.answers, function(index, answerTemplate) {
+            var answer = {};
+            answer.text = replaceVariables(person, answerTemplate.text);
+            if (answerTemplate.hint) {
+                answer.hint = replaceVariables(person, answerTemplate.hint);
+            }
+            console.info("Got answer '" + answer + "'");
+            questionAndAnswers.answers.push(answer);
+        });
+        
+        return questionAndAnswers;
+    }
+    
+    function replaceVariables(person, original) {
+        var regex = /\$\{([^\}]+)\}/g;
+        var matches = original.match(regex);
+        
+        if (!matches) {
+            return original;
+        }
+        
+        var final = original;
+        $.each(matches, function(index, found) {
+            var variable = found.substr(2, found.length - 3);
+            final = final.replace(found, resolveChildProperty(person, variable)); 
+        });
+        
+        return final;
+    }
+    
+    function satisfiesPrerequisites(person, prerequisites) {
+        if (person.living) {
+            return false;
+        }
+        
+        var hasPrerequisites = true;
+        $.each(prerequisites, function(index, prerequisite) {
+            if (!resolveChildProperty(person, prerequisite)) {
+                console.info("Could not resolve prerequisite " + prerequisite + " in person " + JSON.stringify(person));
+                hasPrerequisites = false;
+            }
+        });
+        
+        return hasPrerequisites;
+    }
+    
+    function resolveChildProperty(person, path) {
+        var split = path.split(".");
+        var currentObject = person;
+        
+        $.each(split, function(index, key) {
+            if (!currentObject) {
+                return;
+            }
+            
+            if (index > 0 && split[index-1] === "facts") {
+                // Loop through facts until found
+                $.each(currentObject, function(index, fact) {
+                    if (fact.type === key) {
+                        currentObject = fact;
+                    }
+                });
+            } else if (currentObject && currentObject[key]) {
+                currentObject = currentObject[key];
+            } else {
+                currentObject = null;
+            }
+        });
+        
+        return currentObject;
+    }
+    
+    function sendQuestion(question) {
+        ws.socketSend("send " + displayName + " {\"responseType\":\"question\",\"question\":\"" + question + "\"}");
+    }
+    
+    function setAnswers(answers) {
+        $("#hint").html("");
+        $("#answers").html("");
+        //TODO: Shuffle answers
+        $.each(answers, function(index, answer) {
+            $("#answers").append('<button data-id="' + index + '"' + (answer.hint?' data-hint="' + answer.hint + '"':'') + ' class="btn btn-default btn-lg answer-btn" >' + answer.text + "</button>");
+        });
+        
+        $(".answer-btn").click(function() {
+            var id = $(this).attr("data-id");
+            if (id === "0") {
+                $(this).addClass("btn-success");
+                $(this).parent().children().prop("disabled", "true");
+            } else {
+                $(this).addClass("btn-danger");
+                $(this).prop("disabled", "true");
+            }
+            
+            var hint = $(this).attr("data-hint");
+            if (hint) {
+                $("#hint").html(hint);
+            } else {
+                $("#hint").html("");
+            }
+        });
+    }
+    
+    $("#new-question").click(askQuestion);
+    
+    ws.socketSend("get-ancestors " + token + " " + settings.userId);
+    
+    asdf();
+</script>

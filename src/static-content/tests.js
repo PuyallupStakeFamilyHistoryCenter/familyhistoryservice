@@ -488,3 +488,82 @@ QUnit.cases([
     var actual = sortFacts(params.input);
     assert.deepEqual(params.expected, actual);
 });
+
+
+
+QUnit.module("Test quiz functions", {
+    setup: function (assert) {
+        $("#qunit-fixture").html("<div id='messages'></div><div id='page-header'></div><div id='content'></div>");
+        //NOTE: Don't try to change location.search from within the test; it causes a page refresh
+        configureSockete([
+            { verb: "ping", response: "{\"responseType\":\"pong\"}" }
+        ]);
+        content = null;
+        mode = null;
+        displayName = null;
+        settings.page = {verbs: {}};
+        settings.local = {verbs: {}};
+        token = null;
+        userName = null;
+        urlVars = null;
+        $.cookie("display-name", "336f7a86");
+        urlVars = { mode: "controller" };
+        getReady();
+    },
+    teardown: function() {
+        ws.close();
+    }
+});
+
+
+QUnit.cases([
+    { title: "Empty", person:{}, path:"", expected: null },
+    { title: "Name", person:{name:"Graham Tibbitts"}, path:"name", expected: "Graham Tibbitts"},
+    { title: "Birth date", person:{name:"Graham Tibbitts", facts:[{type:"Birth",date:"2014-10-27"}]}, path:"facts.Birth.date", expected: "2014-10-27"},
+    { title: "Array index", person:{name:"Graham Tibbitts", spouses:[{id:"asdf",name:"Katrina Tibbitts"}]}, path:"spouses.0.id", expected: "asdf"},
+]).test("Test resolveChildProperty", function(params, assert) {
+    assert.expect(1);
+    QUnit.stop();
+    navigate("controller-quiz", 1000).then(function() {
+        var actual = resolveChildProperty(params.person, params.path);
+        assert.deepEqual(actual, params.expected);
+        QUnit.start();
+    }).fail(function() {
+        QUnit.start();
+    });
+});
+
+QUnit.cases([
+    { title: "Empty", person:{}, prerequisites:[], expected: true },
+    { title: "Living", person:{living:true}, prerequisites:[], expected: false },
+    { title: "Missing name", person:{}, prerequisites:["name"], expected: false },
+    { title: "Name", person:{name:"Graham Tibbitts"}, prerequisites:["name"], expected: true },
+    { title: "Name and missing birth date", person:{name:"Graham Tibbitts"}, prerequisites:["name", "facts.Birth.date"], expected: false },
+    { title: "Name and birth date", person:{name:"Graham Tibbitts", facts:[{type:"Birth",date:"2014-10-27"}]}, prerequisites:["name", "facts.Birth.date"], expected: true },
+]).test("Test satisfiesPrerequisites", function(params, assert) {
+    assert.expect(1);
+    QUnit.stop();
+    navigate("controller-quiz", 1000).then(function() {
+        var actual = satisfiesPrerequisites(params.person, params.prerequisites);
+        assert.equal(actual, params.expected);
+        QUnit.start();
+    }).fail(function() {
+        QUnit.start();
+    });
+});
+
+QUnit.cases([
+    { title: "Empty", person:{}, original:"", expected: "" },
+    { title: "Name", person:{name:"Graham Tibbitts"}, original:"My name is ${name}", expected: "My name is Graham Tibbitts" },
+    { title: "Name and birth date", person:{name:"Graham Tibbitts", facts:[{type:"Birth",date:"2014-10-27"}]}, original: "${name} was born on ${facts.Birth.date}", expected: "Graham Tibbitts was born on 2014-10-27" },
+]).test("Test replaceVariables", function(params, assert) {
+    assert.expect(1);
+    QUnit.stop();
+    navigate("controller-quiz", 1000).then(function() {
+        var actual = replaceVariables(params.person, params.original);
+        assert.equal(actual, params.expected);
+        QUnit.start();
+    }).fail(function() {
+        QUnit.start();
+    });
+});

@@ -90,3 +90,11 @@ function sortFacts(facts) {
     });
     return facts;
 }
+
+function rand(min, max) {
+    return Math.floor(Math.random() * (max - min)) + min;
+}
+
+function getRandomElement(array) {
+    return array[rand(0, array.length)];
+}
