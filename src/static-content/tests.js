@@ -570,3 +570,26 @@ QUnit.cases([
         QUnit.start();
     });
 });
+
+QUnit.cases([
+    { title: "Empty", array:[], filters:"", expected: [] },
+    { title: "Single filter", array:[{gender:"Male"},{gender:"Female"}], filters:"gender=Female", expected: [{gender:"Female"}] },
+    { title: "Single filter w/ missing key", array:[{},{gender:"Female"}], filters:"gender=Female", expected: [{gender:"Female"}] },
+    { title: "Single filter numeric", array:[{age:25},{age:26}], filters:"age=26", expected: [{age:26}] },
+    { title: "Single filter boolean", array:[{living:false},{living:true}], filters:"living=false", expected: [{living:false}] },
+//    { title: "Single filter numeric >", array:[{age:25},{age:26}], filters:"age>25", expected: [{age:26}] },
+//    { title: "Single filter numeric >=", array:[{age:25},{age:26}], filters:"age>=26", expected: [{age:26}] },
+//    { title: "Single filter numeric <=", array:[{age:25},{age:26}], filters:"age<=25", expected: [{age:25}] },
+//    { title: "Single filter numeric <", array:[{age:25},{age:26}], filters:"age<26", expected: [{age:25}] },
+    { title: "Compound filter", array:[{gender:"Male",age:25},{gender:"Female",age:26},{gender:"Male",age:26},{gender:"Female",age:28}], filters:"age=26,gender=Female", expected: [{gender:"Female",age:26}] },
+]).test("Test filterArray", function(params, assert) {
+    assert.expect(1);
+    QUnit.stop();
+    navigate("controller-quiz", 1000).then(function() {
+        var actual = filterArray(params.array, params.filters);
+        assert.deepEqual(actual, params.expected);
+        QUnit.start();
+    }).fail(function() {
+        QUnit.start();
+    });
+});

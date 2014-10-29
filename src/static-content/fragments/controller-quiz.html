@@ -76,36 +76,60 @@ POSSIBILITY OF SUCH DAMAGE.
                 'name',
                 'parents.0.name',
                 'parents.1.name',
-                'children.0.name',
-                'children.1.name',
+                'children.*,gender=Male.name',
+                'children.*,gender=Female.name',
             ],
             question: "Who were ${name}'s parents?",
             answers: [
                 { 
-                    text: '${parents.0.name} and ${parents.1.name}', 
-                    hint: "Correct! ${name} was born on ${facts.Birth.date} in ${facts.Birth.place} to ${parents.0.name} and ${parents.1.name}" 
+                    text: '${parents.*,gender=Male.name} and ${parents.*,gender=Female.name}', 
+                    hint: "Correct! ${name} was born on ${facts.Birth.date} in ${facts.Birth.place} to ${parents.*,gender=Male.name} and ${parents.*,gender=Female.name}" 
                 },
                 { 
-                    text: '${children.*.name} and ${children.*.name}', 
+                    text: '${children.*,gender=Male.name} and ${children.*,gender=Female.name}', 
                     hint: "No, those are his/her children!" 
                 },
-//                { 
-//                    text: '${*.name} and ${*.name}', 
-//                    hint: "No, those are his/her children!" 
-//                },
+                { 
+                    text: '${*,gender=Male,living=false.name} and ${children.*,gender=Female.name}', 
+                },
+                { 
+                    text: '${parents.*,gender=Male.name} and ${*,gender=Female,living=false.name}'
+                },
             ],
         },
+        {
+            prerequisites: [
+                'name',
+                'images.0'
+            ],
+            question: "<img src='${images.*}' style='max-width:300px; max-height:300px' /><br>Who is this?",
+            answers: [
+                { 
+                    text: '${name}', 
+                    hint: "Correct!" 
+                },
+                { 
+                    text: '${*.name}'
+                },
+                { 
+                    text: "That's not a person!"
+                },
+            ],
+        },
+        
+        //Question ideas
+        //
     ];
     
     function askQuestion() {
         $("#new-question").show();
+        var template = getRandomElement(personQuestionTemplates);
         
         var questionAndAnswers;
         var maxTries = 100;
         var currentTry = 0;
         while (!questionAndAnswers && currentTry < maxTries) {
-            var person = getRandomElement(people);
-            var template = getRandomElement(personQuestionTemplates);
+            var person = getRandomElement(filterArray(people, "living=false"));
             
             if (satisfiesPrerequisites(person, template.prerequisites)) {
                 questionAndAnswers = createQuestion(person, template);
@@ -191,10 +215,10 @@ POSSIBILITY OF SUCH DAMAGE.
                     return;
                 }
 
-                if (key === "*" && index === 0) {
-                    currentObject = getRandomElement(people);
-                } else if (key === "*") {
-                    currentObject = getRandomElement(currentObject);
+                if (key[0] === "*" && index === 0) {
+                    currentObject = getRandomElement(filterArray(people, key.substr(1)));
+                } else if (key[0] === "*") {
+                    currentObject = getRandomElement(filterArray(currentObject, key.substr(1)));
                 } else if (index > 0 && split[index-1] === "facts") {
                     // Loop through facts until found
                     $.each(currentObject, function(index, fact) {
@@ -211,6 +235,30 @@ POSSIBILITY OF SUCH DAMAGE.
         } while (split[0] === "*" && currentObject === null && currentTry < maxTries);
         
         return currentObject;
+    }
+    
+    function filterArray(array, rawFilters) {
+        var split = rawFilters.split(',');
+        
+        var currentArray = array;
+        $.each(split, function(index, rawFilter) {
+            var newArray = [];
+            var splitFilter = rawFilter.split("=");
+            var filterKey = splitFilter[0];
+            var filterValue = splitFilter[1];
+            
+            $.each(currentArray, function(index2, arrayValue) {
+                if (arrayValue[filterKey] != null && arrayValue[filterKey].toString && arrayValue[filterKey].toString() === filterValue) {
+                    newArray.push(arrayValue);
+                } else if (arrayValue[filterKey] == filterValue) {
+                    newArray.push(arrayValue);
+                }
+            });
+            
+            currentArray = newArray;
+        });
+        
+        return currentArray;
     }
     
     function sendQuestion(question) {

@@ -39,6 +39,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 public class PersonReference {
     private String id;
     private String name;
+    private String gender;
     private String relationship;
     private Fact[] facts;
     private Integer depth;
@@ -83,6 +84,15 @@ public class PersonReference {
     
     public Fact[] getFacts() {
         return facts;
+    }
+    
+    public PersonReference withGender(String gender) {
+        this.gender = gender;
+        return this;
+    }
+
+    public String getGender() {
+        return gender;
     }
 
     @Override

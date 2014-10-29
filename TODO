@@ -127,7 +127,11 @@ Difficulty levels
     Give questions difficulty grades
 Automatically grade questions based on answer frequency
 Automatically grade answers based on answer frequency
-Allow star operator to filter on gender, etc
+Allow star operator to filter on gender, etc DONE
+Allow more complex filters (e.g. >, >=)
+Allow filter based on main person's attributes
+Image questions should use persona info from FS
+Rethink layout
 
 Display main:
 Put sample content into carousel           DONE
