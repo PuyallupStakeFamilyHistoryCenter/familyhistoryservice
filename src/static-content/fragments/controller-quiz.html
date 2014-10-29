@@ -25,8 +25,9 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 -->
 
-<h4>Answers</h4>
-<div id="answers">
+<h3>Answers</h3>
+<div id="score"></div>
+<div id="answers" class="btn-group-vertical">
 </div>
 
 <div id="hint" >
@@ -69,6 +70,9 @@ POSSIBILITY OF SUCH DAMAGE.
                 { 
                     text: '${*.facts.*.date}'
                 },
+                { 
+                    text: '${*.facts.*.date}'
+                },
             ],
         },
         {
@@ -102,11 +106,14 @@ POSSIBILITY OF SUCH DAMAGE.
                 'name',
                 'images.0'
             ],
-            question: "<img src='${images.*}' style='max-width:300px; max-height:300px' /><br>Who is this?",
+            question: "Who is this?<br><img src='${images.*}' style='max-width:600px; max-height:600px' />",
             answers: [
                 { 
                     text: '${name}', 
                     hint: "Correct!" 
+                },
+                { 
+                    text: '${*.name}'
                 },
                 { 
                     text: '${*.name}'
@@ -265,6 +272,8 @@ POSSIBILITY OF SUCH DAMAGE.
         ws.socketSend("send " + displayName + " {\"responseType\":\"question\",\"question\":\"" + question + "\"}");
     }
     
+    var totalCorrect = 0;
+    var totalAnswered = 0;
     function setAnswers(answers) {
         $("#hint").html("");
         $("#answers").html("");
@@ -277,7 +286,8 @@ POSSIBILITY OF SUCH DAMAGE.
             var id = $(this).attr("data-id");
             if (id === "0") {
                 $(this).addClass("btn-success");
-                $(this).parent().children().prop("disabled", "true");
+                $(this).parent().parent().children().children().prop("disabled", "true");
+                totalCorrect++;
             } else {
                 $(this).addClass("btn-danger");
                 $(this).prop("disabled", "true");
@@ -289,6 +299,9 @@ POSSIBILITY OF SUCH DAMAGE.
             } else {
                 $("#hint").html("");
             }
+            
+            totalAnswered++;
+            $("#score").html(totalCorrect + "/" + totalAnswered + " (" + Math.round(totalCorrect * 10000 / totalAnswered) / 100 + "%)")
         });
     }
     
