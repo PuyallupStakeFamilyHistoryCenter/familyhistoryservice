@@ -66,9 +66,9 @@ POSSIBILITY OF SUCH DAMAGE.
                     text: '${facts.Death.date}', 
                     hint: "No, but ${name} died on ${facts.Death.date} in ${facts.Death.place}" 
                 },
-//                { 
-//                    text: '${*.facts.*.date}'
-//                },
+                { 
+                    text: '${*.facts.*.date}'
+                },
             ],
         },
         {
@@ -86,7 +86,7 @@ POSSIBILITY OF SUCH DAMAGE.
                     hint: "Correct! ${name} was born on ${facts.Birth.date} in ${facts.Birth.place} to ${parents.0.name} and ${parents.1.name}" 
                 },
                 { 
-                    text: '${children.0.name} and ${children.1.name}', 
+                    text: '${children.*.name} and ${children.*.name}', 
                     hint: "No, those are his/her children!" 
                 },
 //                { 
@@ -180,26 +180,35 @@ POSSIBILITY OF SUCH DAMAGE.
     
     function resolveChildProperty(person, path) {
         var split = path.split(".");
-        var currentObject = person;
+        var currentObject;
+        var currentTry = 0;
+        var maxTries = 10;
         
-        $.each(split, function(index, key) {
-            if (!currentObject) {
-                return;
-            }
-            
-            if (index > 0 && split[index-1] === "facts") {
-                // Loop through facts until found
-                $.each(currentObject, function(index, fact) {
-                    if (fact.type === key) {
-                        currentObject = fact;
-                    }
-                });
-            } else if (currentObject && currentObject[key]) {
-                currentObject = currentObject[key];
-            } else {
-                currentObject = null;
-            }
-        });
+        do {
+            currentObject = person;
+            $.each(split, function(index, key) {
+                if (!currentObject) {
+                    return;
+                }
+
+                if (key === "*" && index === 0) {
+                    currentObject = getRandomElement(people);
+                } else if (key === "*") {
+                    currentObject = getRandomElement(currentObject);
+                } else if (index > 0 && split[index-1] === "facts") {
+                    // Loop through facts until found
+                    $.each(currentObject, function(index, fact) {
+                        if (fact.type === key) {
+                            currentObject = fact;
+                        }
+                    });
+                } else if (currentObject && currentObject[key]) {
+                    currentObject = currentObject[key];
+                } else {
+                    currentObject = null;
+                }
+            });
+        } while (split[0] === "*" && currentObject === null && currentTry < maxTries);
         
         return currentObject;
     }
@@ -238,6 +247,4 @@ POSSIBILITY OF SUCH DAMAGE.
     $("#new-question").click(askQuestion);
     
     ws.socketSend("get-ancestors " + token + " " + settings.userId);
-    
-    asdf();
 </script>

@@ -120,6 +120,14 @@ Implement basic quiz                       DONE
 Add more questions
 Allow answers to be pulled from random people
 Shuffle answers
+Basic duplicate answer detection
+Allow selection of people
+Difficulty levels
+    Configurable # answers
+    Give questions difficulty grades
+Automatically grade questions based on answer frequency
+Automatically grade answers based on answer frequency
+Allow star operator to filter on gender, etc
 
 Display main:
 Put sample content into carousel           DONE

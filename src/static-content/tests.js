@@ -521,6 +521,9 @@ QUnit.cases([
     { title: "Name", person:{name:"Graham Tibbitts"}, path:"name", expected: "Graham Tibbitts"},
     { title: "Birth date", person:{name:"Graham Tibbitts", facts:[{type:"Birth",date:"2014-10-27"}]}, path:"facts.Birth.date", expected: "2014-10-27"},
     { title: "Array index", person:{name:"Graham Tibbitts", spouses:[{id:"asdf",name:"Katrina Tibbitts"}]}, path:"spouses.0.id", expected: "asdf"},
+    { title: "Star operator array single option", person:{name:"Graham Tibbitts", spouses:[{id:"asdf",name:"Katrina Tibbitts"}]}, path:"spouses.*.id", expected: "asdf"},
+    { title: "Star operator array multiple options", person:{name:"Graham Tibbitts", children:[{id:"asdf",name:"Allison Tibbitts"},{id:"asdf",name:"James Tibbitts"}]}, path:"children.*.id", expected: "asdf"},
+    //{ title: "Star operator object", person:{name:"Graham Tibbitts", children:[{id:"asdf"}]}, path:"children.0.*", expected: "asdf"}, TODO: Not working
 ]).test("Test resolveChildProperty", function(params, assert) {
     assert.expect(1);
     QUnit.stop();
