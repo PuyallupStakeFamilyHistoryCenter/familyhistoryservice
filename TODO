@@ -147,6 +147,10 @@ Fix log-out button in split mode
 Disable navigation when logged out
 Set up accordian for groups of controls
 
+Kiosk:
+Show FS permissions dialog                 DONE
+Revoke access token if permissions rejected
+
 Library:
 Separate query params for page and fragment DONE
 Rewire sockete.js to accept a response callback

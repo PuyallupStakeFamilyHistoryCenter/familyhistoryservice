@@ -99,12 +99,47 @@ POSSIBILITY OF SUCH DAMAGE.
     </div>
 </div>
 
+<div id="permissions-modal" class="modal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" id="close-permissions-btn"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <img src="/media/FSMosaicTreeLogo.png" style="height: 50px" />
+            </div>
+            <div class="modal-body">
+                <h4>Puyallup Stake Family History Center would like to:</h4>
+
+                <hr>
+
+                <p style="font-size: 16px">
+                    <span class="glyphicon glyphicon-user" style="font-size: 20px"></span>
+                    Know your basic FamilySearch profile information
+                </p>
+
+                <p style="font-size: 16px">
+                    <span class="glyphicon glyphicon-cloud-download" style="font-size: 20px"></span>
+                    Access data about your ancestors from FamilySearch Family Tree
+                </p>
+
+                <p class="small">
+                Puyallup Stake Family History Center will use this information in accordance with their respective terms of service and privacy policies.
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="accept-permissions-btn">Accept</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal" id="cancel-permissions-btn">Cancel</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div>
+
 <script src="js/familysearch-javascript-sdk.min.js"></script>
 
 <script>
+    var timeout;
     settings.local = {
         verbs: {
-            "app-key": function(obj) {
+            "app-key": function (obj) {
                 FamilySearch.init({
                     app_key: obj.key,
                     environment: obj.environment,
@@ -126,69 +161,90 @@ POSSIBILITY OF SUCH DAMAGE.
 
     $("#show-login-screen").click(function (event) {
         event.preventDefault();
-        
+
         $("#login-start").hide();
         $("#login-wait").show();
 
-        var timeout = setTimeout(function () {
-            navigate("kiosk-main");
-            warn("Timeout logging into FamilySearch. Please try again.", 5000);
+        timeout = setTimeout(function () {
+            reset("Timeout logging into FamilySearch. Please try again.");
         }, 60000);
-        
+
         FamilySearch.getAccessToken().then(function (accessToken) {
             $("#messages").html("");
             clearTimeout(timeout);
             timeout = setTimeout(function () {
-                navigate("kiosk-main");
-                warn("Timeout setting PIN. Please log in again", 5000);
+                reset("Timeout accepting permissions. Please log in again");
             }, 60000);
 
-            FamilySearch.getCurrentUser().then(function (result) {
-                var user = result.getUser();
-                var displayName = user.displayName;
-                var userId = user.personId;
-//                var displayName = "Willow Ufgood"; //["Willow Ufgood", "Luke Skywalker", "Indiana Jones"][//Choose random element];
-//                var userId = "AEF-2344";        //TODO
-//                var accessToken = "fake-access-token-replace-with-actual";
+            $("#permissions-modal").modal("show");
 
-                $("#user-name").html(displayName);
-
-                $("#login-wait").hide();
-                $("#login-continue").show();
-
-                $("#set-pin-form").submit(function (event) {
-                    $("#messages").html("");
-                    event.preventDefault();
-                    clearTimeout(timeout);
-
-                    var pin = $("#pin-input").val();
-                    var pinConfirm = $("#pin-confirm").val();
-
-                    if (pin !== pinConfirm) {
-                        //TODO: Replace this with actual validation
-                        logger.error("PINs don't match");
-                        timeout = setTimeout(function () {
-                            navigate("kiosk-main");
-                            warn("Timeout creating PIN. Please log in again.", 5000);
-                        }, 60000);
-                        return;
-                    }
-
-
-                    settings.page.gotAccessToken(userId, displayName, pin, accessToken);
-
-                    $("#login-continue").hide();
-                    $("#login-success").show();
-                    setTimeout(function () {
-                        navigate("kiosk-main");
-                    }, 10000);
-                });
+            $("#cancel-permissions-btn, #close-permissions-btn").click(function() {
+                //TODO: Revoke access token
+                reset("You must accept the permissions from FamilySearch.org to log into the Puyallup Stake Family History Center");
             });
+            $("#accept-permissions-btn").click(function() {
+                $("#permissions-modal").modal("hide");
+                $("#messages").html("");
+                clearTimeout(timeout);
+                timeout = setTimeout(function () {
+                    reset("Timeout setting PIN. Please log in again");
+                }, 60000);
+
+                FamilySearch.getCurrentUser().then(function (result) {
+                    var user = result.getUser();
+                    var displayName = user.displayName;
+                    var userId = user.personId;
+//                    var displayName = "Willow Ufgood"; //["Willow Ufgood", "Luke Skywalker", "Indiana Jones"][//Choose random element];
+//                    var userId = "AEF-2344";        //TODO
+//                    var accessToken = "fake-access-token-replace-with-actual";
+
+                    $("#user-name").html(displayName);
+
+                    $("#login-wait").hide();
+                    $("#login-continue").show();
+
+                    $("#set-pin-form").submit(function (event) {
+                        $("#messages").html("");
+                        event.preventDefault();
+                        clearTimeout(timeout);
+
+                        var pin = $("#pin-input").val();
+                        var pinConfirm = $("#pin-confirm").val();
+
+                        if (pin !== pinConfirm) {
+                            //TODO: Replace this with actual validation
+                            logger.error("PINs don't match");
+                            timeout = setTimeout(function () {
+                                navigate("kiosk-main");
+                                warn("Timeout creating PIN. Please log in again.", 5000);
+                            }, 60000);
+                            return;
+                        }
 
 
+                        settings.page.gotAccessToken(userId, displayName, pin, accessToken);
+
+                        $("#login-continue").hide();
+                        $("#login-success").show();
+                        setTimeout(function () {
+                            reset();
+                        }, 10000);
+                    });
+                });
+
+
+            });
         });
-
     });
+
+    function reset(message) {
+        $("#permissions-modal").modal("hide");
+        if (timeout) clearTimeout(timeout);
+        navigate("kiosk-main");
+        if (message) {
+            logger.warn(message, 5000);
+        }
+    }
 </script>
 
 
