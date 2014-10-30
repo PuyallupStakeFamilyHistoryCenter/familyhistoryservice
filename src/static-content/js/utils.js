@@ -98,3 +98,30 @@ function rand(min, max) {
 function getRandomElement(array) {
     return array[rand(0, array.length)];
 }
+
+
+    
+function filterArray(array, rawFilters) {
+    var split = rawFilters.split(',');
+
+    var currentArray = array;
+    $.each(split, function(index, rawFilter) {
+        var newArray = [];
+        var splitFilter = rawFilter.split("=");
+        var filterKey = splitFilter[0];
+        var filterValue = splitFilter[1];
+
+        $.each(currentArray, function(index2, arrayValue) {
+            if (arrayValue[filterKey] != null && arrayValue[filterKey].toString && arrayValue[filterKey].toString() === filterValue) {
+                newArray.push(arrayValue);
+            } else if (arrayValue[filterKey] == filterValue) {
+                newArray.push(arrayValue);
+            }
+        });
+
+        currentArray = newArray;
+    });
+
+    return currentArray;
+}
+

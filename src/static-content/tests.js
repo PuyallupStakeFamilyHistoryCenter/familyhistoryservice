@@ -489,6 +489,23 @@ QUnit.cases([
     assert.deepEqual(params.expected, actual);
 });
 
+QUnit.cases([
+    { title: "Empty", array:[], filters:"", expected: [] },
+    { title: "Single filter", array:[{gender:"Male"},{gender:"Female"}], filters:"gender=Female", expected: [{gender:"Female"}] },
+    { title: "Single filter w/ missing key", array:[{},{gender:"Female"}], filters:"gender=Female", expected: [{gender:"Female"}] },
+    { title: "Single filter numeric", array:[{age:25},{age:26}], filters:"age=26", expected: [{age:26}] },
+    { title: "Single filter boolean", array:[{living:false},{living:true}], filters:"living=false", expected: [{living:false}] },
+//    { title: "Single filter numeric >", array:[{age:25},{age:26}], filters:"age>25", expected: [{age:26}] },
+//    { title: "Single filter numeric >=", array:[{age:25},{age:26}], filters:"age>=26", expected: [{age:26}] },
+//    { title: "Single filter numeric <=", array:[{age:25},{age:26}], filters:"age<=25", expected: [{age:25}] },
+//    { title: "Single filter numeric <", array:[{age:25},{age:26}], filters:"age<26", expected: [{age:25}] },
+    { title: "Compound filter", array:[{gender:"Male",age:25},{gender:"Female",age:26},{gender:"Male",age:26},{gender:"Female",age:28}], filters:"age=26,gender=Female", expected: [{gender:"Female",age:26}] },
+]).test("Test filterArray", function(params, assert) {
+    assert.expect(1);
+    var actual = filterArray(params.array, params.filters);
+    assert.deepEqual(actual, params.expected);
+});
+
 
 
 QUnit.module("Test quiz functions", {
@@ -523,11 +540,14 @@ QUnit.cases([
     { title: "Array index", person:{name:"Graham Tibbitts", spouses:[{id:"asdf",name:"Katrina Tibbitts"}]}, path:"spouses.0.id", expected: "asdf"},
     { title: "Star operator array single option", person:{name:"Graham Tibbitts", spouses:[{id:"asdf",name:"Katrina Tibbitts"}]}, path:"spouses.*.id", expected: "asdf"},
     { title: "Star operator array multiple options", person:{name:"Graham Tibbitts", children:[{id:"asdf",name:"Allison Tibbitts"},{id:"asdf",name:"James Tibbitts"}]}, path:"children.*.id", expected: "asdf"},
-    //{ title: "Star operator object", person:{name:"Graham Tibbitts", children:[{id:"asdf"}]}, path:"children.0.*", expected: "asdf"}, TODO: Not working
+    { title: "Star operator object", person:{name:"Graham Tibbitts", children:[{id:"asdf"}]}, path:"children.0.*", expected: "asdf"},
+    { title: "Star operator person", person:{}, people:[{name:"Graham Tibbitts"}], path: "*.name", expected: "Graham Tibbitts"}
 ]).test("Test resolveChildProperty", function(params, assert) {
     assert.expect(1);
     QUnit.stop();
-    navigate("controller-quiz", 1000).then(function() {
+    navigate("controller-quiz", 100).then(function() {
+        people = params.people;
+        
         var actual = resolveChildProperty(params.person, params.path);
         assert.deepEqual(actual, params.expected);
         QUnit.start();
@@ -546,7 +566,7 @@ QUnit.cases([
 ]).test("Test satisfiesPrerequisites", function(params, assert) {
     assert.expect(1);
     QUnit.stop();
-    navigate("controller-quiz", 1000).then(function() {
+    navigate("controller-quiz", 100).then(function() {
         var actual = satisfiesPrerequisites(params.person, params.prerequisites);
         assert.equal(actual, params.expected);
         QUnit.start();
@@ -560,36 +580,14 @@ QUnit.cases([
     { title: "Name", person:{name:"Graham Tibbitts"}, original:"My name is ${name}", expected: "My name is Graham Tibbitts" },
     { title: "Name and birth date", person:{name:"Graham Tibbitts", facts:[{type:"Birth",date:"2014-10-27"}]}, original: "${name} was born on ${facts.Birth.date}", expected: "Graham Tibbitts was born on 2014-10-27" },
     { title: "Array length", person:{children:[{},{},{}]}, original:"I have ${children.length} children", expected: "I have 3 children" },
-    
+    { title: "Compound", person:{parents:[{id:"ASDF-123",gender:"Male"},{id:"QWER-456",gender:"Female"}]}, people:[{id:"ASDF-123",name:"Graham Tibbitts"}], original:"My father's name is ${*id=${parents.*gender=Male.id}.name}", expected: "My father's name is Graham Tibbitts" },
 ]).test("Test replaceVariables", function(params, assert) {
     assert.expect(1);
     QUnit.stop();
-    navigate("controller-quiz", 1000).then(function() {
+    navigate("controller-quiz", 100).then(function() {
+        people = params.people;
         var actual = replaceVariables(params.person, params.original);
         assert.equal(actual, params.expected);
-        QUnit.start();
-    }).fail(function() {
-        QUnit.start();
-    });
-});
-
-QUnit.cases([
-    { title: "Empty", array:[], filters:"", expected: [] },
-    { title: "Single filter", array:[{gender:"Male"},{gender:"Female"}], filters:"gender=Female", expected: [{gender:"Female"}] },
-    { title: "Single filter w/ missing key", array:[{},{gender:"Female"}], filters:"gender=Female", expected: [{gender:"Female"}] },
-    { title: "Single filter numeric", array:[{age:25},{age:26}], filters:"age=26", expected: [{age:26}] },
-    { title: "Single filter boolean", array:[{living:false},{living:true}], filters:"living=false", expected: [{living:false}] },
-//    { title: "Single filter numeric >", array:[{age:25},{age:26}], filters:"age>25", expected: [{age:26}] },
-//    { title: "Single filter numeric >=", array:[{age:25},{age:26}], filters:"age>=26", expected: [{age:26}] },
-//    { title: "Single filter numeric <=", array:[{age:25},{age:26}], filters:"age<=25", expected: [{age:25}] },
-//    { title: "Single filter numeric <", array:[{age:25},{age:26}], filters:"age<26", expected: [{age:25}] },
-    { title: "Compound filter", array:[{gender:"Male",age:25},{gender:"Female",age:26},{gender:"Male",age:26},{gender:"Female",age:28}], filters:"age=26,gender=Female", expected: [{gender:"Female",age:26}] },
-]).test("Test filterArray", function(params, assert) {
-    assert.expect(1);
-    QUnit.stop();
-    navigate("controller-quiz", 1000).then(function() {
-        var actual = filterArray(params.array, params.filters);
-        assert.deepEqual(actual, params.expected);
         QUnit.start();
     }).fail(function() {
         QUnit.start();

@@ -284,18 +284,20 @@ POSSIBILITY OF SUCH DAMAGE.
     }
     
     function replaceVariables(person, original) {
-        var regex = /\$\{([^\}]+)\}/g;
+        var regex = /\$\{([^\}\{]+)\}/g;
         var matches = original.match(regex);
-        
         if (!matches) {
             return original;
         }
         
         var final = original;
-        $.each(matches, function(index, found) {
-            var variable = found.substr(2, found.length - 3);
-            final = final.replace(found, resolveChildProperty(person, variable)); 
-        });
+        do {
+            $.each(matches, function(index, found) {
+                var variable = found.substr(2, found.length - 3);
+                final = final.replace(found, resolveChildProperty(person, variable)); 
+            });
+            matches = final.match(regex)
+        } while (matches);
         
         return final;
     }
@@ -349,30 +351,6 @@ POSSIBILITY OF SUCH DAMAGE.
         } while (split[0] === "*" && currentObject === null && currentTry < maxTries);
         
         return currentObject;
-    }
-    
-    function filterArray(array, rawFilters) {
-        var split = rawFilters.split(',');
-        
-        var currentArray = array;
-        $.each(split, function(index, rawFilter) {
-            var newArray = [];
-            var splitFilter = rawFilter.split("=");
-            var filterKey = splitFilter[0];
-            var filterValue = splitFilter[1];
-            
-            $.each(currentArray, function(index2, arrayValue) {
-                if (arrayValue[filterKey] != null && arrayValue[filterKey].toString && arrayValue[filterKey].toString() === filterValue) {
-                    newArray.push(arrayValue);
-                } else if (arrayValue[filterKey] == filterValue) {
-                    newArray.push(arrayValue);
-                }
-            });
-            
-            currentArray = newArray;
-        });
-        
-        return currentArray;
     }
     
     function sendQuestion(question) {

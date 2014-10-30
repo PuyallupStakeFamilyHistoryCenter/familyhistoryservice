@@ -131,7 +131,7 @@ Automatically grade answers based on answer frequency
 Automatically progress difficulty based on performance
 Allow star operator to filter on gender, etc DONE
 Allow more complex filters (e.g. >, >=)
-Allow filter based on main person's attributes
+Allow filter based on main person's attributes DONE
 Image questions should use persona info from FS
 Rethink layout
 Show stats on display
