@@ -118,13 +118,14 @@ Implement basic family statistics
 Quiz:
 Implement basic quiz                       DONE
 Add more questions
-Allow answers to be pulled from random people
+Allow answers to be pulled from random people DONE
 Shuffle answers
-Basic duplicate answer detection
+Basic duplicate answer detection           DONE
 Allow selection of people
 Difficulty levels
     Configurable # answers
     Give questions difficulty grades
+    Change # generations
 Automatically grade questions based on answer frequency
 Automatically grade answers based on answer frequency
 Automatically progress difficulty based on performance
@@ -135,6 +136,7 @@ Image questions should use persona info from FS
 Rethink layout
 Show stats on display
 React on display to correct and incorrect answers
+Allow reporting problems with question/answers
 
 Display main:
 Put sample content into carousel           DONE
@@ -178,3 +180,6 @@ Show and hide controller in split mode should respond to swipe gesture
 Get unit tests working again
 Add search feature (to search for ancestors)
 Allow members to see ordinance information
+Add guided tour of ancestors
+    Show tour on Google Earth with stock and real images
+    Have quiz on people and places visited
