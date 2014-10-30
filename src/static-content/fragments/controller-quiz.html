@@ -118,6 +118,25 @@ POSSIBILITY OF SUCH DAMAGE.
                 { 
                     text: '${*.name}'
                 },
+            ],
+        },
+        {
+            prerequisites: [
+                'name',
+                'children'
+            ],
+            question: "How many children did ${name} have?",
+            answers: [
+                { 
+                    text: '${children.length}', 
+                    hint: "Correct!" 
+                },
+                { 
+                    text: '${*.children.length}'
+                },
+                { 
+                    text: '${*.children.length}'
+                },
                 { 
                     text: "That's not a person!"
                 },

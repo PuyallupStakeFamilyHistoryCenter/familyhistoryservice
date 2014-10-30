@@ -559,6 +559,8 @@ QUnit.cases([
     { title: "Empty", person:{}, original:"", expected: "" },
     { title: "Name", person:{name:"Graham Tibbitts"}, original:"My name is ${name}", expected: "My name is Graham Tibbitts" },
     { title: "Name and birth date", person:{name:"Graham Tibbitts", facts:[{type:"Birth",date:"2014-10-27"}]}, original: "${name} was born on ${facts.Birth.date}", expected: "Graham Tibbitts was born on 2014-10-27" },
+    { title: "Array length", person:{children:[{},{},{}]}, original:"I have ${children.length} children", expected: "I have 3 children" },
+    
 ]).test("Test replaceVariables", function(params, assert) {
     assert.expect(1);
     QUnit.stop();
