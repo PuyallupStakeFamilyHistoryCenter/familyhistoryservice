@@ -78,6 +78,28 @@ POSSIBILITY OF SUCH DAMAGE.
         {
             prerequisites: [
                 'name',
+                'facts.Birth.place'
+            ],
+            question: "Where was ${name} born?",
+            answers: [
+                { 
+                    text: '${facts.Birth.place}', 
+                    hint: "Correct! ${name} was born on ${facts.Birth.date} in ${facts.Birth.place} to ${parents.0.name} and ${parents.1.name}" 
+                },
+                { 
+                    text: '${*.facts.*.place}'
+                },
+                { 
+                    text: '${*.facts.*.place}'
+                },
+                { 
+                    text: '${*.facts.*.place}'
+                },
+            ],
+        },
+        {
+            prerequisites: [
+                'name',
                 'parents.0.name',
                 'parents.1.name',
                 'children.*,gender=Male.name',
@@ -137,9 +159,6 @@ POSSIBILITY OF SUCH DAMAGE.
                 { 
                     text: '${*.children.length}'
                 },
-                { 
-                    text: "That's not a person!"
-                },
             ],
         },
         
@@ -184,11 +203,24 @@ POSSIBILITY OF SUCH DAMAGE.
         
         $.each(template.answers, function(index, answerTemplate) {
             var answer = {};
-            answer.text = replaceVariables(person, answerTemplate.text);
+            var retry;
+            var currentTry = 0;
+            var maxTries = 10;
+            do {
+                retry = false;
+                answer.text = replaceVariables(person, answerTemplate.text);
+                for (var i = 0; i < index; i++) {
+                    if (questionAndAnswers.answers[i].text === answer.text) {
+                        retry = true;
+                        break;
+                    }
+                }
+                currentTry++;
+            } while (retry && currentTry < maxTries);
             if (answerTemplate.hint) {
                 answer.hint = replaceVariables(person, answerTemplate.hint);
             }
-            console.info("Got answer '" + answer + "'");
+            console.info("Got answer '" + answer.answer + "'");
             questionAndAnswers.answers.push(answer);
         });
         
