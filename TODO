@@ -132,6 +132,8 @@ Allow more complex filters (e.g. >, >=)
 Allow filter based on main person's attributes
 Image questions should use persona info from FS
 Rethink layout
+Show stats on display
+React on display to correct and incorrect answers
 
 Display main:
 Put sample content into carousel           DONE
