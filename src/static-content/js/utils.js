@@ -107,15 +107,71 @@ function filterArray(array, rawFilters) {
     var currentArray = array;
     $.each(split, function(index, rawFilter) {
         var newArray = [];
-        var splitFilter = rawFilter.split("=");
-        var filterKey = splitFilter[0];
-        var filterValue = splitFilter[1];
+        var filterRegex = /([a-z0-9]+)(=|<|<=|>|>=|!=|∋|∌| contains | !contains )([a-z0-9]+)/i;
+        var filterMatches = rawFilter.match(filterRegex);
+        if (!filterMatches || filterMatches.length < 4) {
+            return [];
+        }
+        var filterKey = filterMatches[1];
+        var operator = filterMatches[2];
+        var filterValue = filterMatches[3];
 
         $.each(currentArray, function(index2, arrayValue) {
-            if (arrayValue[filterKey] != null && arrayValue[filterKey].toString && arrayValue[filterKey].toString() === filterValue) {
-                newArray.push(arrayValue);
-            } else if (arrayValue[filterKey] == filterValue) {
-                newArray.push(arrayValue);
+            switch (operator) {
+            case "=":
+                if (arrayValue[filterKey] != null && arrayValue[filterKey].toString && arrayValue[filterKey].toString() === filterValue) {
+                    newArray.push(arrayValue);
+                } else if (arrayValue[filterKey] == filterValue) {
+                    newArray.push(arrayValue);
+                }
+                break;
+            case "!=":
+                if (arrayValue[filterKey] != null && arrayValue[filterKey].toString && arrayValue[filterKey].toString() !== filterValue) {
+                    newArray.push(arrayValue);
+                } else if (arrayValue[filterKey] != filterValue) {
+                    newArray.push(arrayValue);
+                }
+                break;
+            case ">":
+                if (arrayValue[filterKey] != null && arrayValue[filterKey].toString && arrayValue[filterKey].toString() > filterValue) {
+                    newArray.push(arrayValue);
+                } else if (arrayValue[filterKey] > filterValue) {
+                    newArray.push(arrayValue);
+                }
+                break;
+            case ">=":
+                if (arrayValue[filterKey] != null && arrayValue[filterKey].toString && arrayValue[filterKey].toString() >= filterValue) {
+                    newArray.push(arrayValue);
+                } else if (arrayValue[filterKey] >= filterValue) {
+                    newArray.push(arrayValue);
+                }
+                break;
+            case "<":
+                if (arrayValue[filterKey] != null && arrayValue[filterKey].toString && arrayValue[filterKey].toString() < filterValue) {
+                    newArray.push(arrayValue);
+                } else if (arrayValue[filterKey] < filterValue) {
+                    newArray.push(arrayValue);
+                }
+                break;
+            case "<=":
+                if (arrayValue[filterKey] != null && arrayValue[filterKey].toString && arrayValue[filterKey].toString() <= filterValue) {
+                    newArray.push(arrayValue);
+                } else if (arrayValue[filterKey] <= filterValue) {
+                    newArray.push(arrayValue);
+                }
+                break;
+            case "∋":
+            case " contains ":
+                if (Array.isArray(arrayValue[filterKey]) && arrayValue[filterKey].indexOf(filterValue) >= 0) {
+                    newArray.push(arrayValue);
+                }
+                break;
+            case "∌":
+            case " !contains ":
+                if (Array.isArray(arrayValue[filterKey]) && arrayValue[filterKey].indexOf(filterValue) == -1) {
+                    newArray.push(arrayValue);
+                }
+                break;
             }
         });
 
