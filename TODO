@@ -137,6 +137,7 @@ Rethink layout
 Show stats on display
 React on display to correct and incorrect answers
 Allow reporting problems with question/answers
+Figure out why some answers are 'undefined'
 
 Display main:
 Put sample content into carousel           DONE

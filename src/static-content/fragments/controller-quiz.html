@@ -373,9 +373,11 @@ POSSIBILITY OF SUCH DAMAGE.
                 $(this).addClass("btn-success");
                 $(this).parent().parent().children().children().prop("disabled", "true");
                 totalCorrect++;
+                sendToDisplay(JSON.stringify({responseType:"correctAnswer"}));
             } else {
                 $(this).addClass("btn-danger");
                 $(this).prop("disabled", "true");
+                sendToDisplay(JSON.stringify({responseType:"incorrectAnswer"}));
             }
             
             var hint = $(this).attr("data-hint");

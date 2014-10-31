@@ -25,6 +25,7 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 -->
 
+<div id="score"></div>
 <div class="jumbotron" >
     <h2>Question:</h2>
     <h1 id="question"></h1>
@@ -35,7 +36,24 @@ POSSIBILITY OF SUCH DAMAGE.
         verbs: {
             question: function(obj) {
                 $("#question").html(obj.question);
+            },
+            correctAnswer: function() {
+                incrementAnswers(true);
+            },
+            incorrectAnswer: function() {
+                incrementAnswers(false);
             }
         }
+    };
+    
+    var totalCorrect = 0;
+    var totalAnswered = 0;
+    function incrementAnswers(correct) {
+        if (correct) {
+            totalCorrect++;
+        }
+        totalAnswered++;
+        
+        $("#score").html(totalCorrect + "/" + totalAnswered + " (" + Math.round(totalCorrect * 10000 / totalAnswered) / 100 + "%)")
     }
 </script>
