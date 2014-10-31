@@ -134,10 +134,13 @@ Allow more complex filters (e.g. >, >=)
 Allow filter based on main person's attributes DONE
 Image questions should use persona info from FS
 Rethink layout
-Show stats on display
+Show stats on display                      DONE
 React on display to correct and incorrect answers
 Allow reporting problems with question/answers
 Figure out why some answers are 'undefined'
+Allow assigning variables names for reuse  DONE
+Allow conditionals (e.g. "gender=Female?her:his")
+Conditionalize relationship questions
 
 Display main:
 Put sample content into carousel           DONE

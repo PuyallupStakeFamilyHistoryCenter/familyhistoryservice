@@ -215,6 +215,58 @@ POSSIBILITY OF SUCH DAMAGE.
                 },
             ],
         },
+        {
+            prerequisites: [
+            ],
+            constants: {
+                child: "*gender=Female",
+                parent: "child.parents.*gender=Female"
+            },
+            question: "How are ${parent.name} and ${child.name} related?",
+            answers: [
+                { 
+                    text: 'Mother and daughter',
+                    hint: "Correct!"
+                },
+                { 
+                    text: 'Mother and son',
+                    hint: "${child.name} isn't a boy!"
+                },
+                { 
+                    text: 'Grandmother and granddaughter',
+                },
+                { 
+                    text: 'Grandmother and grandson',
+                },
+            ],
+        },
+        {
+            prerequisites: [
+                "children.*gender=Female",
+                "parents.*gender=Female"
+            ],
+            constants: {
+                child: "children.*gender=Female",
+                parent: "parents.*gender=Female"
+            },
+            question: "How are ${parent.name} and ${child.name} related?",
+            answers: [
+                { 
+                    text: 'Grandmother and granddaughter',
+                    hint: "Correct!" 
+                },
+                { 
+                    text: 'Grandmother and grandson',
+                    hint: "${child.name} isn't a boy!"
+                },
+                { 
+                    text: 'Mother and daughter',
+                },
+                { 
+                    text: 'Mother and son',
+                },
+            ],
+        }
         
         //Question ideas
         //
@@ -228,6 +280,7 @@ POSSIBILITY OF SUCH DAMAGE.
         var maxTries = 100;
         var currentTry = 0;
         while (!questionAndAnswers && currentTry < maxTries) {
+            resolvedConstants = {};
             var person = getRandomElement(filterArray(people, "living=false"));
             
             if (satisfiesPrerequisites(person, template.prerequisites)) {
@@ -245,10 +298,18 @@ POSSIBILITY OF SUCH DAMAGE.
         setAnswers(questionAndAnswers.answers);
     }
     
+    var resolvedConstants;
     function createQuestion(person, template) {
         var questionAndAnswers = {};
             
         console.info("Trying to create question " + JSON.stringify(template) + " for person " + JSON.stringify(person));
+        
+        if (template.constants) {
+            Object.keys(template.constants).forEach(function(key) {
+                resolvedConstants[key] = resolveChildProperty(person, template.constants[key]);
+            });
+            console.info("Resolved constants " + JSON.stringify(resolvedConstants));
+        }
         
         questionAndAnswers.question = replaceVariables(person, template.question);
         questionAndAnswers.answers = [];
@@ -335,6 +396,8 @@ POSSIBILITY OF SUCH DAMAGE.
                     currentObject = getRandomElement(filterArray(people, key.substr(1)));
                 } else if (key[0] === "*") {
                     currentObject = getRandomElement(filterArray(currentObject, key.substr(1)));
+                } else if (resolvedConstants[key] && index === 0) {
+                    currentObject = resolvedConstants[key];
                 } else if (index > 0 && split[index-1] === "facts") {
                     // Loop through facts until found
                     $.each(currentObject, function(index, fact) {
