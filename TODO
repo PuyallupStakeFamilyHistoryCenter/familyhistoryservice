@@ -5,7 +5,7 @@ Maybe wrap FamilySearch JS library for use in Java
 Server:
 Set up SSL for web socket and image cache  DONE
 Delete access token on log out             DONE
-Speed up hosting
+*Speed up hosting
     zip/minify resources (static-resources) DONE
     zip/minify resources (image-cache)      DONE
     allow client-side caching (static-resources images) DONE
@@ -16,27 +16,27 @@ Add method for authenticating with devices
 
 Socket:
 Move display name check to function        DONE
-Apps should auto-reconnect to websockets
+*Apps should auto-reconnect to websockets
 
 
 Caching:
 Get facts into person                      DONE
 Set up pre-caching                         DONE
 Limit precaching to a configurable depth   DONE
-Create clean-up script to clear cache occasionally
-Add progress bar for caching
-Location cache
-File cacher should fall back to cached file even if expired
-Ensure security of living person data
+*Create clean-up script to clear cache occasionally
+*File cacher should fall back to cached file even if expired
+*Ensure security of living person data
     Filter living children out of person
     Partition living person in-memory cache
         OR
     Don't display/cache living people
         OR
     Show only placeholder for living people
-Speed up caching
+*Speed up caching
     Add thread(s)                          DONE
     Use getAncestory function to get several generations at once
+Add progress bar for caching
+Location cache
 Allow timeouts on requests
 
 
@@ -57,9 +57,9 @@ Snap radius setting shouldn't be disabled by snap-on-drag DONE
 Don't reset game on size change if the size doesn't actually change DONE
 Figure out why puzzle scrolls in split mode DONE
 Set up image chooser                       DONE
-Fix piece rotation in split mode
-Test on iPad in split mode
-Fix z-order in split mode
+*Fix piece rotation in split mode
+*Test on iPad in split mode
+*Fix z-order in split mode
 Add person info on controller-puzzle       DONE
 Make piece shapes more interesting
 Back button in puzzle goes back to main screen instead of games screen
@@ -85,8 +85,8 @@ Color:
 Add coloring game to menu                  DONE
 Use image chooser                          DONE
 Move image to opposite side from menu      DONE
-Set up print function
-Fix brush
+*Set up print function
+*Fix brush
 Limit coloring to inside image
 Undo feature?
 Move palate and brushes to controller?
@@ -98,8 +98,8 @@ Show life events for family                DONE
 Add timestamp to facts and sort            DONE
 Add person chooser                         DONE
 Add person info                            DONE
-Fix mouse zoom (pinch) in split mode
-Fix buttons in split mode
+*Fix mouse zoom (pinch) in split mode
+*Fix buttons in split mode
 Maybe add spiral effect from RootsMapper
 Load Google Maps API only once
 Add multi-generation map mode
@@ -117,10 +117,14 @@ Implement basic family statistics
 
 Quiz:
 Implement basic quiz                       DONE
-Add more questions
 Allow answers to be pulled from random people DONE
-Shuffle answers
 Basic duplicate answer detection           DONE
+Allow star operator to filter on gender, etc DONE
+Allow filter based on main person's attributes DONE
+Show stats on display                      DONE
+Allow assigning variables names for reuse  DONE
+*Shuffle answers
+Add more questions
 Allow selection of people
 Difficulty levels
     Configurable # answers
@@ -129,19 +133,15 @@ Difficulty levels
 Automatically grade questions based on answer frequency
 Automatically grade answers based on answer frequency
 Automatically progress difficulty based on performance
-Allow star operator to filter on gender, etc DONE
-Allow more complex filters (e.g. >, >=)
-Allow filter based on main person's attributes DONE
+Allow more complex filters (e.g. >, >=)    DONE
 Fix image questions
     Image questions should use persona info from FS
     OR
-    Allow searching for people with same image
+    Allow searching for people with same image DONE
 Rethink layout
-Show stats on display                      DONE
 React on display to correct and incorrect answers
 Allow reporting problems with question/answers
 Figure out why some answers are 'undefined'
-Allow assigning variables names for reuse  DONE
 Allow conditionals (e.g. "gender=Female?her:his")
 Conditionalize relationship questions
 
@@ -157,15 +157,16 @@ Set logged-in name when logged in          DONE
 Add back button to standard header         DONE
 Make header opaque so scrolling doesn't look weird DONE
 Add picture to the individual page         DONE
-Clear logged-in name when logged out
-Turn off log-out button when logged out
-Fix log-out button in split mode
-Disable navigation when logged out
+*Clear logged-in name when logged out
+*Turn off log-out button when logged out
+*Fix log-out button in split mode
+*Disable navigation when logged out
 Set up accordian for groups of controls
+Add 'report a problem' button for bug reports
 
 Kiosk:
 Show FS permissions dialog                 DONE
-Revoke access token if permissions rejected
+*Revoke access token if permissions rejected
 
 Library:
 Separate query params for page and fragment DONE
@@ -177,12 +178,12 @@ Reload display causes "display * is already connected" DONE
 Unit tests should use JSON responses       DONE
 Finish wiring dependencies via Spring      DONE
 Move developer id into config file (not in Git) DONE
+Delay loading of controller in split mode DONE
+*Turn features on/off for split/normal mode
 Figure out why log4j via Ivy isn't working
 Move css files into folder
 Move test files into folder
 Move these TODOs to the shared task board
-Turn features on/off for split/normal mode
-Delay loading of controller in split mode
 Show and hide controller in split mode should respond to swipe gesture
 Get unit tests working again
 Add search feature (to search for ancestors)

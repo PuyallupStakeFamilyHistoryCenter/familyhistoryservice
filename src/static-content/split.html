@@ -46,10 +46,10 @@ POSSIBILITY OF SUCH DAMAGE.
     </head>
     <body>
         <div class="display">
-            <iframe src="controller-display-base.html?mode=display" style="width: 100%; height: calc(100% - 20px); border-style: none" ></iframe>
+            <iframe id="display-iframe" src="controller-display-base.html?mode=display" style="width: 100%; height: calc(100% - 20px); border-style: none" ></iframe>
         </div>
         <div class="controller">
-            <iframe src="controller-display-base.html?mode=controller" style="width: calc(100% - 10px); height: 100%; border-style: none; overflow-x: hidden; float: right;" ></iframe>
+            <iframe id="controller-iframe" style="width: calc(100% - 10px); height: 100%; border-style: none; overflow-x: hidden; float: right;" ></iframe>
             <div style="width:10px; height:100%; float: right;">
                 <div style="height: calc(50% - 15px);"></div>
                 <div id="handle" style="width: 10px; height: 30px; background-color: grey; border-radius: 10px 0px 0px 10px"></div>
@@ -58,6 +58,10 @@ POSSIBILITY OF SUCH DAMAGE.
         
         <script src="js/jquery-1.11.1.min.js" ></script>
         <script>
+            $("#display-iframe").load(function() {
+                $("#controller-iframe").attr("src", "controller-display-base.html?mode=controller")
+            });
+            
             var hidden = false;
             $("#handle").click(function(e) {
                 var width = $(".controller").width();
