@@ -33,7 +33,7 @@ function getUrlVars(hashes)
 {
     var vars = [];
     var split = hashes.split('&');
-    for(var i = 0; i < split.length; i++)
+    for (var i = 0; i < split.length; i++)
     {
         var hash = split[i].split('=');
         vars.push(hash[0]);
@@ -78,7 +78,7 @@ function sortFacts(facts) {
         } else if (a.type === "Death") {
             return -1;
         }
-        
+
         var aDate = a.sortableDate;
         var bDate = b.sortableDate;
         if (bDate == null)
@@ -99,13 +99,31 @@ function getRandomElement(array) {
     return array[rand(0, array.length)];
 }
 
+/* Courtesy of http://stackoverflow.com/a/2450976/303601 */
+function shuffle(array) {
+    var currentIndex = array.length, temporaryValue, randomIndex;
 
-    
+    // While there remain elements to shuffle...
+    while (0 !== currentIndex) {
+
+        // Pick a remaining element...
+        randomIndex = Math.floor(Math.random() * currentIndex);
+        currentIndex -= 1;
+
+        // And swap it with the current element.
+        temporaryValue = array[currentIndex];
+        array[currentIndex] = array[randomIndex];
+        array[randomIndex] = temporaryValue;
+    }
+
+    return array;
+}
+
 function filterArray(array, rawFilters) {
     var split = rawFilters.split(',');
 
     var currentArray = array;
-    $.each(split, function(index, rawFilter) {
+    $.each(split, function (index, rawFilter) {
         var newArray = [];
         var filterRegex = /([a-z0-9]+)(=|<|<=|>|>=|!=|∋|∌| contains | !contains )([a-z0-9]+)/i;
         var filterMatches = rawFilter.match(filterRegex);
@@ -116,62 +134,62 @@ function filterArray(array, rawFilters) {
         var operator = filterMatches[2];
         var filterValue = filterMatches[3];
 
-        $.each(currentArray, function(index2, arrayValue) {
+        $.each(currentArray, function (index2, arrayValue) {
             switch (operator) {
-            case "=":
-                if (arrayValue[filterKey] != null && arrayValue[filterKey].toString && arrayValue[filterKey].toString() === filterValue) {
-                    newArray.push(arrayValue);
-                } else if (arrayValue[filterKey] == filterValue) {
-                    newArray.push(arrayValue);
-                }
-                break;
-            case "!=":
-                if (arrayValue[filterKey] != null && arrayValue[filterKey].toString && arrayValue[filterKey].toString() !== filterValue) {
-                    newArray.push(arrayValue);
-                } else if (arrayValue[filterKey] != filterValue) {
-                    newArray.push(arrayValue);
-                }
-                break;
-            case ">":
-                if (arrayValue[filterKey] != null && arrayValue[filterKey].toString && arrayValue[filterKey].toString() > filterValue) {
-                    newArray.push(arrayValue);
-                } else if (arrayValue[filterKey] > filterValue) {
-                    newArray.push(arrayValue);
-                }
-                break;
-            case ">=":
-                if (arrayValue[filterKey] != null && arrayValue[filterKey].toString && arrayValue[filterKey].toString() >= filterValue) {
-                    newArray.push(arrayValue);
-                } else if (arrayValue[filterKey] >= filterValue) {
-                    newArray.push(arrayValue);
-                }
-                break;
-            case "<":
-                if (arrayValue[filterKey] != null && arrayValue[filterKey].toString && arrayValue[filterKey].toString() < filterValue) {
-                    newArray.push(arrayValue);
-                } else if (arrayValue[filterKey] < filterValue) {
-                    newArray.push(arrayValue);
-                }
-                break;
-            case "<=":
-                if (arrayValue[filterKey] != null && arrayValue[filterKey].toString && arrayValue[filterKey].toString() <= filterValue) {
-                    newArray.push(arrayValue);
-                } else if (arrayValue[filterKey] <= filterValue) {
-                    newArray.push(arrayValue);
-                }
-                break;
-            case "∋":
-            case " contains ":
-                if (Array.isArray(arrayValue[filterKey]) && arrayValue[filterKey].indexOf(filterValue) >= 0) {
-                    newArray.push(arrayValue);
-                }
-                break;
-            case "∌":
-            case " !contains ":
-                if (Array.isArray(arrayValue[filterKey]) && arrayValue[filterKey].indexOf(filterValue) == -1) {
-                    newArray.push(arrayValue);
-                }
-                break;
+                case "=":
+                    if (arrayValue[filterKey] != null && arrayValue[filterKey].toString && arrayValue[filterKey].toString() === filterValue) {
+                        newArray.push(arrayValue);
+                    } else if (arrayValue[filterKey] == filterValue) {
+                        newArray.push(arrayValue);
+                    }
+                    break;
+                case "!=":
+                    if (arrayValue[filterKey] != null && arrayValue[filterKey].toString && arrayValue[filterKey].toString() !== filterValue) {
+                        newArray.push(arrayValue);
+                    } else if (arrayValue[filterKey] != filterValue) {
+                        newArray.push(arrayValue);
+                    }
+                    break;
+                case ">":
+                    if (arrayValue[filterKey] != null && arrayValue[filterKey].toString && arrayValue[filterKey].toString() > filterValue) {
+                        newArray.push(arrayValue);
+                    } else if (arrayValue[filterKey] > filterValue) {
+                        newArray.push(arrayValue);
+                    }
+                    break;
+                case ">=":
+                    if (arrayValue[filterKey] != null && arrayValue[filterKey].toString && arrayValue[filterKey].toString() >= filterValue) {
+                        newArray.push(arrayValue);
+                    } else if (arrayValue[filterKey] >= filterValue) {
+                        newArray.push(arrayValue);
+                    }
+                    break;
+                case "<":
+                    if (arrayValue[filterKey] != null && arrayValue[filterKey].toString && arrayValue[filterKey].toString() < filterValue) {
+                        newArray.push(arrayValue);
+                    } else if (arrayValue[filterKey] < filterValue) {
+                        newArray.push(arrayValue);
+                    }
+                    break;
+                case "<=":
+                    if (arrayValue[filterKey] != null && arrayValue[filterKey].toString && arrayValue[filterKey].toString() <= filterValue) {
+                        newArray.push(arrayValue);
+                    } else if (arrayValue[filterKey] <= filterValue) {
+                        newArray.push(arrayValue);
+                    }
+                    break;
+                case "∋":
+                case " contains ":
+                    if (Array.isArray(arrayValue[filterKey]) && arrayValue[filterKey].indexOf(filterValue) >= 0) {
+                        newArray.push(arrayValue);
+                    }
+                    break;
+                case "∌":
+                case " !contains ":
+                    if (Array.isArray(arrayValue[filterKey]) && arrayValue[filterKey].indexOf(filterValue) == -1) {
+                        newArray.push(arrayValue);
+                    }
+                    break;
             }
         });
 

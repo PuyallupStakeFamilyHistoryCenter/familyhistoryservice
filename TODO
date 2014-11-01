@@ -181,6 +181,7 @@ Finish wiring dependencies via Spring      DONE
 Move developer id into config file (not in Git) DONE
 Delay loading of controller in split mode DONE
 *Turn features on/off for split/normal mode
+*Split mode controller shouldn't cover display
 Figure out why log4j via Ivy isn't working
 Move css files into folder
 Move test files into folder
