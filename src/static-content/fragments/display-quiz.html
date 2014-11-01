@@ -29,6 +29,7 @@ POSSIBILITY OF SUCH DAMAGE.
 <div class="jumbotron" >
     <h2>Question:</h2>
     <h1 id="question"></h1>
+    <ol id="answers" class="h2 list-group"></ol>
 </div>
 
 <script>
@@ -36,11 +37,18 @@ POSSIBILITY OF SUCH DAMAGE.
         verbs: {
             question: function(obj) {
                 $("#question").html(obj.question);
+                $("#answers").html("");
+                $.each(obj.answers, function(index, answer) {
+                    console.info("Display got answer " + JSON.stringify(answer));
+                    $("#answers").append("<li class='list-group-item' data-id='" + answer.index + "'>" + answer.text + "<span class='glyphicon glyphicon-ok' style='float: right; display: none' ></span><span class='glyphicon glyphicon-remove' style='float: right; display: none' ></span></li>");
+                });
             },
-            correctAnswer: function() {
+            correctAnswer: function(obj) {
+                $("li[data-id=" + obj.index + "]").addClass("list-group-item-success").children(".glyphicon-ok").show();
                 incrementAnswers(true);
             },
-            incorrectAnswer: function() {
+            incorrectAnswer: function(obj) {
+                $("li[data-id=" + obj.index + "]").addClass("list-group-item-danger").children(".glyphicon-remove").show();
                 incrementAnswers(false);
             }
         }
@@ -54,6 +62,6 @@ POSSIBILITY OF SUCH DAMAGE.
         }
         totalAnswered++;
         
-        $("#score").html(totalCorrect + "/" + totalAnswered + " (" + Math.round(totalCorrect * 10000 / totalAnswered) / 100 + "%)")
+//        $("#score").html(totalCorrect + "/" + totalAnswered + " (" + Math.round(totalCorrect * 10000 / totalAnswered) / 100 + "%)")
     }
 </script>

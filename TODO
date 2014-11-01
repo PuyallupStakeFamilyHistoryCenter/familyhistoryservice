@@ -69,7 +69,7 @@ Image chooser:
 Add get people with images call            DONE
 Make app controls a tab                    DONE
 Style tabs correctly                       DONE
-Figure out why image choice persists from puzzle to color
+*Image choice persists from puzzle to color
 Spacing between tabs and controls
 
 Person chooser:
@@ -139,7 +139,7 @@ Fix image questions
     OR
     Allow searching for people with same image DONE
 Rethink layout
-React on display to correct and incorrect answers
+React on display to correct and incorrect answers DONE
 Allow reporting problems with question/answers
 Figure out why some answers are 'undefined'
 Allow conditionals (e.g. "gender=Female?her:his")
@@ -161,6 +161,7 @@ Add picture to the individual page         DONE
 *Turn off log-out button when logged out
 *Fix log-out button in split mode
 *Disable navigation when logged out
+*Return/done should submit login form
 Set up accordian for groups of controls
 Add 'report a problem' button for bug reports
 

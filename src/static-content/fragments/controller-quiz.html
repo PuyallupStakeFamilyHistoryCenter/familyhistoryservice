@@ -297,7 +297,7 @@ POSSIBILITY OF SUCH DAMAGE.
             return;
         }
         
-        sendQuestion(questionAndAnswers.question);
+        sendQuestion(questionAndAnswers);
         setAnswers(questionAndAnswers.answers);
     }
     
@@ -320,7 +320,9 @@ POSSIBILITY OF SUCH DAMAGE.
         console.info("Got question '" + questionAndAnswers.question + "'")
         
         $.each(template.answers, function(index, answerTemplate) {
-            var answer = {};
+            var answer = {
+                index: index
+            };
             var duplicate;
             var currentTry = 0;
             var maxTries = 10;
@@ -343,6 +345,8 @@ POSSIBILITY OF SUCH DAMAGE.
                 questionAndAnswers.answers.push(answer);
             }
         });
+        
+        //TODO: shuffle answers
         
         return questionAndAnswers;
     }
@@ -419,8 +423,9 @@ POSSIBILITY OF SUCH DAMAGE.
         return currentObject;
     }
     
-    function sendQuestion(question) {
-        ws.socketSend("send " + displayName + " {\"responseType\":\"question\",\"question\":\"" + question + "\"}");
+    function sendQuestion(questionAndAnswers) {
+        questionAndAnswers.responseType = "question";
+        ws.socketSend("send " + displayName + " " + JSON.stringify(questionAndAnswers));
     }
     
     var totalCorrect = 0;
@@ -428,9 +433,8 @@ POSSIBILITY OF SUCH DAMAGE.
     function setAnswers(answers) {
         $("#hint").html("");
         $("#answers").html("");
-        //TODO: Shuffle answers
         $.each(answers, function(index, answer) {
-            $("#answers").append('<button data-id="' + index + '"' + (answer.hint?' data-hint="' + answer.hint + '"':'') + ' class="btn btn-default btn-lg answer-btn" >' + answer.text + "</button>");
+            $("#answers").append('<button data-id="' + answer.index + '"' + (answer.hint?' data-hint="' + answer.hint + '"':'') + ' class="btn btn-default btn-lg answer-btn" >' + answer.text + "</button>");
         });
         
         $(".answer-btn").click(function() {
@@ -439,11 +443,11 @@ POSSIBILITY OF SUCH DAMAGE.
                 $(this).addClass("btn-success");
                 $(this).parent().parent().children().children().prop("disabled", "true");
                 totalCorrect++;
-                sendToDisplay(JSON.stringify({responseType:"correctAnswer"}));
+                sendToDisplay(JSON.stringify({responseType:"correctAnswer",index:id}));
             } else {
                 $(this).addClass("btn-danger");
                 $(this).prop("disabled", "true");
-                sendToDisplay(JSON.stringify({responseType:"incorrectAnswer"}));
+                sendToDisplay(JSON.stringify({responseType:"incorrectAnswer",index:id}));
             }
             
             var hint = $(this).attr("data-hint");
@@ -454,7 +458,6 @@ POSSIBILITY OF SUCH DAMAGE.
             }
             
             totalAnswered++;
-            $("#score").html(totalCorrect + "/" + totalAnswered + " (" + Math.round(totalCorrect * 10000 / totalAnswered) / 100 + "%)")
         });
     }
     
