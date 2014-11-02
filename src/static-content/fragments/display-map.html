@@ -167,11 +167,17 @@ POSSIBILITY OF SUCH DAMAGE.
     }
 
     function graphPerson(person) {
-        graphFacts(person.facts);
+        graphPeople([person]);
     }
 
     function graphPeople(people) {
-        var facts = [];
+        var facts = people[0].facts;
+        
+        if (people[0].spouses) {
+            $.each(people[0].spouses, function(index, spouse) {
+                facts = facts.concat(spouse.facts);
+            });
+        };
 
         $.each(people, function (index, person) {
             if (person.facts) {
@@ -191,7 +197,7 @@ POSSIBILITY OF SUCH DAMAGE.
     function graphFacts(facts) {
         facts = sortFacts(facts);
         
-        console.info("Graphing facts " + facts);
+        console.info("Graphing facts " + JSON.stringify(facts));
         if (markers) {
             $.each(markers, function (index, marker) {
                 marker.setMap(null);
@@ -211,8 +217,10 @@ POSSIBILITY OF SUCH DAMAGE.
 
         var promises = [];
         $.each(facts, function (index, fact) {
-            var promise = getLocationForAddress(fact.place);
-            promises.push(promise);
+            if (fact.place) {
+                var promise = getLocationForAddress(fact.place);
+                promises.push(promise);
+            }
         });
 
         Promise.all(promises).then(
