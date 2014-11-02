@@ -271,7 +271,8 @@ POSSIBILITY OF SUCH DAMAGE.
                 } else if (status == google.maps.GeocoderStatus.ZERO_RESULTS) {
                     resolve(null);
                 } else {
-                    reject(Error("Failed to get location with message " + status));
+                    console.warn("Failed to get location with message " + status);
+                    resolve(null);
                 }
             });
         });
