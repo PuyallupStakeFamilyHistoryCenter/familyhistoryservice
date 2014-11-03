@@ -265,6 +265,7 @@ POSSIBILITY OF SUCH DAMAGE.
         return new Promise(function (resolve, reject) {
             geocoder.geocode({address: address}, function (results, status) {
                 if (status == google.maps.GeocoderStatus.OK) {
+                    console.info("location " + address + " maps to " + JSON.stringify(results));
                     resolve(results[0].geometry.location);
                 } else if (status == google.maps.GeocoderStatus.OVER_QUERY_LIMIT) {
                     //Maybe do something

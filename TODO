@@ -180,6 +180,7 @@ Unit tests should use JSON responses       DONE
 Finish wiring dependencies via Spring      DONE
 Move developer id into config file (not in Git) DONE
 Delay loading of controller in split mode DONE
+*Figure out deployment strategy
 *Turn features on/off for split/normal mode
 *Split mode controller shouldn't cover display
 Figure out why log4j via Ivy isn't working
@@ -193,3 +194,4 @@ Allow members to see ordinance information
 Add guided tour of ancestors
     Show tour on Google Earth with stock and real images
     Have quiz on people and places visited
+Fix ivy classpath

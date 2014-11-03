@@ -134,7 +134,9 @@ public class FamilySearchPersonSource implements Source<Person> {
             Name name = person.getName();
             String stringName = name == null ? null : name.getNameForm().getFullText();
             refs[i] = new PersonReference(person.getId(), stringName, null);
-            refs[i].withGender(person.getGender().getKnownType().name());
+            if (person.getGender() != null && person.getGender().getKnownType() != null) {
+                refs[i].withGender(person.getGender().getKnownType().name());
+            }
             
             if (relationships != null && relationships.size() > i) {
                 Relationship relationship = relationships.get(i);
@@ -145,8 +147,9 @@ public class FamilySearchPersonSource implements Source<Person> {
                     for (org.gedcomx.conclusion.Fact originalFact : originalFacts) {
                         String date = originalFact.getDate() == null ? null : originalFact.getDate().getOriginal();
                         String place = originalFact.getPlace() == null ? null : originalFact.getPlace().getOriginal();
+                        String type = originalFact.getKnownType() == null ? "UNKNOWN" : originalFact.getKnownType().name();
                         facts[index++] = new Fact(
-                                originalFact.getKnownType().name(), 
+                                type, 
                                 date, 
                                 null, //TODO: Extract real timestamp from this
                                 place);
