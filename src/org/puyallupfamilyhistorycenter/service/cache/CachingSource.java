@@ -49,14 +49,21 @@ public class CachingSource<E> implements Source<E> {
 
     @Override
     public E get(String id, String accessToken) {
-        E cached = cache.get(id);
-        if (cached != null) {
-            return cached;
+        if (cache.containsKey(id)) {
+            return cache.get(id);
         }
         
-        E value = source.get(id, accessToken);
-        if (decider == null || decider.shouldCache(value)) {
-            cache.put(id, value);
+        E value;
+        try {
+            value = source.get(id, accessToken);
+            if (decider == null || decider.shouldCache(value)) {
+                cache.put(id, value);
+            }
+        } catch (Exception e) {
+            value = cache.get(id);
+            if (value == null) {
+                throw e;
+            }
         }
         return value;
     }
