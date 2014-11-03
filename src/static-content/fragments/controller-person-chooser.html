@@ -28,13 +28,39 @@ POSSIBILITY OF SUCH DAMAGE.
 <script>
     var target = getParameterByName("target");
 
+    function recursivelyAddButtons(person, personMap, index, depth) {
+        console.info("Adding person " + JSON.stringify(person) + " to #gen-" + depth + "-" + index)
+        $("#gen-" + depth + "-" + index).append("<button class='btn btn-default person-btn' style='clear: both' data-id='" + person.id + "'>"+person.name+"</button>");
+        if (person.parents) {
+            var fatherArray = filterArray(person.parents, "gender=Male");
+            if (fatherArray[0]) {
+                var father = personMap[fatherArray[0].id];
+                if (father) {
+                    recursivelyAddButtons(father, personMap, index*2, depth+1);
+                }
+            }
+            
+            var motherArray = filterArray(person.parents, "gender=Female");
+            if (motherArray[0]) {
+                var mother = personMap[motherArray[0].id];
+                if (mother) {
+                    recursivelyAddButtons(mother, personMap, index*2+1, depth+1);
+                }
+            }
+        }
+    }
+
     settings.local = {
         verbs: {
             people: function(obj) {
                 var people = obj.people;
+                var peopleIndex = {};
+                
                 $.each(people, function (index, person) {
-                    $("#people").append("<button class='btn btn-default person-btn' data-id='" + person.id + "'>"+person.name+"</button>")
+                    peopleIndex[person.id] = person;
                 });
+                
+                recursivelyAddButtons(people[0], peopleIndex, 0, 0);
                 
                 var choiceType = getParameterByName("type");
                 $(".person-btn").click(function (e) {
@@ -53,7 +79,7 @@ POSSIBILITY OF SUCH DAMAGE.
                             break;
                         }
                         case "descendants": {
-                            ws.socketSend("send-ancestors " + token + " " + displayName + " " + id);
+                            ws.socketSend("send-descendants " + token + " " + displayName + " " + id);
                             break;
                         }
                     }
@@ -69,8 +95,6 @@ POSSIBILITY OF SUCH DAMAGE.
             }
         }
     }
-
-    ws.socketSend("get-ancestors " + token + " " + settings.userId);
 </script>
 
 <ul class="nav nav-tabs" id="tabs" role="tablist">
@@ -78,8 +102,12 @@ POSSIBILITY OF SUCH DAMAGE.
     <li id="person-info-btn" style="display: none" ><a href="#person-info" role="tab" data-toggle="tab">Person</a></li>
     <li id="controls-btn" style="display: none" ><a href="#controls" role="tab" data-toggle="tab">Controls</a></li>
 </ul>
-<div id="people">
-
+<div id="people" style="min-width: 500px">
+    <div id="gen-0" style="height: 640px; width: 20%; min-width: 100px; float: left;"></div>
+    <div id="gen-1" style="height: 640px; width: 20%; min-width: 100px; float: left;"></div>
+    <div id="gen-2" style="height: 640px; width: 20%; min-width: 100px; float: left;"></div>
+    <div id="gen-3" style="height: 640px; width: 20%; min-width: 100px; float: left;"></div>
+    <div id="gen-4" style="height: 640px; width: 20%; min-width: 100px; float: left;"></div>
 </div>
 <div id="person-info" style="display: none;">
 
@@ -143,4 +171,17 @@ POSSIBILITY OF SUCH DAMAGE.
 
         return deferred.promise();
     }
+    
+    function build() {
+        for (var i = 0; i < 5; i++) {
+            var pow = Math.pow(2, i);
+            var percentHeight = 100/pow;
+            for (var j = 0; j < Math.pow(2, i); j++) {
+                $("#gen-" + i).append("<div id='gen-" + i + "-"+ j +"' style='height: "+percentHeight+"%; border: 1px solid transparent;'><div style='float: left; height: 50%; width: 100%; margin-bottom: -19.33px;'></div></div>")
+            }
+        }
+    }
+    
+    build();
+    ws.socketSend("get-ancestors " + token + " " + settings.userId);
 </script>
