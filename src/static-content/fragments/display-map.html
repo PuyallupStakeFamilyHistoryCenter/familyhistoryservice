@@ -217,7 +217,7 @@ POSSIBILITY OF SUCH DAMAGE.
 
         var promises = [];
         $.each(facts, function (index, fact) {
-            if (fact.place) {
+            if (fact && fact.place) {
                 var promise = getLocationForAddress(fact.place);
                 promises.push(promise);
             }

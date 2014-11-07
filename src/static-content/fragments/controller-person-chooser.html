@@ -30,7 +30,7 @@ POSSIBILITY OF SUCH DAMAGE.
 
     function recursivelyAddButtons(person, personMap, index, depth) {
         console.info("Adding person " + JSON.stringify(person) + " to #gen-" + depth + "-" + index)
-        $("#gen-" + depth + "-" + index).append("<button class='btn btn-default person-btn' style='clear: both' data-id='" + person.id + "'>"+person.name+"</button>");
+        $("#gen-" + depth + "-" + index).removeClass("invisible").append("<button class='btn btn-default person-btn' style='position: absolute; left: 0; top: calc(50% - 19px); z-index: 100;' data-id='" + person.id + "'>"+person.name+"</button>");
         if (person.parents) {
             var fatherArray = filterArray(person.parents, "gender=Male");
             if (fatherArray[0]) {
@@ -177,7 +177,7 @@ POSSIBILITY OF SUCH DAMAGE.
             var pow = Math.pow(2, i);
             var percentHeight = 100/pow;
             for (var j = 0; j < Math.pow(2, i); j++) {
-                $("#gen-" + i).append("<div id='gen-" + i + "-"+ j +"' style='height: "+percentHeight+"%; border: 1px solid transparent;'><div style='float: left; height: 50%; width: 100%; margin-bottom: -19.33px;'></div></div>")
+                $("#gen-" + i).append("<div id='gen-" + i + "-"+ j +"' class='invisible' style='height: "+percentHeight+"%; border: none; position: relative;'><div style='position: absolute; top: 25%; left: 50%; border: 1px solid white; border-right: none; width: 100%; height: 50%'></div></div>");
             }
         }
     }

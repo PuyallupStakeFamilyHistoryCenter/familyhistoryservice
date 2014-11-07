@@ -23,8 +23,8 @@ Caching:
 Get facts into person                      DONE
 Set up pre-caching                         DONE
 Limit precaching to a configurable depth   DONE
+File cacher should fall back to cached file even if expired DONE
 *Create clean-up script to clear cache occasionally
-*File cacher should fall back to cached file even if expired
 *Ensure security of living person data
     Filter living children out of person
     Partition living person in-memory cache
@@ -57,9 +57,9 @@ Snap radius setting shouldn't be disabled by snap-on-drag DONE
 Don't reset game on size change if the size doesn't actually change DONE
 Figure out why puzzle scrolls in split mode DONE
 Set up image chooser                       DONE
-*Fix piece rotation in split mode
 *Test on iPad in split mode
-*Fix z-order in split mode
+*Fix piece rotation in split mode          ?
+*Fix z-order in split mode                 ?
 Add person info on controller-puzzle       DONE
 Make piece shapes more interesting
 Back button in puzzle goes back to main screen instead of games screen
@@ -123,8 +123,8 @@ Allow star operator to filter on gender, etc DONE
 Allow filter based on main person's attributes DONE
 Show stats on display                      DONE
 Allow assigning variables names for reuse  DONE
-*Shuffle answers
-Add more questions
+Shuffle answers                           DONE
+*Add more questions
 Allow selection of people
 Difficulty levels
     Configurable # answers
@@ -144,10 +144,14 @@ Allow reporting problems with question/answers
 Figure out why some answers are 'undefined'
 Allow conditionals (e.g. "gender=Female?her:his")
 Conditionalize relationship questions
+More advanced duplicate answer detection
+
+Media:
+*Add video selection screen
 
 Display main:
 Put sample content into carousel           DONE
-Make carousel content configurable
+*Make carousel content configurable
 
 Controller:
 Consistent frame between screens without redundancy DONE
@@ -168,6 +172,7 @@ Add 'report a problem' button for bug reports
 Kiosk:
 Show FS permissions dialog                 DONE
 *Revoke access token if permissions rejected
+Show permissions dialog while loading user
 
 Library:
 Separate query params for page and fragment DONE
@@ -180,9 +185,9 @@ Unit tests should use JSON responses       DONE
 Finish wiring dependencies via Spring      DONE
 Move developer id into config file (not in Git) DONE
 Delay loading of controller in split mode DONE
+Split mode controller shouldn't cover display DONE
 *Figure out deployment strategy
 *Turn features on/off for split/normal mode
-*Split mode controller shouldn't cover display
 Figure out why log4j via Ivy isn't working
 Move css files into folder
 Move test files into folder
@@ -195,3 +200,5 @@ Add guided tour of ancestors
     Show tour on Google Earth with stock and real images
     Have quiz on people and places visited
 Fix ivy classpath
+
+Reminder: Ask Stephen about styluses for drawing.

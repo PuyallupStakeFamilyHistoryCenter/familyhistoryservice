@@ -54,3 +54,7 @@ dd, dt {
     border-radius: 20px;
     padding: 20px;
 }
+
+invisible {
+    visibility: hidden;
+}
