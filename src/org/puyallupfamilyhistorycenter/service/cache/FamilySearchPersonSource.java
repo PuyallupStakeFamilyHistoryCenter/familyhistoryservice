@@ -62,31 +62,10 @@ public class FamilySearchPersonSource implements Source<Person> {
 
             org.gedcomx.conclusion.Person originalPerson = state.getEntity().getPerson();
             PersonBuilder builder = new PersonBuilder();
-            Name name = state.getName();
+            
+            /* Get for living and for deceased people */
             builder.withId(personId);
-            if (name != null) {
-                builder.withName(name.getNameForm().getFullText());
-            }
             builder.withLiving(originalPerson.getLiving());
-            builder.withGender(originalPerson.getGender().getKnownType().name());
-
-            {
-                List<org.gedcomx.conclusion.Fact> originalFacts = originalPerson.getFacts();
-                Fact[] facts = new Fact[originalFacts.size()];
-                int index = 0;
-                for (org.gedcomx.conclusion.Fact originalFact : originalFacts) {
-                    String date = originalFact.getDate() == null ? null : originalFact.getDate().getOriginal();
-                    String sortableDate = originalFact.getDate() == null ? null : originalFact.getDate().getFormal();
-                    String place = originalFact.getPlace() == null ? null : originalFact.getPlace().getOriginal();
-                    facts[index++] = new Fact(
-                            originalFact.getKnownType().name(), 
-                            date, 
-                            sortableDate,
-                            place);
-                }
-                
-                builder.withFacts(facts);
-            }
 
             {
                 PersonParentsState parentsState = state.readParents();
@@ -102,18 +81,46 @@ public class FamilySearchPersonSource implements Source<Person> {
                 PersonChildrenState childrenState = state.readChildren();
                 builder.withChildren(fsPersonsToPersonRefs(childrenState.getPersons(), null));
             }
+            
+            if (originalPerson.getLiving()) {
+                builder.withName("Living");
+            } else {
+                Name name = state.getName();
+                if (name != null) {
+                    builder.withName(name.getNameForm().getFullText());
+                }
+                builder.withGender(originalPerson.getGender().getKnownType().name());
 
-            {
-                SourceDescriptionsState sourceState = state.readArtifacts();
-                List<SourceDescription> sources = sourceState.getSourceDescriptions();
-                if (sources != null) {
-                    String[] imageUrls = new String[sources.size()];
-                    int i = 0;
-                    for (SourceDescription source : sources) {
-                        //source.getAbout() is the url to the image
-                        imageUrls[i++] = "/image-cache?ref=" + URLEncoder.encode(source.getAbout().toString(), StandardCharsets.UTF_8.name());
+                {
+                    List<org.gedcomx.conclusion.Fact> originalFacts = originalPerson.getFacts();
+                    Fact[] facts = new Fact[originalFacts.size()];
+                    int index = 0;
+                    for (org.gedcomx.conclusion.Fact originalFact : originalFacts) {
+                        String date = originalFact.getDate() == null ? null : originalFact.getDate().getOriginal();
+                        String sortableDate = originalFact.getDate() == null ? null : originalFact.getDate().getFormal();
+                        String place = originalFact.getPlace() == null ? null : originalFact.getPlace().getOriginal();
+                        facts[index++] = new Fact(
+                                originalFact.getKnownType().name(), 
+                                date, 
+                                sortableDate,
+                                place);
                     }
-                    builder.withImages(imageUrls);
+
+                    builder.withFacts(facts);
+                }
+
+                {
+                    SourceDescriptionsState sourceState = state.readArtifacts();
+                    List<SourceDescription> sources = sourceState.getSourceDescriptions();
+                    if (sources != null) {
+                        String[] imageUrls = new String[sources.size()];
+                        int i = 0;
+                        for (SourceDescription source : sources) {
+                            //source.getAbout() is the url to the image
+                            imageUrls[i++] = "/image-cache?ref=" + URLEncoder.encode(source.getAbout().toString(), StandardCharsets.UTF_8.name());
+                        }
+                        builder.withImages(imageUrls);
+                    }
                 }
             }
 
@@ -131,31 +138,36 @@ public class FamilySearchPersonSource implements Source<Person> {
         PersonReference[] refs = new PersonReference[persons.size()];
         for (int i = 0; i < persons.size(); i++) {
             org.gedcomx.conclusion.Person person = persons.get(i);
-            Name name = person.getName();
-            String stringName = name == null ? null : name.getNameForm().getFullText();
-            refs[i] = new PersonReference(person.getId(), stringName, null);
-            if (person.getGender() != null && person.getGender().getKnownType() != null) {
-                refs[i].withGender(person.getGender().getKnownType().name());
-            }
             
-            if (relationships != null && relationships.size() > i) {
-                Relationship relationship = relationships.get(i);
-                if (relationship.getFacts() != null) {
-                    List<org.gedcomx.conclusion.Fact> originalFacts = relationship.getFacts();
-                    Fact[] facts = new Fact[originalFacts.size()];
-                    int index = 0;
-                    for (org.gedcomx.conclusion.Fact originalFact : originalFacts) {
-                        String date = originalFact.getDate() == null ? null : originalFact.getDate().getOriginal();
-                        String place = originalFact.getPlace() == null ? null : originalFact.getPlace().getOriginal();
-                        String type = originalFact.getKnownType() == null ? "UNKNOWN" : originalFact.getKnownType().name();
-                        facts[index++] = new Fact(
-                                type, 
-                                date, 
-                                null, //TODO: Extract real timestamp from this
-                                place);
-                    }
+            if (person.getLiving()) {
+                refs[i] = new PersonReference(person.getId(), "Living", null);
+            } else {
+                Name name = person.getName();
+                String stringName = name == null ? null : name.getNameForm().getFullText();
+                refs[i] = new PersonReference(person.getId(), stringName, null);
+                if (person.getGender() != null && person.getGender().getKnownType() != null) {
+                    refs[i].withGender(person.getGender().getKnownType().name());
+                }
 
-                    refs[i].withFacts(facts);
+                if (relationships != null && relationships.size() > i) {
+                    Relationship relationship = relationships.get(i);
+                    if (relationship.getFacts() != null) {
+                        List<org.gedcomx.conclusion.Fact> originalFacts = relationship.getFacts();
+                        Fact[] facts = new Fact[originalFacts.size()];
+                        int index = 0;
+                        for (org.gedcomx.conclusion.Fact originalFact : originalFacts) {
+                            String date = originalFact.getDate() == null ? null : originalFact.getDate().getOriginal();
+                            String place = originalFact.getPlace() == null ? null : originalFact.getPlace().getOriginal();
+                            String type = originalFact.getKnownType() == null ? "UNKNOWN" : originalFact.getKnownType().name();
+                            facts[index++] = new Fact(
+                                    type, 
+                                    date, 
+                                    null, //TODO: Extract real timestamp from this
+                                    place);
+                        }
+
+                        refs[i].withFacts(facts);
+                    }
                 }
             }
         }

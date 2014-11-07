@@ -31,7 +31,7 @@ File cacher should fall back to cached file even if expired DONE
         OR
     Don't display/cache living people
         OR
-    Show only placeholder for living people
+    Show only placeholder for living people DONE
 *Speed up caching
     Add thread(s)                          DONE
     Use getAncestory function to get several generations at once

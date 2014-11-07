@@ -85,7 +85,7 @@ public class Precacher {
         frontier.add(new PrecacheObject(person.getPerson().getId(), 0));
 
         PersonSpousesState spouses = person.readSpouses();
-        if (spouses != null) {
+        if (spouses != null && spouses.getPersons() != null) {
             for (org.gedcomx.conclusion.Person spouse : spouses.getPersons()) {
                 frontier.add(new PrecacheObject(spouse.getId(), 0));
             }
