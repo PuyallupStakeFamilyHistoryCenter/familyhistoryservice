@@ -169,12 +169,16 @@ POSSIBILITY OF SUCH DAMAGE.
             reset("Timeout logging into FamilySearch. Please try again.");
         }, 60000);
 
+        console.info("Getting access token from FamilySearch");
         FamilySearch.getAccessToken().then(function (accessToken) {
             $("#messages").html("");
             clearTimeout(timeout);
             timeout = setTimeout(function () {
                 reset("Timeout accepting permissions. Please log in again");
             }, 60000);
+            
+            console.info("Asynchronously fetching current user");
+            var currentUserPromise = FamilySearch.getCurrentUser();
 
             $("#permissions-modal").modal("show");
 
@@ -190,7 +194,7 @@ POSSIBILITY OF SUCH DAMAGE.
                     reset("Timeout setting PIN. Please log in again");
                 }, 60000);
 
-                FamilySearch.getCurrentUser().then(function (result) {
+                currentUserPromise.then(function (result) {
                     var user = result.getUser();
                     var displayName = user.displayName;
                     var userId = user.personId;
@@ -215,8 +219,7 @@ POSSIBILITY OF SUCH DAMAGE.
                             //TODO: Replace this with actual validation
                             logger.error("PINs don't match");
                             timeout = setTimeout(function () {
-                                navigate("kiosk-main");
-                                warn("Timeout creating PIN. Please log in again.", 5000);
+                                reset("Timeout creating PIN. Please log in again.");
                             }, 60000);
                             return;
                         }
@@ -227,7 +230,7 @@ POSSIBILITY OF SUCH DAMAGE.
                         $("#login-continue").hide();
                         $("#login-success").show();
                         setTimeout(function () {
-                            reset();
+                            reset(null, 5000);
                         }, 10000);
                     });
                 });
@@ -237,7 +240,11 @@ POSSIBILITY OF SUCH DAMAGE.
         });
     });
 
-    function reset(message) {
+    function reset(message, timeout) {
+        if (!timeout) {
+            timeout = 60000;
+        }
+        
         $("#permissions-modal").modal("hide");
         if (timeout) clearTimeout(timeout);
         navigate("kiosk-main");

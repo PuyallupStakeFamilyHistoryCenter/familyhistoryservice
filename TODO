@@ -172,7 +172,7 @@ Add 'report a problem' button for bug reports
 Kiosk:
 Show FS permissions dialog                 DONE
 *Revoke access token if permissions rejected
-Show permissions dialog while loading user
+Show permissions dialog while loading user DONE
 
 Library:
 Separate query params for page and fragment DONE
