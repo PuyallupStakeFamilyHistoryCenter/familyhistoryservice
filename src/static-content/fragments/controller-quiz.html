@@ -277,19 +277,20 @@ POSSIBILITY OF SUCH DAMAGE.
     
     function askQuestion() {
         $("#new-question").show();
-        var template = getRandomElement(personQuestionTemplates);
-        
-        var questionAndAnswers;
-        var maxTries = 100;
-        var currentTry = 0;
-        while (!questionAndAnswers && currentTry < maxTries) {
-            resolvedConstants = {};
-            var person = getRandomElement(filterArray(people, "living=false"));
-            
-            if (satisfiesPrerequisites(person, template.prerequisites)) {
-                questionAndAnswers = createQuestion(person, template);
+        for (var i = 0; !questionAndAnswers && i < 5; i++) {
+            var template = getRandomElement(personQuestionTemplates);
+
+            var questionAndAnswers;
+            var maxTries = 100;
+            var currentTry = 0;
+            for (var j = 0; !questionAndAnswers && j < 100; j++) {
+                resolvedConstants = {};
+                var person = getRandomElement(filterArray(people, "living=false"));
+
+                if (satisfiesPrerequisites(person, template.prerequisites)) {
+                    questionAndAnswers = createQuestion(person, template);
+                }
             }
-            currentTry++;
         }
         
         if (!questionAndAnswers) {
