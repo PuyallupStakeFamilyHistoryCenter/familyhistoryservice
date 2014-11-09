@@ -87,8 +87,8 @@ Add coloring game to menu                  DONE
 Use image chooser                          DONE
 Move image to opposite side from menu      DONE
 *Set up print function
-*Fix brush
-Limit coloring to inside image
+*Fix brush                                 DONE
+Limit coloring to inside image             DONE
 Undo feature?
 Move palate and brushes to controller?
 

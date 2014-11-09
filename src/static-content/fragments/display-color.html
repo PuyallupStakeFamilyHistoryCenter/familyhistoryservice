@@ -7,6 +7,7 @@
         verbs: {
             personImage: function (obj) {
                 var data = obj.personImage;
+                console.info("Got image " + JSON.stringify(data));
                 imagesrc = data.url;
                 init();
             }
@@ -147,14 +148,15 @@
 
         var py = -brushSize - 1;
         var px = -brushSize;
-        for (var i = 0; i < data.length; i += 4) {
+        for (var i = 0; i < data.length; i += 4, px++) {
             //TODO: Eliminate pixels that are outside the radius
-            px++;
             if (px > brushSize) {
                 py++;
                 px = -brushSize;
             }
-            if (Math.sqrt(py * py + px * px) > brushSize)
+            if (Math.sqrt(py * py + px * px) > brushSize ||
+                    (px + x) < 0 || (px + x) > image.width * scale ||
+                    (py + y) < 0 || (py + y) > image.height * scale )
                 continue;
 
             var avg = (data2[i] + data2[i + 1] + data2[i + 2]) / 3;
