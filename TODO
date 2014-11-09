@@ -65,6 +65,7 @@ Add person info on controller-puzzle       DONE
 Make piece shapes more interesting
 Back button in puzzle goes back to main screen instead of games screen
 Allow display to signal to controller when puzzle is finished
+Keep puzzle pieces from starting off the screen DONE
 
 Image chooser:
 Add get people with images call            DONE
@@ -77,10 +78,9 @@ Person chooser:
 Move person-chooser from controller-person-detail
 Load the tree instead of just the family   DONE
 Make app controls a tab                    DONE
+Arrange like family tree                   DONE
 Allow searching and sorting of ancestors
 Spacing between tabs and controls
-Arrange people by family?
-Fix spacing between buttons
 
 Color:
 Add coloring game to menu                  DONE

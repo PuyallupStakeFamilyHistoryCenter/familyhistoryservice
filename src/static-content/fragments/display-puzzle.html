@@ -206,7 +206,7 @@ POSSIBILITY OF SUCH DAMAGE.
             for (var x = 0; x < imageWidth; x += pieceWidth) {
                 for (var y = 0; y < imageHeight; y += pieceHeight) {
                     var rot = config.rotate ? rand(-Math.PI, Math.PI) : 0;
-                    var destx = rand(image.width * scale + 10, canvas.width - pieceWidth * scale - 10);
+                    var destx = Math.min(canvas.width - pieceWidth * scale, rand(image.width * scale + 10, canvas.width - pieceWidth * scale - 10));
                     var desty = rand(10, canvas.height - pieceHeight * scale - 10);
                     var n = pNSMap[x + "," + y];
                     var w = pWEMap[x + "," + y];
