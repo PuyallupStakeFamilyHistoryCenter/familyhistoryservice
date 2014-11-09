@@ -117,7 +117,7 @@ public class FamilySearchPersonSource implements Source<Person> {
                         int i = 0;
                         for (SourceDescription source : sources) {
                             //source.getAbout() is the url to the image
-                            imageUrls[i++] = "/image-cache?ref=" + URLEncoder.encode(source.getAbout().toString(), StandardCharsets.UTF_8.name());
+                            imageUrls[i++] = "/image-cache?ref=" + URLEncoder.encode(source.getAbout().toString() + "&access_token=" + accessToken, StandardCharsets.UTF_8.name());
                         }
                         builder.withImages(imageUrls);
                     }

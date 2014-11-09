@@ -40,6 +40,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.zip.GZIPOutputStream;
@@ -75,14 +76,20 @@ public class FamilySearchImageCacheHandler extends AbstractHandler {
         
         if (ref == null) {
             response.sendError(400, "Query parameter 'ref' required");
+            return;
         }
         
-        File cachedFile = new File(cacheDir, ref + ".gz");
-        File metadataFile = new File(cacheDir, ref + ".meta");
+        String filename = ref.replaceAll("access_token.*", "");
+        File cachedFile = new File(cacheDir, filename + ".gz");
+        File metadataFile = new File(cacheDir, filename + ".meta");
         
         if (!cachedFile.exists()) {
             URL refUrl = new URL(URLDecoder.decode(ref, StandardCharsets.US_ASCII.name()));
             HttpURLConnection connection = (HttpURLConnection) refUrl.openConnection();
+            Enumeration<String> headerNames = baseRequest.getHeaderNames();
+            for (String headerName = headerNames.nextElement(); headerNames.hasMoreElements(); headerName = headerNames.nextElement()) {
+                connection.setRequestProperty(headerName, baseRequest.getHeader(headerName));
+            }
             try {
                 if (connection.getResponseCode() / 100 == 2) { // Shorthand for 'is response successful?'
                     try (OutputStream out = new GZIPOutputStream(new FileOutputStream(cachedFile))) {
