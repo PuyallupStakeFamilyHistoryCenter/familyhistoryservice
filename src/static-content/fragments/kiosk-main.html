@@ -153,12 +153,6 @@ POSSIBILITY OF SUCH DAMAGE.
         }
     };
 
-    $("#login-start").hide();
-    $("#login-wait").hide();
-    $("#login-continue").hide();
-    $("#login-success").hide();
-    ws.socketSend("get-app-key");
-
     $("#show-login-screen").click(function (event) {
         event.preventDefault();
 
@@ -171,7 +165,7 @@ POSSIBILITY OF SUCH DAMAGE.
 
         console.info("Getting access token from FamilySearch");
         FamilySearch.getAccessToken().then(function (accessToken) {
-            $("#messages").html("");
+            logger.clear();
             clearTimeout(timeout);
             timeout = setTimeout(function () {
                 reset("Timeout accepting permissions. Please log in again");
@@ -188,7 +182,7 @@ POSSIBILITY OF SUCH DAMAGE.
             });
             $("#accept-permissions-btn").click(function() {
                 $("#permissions-modal").modal("hide");
-                $("#messages").html("");
+                logger.clear();
                 clearTimeout(timeout);
                 timeout = setTimeout(function () {
                     reset("Timeout setting PIN. Please log in again");
@@ -208,7 +202,7 @@ POSSIBILITY OF SUCH DAMAGE.
                     $("#login-continue").show();
 
                     $("#set-pin-form").submit(function (event) {
-                        $("#messages").html("");
+                        logger.clear();
                         event.preventDefault();
                         clearTimeout(timeout);
 
@@ -240,18 +234,22 @@ POSSIBILITY OF SUCH DAMAGE.
         });
     });
 
-    function reset(message, timeout) {
-        if (!timeout) {
-            timeout = 60000;
-        }
-        
+    function reset(message) {
         $("#permissions-modal").modal("hide");
         if (timeout) clearTimeout(timeout);
-        navigate("kiosk-main");
+        //navigate("kiosk-main");
+        $("#login-start").hide();
+        $("#login-wait").hide();
+        $("#login-continue").hide();
+        $("#login-success").hide();
+        ws.socketSend("get-app-key");
+        logger.clear();
         if (message) {
             logger.warn(message, 5000);
         }
     }
+    
+    reset();
 </script>
 
 

@@ -124,7 +124,7 @@ function getDisplayName() {
 var defaultSettings = {
     display: {
         title: "Display",
-        header: '<img src="/media/logo.png" alt="Puyallup Family History Center logo" />',
+        header: '<img src="/nmedia/logo.png" alt="Puyallup Family History Center logo" />',
         contentPadding: false,
         verbs: {
             standby: function() {
@@ -189,7 +189,7 @@ var defaultSettings = {
     },
     kiosk: {
         title: "Kiosk",
-        header: '<img src="/media/logo.png" alt="Puyallup Family History Center logo" />',
+        header: '<img src="/nmedia/logo.png" alt="Puyallup Family History Center logo" />',
         contentPadding: false,
         verbs:{},
         begin: function() {
@@ -202,7 +202,7 @@ var defaultSettings = {
 };
 
 function messageHandler(message) {
-    $("#messages").html("");
+    logger.clear();
     
     if (message.data === "connected") {
         return;
@@ -243,6 +243,10 @@ var logger = {
 
     success: function (message) {
         log("success", message);
+    },
+    
+    clear: function() {
+        clearLog();
     }
 }
 
@@ -251,6 +255,11 @@ function log(level, message) {
     $("#messages").append('<div class="alert alert-' + level + ' alert-dismissible" role="alert">'+
             '<button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>' + 
             message + '</div>');
+}
+
+function clearLog() {
+    //TODO: Add timeout parameter for messages to disappear
+    $("#messages").html();
 }
 
 function navigate(dest, timeout) {

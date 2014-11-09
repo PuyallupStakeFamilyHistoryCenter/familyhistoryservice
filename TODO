@@ -35,6 +35,7 @@ File cacher should fall back to cached file even if expired DONE
 *Speed up caching
     Add thread(s)                          DONE
     Use getAncestory function to get several generations at once
+    Rethink get person logic to reduce wasted downloads
 Add progress bar for caching
 Location cache
 Allow timeouts on requests

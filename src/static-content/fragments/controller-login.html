@@ -80,7 +80,7 @@ POSSIBILITY OF SUCH DAMAGE.
     ws.socketSend("list-current-users");
 
     $("#login-form").submit(function (event) {
-        $("#messages").html("");
+        logger.clear();
         event.preventDefault();
 
         var userId = $("#userid-input").val();
