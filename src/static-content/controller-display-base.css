@@ -58,3 +58,7 @@ dd, dt {
 invisible {
     visibility: hidden;
 }
+
+.nav-tabs>li>a {
+    border: 1px solid #282828
+}

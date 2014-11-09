@@ -66,6 +66,8 @@ POSSIBILITY OF SUCH DAMAGE.
                 
                 var choiceType = getParameterByName("type");
                 $(".person-btn").click(function (e) {
+                    logger.clear();
+                    
                     var id = $(this).attr("data-id");
                     switch (choiceType) {
                         case "person": {
@@ -88,11 +90,11 @@ POSSIBILITY OF SUCH DAMAGE.
 
                     //navigate("controller-" + target);
                     innerNavigate("controller-" + target, "#controls");
-                    innerNavigate("display-person-detail?hide_image=true&person_id=" + id, "#person-info");
-
-                    $("#images-btn").removeClass("active");
-                    $("#person-info-btn").show().click().addClass("active");
-                    $("#controls-btn").show();
+                    innerNavigate("display-person-detail?hide_image=true&person_id=" + id, "#person-info").then(function() {
+                        $("#people-btn").removeClass("active");
+                        $("#person-info-btn").show().click().addClass("active");
+                        $("#controls-btn").show();
+                    });
                 });
             }
         }
@@ -179,7 +181,10 @@ POSSIBILITY OF SUCH DAMAGE.
             var pow = Math.pow(2, i);
             var percentHeight = 100/pow;
             for (var j = 0; j < Math.pow(2, i); j++) {
-                $("#gen-" + i).append("<div id='gen-" + i + "-"+ j +"' style='height: "+percentHeight+"%; border: none; position: relative;'><div id='connector-" + (i+1) + "-"+ (j*2) +"' class='invisible' style='position: absolute; top: 25%; left: 50%; border-top-left-radius: 10px; border-left: 2px solid CornflowerBlue; border-top: 2px solid CornflowerBlue; width: 100%; height: 25%'></div><div id='connector-" + (i+1) + "-"+ (j*2+1) +"' class='invisible' style='position: absolute; top: 50%; left: 50%; border-bottom-left-radius: 10px; border-left: 2px solid Crimson; border-bottom: 2px solid Crimson; width: 100%; height: 25%'></div></div>");
+                $("#gen-" + i).append("<div id='gen-" + i + "-"+ j +"' style='height: "+percentHeight+"%; border: none; position: relative;'>\n" +
+                        "<div id='connector-" + (i+1) + "-"+ (j*2) +"' class='invisible' style='position: absolute; top: 25%; left: 50%; border-top-left-radius: 10px; border-left: 2px solid CornflowerBlue; border-top: 2px solid CornflowerBlue; width: 100%; height: 25%'></div>\n" +
+                        "<div id='connector-" + (i+1) + "-"+ (j*2+1) +"' class='invisible' style='position: absolute; top: 50%; left: 50%; border-bottom-left-radius: 10px; border-left: 2px solid Crimson; border-bottom: 2px solid Crimson; width: 100%; height: 25%'></div>\n" +
+                    "</div>");
             }
         }
     }
