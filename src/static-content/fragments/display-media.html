@@ -24,6 +24,20 @@ CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 -->
-<div class="embed-responsive embed-responsive-16by9">
-  <iframe class="embed-responsive-item" src="https://www.youtube.com/embed/-015RQxil5A?autoplay=1&cc_lang_pref=fr&cc_load_policy=1"></iframe>
+<script>
+    settings.local = {
+        verbs: {
+            youtube: function(obj) {
+                console.info("Embedding video from YouTube");
+                $("#media-holder").html('<iframe style="height: 100%; width: 100%; position: fixed; top: 0; left: 0;" type="text/html" src="https://www.youtube.com/embed/' + obj.id + '?autoplay=1&controls=0&disablekb=1&enablejsapi=1&fs=1&modestbranding=1&rel=0" frameborder="0">')
+            }
+        }
+    }
+    
+    function onYouTubeIframeAPIReady() {
+        
+    }
+</script>
+
+<div id="media-holder" class="embed-responsive embed-responsive-16by9">
 </div>

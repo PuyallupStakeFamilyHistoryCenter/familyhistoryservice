@@ -58,6 +58,7 @@ Snap radius setting shouldn't be disabled by snap-on-drag DONE
 Don't reset game on size change if the size doesn't actually change DONE
 Figure out why puzzle scrolls in split mode DONE
 Set up image chooser                       DONE
+Keep puzzle pieces from starting off the screen DONE
 *Test on iPad in split mode
 *Fix piece rotation in split mode          ?
 *Fix z-order in split mode                 ?
@@ -65,13 +66,13 @@ Add person info on controller-puzzle       DONE
 Make piece shapes more interesting
 Back button in puzzle goes back to main screen instead of games screen
 Allow display to signal to controller when puzzle is finished
-Keep puzzle pieces from starting off the screen DONE
 
 Image chooser:
 Add get people with images call            DONE
 Make app controls a tab                    DONE
 Style tabs correctly                       DONE
-*Image choice persists from puzzle to color DONE
+Image choice persists from puzzle to color DONE
+*Split mode on iPad: images don't load
 Spacing between tabs and controls
 
 Person chooser:
@@ -79,7 +80,7 @@ Move person-chooser from controller-person-detail
 Load the tree instead of just the family   DONE
 Make app controls a tab                    DONE
 Arrange like family tree                   DONE
-*Use person chooser for the person-details page DONE
+Use person chooser for the person-details page DONE
 Allow searching and sorting of ancestors
 Spacing between tabs and controls
 
@@ -87,11 +88,13 @@ Color:
 Add coloring game to menu                  DONE
 Use image chooser                          DONE
 Move image to opposite side from menu      DONE
-*Set up print function
-*Fix brush                                 DONE
+Fix brush                                  DONE
 Limit coloring to inside image             DONE
-Undo feature?
+*Set up print function
+*Allow brush resizing
 Move palate and brushes to controller?
+Add different brush types?
+Undo feature?
 
 Life map:
 Test map movement (changed to 'send' commands; removed native 'move' commands) DONE
@@ -100,8 +103,9 @@ Show life events for family                DONE
 Add timestamp to facts and sort            DONE
 Add person chooser                         DONE
 Add person info                            DONE
-*Fix mouse zoom (pinch) in split mode
+*Fix mouse zoom (pinch) in split mode      DONE
 *Fix buttons in split mode
+*Map doesn't display locations in split mode
 Maybe add spiral effect from RootsMapper
 Load Google Maps API only once
 Add multi-generation map mode
@@ -126,6 +130,7 @@ Allow filter based on main person's attributes DONE
 Show stats on display                      DONE
 Allow assigning variables names for reuse  DONE
 Shuffle answers                           DONE
+Allow more complex filters (e.g. >, >=)    DONE
 *Add more questions
 Allow selection of people
 Difficulty levels
@@ -135,7 +140,6 @@ Difficulty levels
 Automatically grade questions based on answer frequency
 Automatically grade answers based on answer frequency
 Automatically progress difficulty based on performance
-Allow more complex filters (e.g. >, >=)    DONE
 Fix image questions
     Image questions should use persona info from FS
     OR
@@ -149,7 +153,8 @@ Conditionalize relationship questions
 More advanced duplicate answer detection
 
 Media:
-*Add video selection screen
+Add video selection screen                 DONE
+Add video controls to controller
 
 Display main:
 Put sample content into carousel           DONE

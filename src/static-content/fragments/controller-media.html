@@ -24,3 +24,34 @@ CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 -->
+
+<script>
+    var videos = [
+        {
+            id: "-DpJ85617hc",
+            title: "Music Video: Something Divine - Brooke White",
+            responseType: "youtube"
+        },
+        {
+            id: "gdoaHHDK_SA",
+            title: "Music Video: Have I Done Any Good? featuring Alex Boye and Carmen Rasmusen Herbert",
+            responseType: "youtube"
+        },
+        {
+            id: "-015RQxil5A",
+            title: "Syrian Refugee - “The moment I was shot I knew I would never walk again”",
+            responseType: "youtube"
+        }
+    ];
+    
+    console.info("Creating media buttons");
+    $.each(videos, function(index, video) {
+        $("#media-buttons").append("<button class='btn btn-lg btn-default media-btn' data-video='" + JSON.stringify(video) + "' ><span class='btn-nav' style='background-image: url(\"/image-cache?ref=https%3A%2F%2Fimg.youtube.com%2Fvi%2F"+ video.id +"%2Fsddefault.jpg\"); background-repeat: no-repeat; background-attachment: local; background-position: center; background-size:200px 150px '></span></button>")
+    });
+    
+    $(".media-btn").click(function() {
+        sendToDisplay($(this).attr("data-video"));
+    });
+</script>
+
+<div id="media-buttons"></div>
