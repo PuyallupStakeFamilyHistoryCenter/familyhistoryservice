@@ -24,20 +24,56 @@ CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 -->
+
+<div id="media-holder" class="embed-responsive embed-responsive-16by9">
+    <iframe id="player" style="height: 100%; width: 100%; position: fixed; top: 0; left: 0;" type="text/html" src="https://www.youtube.com/embed/-DpJ85617hc?controls=0&disablekb=1&enablejsapi=1&fs=1&modestbranding=1&rel=0" frameborder="0"></iframe>
+</div>
+
 <script>
+    var player, ready;
+    
     settings.local = {
         verbs: {
-            youtube: function(obj) {
+            youtube: function (obj) {
                 console.info("Embedding video from YouTube");
-                $("#media-holder").html('<iframe style="height: 100%; width: 100%; position: fixed; top: 0; left: 0;" type="text/html" src="https://www.youtube.com/embed/' + obj.id + '?autoplay=1&controls=0&disablekb=1&enablejsapi=1&fs=1&modestbranding=1&rel=0" frameborder="0">')
+                if (ready) player.loadVideoById(obj.id);
+            },
+            pause: function () {
+                if (ready) player.pauseVideo();
+            },
+            play: function () {
+                if (ready) player.playVideo();
             }
         }
     }
-    
+
+    $("#player").load(function () {
+        try {
+            //Test if YouTube API already loaded
+            onYouTubeIframeAPIReady();
+        } catch (e) {
+            var tag = document.createElement('script');
+
+            tag.src = "https://www.youtube.com/iframe_api";
+            var player = document.getElementById("player");
+            player.parentNode.insertBefore(tag, player);
+        }
+    });
+
     function onYouTubeIframeAPIReady() {
-        
+        player = new YT.Player('player', {
+            events: {
+                'onReady': onPlayerReady,
+                'onStateChange': onPlayerStateChange
+            }
+        });
+    }
+    
+    function onPlayerReady(event) {
+        ready = true;
+    }
+    
+    function onPlayerStateChange(event) {
+        console.info("Player state change event " + JSON.stringify(event));
     }
 </script>
-
-<div id="media-holder" class="embed-responsive embed-responsive-16by9">
-</div>

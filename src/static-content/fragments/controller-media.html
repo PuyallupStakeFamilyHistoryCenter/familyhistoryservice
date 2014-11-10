@@ -25,6 +25,16 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 -->
 
+<ul class="nav nav-tabs" id="tabs" role="tablist">
+    <li class="active" id="media-tab" ><a href="#images" role="tab" data-toggle="tab">Media</a></li>
+    <li id="controls-tab" style="display: none" ><a href="#controls" role="tab" data-toggle="tab">Controls</a></li>
+</ul>
+<div id="media-buttons"></div>
+<div id="controls" style="display: none;">
+    <button id="play-btn" class="btn btn-lg btn-default" style="display: none"><span class="glyphicon glyphicon-play" ></span></button>
+    <button id="pause-btn" class="btn btn-lg btn-default"><span class="glyphicon glyphicon-pause" ></span></button>
+</div>
+
 <script>
     var videos = [
         {
@@ -51,7 +61,31 @@ POSSIBILITY OF SUCH DAMAGE.
     
     $(".media-btn").click(function() {
         sendToDisplay($(this).attr("data-video"));
+        $("#controls-tab").show().click().addClass("active");
+        $("#media-tab").removeClass("active");
+        $("#pause-btn").show();
+        $("#play-btn").hide();
+    });
+    
+    $("#media-tab").click(function (e) {
+        $("#media-buttons").show();
+        $("#controls").hide();
+    });
+
+    $("#controls-tab").click(function (e) {
+        $("#media-buttons").hide();
+        $("#controls").show();
+    });
+    
+    $("#play-btn").click(function (e) {
+        sendToDisplay(JSON.stringify({responseType:"play"}));
+        $("#pause-btn").show();
+        $("#play-btn").hide();
+    });
+    
+    $("#pause-btn").click(function (e) {
+        sendToDisplay(JSON.stringify({responseType:"pause"}));
+        $("#pause-btn").hide();
+        $("#play-btn").show();
     });
 </script>
-
-<div id="media-buttons"></div>
