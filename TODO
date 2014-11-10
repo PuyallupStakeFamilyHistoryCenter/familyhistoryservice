@@ -79,7 +79,7 @@ Move person-chooser from controller-person-detail
 Load the tree instead of just the family   DONE
 Make app controls a tab                    DONE
 Arrange like family tree                   DONE
-*Use person chooser for the person-details page
+*Use person chooser for the person-details page DONE
 Allow searching and sorting of ancestors
 Spacing between tabs and controls
 
@@ -170,6 +170,9 @@ Add picture to the individual page         DONE
 *Return/done should submit login form
 Set up accordian for groups of controls
 Add 'report a problem' button for bug reports
+
+Display:
+Experiment with setting font sizes with vh,vw,vmin,and vmax css units
 
 Kiosk:
 Show FS permissions dialog                 DONE
