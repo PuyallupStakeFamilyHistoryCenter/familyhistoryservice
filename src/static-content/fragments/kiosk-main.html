@@ -235,21 +235,20 @@ POSSIBILITY OF SUCH DAMAGE.
     });
 
     function reset(message) {
+        logger.clear();
         $("#permissions-modal").modal("hide");
         if (timeout) clearTimeout(timeout);
-        //navigate("kiosk-main");
-        $("#login-start").hide();
-        $("#login-wait").hide();
-        $("#login-continue").hide();
-        $("#login-success").hide();
-        ws.socketSend("get-app-key");
-        logger.clear();
+        navigate("kiosk-main");
         if (message) {
             logger.warn(message, 5000);
         }
     }
     
-    reset();
+    $("#login-start").hide();
+    $("#login-wait").hide();
+    $("#login-continue").hide();
+    $("#login-success").hide();
+    ws.socketSend("get-app-key");
 </script>
 
 
