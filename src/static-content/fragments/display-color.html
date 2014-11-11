@@ -10,6 +10,14 @@
                 console.info("Got image " + JSON.stringify(data));
                 imagesrc = data.url;
                 init();
+            },
+            swatch: function(obj) {
+                console.info("Setting brush color");
+                context.fillStyle = obj.color;
+            },
+            brushSize: function(obj) {
+                console.info("Setting brush size");
+                brushSize = obj.size;
             }
         }
     }

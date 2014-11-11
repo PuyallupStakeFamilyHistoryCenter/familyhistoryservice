@@ -90,10 +90,12 @@ Use image chooser                          DONE
 Move image to opposite side from menu      DONE
 Fix brush                                  DONE
 Limit coloring to inside image             DONE
+Allow brush resizing                       DONE
 *Set up print function
-*Allow brush resizing
-Move palate and brushes to controller?
+Move palate and brushes to controller?     STARTED
 Add different brush types?
+Rearrange colors more logically
+Change mouse pointer
 Undo feature?
 
 Life map:
