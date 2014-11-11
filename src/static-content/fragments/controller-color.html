@@ -38,6 +38,7 @@ POSSIBILITY OF SUCH DAMAGE.
 </dl>
 
 <button id="print-btn" class="btn btn-lg btn-default">Print</button>
+<button id="email-btn" class="btn btn-lg btn-default">Email</button>
 
 <script>
     var swatches = [
@@ -82,5 +83,9 @@ POSSIBILITY OF SUCH DAMAGE.
     
     $("#print-btn").click(function() {
         sendToDisplay("{\"responseType\":\"print\"}")
+    });
+    
+    $("#print-btn").click(function() {
+        sendToDisplay("{\"responseType\":\"email\",\"email\":\"anonymous@gmail.com\"}")
     });
 </script>
