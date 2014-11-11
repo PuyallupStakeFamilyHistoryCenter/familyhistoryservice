@@ -37,6 +37,8 @@ POSSIBILITY OF SUCH DAMAGE.
     </dd>
 </dl>
 
+<button id="print-btn" class="btn btn-lg btn-default">Print</button>
+
 <script>
     var swatches = [
         {responseType: "swatch", color: "#FFDCB2"},
@@ -76,5 +78,9 @@ POSSIBILITY OF SUCH DAMAGE.
 
     $(".brush-size-btn").click(function () {
         sendToDisplay($(this).attr("data-size"));
+    });
+    
+    $("#print-btn").click(function() {
+        sendToDisplay("{\"responseType\":\"print\"}")
     });
 </script>
