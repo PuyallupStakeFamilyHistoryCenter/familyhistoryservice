@@ -162,7 +162,7 @@
                 py++;
                 px = -brushSize;
             }
-            if (Math.sqrt(py * py + px * px) > brushSize ||
+            if (Math.sqrt(py * py + px * px) > brushSize - .5 ||
                     (px + x) < 0 || (px + x) > image.width * scale ||
                     (py + y) < 0 || (py + y) > image.height * scale )
                 continue;

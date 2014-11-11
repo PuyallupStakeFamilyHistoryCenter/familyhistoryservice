@@ -25,46 +25,55 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 -->
 
-<div id="palate"></div>
-<div id="brush-size" class="btn-group"></div>
+<dl class="dl-horizontal">
+    <dt>Brush color</dt>
+    <dd>
+        <div id="palate"></div>
+    </dd>
+        
+    <dt>Brush size</dt>
+    <dd>
+        <div id="brush-size" class="btn-group"></div>
+    </dd>
+</dl>
 
 <script>
     var swatches = [
-        { responseType:"swatch", color: "#FFDCB2"}, 
-        { responseType:"swatch", color: "#FF0066"}, 
-        { responseType:"swatch", color: "#00CC00"}, 
-        { responseType:"swatch", color: "#FF0000"}, 
-        { responseType:"swatch", color: "#00FF00"}, 
-        { responseType:"swatch", color: "#0000FF"}, 
-        { responseType:"swatch", color: "SkyBlue"}, 
-        { responseType:"swatch", color: "LightGreen"}, 
-        { responseType:"swatch", color: "SaddleBrown"}, 
-        { responseType:"swatch", color: "Tomato"}, 
-        { responseType:"swatch", color: "OrangeRed"}
+        {responseType: "swatch", color: "#FFDCB2"},
+        {responseType: "swatch", color: "#FF0066"},
+        {responseType: "swatch", color: "#00CC00"},
+        {responseType: "swatch", color: "#FF0000"},
+        {responseType: "swatch", color: "#00FF00"},
+        {responseType: "swatch", color: "#0000FF"},
+        {responseType: "swatch", color: "SkyBlue"},
+        {responseType: "swatch", color: "LightGreen"},
+        {responseType: "swatch", color: "SaddleBrown"},
+        {responseType: "swatch", color: "Tomato"},
+        {responseType: "swatch", color: "OrangeRed"}
     ];
-    
+
     var brushSizes = [
-        { responseType:"brushSize", size: 1 },
-        { responseType:"brushSize", size: 3 },
-        { responseType:"brushSize", size: 5 },
-        { responseType:"brushSize", size: 7 },
-        { responseType:"brushSize", size: 9 },
-        { responseType:"brushSize", size: 11 }
+        {responseType: "brushSize", size: 1},
+        {responseType: "brushSize", size: 3},
+        {responseType: "brushSize", size: 5},
+        {responseType: "brushSize", size: 7},
+        {responseType: "brushSize", size: 9},
+        {responseType: "brushSize", size: 11}
     ]
-    
-    $.each(swatches, function(index, swatch) {
-        $("#palate").append("<button class='btn btn-lg btn-default swatch-btn' data-swatch='"+JSON.stringify(swatch)+"' style='background-color: "+ swatch.color +"'></button>");
+
+    $.each(swatches, function (index, swatch) {
+        $("#palate").append("<button class='btn btn-lg btn-default swatch-btn' data-swatch='" + JSON.stringify(swatch) + "' style='background-color: " + swatch.color + "'></button>");
     });
 
-    $(".swatch-btn").click(function() {
+    $(".swatch-btn").click(function () {
         sendToDisplay($(this).attr("data-swatch"));
     });
-        
-    $.each(brushSizes, function(index, brushSize) {
-        $("#brush-size").append("<button class='btn btn-lg btn-default brush-size-btn' data-size='"+JSON.stringify(brushSize)+"'>"+brushSize.size+"</button>")
+
+    $.each(brushSizes, function (index, brushSize) {
+        $("#brush-size").append("<button class='btn btn-lg btn-default brush-size-btn' data-size='" + JSON.stringify(brushSize) + "'>" + brushSize.size + "</button>")
     })
-    
-    $(".brush-size-btn").click(function() {
+
+    $(".brush-size-btn").click(function () {
         sendToDisplay($(this).attr("data-size"));
     });
 </script>
