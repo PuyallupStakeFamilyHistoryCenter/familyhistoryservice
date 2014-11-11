@@ -1,6 +1,7 @@
 
 <canvas id="canvas" width="1" height="1" style="position:fixed; top: 0px; left: 0px;"/>
 <canvas id="canvas2" width="1" height="1" style="position:fixed; top: 0px; left: 0px; visibility: hidden"/>
+<canvas id="palateCanvas" width="1" height="1" style="position:fixed; top: 0px; left: 0px; visibility: hidden"/>
 
 <script>
     settings.local = {
@@ -13,7 +14,7 @@
             },
             swatch: function(obj) {
                 console.info("Setting brush color");
-                context.fillStyle = obj.color;
+                changeBrush(obj.color);
             },
             brushSize: function(obj) {
                 console.info("Setting brush size");
@@ -21,11 +22,10 @@
             }
         }
     }
-    
-    var swatches = ["#FFDCB2", "#FF0066", "#00CC00", "#FF0000", "#00FF00", "#0000FF", "SkyBlue", "LightGreen", "SaddleBrown", "Tomato", "OrangeRed"]
 
     var imagesrc = getParameterByName("image");
     var canvas, context, canvas2, context2, image;
+    var palateCanvas, palateContext;
     var r, g, b, brushSize;
     var scale;
     var pressed = false;
@@ -39,6 +39,8 @@
         context = canvas.getContext("2d");
         canvas2 = document.getElementById("canvas2");
         context2 = canvas2.getContext("2d");
+        palateCanvas = document.getElementById("palateCanvas");
+        palateContext = palateCanvas.getContext("2d");
         image = new Image();
         if (!imagesrc) {
             return;
@@ -65,8 +67,6 @@
             }
 
             context.putImageData(imageData, 0, 0);
-
-            drawSwatches();
         }
 
         canvas.onmousedown = function (e) {
@@ -132,8 +132,12 @@
 //        drawLineSegment(startX, startY, x, y);
     }
 
-    function changeBrush(x, y) {
-        var pixels = context.getImageData(x, y, 1, 1);
+    function changeBrush(color) {
+        var x = 0, y = 0;
+        palateContext.fillStyle = color;
+        palateContext.fillRect(x, y, 1, 1);
+        
+        var pixels = palateContext.getImageData(x, y, 1, 1);
         var d = pixels.data;
         if (d[3] === 0) {
             r = 255;
@@ -144,8 +148,6 @@
             g = d[1];
             b = d[2];
         }
-        context.fillStyle = "rgba(" + r + "," + g + "," + b + ",.01)";
-        context.fillRect(image.width * scale + 60, 10, 50, 50);
     }
 
     function applyBrush(x, y) {
@@ -221,14 +223,6 @@
         context.arc(sx, sy, radius, startAngle, endAngle, true);
         context.fill();
     }
-
-    function drawSwatches() {
-        for (i = 0; i < swatches.length; i++) {
-            context.strokeStyle = swatches[i];
-            context.fillStyle = swatches[i];
-            context.fillRect(image.width * scale + 10, 10 * (i + 1) + 30 * i, 30, 30);
-        }
-    }
     
     function resize() {
         canvas.width = window.innerWidth - 16;
@@ -236,7 +230,7 @@
         canvas2.width = window.innerWidth - 16;
         canvas2.height = window.innerHeight - 16;
             
-        scale = Math.min((canvas.width - 50)/image.width, canvas.height/image.height);
+        scale = Math.min(canvas.width/image.width, canvas.height/image.height);
     }
 
     init();

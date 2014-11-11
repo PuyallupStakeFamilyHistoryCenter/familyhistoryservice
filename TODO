@@ -91,10 +91,11 @@ Move image to opposite side from menu      DONE
 Fix brush                                  DONE
 Limit coloring to inside image             DONE
 Allow brush resizing                       DONE
+Move palate and brushes to controller?     DONE
 *Set up print function
-Move palate and brushes to controller?     STARTED
 Add different brush types?
 Rearrange colors more logically
+Add more color options
 Change mouse pointer
 Undo feature?
 
@@ -139,6 +140,7 @@ Difficulty levels
     Configurable # answers
     Give questions difficulty grades
     Change # generations
+    Show person-details tab (for lower difficulty)
 Automatically grade questions based on answer frequency
 Automatically grade answers based on answer frequency
 Automatically progress difficulty based on performance
