@@ -339,7 +339,19 @@ public class FamilyHistoryCenterSocket {
                     break;
                 }
                 
-                case "get-descendents": {
+                case "send-ancestors": {
+                    token = scanner.next();
+                    String displayId = scanner.next();
+                    String personId = scanner.next();
+                    String accessToken = tokenToAccessToken(token);
+                    List<Person> family = personDao.listAncestors(personId, 4, accessToken);
+                    
+                    sendToDisplay(displayId, getPeopleResponse(family));
+                    
+                    break;
+                }
+                
+                case "get-descendants": {
                     token = scanner.next();
                     String personId = scanner.next();
                     String paginationKey = null;
@@ -352,6 +364,18 @@ public class FamilyHistoryCenterSocket {
                     } else {
                         throw new IllegalStateException("person " + personId + " not found");
                     }
+                    
+                    break;
+                }
+                
+                case "send-descendants": {
+                    token = scanner.next();
+                    String displayId = scanner.next();
+                    String personId = scanner.next();
+                    String accessToken = tokenToAccessToken(token);
+                    List<Person> family = personDao.listDescendants(personId, 3, accessToken);
+                    
+                    sendToDisplay(displayId, getPeopleResponse(family));
                     
                     break;
                 }

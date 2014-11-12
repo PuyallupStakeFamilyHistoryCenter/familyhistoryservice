@@ -107,28 +107,7 @@ POSSIBILITY OF SUCH DAMAGE.
 
                     var id = $(this).attr("data-id");
                     if (sendPeople) {
-                        switch (choiceType) {
-                            case "person":
-                            {
-                                ws.socketSend("send-person " + token + " " + displayName + " " + id);
-                                break;
-                            }
-                            case "family":
-                            {
-                                ws.socketSend("send-family " + token + " " + displayName + " " + id);
-                                break;
-                            }
-                            case "ancestors":
-                            {
-                                ws.socketSend("send-ancestors " + token + " " + displayName + " " + id);
-                                break;
-                            }
-                            case "descendants":
-                            {
-                                ws.socketSend("send-descendants " + token + " " + displayName + " " + id);
-                                break;
-                            }
-                        }
+                        ws.socketSend("send-" + choiceType + " " + token + " " + displayName + " " + id);
                     }
 
                     if (target) {
@@ -139,28 +118,7 @@ POSSIBILITY OF SUCH DAMAGE.
                                 $("#controls-btn").click().addClass("active");
 
                                 if (!sendPeople) {
-                                    switch (choiceType) {
-                                        case "person":
-                                        {
-                                            ws.socketSend("get-person " + token + " " + id);
-                                            break;
-                                        }
-                                        case "family":
-                                        {
-                                            ws.socketSend("get-family " + token + " " + id);
-                                            break;
-                                        }
-                                        case "ancestors":
-                                        {
-                                            ws.socketSend("get-ancestors " + token + " " + id);
-                                            break;
-                                        }
-                                        case "descendants":
-                                        {
-                                            ws.socketSend("get-descendants " + token + " " + id);
-                                            break;
-                                        }
-                                    }
+                                    ws.socketSend("get-" + choiceType + " " + token + " " + id);
                                 }
                             }
                         });
@@ -200,7 +158,7 @@ POSSIBILITY OF SUCH DAMAGE.
     });
 
     if (!choiceType) {
-        choiceType = "ancestory";
+        choiceType = "ancestors";
         $("#choice-type-btns").show();
     }
 

@@ -278,7 +278,7 @@ POSSIBILITY OF SUCH DAMAGE.
             ],
             constants: {
                 child1: "children.*gender=Female",
-                child2: "children.*gender=Female,id!=${child.id}"
+                child2: "children.*gender=Female,id!=${child1.id}"
             },
             question: "How are ${child1.name} and ${child2.name} related?",
             answers: [
@@ -404,7 +404,7 @@ POSSIBILITY OF SUCH DAMAGE.
     }
     
     function satisfiesPrerequisites(person, prerequisites) {
-        if (person.living) {
+        if (!person || person.living) {
             return false;
         }
         
