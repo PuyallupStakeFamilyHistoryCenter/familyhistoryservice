@@ -140,6 +140,7 @@ Show stats on display                      DONE
 Allow assigning variables names for reuse  DONE
 Shuffle answers                           DONE
 Allow more complex filters (e.g. >, >=)    DONE
+React on display to correct and incorrect answers DONE
 *Add more questions
 *BUG: How are null and null related? Mother and daughter
 Allow selection of people
@@ -156,12 +157,12 @@ Fix image questions
     OR
     Allow searching for people with same image DONE
 Rethink layout
-React on display to correct and incorrect answers DONE
 Allow reporting problems with question/answers
 Figure out why some answers are 'undefined'
 Allow conditionals (e.g. "gender=Female?her:his")
 Conditionalize relationship questions
 More advanced duplicate answer detection
+Require at least 2 answers                 DONE
 
 Media:
 Add video selection screen                 DONE
