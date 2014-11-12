@@ -25,116 +25,6 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 -->
 
-<script>
-    var choiceType = getParameterByName("type");
-    var target = getParameterByName("target");
-    var showPersonDetail = !getParameterByName("hidePersonDetail");
-    var sendPeople = !getParameterByName("getPeople");
-
-    function recursivelyAddButtons(person, personMap, index, depth) {
-        console.info("Adding person " + JSON.stringify(person) + " to #gen-" + depth + "-" + index)
-        $("#gen-" + depth + "-" + index).append("<button class='btn btn-default person-btn' style='position: absolute; left: 0; top: calc(50% - 19px); z-index: 100;' data-id='" + person.id + "'>"+person.name+"</button>");
-        $("#connector-" + depth + "-" + index).removeClass("invisible");
-        
-        if (person.parents) {
-            var fatherArray = filterArray(person.parents, "gender=Male");
-            if (fatherArray[0]) {
-                var father = personMap[fatherArray[0].id];
-                if (father) {
-                    recursivelyAddButtons(father, personMap, index*2, depth+1);
-                }
-            }
-            
-            var motherArray = filterArray(person.parents, "gender=Female");
-            if (motherArray[0]) {
-                var mother = personMap[motherArray[0].id];
-                if (mother) {
-                    recursivelyAddButtons(mother, personMap, index*2+1, depth+1);
-                }
-            }
-        }
-    }
-
-    settings.local = {
-        verbs: {
-            people: function(obj) {
-                var people = obj.people;
-                var peopleIndex = {};
-                
-                $.each(people, function (index, person) {
-                    peopleIndex[person.id] = person;
-                });
-                
-                recursivelyAddButtons(people[0], peopleIndex, 0, 0);
-                
-                $(".person-btn").click(function (e) {
-                    logger.clear();
-                    
-                    var id = $(this).attr("data-id");
-                    if (sendPeople) {
-                        switch (choiceType) {
-                            case "person": {
-                                ws.socketSend("send-person " + token + " " + displayName + " " + id);
-                                break;
-                            }
-                            case "family": {
-                                ws.socketSend("send-family " + token + " " + displayName + " " + id);
-                                break;
-                            }
-                            case "ancestors": {
-                                ws.socketSend("send-ancestors " + token + " " + displayName + " " + id);
-                                break;
-                            }
-                            case "descendants": {
-                                ws.socketSend("send-descendants " + token + " " + displayName + " " + id);
-                                break;
-                            }
-                        }
-                    }
-
-                    if (target) {
-                        innerNavigate("controller-" + target, "#controls").then(function() {
-                            $("#controls-btn").show();
-                            if (!showPersonDetail) {
-                                $("#people-btn").removeClass("active");
-                                $("#controls-btn").click().addClass("active");
-                                
-                                if (!sendPeople) {
-                                    switch (choiceType) {
-                                        case "person": {
-                                            ws.socketSend("get-person " + token + " " + id);
-                                            break;
-                                        }
-                                        case "family": {
-                                            ws.socketSend("get-family " + token + " " + id);
-                                            break;
-                                        }
-                                        case "ancestors": {
-                                            ws.socketSend("get-ancestors " + token + " " + id);
-                                            break;
-                                        }
-                                        case "descendants": {
-                                            ws.socketSend("get-descendants " + token + " " + id);
-                                            break;
-                                        }
-                                    }
-                                }
-                            }
-                        });
-                    }
-                    
-                    if (showPersonDetail) {
-                        innerNavigate("display-person-detail?hide_image=true&person_id=" + id, "#person-info").then(function() {
-                            $("#people-btn").removeClass("active");
-                            $("#person-info-btn").show().click().addClass("active");
-                        });
-                    }
-                });
-            }
-        }
-    }
-</script>
-
 <ul class="nav nav-tabs" id="tabs" role="tablist">
     <li class="active" id="people-btn" ><a href="#people" role="tab" data-toggle="tab">People</a></li>
     <li id="person-info-btn" style="display: none" ><a href="#person-info" role="tab" data-toggle="tab">Person</a></li>
@@ -142,16 +32,16 @@ POSSIBILITY OF SUCH DAMAGE.
 </ul>
 <div id="people">
     <div id="choice-type-btns" class="btn-group btn-group-lg" style="display: none" data-toggle="buttons" >
-        <label class="btn btn-default">
+        <label class="btn btn-default type-btn">
             <input type="radio" name="choice-type" value="person">Person
         </label>
-        <label class="btn btn-default">
+        <label class="btn btn-default type-btn">
             <input type="radio" name="choice-type" value="family">Family
         </label>
-        <label class="btn btn-default">
+        <label class="btn btn-default type-btn">
             <input type="radio" name="choice-type" value="ancestors">Ancestors
         </label>
-        <label class="btn btn-default">
+        <label class="btn btn-default type-btn">
             <input type="radio" name="choice-type" value="descendants">Descendants
         </label>
     </div>
@@ -171,6 +61,122 @@ POSSIBILITY OF SUCH DAMAGE.
 </div>
 
 <script>
+    var choiceType = getParameterByName("type");
+    var target = getParameterByName("target");
+    var showPersonDetail = !getParameterByName("hidePersonDetail");
+    var sendPeople = !getParameterByName("getPeople");
+
+    function recursivelyAddButtons(person, personMap, index, depth) {
+        console.info("Adding person " + JSON.stringify(person) + " to #gen-" + depth + "-" + index)
+        $("#gen-" + depth + "-" + index).append("<button class='btn btn-default person-btn' style='position: absolute; left: 0; top: calc(50% - 19px); z-index: 100;' data-id='" + person.id + "'>" + person.name + "</button>");
+        $("#connector-" + depth + "-" + index).removeClass("invisible");
+
+        if (person.parents) {
+            var fatherArray = filterArray(person.parents, "gender=Male");
+            if (fatherArray[0]) {
+                var father = personMap[fatherArray[0].id];
+                if (father) {
+                    recursivelyAddButtons(father, personMap, index * 2, depth + 1);
+                }
+            }
+
+            var motherArray = filterArray(person.parents, "gender=Female");
+            if (motherArray[0]) {
+                var mother = personMap[motherArray[0].id];
+                if (mother) {
+                    recursivelyAddButtons(mother, personMap, index * 2 + 1, depth + 1);
+                }
+            }
+        }
+    }
+
+    settings.local = {
+        verbs: {
+            people: function (obj) {
+                var people = obj.people;
+                var peopleIndex = {};
+
+                $.each(people, function (index, person) {
+                    peopleIndex[person.id] = person;
+                });
+
+                recursivelyAddButtons(people[0], peopleIndex, 0, 0);
+
+                $(".person-btn").click(function (e) {
+                    logger.clear();
+
+                    var id = $(this).attr("data-id");
+                    if (sendPeople) {
+                        switch (choiceType) {
+                            case "person":
+                            {
+                                ws.socketSend("send-person " + token + " " + displayName + " " + id);
+                                break;
+                            }
+                            case "family":
+                            {
+                                ws.socketSend("send-family " + token + " " + displayName + " " + id);
+                                break;
+                            }
+                            case "ancestors":
+                            {
+                                ws.socketSend("send-ancestors " + token + " " + displayName + " " + id);
+                                break;
+                            }
+                            case "descendants":
+                            {
+                                ws.socketSend("send-descendants " + token + " " + displayName + " " + id);
+                                break;
+                            }
+                        }
+                    }
+
+                    if (target) {
+                        innerNavigate("controller-" + target, "#controls").then(function () {
+                            $("#controls-btn").show();
+                            if (!showPersonDetail) {
+                                $("#people-btn").removeClass("active");
+                                $("#controls-btn").click().addClass("active");
+
+                                if (!sendPeople) {
+                                    switch (choiceType) {
+                                        case "person":
+                                        {
+                                            ws.socketSend("get-person " + token + " " + id);
+                                            break;
+                                        }
+                                        case "family":
+                                        {
+                                            ws.socketSend("get-family " + token + " " + id);
+                                            break;
+                                        }
+                                        case "ancestors":
+                                        {
+                                            ws.socketSend("get-ancestors " + token + " " + id);
+                                            break;
+                                        }
+                                        case "descendants":
+                                        {
+                                            ws.socketSend("get-descendants " + token + " " + id);
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+                        });
+                    }
+
+                    if (showPersonDetail) {
+                        innerNavigate("display-person-detail?hide_image=true&person_id=" + id, "#person-info").then(function () {
+                            $("#people-btn").removeClass("active");
+                            $("#person-info-btn").show().click().addClass("active");
+                        });
+                    }
+                });
+            }
+        }
+    }
+
     $("#people-btn").click(function (e) {
         $("#people").show();
         $("#person-info").hide();
@@ -188,11 +194,11 @@ POSSIBILITY OF SUCH DAMAGE.
         $("#person-info").hide();
         $("#controls").show();
     });
-    
+
     $(".type-btn").click(function (e) {
-        choiceType = $(this).attr("data-type");
+        choiceType = $(this).children("input").val();
     });
-    
+
     if (!choiceType) {
         choiceType = "ancestory";
         $("#choice-type-btns").show();
@@ -234,20 +240,20 @@ POSSIBILITY OF SUCH DAMAGE.
 
         return deferred.promise();
     }
-    
+
     function build() {
         for (var i = 0; i < 5; i++) {
             var pow = Math.pow(2, i);
-            var percentHeight = 100/pow;
+            var percentHeight = 100 / pow;
             for (var j = 0; j < Math.pow(2, i); j++) {
-                $("#gen-" + i).append("<div id='gen-" + i + "-"+ j +"' style='height: "+percentHeight+"%; border: none; position: relative;'>\n" +
-                        "<div id='connector-" + (i+1) + "-"+ (j*2) +"' class='invisible' style='position: absolute; top: 25%; left: 50%; border-top-left-radius: 50px; border-left: 2px solid CornflowerBlue; border-top: 2px solid CornflowerBlue; width: 100%; height: 25%'></div>\n" +
-                        "<div id='connector-" + (i+1) + "-"+ (j*2+1) +"' class='invisible' style='position: absolute; top: 50%; left: 50%; border-bottom-left-radius: 50px; border-left: 2px solid Crimson; border-bottom: 2px solid Crimson; width: 100%; height: 25%'></div>\n" +
-                    "</div>");
+                $("#gen-" + i).append("<div id='gen-" + i + "-" + j + "' style='height: " + percentHeight + "%; border: none; position: relative;'>\n" +
+                        "<div id='connector-" + (i + 1) + "-" + (j * 2) + "' class='invisible' style='position: absolute; top: 25%; left: 50%; border-top-left-radius: 50px; border-left: 2px solid CornflowerBlue; border-top: 2px solid CornflowerBlue; width: 100%; height: 25%'></div>\n" +
+                        "<div id='connector-" + (i + 1) + "-" + (j * 2 + 1) + "' class='invisible' style='position: absolute; top: 50%; left: 50%; border-bottom-left-radius: 50px; border-left: 2px solid Crimson; border-bottom: 2px solid Crimson; width: 100%; height: 25%'></div>\n" +
+                        "</div>");
             }
         }
     }
-    
+
     build();
     ws.socketSend("get-ancestors " + token + " " + settings.userId);
 </script>

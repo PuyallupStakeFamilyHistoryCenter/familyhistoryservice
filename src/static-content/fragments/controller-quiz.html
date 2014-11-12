@@ -269,6 +269,33 @@ POSSIBILITY OF SUCH DAMAGE.
                     text: 'Mother and son',
                 },
             ],
+        },
+        {
+            prerequisites: [
+                "children.1.name",
+                "children.2.name"
+            ],
+            constants: {
+                child1: "children.*gender=Male",
+                child2: "children.*gender=Male,id!=${child.id}"
+            },
+            question: "How are ${parent.name} and ${child.name} related?",
+            answers: [
+                { 
+                    text: 'Brothers',
+                    hint: "Correct!" 
+                },
+                { 
+                    text: 'Brother and sister',
+                    hint: "${child1.name} and ${child2.name} are both male!"
+                },
+                { 
+                    text: 'Father and sone',
+                },
+                { 
+                    text: 'Mother and son',
+                },
+            ],
         }
         
         //Question ideas

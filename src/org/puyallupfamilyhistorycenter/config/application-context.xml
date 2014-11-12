@@ -34,7 +34,8 @@ POSSIBILITY OF SUCH DAMAGE.
 
     <context:annotation-config />
     <context:property-placeholder location="classpath:org/puyallupfamilyhistorycenter/config/sandbox.properties" />
-    <!--<context:property-placeholder location="classpath:org/puyallupfamilyhistorycenter/config/app.properties" />-->
+    <!--<context:property-placeholder location="classpath:org/puyallupfamilyhistorycenter/config/beta.properties" />-->
+    <!--<context:property-placeholder location="classpath:org/puyallupfamilyhistorycenter/config/prod.properties" />-->
     
     <bean id="app-key-config" class="org.puyallupfamilyhistorycenter.service.websocket.AppKeyConfig" />
     
