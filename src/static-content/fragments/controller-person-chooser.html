@@ -26,6 +26,7 @@ POSSIBILITY OF SUCH DAMAGE.
 -->
 
 <script>
+    var choiceType = getParameterByName("type");
     var target = getParameterByName("target");
     var showPersonDetail = !getParameterByName("hidePersonDetail");
     var sendPeople = !getParameterByName("getPeople");
@@ -66,7 +67,6 @@ POSSIBILITY OF SUCH DAMAGE.
                 
                 recursivelyAddButtons(people[0], peopleIndex, 0, 0);
                 
-                var choiceType = getParameterByName("type");
                 $(".person-btn").click(function (e) {
                     logger.clear();
                     
@@ -141,11 +141,19 @@ POSSIBILITY OF SUCH DAMAGE.
     <li id="controls-btn" style="display: none" ><a href="#controls" role="tab" data-toggle="tab">Controls</a></li>
 </ul>
 <div id="people" style="min-width: 500px">
-    <div id="gen-0" style="height: 640px; width: 20%; float: left;"></div>
-    <div id="gen-1" style="height: 640px; width: 20%; float: left;"></div>
-    <div id="gen-2" style="height: 640px; width: 20%; float: left;"></div>
-    <div id="gen-3" style="height: 640px; width: 20%; float: left;"></div>
-    <div id="gen-4" style="height: 640px; width: 20%; float: left;"></div>
+    <div id="choice-type-btns" class="btn-group btn-group-lg" style="display: none" >
+        <button class="btn btn-default type-btn" data-type="person" >Person</button>
+        <button class="btn btn-default type-btn" data-type="family" >Family</button>
+        <button class="btn btn-default type-btn" data-type="ancestors" >Ancestors</button>
+        <button class="btn btn-default type-btn" data-type="descendants" >Descendants</button>
+    </div>
+    <div>
+        <div id="gen-0" style="height: 640px; width: 20%; float: left;"></div>
+        <div id="gen-1" style="height: 640px; width: 20%; float: left;"></div>
+        <div id="gen-2" style="height: 640px; width: 20%; float: left;"></div>
+        <div id="gen-3" style="height: 640px; width: 20%; float: left;"></div>
+        <div id="gen-4" style="height: 640px; width: 20%; float: left;"></div>
+    </div>
 </div>
 <div id="person-info" style="display: none;">
 
@@ -172,6 +180,15 @@ POSSIBILITY OF SUCH DAMAGE.
         $("#person-info").hide();
         $("#controls").show();
     });
+    
+    $(".type-btn").click(function (e) {
+        choiceType = $(this).attr("data-type");
+    });
+    
+    if (!choiceType) {
+        choiceType = "ancestory";
+        $("#choice-type-btns").show();
+    }
 
     function innerNavigate(dest, selector, timeout) {
         if (!timeout) {
