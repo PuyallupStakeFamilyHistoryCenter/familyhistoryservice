@@ -142,10 +142,18 @@ POSSIBILITY OF SUCH DAMAGE.
 </ul>
 <div id="people" style="min-width: 500px">
     <div id="choice-type-btns" class="btn-group btn-group-lg" style="display: none" >
-        <button class="btn btn-default type-btn" data-type="person" >Person</button>
-        <button class="btn btn-default type-btn" data-type="family" >Family</button>
-        <button class="btn btn-default type-btn" data-type="ancestors" >Ancestors</button>
-        <button class="btn btn-default type-btn" data-type="descendants" >Descendants</button>
+        <label class="btn btn-default">
+            <input type="radio" name="choice-type" value="person">Person
+        </label>
+        <label class="btn btn-default">
+            <input type="radio" name="choice-type" value="family">Family
+        </label>
+        <label class="btn btn-default">
+            <input type="radio" name="choice-type" value="ancestors">Ancestors
+        </label>
+        <label class="btn btn-default">
+            <input type="radio" name="choice-type" value="descendants">Descendants
+        </label>
     </div>
     <div>
         <div id="gen-0" style="height: 640px; width: 20%; float: left;"></div>
