@@ -133,13 +133,14 @@ POSSIBILITY OF SUCH DAMAGE.
     </div><!-- /.modal-dialog -->
 </div>
 
-<script src="js/familysearch-javascript-sdk.min.js"></script>
+<script src="js/familysearch-javascript-sdk.js"></script>
 
 <script>
     var timeout;
     settings.local = {
         verbs: {
             "app-key": function (obj) {
+                console.info("Got app key " + obj.key + " from server");
                 FamilySearch.init({
                     app_key: obj.key,
                     environment: obj.environment,
@@ -231,6 +232,8 @@ POSSIBILITY OF SUCH DAMAGE.
 
 
             });
+        }).fail(function(message) {
+            logger.error("Failed to log in to FamilySearch: " + message);
         });
     });
 
