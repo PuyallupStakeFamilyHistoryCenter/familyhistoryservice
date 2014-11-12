@@ -67,6 +67,9 @@ Make piece shapes more interesting
 Back button in puzzle goes back to main screen instead of games screen
 Allow display to signal to controller when puzzle is finished
 
+Image cacher:
+Filter out stories
+
 Image chooser:
 Add get people with images call            DONE
 Make app controls a tab                    DONE
@@ -83,6 +86,8 @@ Arrange like family tree                   DONE
 Use person chooser for the person-details page DONE
 Allow searching and sorting of ancestors
 Spacing between tabs and controls
+Allow choosing person/family/ancestors/descendants
+Allow choosing depth for ancestors/descendants
 
 Color:
 Add coloring game to menu                  DONE
@@ -136,6 +141,7 @@ Allow assigning variables names for reuse  DONE
 Shuffle answers                           DONE
 Allow more complex filters (e.g. >, >=)    DONE
 *Add more questions
+*BUG: How are null and null related? Mother and daughter
 Allow selection of people
 Difficulty levels
     Configurable # answers
@@ -180,6 +186,7 @@ Add picture to the individual page         DONE
 *Return/done should submit login form
 Set up accordian for groups of controls
 Add 'report a problem' button for bug reports
+Use custom number pad for PIN
 
 Display:
 Experiment with setting font sizes with vh,vw,vmin,and vmax css units
