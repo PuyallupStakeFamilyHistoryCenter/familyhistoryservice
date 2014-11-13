@@ -88,12 +88,15 @@ public class FamilyHistoryCenterSocket {
         public final Set<String> tokens; //TODO: Rename to prevent confusion with access token
         public final Precacher precacher;
         public UserContext(String userId, String userName, String hashedPin, String accessToken, Precacher precacher) {
+            this(userId, userName, hashedPin, accessToken, precacher, new HashSet<String>());
+        }
+        public UserContext(String userId, String userName, String hashedPin, String accessToken, Precacher precacher, Set<String> tokens) {
             this.userName = userName;
             this.userId = userId;
             this.hashedPin = hashedPin;
             this.accessToken = accessToken;
             this.lastUsed = System.currentTimeMillis();
-            this.tokens = new HashSet<>();
+            this.tokens = tokens==null? new HashSet<String>() : tokens;
             this.precacher = precacher;
         }
     }
@@ -445,7 +448,14 @@ public class FamilyHistoryCenterSocket {
                     });
                     precacher.precache();
                     
-                    userContextMap.put(userId, new UserContext(userId, userName, pin, accessToken, precacher));
+                    Set<String> tokens = null;
+                    if (userContextMap.containsKey(userId)) {
+                        UserContext oldContext = userContextMap.get(userId);
+                        if (oldContext != null) {
+                            tokens = oldContext.tokens;
+                        }
+                    }
+                    userContextMap.put(userId, new UserContext(userId, userName, pin, accessToken, precacher, tokens));
                     
                     resendUserListToControllers();
                     break;

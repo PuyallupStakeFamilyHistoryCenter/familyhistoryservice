@@ -24,6 +24,7 @@ Get facts into person                      DONE
 Set up pre-caching                         DONE
 Limit precaching to a configurable depth   DONE
 File cacher should fall back to cached file even if expired DONE
+Add progress bar for caching               DONE
 *Create clean-up script to clear cache occasionally
 *Ensure security of living person data
     Filter living children out of person
@@ -37,7 +38,6 @@ File cacher should fall back to cached file even if expired DONE
     Use getAncestory function to get several generations at once
     Rethink get person logic to reduce wasted downloads
 *Implement listDescendants
-Add progress bar for caching
 Location cache
 Allow timeouts on requests
 

@@ -68,8 +68,8 @@ public class Precacher {
 
     private final String accessToken;
     private final int maxDepth;
-    private Set<Future> futures;
-    private Set<PrecacheListener> listeners;
+    private final Set<Future> futures;
+    private final Set<PrecacheListener> listeners;
 
     public Precacher(String accessToken, int maxDepth) {
         this.accessToken = accessToken;
@@ -121,7 +121,7 @@ public class Precacher {
                                 int queueSize = frontier.size();
                                 int currentGeneration = precacheObject.depth;
                                 
-                                int estimatedUnvisited = Math.min(queueSize * (int) Math.pow(2, maxDepth - currentGeneration) - queueSize, maxVisited - totalPrecachedValue - currentGeneration);
+                                int estimatedUnvisited = queueSize * (int) Math.pow(2, maxDepth - currentGeneration) - queueSize;
                                 
                                 
                                 PrecacheEvent event = new PrecacheEvent(totalPrecachedValue, queueSize, estimatedUnvisited, currentGeneration);
