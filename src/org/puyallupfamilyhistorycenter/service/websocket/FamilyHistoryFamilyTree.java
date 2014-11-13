@@ -21,7 +21,7 @@ public class FamilyHistoryFamilyTree extends FamilySearchFamilyTree {
     static {
         AppKeyConfig appKeyConfig = (AppKeyConfig) SpringContextInitializer.getContext().getBean("app-key-config");
         try {
-            uri = new URI("https://"+appKeyConfig.environment+".familysearch.org/platform/collections/tree");
+            uri = new URI("https://"+(appKeyConfig.environment.equals("production")?"":appKeyConfig.environment + ".") +"familysearch.org/platform/collections/tree");
         } catch (URISyntaxException ex) {
             throw new IllegalStateException("Failed to create FamilySearch URI", ex);
         }
