@@ -425,7 +425,24 @@ public class FamilyHistoryCenterSocket {
                         throw new IllegalStateException("Access token does not match userId");
                     }
                     
+                    final String finalUserId = userId;
                     Precacher precacher = new Precacher(accessToken, 10);
+                    precacher.addPrecacheListener(new Precacher.PrecacheListener() {
+
+                        @Override
+                        public void onPrecache(Precacher.PrecacheEvent event) {
+                            UserContext context = userContextMap.get(finalUserId);
+                            if (context != null) {
+                                for (String token : context.tokens) {
+                                    try {
+                                        tokenControllerMap.get(token).sendString(GSON.toJson(event));
+                                    } catch (Exception e) {
+                                        logger.warn("Failed to notify controller " + token + " about precache event");
+                                    }
+                                }
+                            }
+                        }
+                    });
                     precacher.precache();
                     
                     userContextMap.put(userId, new UserContext(userId, userName, pin, accessToken, precacher));

@@ -33,6 +33,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicInteger;
 import org.familysearch.api.client.ft.FamilySearchFamilyTree;
 import org.gedcomx.rs.client.PersonSpousesState;
 import org.gedcomx.rs.client.PersonState;
@@ -68,11 +69,13 @@ public class Precacher {
     private final String accessToken;
     private final int maxDepth;
     private Set<Future> futures;
+    private Set<PrecacheListener> listeners;
 
     public Precacher(String accessToken, int maxDepth) {
         this.accessToken = accessToken;
         this.maxDepth = maxDepth;
         this.futures = new HashSet<>();
+        this.listeners = new HashSet<>();
     }
 
     public void precache() {
@@ -80,6 +83,7 @@ public class Precacher {
         final Queue<PrecacheObject> frontier = new ConcurrentLinkedQueue<>();
         final Queue<PrecacheObject> leafNodes = new ConcurrentLinkedQueue<>();
         final Set<String> currentLeafs = Collections.synchronizedSet(new HashSet<String>());
+        final AtomicInteger totalPrecached = new AtomicInteger();
         
         PersonState person = tree.readPersonForCurrentUser();
         frontier.add(new PrecacheObject(person.getPerson().getId(), 0));
@@ -91,7 +95,9 @@ public class Precacher {
             }
         }
         
-        for (int i = 0; i < 2; i++) {
+        final int maxVisited = frontier.size() * (int) Math.pow(2, maxDepth);
+        
+        for (int i = 0; i < 3; i++) {
             futures.add(executor.submit(new Runnable() {
 
                 @Override
@@ -109,6 +115,18 @@ public class Precacher {
                                 } else {
                                     System.out.println(Thread.currentThread().getName() + ": Adding self " + person.name + " to leaf nodes");
                                     leafNodes.add(precacheObject);
+                                }
+                                
+                                int totalPrecachedValue = totalPrecached.incrementAndGet();
+                                int queueSize = frontier.size();
+                                int currentGeneration = precacheObject.depth;
+                                
+                                int estimatedUnvisited = Math.min(queueSize * (int) Math.pow(2, maxDepth - currentGeneration) - queueSize, maxVisited - totalPrecachedValue - currentGeneration);
+                                
+                                
+                                PrecacheEvent event = new PrecacheEvent(totalPrecachedValue, queueSize, estimatedUnvisited, currentGeneration);
+                                for (PrecacheListener listener : listeners) {
+                                    listener.onPrecache(event);
                                 }
                             } catch (Exception ex) {
                                 ex.printStackTrace(System.err);
@@ -146,5 +164,29 @@ public class Precacher {
             future.cancel(true);
         }
         System.out.println("Cancelling precaching");
+    }
+    
+    public void addPrecacheListener(PrecacheListener listener) {
+        listeners.add(listener);
+    }
+    
+    public static interface PrecacheListener {
+        void onPrecache(PrecacheEvent event);
+    }
+    
+    public static class PrecacheEvent {
+        public final String responseType = "precacheEvent";
+        public final int totalCached;
+        public final int totalQueueSize;
+        public final int estimatedUnvisited;
+        
+        public final int currentGeneration;
+
+        public PrecacheEvent(int totalCached, int totalQueueSize, int estimatedUnvisited, int currentGeneration) {
+            this.totalCached = totalCached;
+            this.totalQueueSize = totalQueueSize;
+            this.estimatedUnvisited = estimatedUnvisited;
+            this.currentGeneration = currentGeneration;
+        }
     }
 }

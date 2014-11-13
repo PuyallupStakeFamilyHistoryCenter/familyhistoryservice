@@ -102,6 +102,17 @@ function setup() {
             logger.error("Failed to load header from " + settings.page.headerFile);
         });
     }
+    var pageFooter = $("#page-footer");
+    if (settings.page.footer) {
+        pageFooter.html("settings.page.footer");
+    } else if (settings.page.footerFile) {
+        $.ajax("fragments/"+ settings.page.footerFile)
+        .done(function(data) {
+            pageFooter.html(data);
+        }).fail(function() {
+            logger.error("Failed to load footer from " + settings.page.footerFile);
+        });
+    }
     if (settings.page.contentPadding) {
         $("#messages").addClass("content-padding");
     } else {
@@ -147,6 +158,7 @@ var defaultSettings = {
         title: "Controller",
         header: '',
         headerFile: 'controller-header.html',
+        footerFile: 'controller-footer.html',
         contentPadding: true,
         verbs: {
             attached: function() {
@@ -164,6 +176,9 @@ var defaultSettings = {
                 ws.socketSend("nav " + displayName + " " + "display-main");
                 clearHistory();
                 navigate("controller-main");
+            },
+            precacheEvent: function(obj) {
+                
             }
         },
         begin: getDisplayName,

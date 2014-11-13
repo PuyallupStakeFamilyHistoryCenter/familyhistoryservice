@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<!--
+Copyright (c) 2014, tibbitts
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+* Redistributions of source code must retain the above copyright notice, this
+  list of conditions and the following disclaimer.
+* Redistributions in binary form must reproduce the above copyright notice,
+  this list of conditions and the following disclaimer in the documentation
+  and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+POSSIBILITY OF SUCH DAMAGE.
+-->
+
+<div id="progress-div" style="display: none">
+    <div style="margin-bottom: 80px;">
+        <nav class="navbar navbar-default navbar-fixed-bottom" role="navigation">
+            <div class="container-fluid">
+                <div class="progress">
+                    <div id="cached-prg" class="progress-bar progress-bar-success" style="width: 0%">
+                        <span class="sr-only"></span>
+                    </div>
+                    <div id="queue-size-prg" class="progress-bar progress-bar-warning progress-bar-striped" style="width: 0%">
+                        <span class="sr-only"></span>
+                    </div>
+                    <div id="unvisited-prg" class="progress-bar progress-bar-danger" style="width: 0%">
+                        <span class="sr-only"></span>
+                    </div>
+                </div>
+            </div> <!-- /.container-fluid -->
+        </nav>
+    </div>
+</div>
+
+<script>;
+    settings.page.verbs.precacheEvent = function(obj) {
+        var cached = obj.totalCached;
+        var queueSize = obj.totalQueueSize;
+        var unvisited = obj.estimatedUnvisited;
+        var currentGeneration = obj.currentGeneration;
+        
+        if (queueSize === 0) {
+            $("#progress-div").hide();
+        } else {
+            $("#progress-div").show();
+            
+            var total = cached + queueSize + unvisited;
+            $("#cached-prg").css("width", ((cached / total) * 100) + "%");
+            $("#queue-size-prg").css("width", ((queueSize / total) * 100) + "%");
+            $("#unvisited-prg").css("width", ((unvisited / total) * 100) + "%");
+        }
+    };
+</script>  
