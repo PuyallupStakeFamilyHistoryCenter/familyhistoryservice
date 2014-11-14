@@ -50,11 +50,18 @@ POSSIBILITY OF SUCH DAMAGE.
                     });
                 });
             });
+            
+            var logger = {
+                info: function(message) {
+                    $("#messages").append("<div>" + message + "</div>")
+                }
+            }
         </script>
 
         <title>Test login</title>
     </head>
     <body>
         <button id="login-btn">Login</button>
+        <div id="messages" ></div>
     </body>
 </html>
