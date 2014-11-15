@@ -436,11 +436,15 @@ public class FamilyHistoryCenterSocket {
                         public void onPrecache(Precacher.PrecacheEvent event) {
                             UserContext context = userContextMap.get(finalUserId);
                             if (context != null) {
-                                for (String token : context.tokens) {
+                                Iterator<String> it = context.tokens.iterator();
+                                while (it.hasNext()) {
+                                    String token = it.next();
                                     try {
                                         tokenControllerMap.get(token).sendString(GSON.toJson(event));
                                     } catch (Exception e) {
-                                        logger.warn("Failed to notify controller " + token + " about precache event");
+                                        logger.warn("Failed to notify controller " + token + " about precache event; removing");
+                                        it.remove();
+                                        tokenControllerMap.remove(token);
                                     }
                                 }
                             }
