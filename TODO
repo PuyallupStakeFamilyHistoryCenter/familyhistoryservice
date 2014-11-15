@@ -25,6 +25,7 @@ Set up pre-caching                         DONE
 Limit precaching to a configurable depth   DONE
 File cacher should fall back to cached file even if expired DONE
 Add progress bar for caching               DONE
+Progress bar should never regress          DONE
 *Create clean-up script to clear cache occasionally
 *Ensure security of living person data
     Filter living children out of person
@@ -40,8 +41,7 @@ Add progress bar for caching               DONE
 *Implement listDescendants
 Location cache
 Allow timeouts on requests
-Progress bar should never regress
-
+Retire websocket instance if precache event fails to send
 
 Puzzle:
 Wire puzzle settings into display          DONE
@@ -106,6 +106,7 @@ Rearrange colors more logically
 Add more color options
 Change mouse pointer
 Undo feature?
+Transparent images show logo in background
 
 Life map:
 Test map movement (changed to 'send' commands; removed native 'move' commands) DONE
@@ -128,6 +129,7 @@ Add parents                                DONE
 Add marriage date/place to spouse          DONE
 Display more/all facts                     DONE
 Filter marriage details
+Add space between marriage event and date
 
 Statistics:
 Implement basic family statistics
@@ -192,7 +194,7 @@ Add 'report a problem' button for bug reports
 Use custom number pad for PIN
 
 Display:
-Experiment with setting font sizes with vh,vw,vmin,and vmax css units
+*Experiment with setting font sizes with vh,vw,vmin,and vmax css units (adaptive display sizing)
 
 Kiosk:
 Show FS permissions dialog                 DONE

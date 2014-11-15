@@ -26,7 +26,7 @@ POSSIBILITY OF SUCH DAMAGE.
 -->
 
 <div id="progress-div" style="display: none">
-    <div style="margin-bottom: 50px;">
+    <div style="margin-bottom: 50px; clear: both">
     </div>
     <nav class="navbar navbar-default navbar-fixed-bottom" role="navigation">
         <div class="navbar-collapse">
@@ -48,6 +48,7 @@ POSSIBILITY OF SUCH DAMAGE.
 </div>
 
 <script>;
+    var previousCached = 0;
     settings.page.verbs.precacheEvent = function(obj) {
         var cached = obj.totalCached;
         var queueSize = obj.totalQueueSize;
@@ -56,7 +57,9 @@ POSSIBILITY OF SUCH DAMAGE.
         
         if (queueSize === 0) {
             $("#progress-div").hide();
-        } else {
+        } else if (cached > previousCached) {
+            previousCached = cached;
+            
             $("#progress-div").show();
             
             var total = cached + queueSize + unvisited;
