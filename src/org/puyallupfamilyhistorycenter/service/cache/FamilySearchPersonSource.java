@@ -66,6 +66,7 @@ public class FamilySearchPersonSource implements Source<Person> {
             /* Get for living and for deceased people */
             builder.withId(personId);
             builder.withLiving(originalPerson.getLiving());
+            builder.withGender(originalPerson.getGender().getKnownType().name());
 
             {
                 PersonParentsState parentsState = state.readParents();
@@ -89,7 +90,6 @@ public class FamilySearchPersonSource implements Source<Person> {
                 if (name != null) {
                     builder.withName(name.getNameForm().getFullText());
                 }
-                builder.withGender(originalPerson.getGender().getKnownType().name());
 
                 {
                     List<org.gedcomx.conclusion.Fact> originalFacts = originalPerson.getFacts();
