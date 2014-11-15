@@ -116,7 +116,9 @@ Show life events for family                DONE
 Add timestamp to facts and sort            DONE
 Add person chooser                         DONE
 Add person info                            DONE
-*Fix mouse zoom (pinch) in split mode      DONE
+Fix mouse zoom (pinch) in split mode       DONE
+Add blurb to map markers                   DONE
+Add outline of states                      DONE
 *Fix buttons in split mode
 *Map doesn't display locations in split mode
 Maybe add spiral effect from RootsMapper
@@ -236,8 +238,6 @@ No feedback when something appears on display
 They spent a long time on the family>individual app
 Network issues (work on wifi strength)!!
 Set max zoom in map
-Add pop-ups in map (better identification of points)
-Add outline of states
 Add path from ancestor to root
 Time out (auto-dismiss) error messages
 Keep display from timing out
