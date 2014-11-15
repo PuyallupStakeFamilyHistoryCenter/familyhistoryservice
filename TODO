@@ -40,6 +40,7 @@ Add progress bar for caching               DONE
 *Implement listDescendants
 Location cache
 Allow timeouts on requests
+Progress bar should never regress
 
 
 Puzzle:

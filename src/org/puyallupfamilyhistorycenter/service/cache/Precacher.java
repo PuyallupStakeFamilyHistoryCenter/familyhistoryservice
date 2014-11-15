@@ -95,7 +95,7 @@ public class Precacher {
             }
         }
         
-        final int maxVisited = frontier.size() * (int) Math.pow(2, maxDepth);
+        final AtomicInteger minEstimatedUnvistited = new AtomicInteger(frontier.size() * (int) Math.pow(2, maxDepth));
         
         for (int i = 0; i < 3; i++) {
             futures.add(executor.submit(new Runnable() {
@@ -122,9 +122,12 @@ public class Precacher {
                                 int currentGeneration = precacheObject.depth;
                                 
                                 int estimatedUnvisited = queueSize * (int) Math.pow(2, maxDepth - currentGeneration) - queueSize;
+                                if (estimatedUnvisited < minEstimatedUnvistited.get()) {
+                                    minEstimatedUnvistited.set(estimatedUnvisited);
+                                }
                                 
                                 
-                                PrecacheEvent event = new PrecacheEvent(totalPrecachedValue, queueSize, estimatedUnvisited, currentGeneration);
+                                PrecacheEvent event = new PrecacheEvent(totalPrecachedValue, queueSize, minEstimatedUnvistited.get(), currentGeneration);
                                 for (PrecacheListener listener : listeners) {
                                     listener.onPrecache(event);
                                 }
