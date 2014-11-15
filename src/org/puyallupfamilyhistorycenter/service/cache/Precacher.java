@@ -34,6 +34,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
+import org.apache.log4j.Logger;
 import org.familysearch.api.client.ft.FamilySearchFamilyTree;
 import org.gedcomx.rs.client.PersonSpousesState;
 import org.gedcomx.rs.client.PersonState;
@@ -47,7 +48,7 @@ import org.puyallupfamilyhistorycenter.service.websocket.FamilyHistoryFamilyTree
  * @author tibbitts
  */
 public class Precacher {
-
+    private static final Logger logger = Logger.getLogger(Precacher.class);
     private static final Source<Person> source;
     private static final ExecutorService executor = Executors.newCachedThreadPool();
 
@@ -104,16 +105,16 @@ public class Precacher {
                 public void run() {
                     for (int i = 0; i < 10; i++) {
                         while (!frontier.isEmpty()) {
+                            PrecacheObject precacheObject = frontier.remove();
                             try {
-                                PrecacheObject precacheObject = frontier.remove();
                                 Person person = source.get(precacheObject.id, accessToken);
                                 if (person.parents != null && precacheObject.depth < maxDepth) {
                                     for (PersonReference parent : person.parents) {
-                                        System.out.println(Thread.currentThread().getName() + ": Adding parent " + parent.getName() + " to frontier level " + (precacheObject.depth + 1));
+                                        logger.info(Thread.currentThread().getName() + ": Adding parent " + parent.getName() + " to frontier level " + (precacheObject.depth + 1));
                                         frontier.add(new PrecacheObject(parent.getId(), precacheObject.depth + 1));
                                     }
                                 } else {
-                                    System.out.println(Thread.currentThread().getName() + ": Adding self " + person.name + " to leaf nodes");
+                                    logger.info(Thread.currentThread().getName() + ": Adding self " + person.name + " to leaf nodes");
                                     leafNodes.add(precacheObject);
                                 }
                                 
@@ -132,7 +133,7 @@ public class Precacher {
                                     listener.onPrecache(event);
                                 }
                             } catch (Exception ex) {
-                                ex.printStackTrace(System.err);
+                                logger.warn("Failed to get person " + precacheObject.id + "; skipping", ex);
                             }
                         }
                         try {
@@ -148,13 +149,13 @@ public class Precacher {
     //                        if (person.children != null) {
     //                            for (PersonReference child : person.children) {
     //                                if (!currentLeafs.contains(child.getId())) {
-    //                                    System.out.println("Adding child " + child.getName() + " to frontier");
+    //                                    logger.info("Adding child " + child.getName() + " to frontier");
     //                                    leafNodes.add(new PrecacheObject(child.getId(), precacheObject.depth - 1));
     //                                    currentLeafs.add(child.getId());
     //                                }
     //                            }
     //                        } else {
-    //                            System.out.println("Person " + person.name + " has no children on record");
+    //                            logger.info("Person " + person.name + " has no children on record");
     //                        }
     //                    }
                 }
@@ -166,7 +167,7 @@ public class Precacher {
         for (Future future : futures) {
             future.cancel(true);
         }
-        System.out.println("Cancelling precaching");
+        logger.info("Cancelling precaching");
     }
     
     public void addPrecacheListener(PrecacheListener listener) {

@@ -26,7 +26,12 @@
 package org.puyallupfamilyhistorycenter.service.cache;
 
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.Queue;
+import org.jboss.logging.Logger;
 import org.puyallupfamilyhistorycenter.service.models.Person;
+import org.puyallupfamilyhistorycenter.service.models.PersonBuilder;
+import org.puyallupfamilyhistorycenter.service.models.PersonReference;
 
 /**
  *
@@ -35,24 +40,59 @@ import org.puyallupfamilyhistorycenter.service.models.Person;
 
 
 public class DescendantsIterator implements Iterator<Person> {
+    private static final Logger logger = Logger.getLogger(AncestorsIterator.class);
 
+    private final String personId;
+    private final int maxDepth;
+    private final Source<Person> source;
+    private final String accessToken;
+    private final Queue<PersonReference> frontier = new LinkedList<>();
+    
     DescendantsIterator(String personId, int maxDepth, Source<Person> source, String accessToken) {
+        this.personId = personId;
+        this.maxDepth = maxDepth;
+        this.source = source;
+        this.accessToken = accessToken;
         
+        Person root = source.get(personId, accessToken);
+        if (root != null) {
+            frontier.add(new PersonReference(personId, root.name, 0));
+        }
     }
 
     @Override
     public boolean hasNext() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return !frontier.isEmpty();
     }
 
     @Override
     public Person next() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        PersonReference next = null;
+        Person person = null;
+        while (person == null) {
+            try {
+                next = frontier.remove();
+                person = source.get(next.getId(), accessToken);
+            } catch (Exception e) {
+                logger.warn("Failed to get person " + next.getId() + "; attempting to recover", e);
+                person = new PersonBuilder().withName(next.getName()).withId(next.getId()).withGender(next.getGender()).build();
+            }
+        }
+        
+        if (next.getDepth() < maxDepth) {
+            if (person.children != null) {
+                for (PersonReference child : person.children) {
+                    frontier.add(child.withDepth(next.getDepth() + 1));
+                }
+            }
+        }
+        
+        return person;
     }
 
     @Override
     public void remove() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        throw new UnsupportedOperationException("Not supported");
     }
     
 }
