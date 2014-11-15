@@ -145,9 +145,6 @@ public class FamilySearchPersonSource implements Source<Person> {
                 Name name = person.getName();
                 String stringName = name == null ? null : name.getNameForm().getFullText();
                 refs[i] = new PersonReference(person.getId(), stringName, null);
-                if (person.getGender() != null && person.getGender().getKnownType() != null) {
-                    refs[i].withGender(person.getGender().getKnownType().name());
-                }
 
                 if (relationships != null && relationships.size() > i) {
                     Relationship relationship = relationships.get(i);
@@ -169,6 +166,10 @@ public class FamilySearchPersonSource implements Source<Person> {
                         refs[i].withFacts(facts);
                     }
                 }
+            }
+            
+            if (person.getGender() != null && person.getGender().getKnownType() != null) {
+                refs[i].withGender(person.getGender().getKnownType().name());
             }
         }
         return refs;
