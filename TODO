@@ -42,6 +42,7 @@ Progress bar should never regress          DONE
 Location cache
 Allow timeouts on requests
 Retire websocket instance if precache event fails to send
+Throttle precaching messages
 
 Puzzle:
 Wire puzzle settings into display          DONE

@@ -172,15 +172,19 @@ POSSIBILITY OF SUCH DAMAGE.
 
     function graphPeople(people) {
         var facts = people[0].facts;
-        
+        attachNameToFacts(facts, people[0].name);
+
         if (people[0].spouses) {
-            $.each(people[0].spouses, function(index, spouse) {
+            $.each(people[0].spouses, function (index, spouse) {
+                attachNameToFacts(spouse.facts, people[0].name + " and " + spouse.name)
                 facts = facts.concat(spouse.facts);
             });
-        };
+        }
+        ;
 
         $.each(people, function (index, person) {
             if (person.facts) {
+                attachNameToFacts(person.facts, person.name);
                 $.each(person.facts, function (index, fact) {
                     if (fact.type === "Birth" || index === 0) {
                         facts.push(fact);
@@ -191,12 +195,19 @@ POSSIBILITY OF SUCH DAMAGE.
 
         graphFacts(facts);
     }
+    
+    function attachNameToFacts(facts, name) {
+        $.each(facts, function(index, fact) {
+            fact.name = name;
+        });
+    }
 
     var flightPath;
     var markers;
+    var infoWindows;
     function graphFacts(facts) {
         facts = sortFacts(facts);
-        
+
         console.info("Graphing facts " + JSON.stringify(facts));
         if (markers) {
             $.each(markers, function (index, marker) {
@@ -235,6 +246,13 @@ POSSIBILITY OF SUCH DAMAGE.
                                 title: fact.place + ": " + fact.type + " " + fact.date
                             });
                             markers.push(marker);
+                            var contentString = getFactBlurb(fact);
+
+                            var infowindow = new google.maps.InfoWindow({
+                                position: result,
+                                content: contentString
+                            });
+                            infowindow.open(map, marker);
                         }
                     });
                     var bounds = new google.maps.LatLngBounds();
@@ -277,6 +295,21 @@ POSSIBILITY OF SUCH DAMAGE.
                 }
             });
         });
+    }
+    
+    var factTypeVerbMap = {
+        "Birth": "was born",
+        "Christening": "was christened",
+        "Residence": "lived",
+        "Marriage": "were married",
+        "Death": "died",
+    }
+    function getFactBlurb(fact) {
+        var message = fact.type + ": " + fact.place + " " + fact.date;
+        if (factTypeVerbMap[fact.type]) {
+            message = fact.name + " " + factTypeVerbMap[fact.type] + " in " + fact.place + " on " + fact.date;
+        }
+        return "<div style='width: 200px'>"+message+"</div>"
     }
 
     resize();
