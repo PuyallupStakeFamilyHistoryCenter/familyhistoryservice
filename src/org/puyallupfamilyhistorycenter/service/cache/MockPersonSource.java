@@ -268,14 +268,10 @@ public class MockPersonSource implements Source<Person> {
                         + "}";
             break;
         default:
-            throw new IllegalStateException("Person " + personId + " not found");
+            throw new NotFoundException("Person " + personId + " not found");
         }
 
-        if (personJson != null) {
-            return GSON.fromJson(personJson, Person.class);
-        }
-
-        return null;
+        return GSON.fromJson(personJson, Person.class);
     }
     
 }

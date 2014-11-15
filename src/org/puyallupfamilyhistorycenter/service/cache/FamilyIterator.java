@@ -97,7 +97,7 @@ public class FamilyIterator implements Iterator<Person> {
         
         iterator = new Iterator<PersonReference>() {
             PersonReference next = new PersonReference(root.id, root.name, "self");
-            State state = State.PARENTS;
+            State state = State.SPOUSES;
             Iterator<PersonReference> innerIt = state.iterate(root);
             
             @Override

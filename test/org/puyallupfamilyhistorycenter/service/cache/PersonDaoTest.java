@@ -27,10 +27,9 @@ package org.puyallupfamilyhistorycenter.service.cache;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
-import junit.framework.AssertionFailedError;
 import static org.junit.Assert.*;
 import org.junit.Test;
 import org.puyallupfamilyhistorycenter.service.models.Fact;
@@ -53,13 +52,11 @@ public class PersonDaoTest {
     
     public PersonDaoTest() {
         MockPersonSource source = new MockPersonSource();
-//        InMemoryCache<String, Person> cache = new InMemoryCache<>();
-//        CachingSource<Person> cachingSource = new CachingSource<>(source, cache);
         dao = new PersonDao(source);
         
         family = Arrays.asList(source.get("KWCB-HZV", ""), source.get("KWCB-HZ2", ""), source.get("KWC6-X7D", ""), source.get("KWJJ-4XH", ""));
-        ancestors = Arrays.asList(source.get("KWZP-8K5", ""), source.get("KWZP-8KG", ""));
-        descendants = Arrays.asList(source.get("KWC6-X7D", ""), source.get("KJWD-Z94", ""), source.get("KWJJ-4XH", ""));
+        ancestors = Arrays.asList(source.get("KWCB-HZV", ""), source.get("KWZP-8K5", ""), source.get("KWZP-8KG", ""));
+        descendants = Arrays.asList(source.get("KWCB-HZV", ""), source.get("KWC6-X7D", ""), source.get("KWJJ-4XH", ""), source.get("KJWD-Z94", ""));
     }
 
     /**
@@ -99,7 +96,8 @@ public class PersonDaoTest {
     @Test
     public void testTraverseFamily() {
         System.out.println("testTraverseFamily");
-        assertEquals(dao.listImmediateFamily("KWCB-HZV", ""), family);
+        List<Person> people = dao.listImmediateFamily("KWCB-HZV", "");
+        assertIdsEqual(family, people);
     }
 
     /**
@@ -108,15 +106,32 @@ public class PersonDaoTest {
     @Test
     public void testTraverseAncestors() {
         System.out.println("testTraverseAncestors");
-        assertEquals(dao.listAncestors("KWCB-HZV", 10, ""), ancestors);
+        List<Person> people = dao.listAncestors("KWCB-HZV", 10, "");
+        assertIdsEqual(ancestors, people);
     }
 
     /**
      * Test of traverseDescendants method, of class PersonCache.
      */
-    //@Test
+    @Test
     public void testTraverseDescendants() {
         System.out.println("testTraverseDescendants");
-        assertEquals(dao.listDescendants("KWCB-HZV", 10, ""), descendants);
+        List<Person> people = dao.listDescendants("KWCB-HZV", 10, "");
+        assertIdsEqual(descendants, people);
+    }
+    
+    private void assertIdsEqual(List<Person> expected, List<Person> actual) {
+        List<String> expectedIds = new ArrayList<>(expected.size());
+        List<String> actualIds = new ArrayList<>(actual.size());
+        
+        for (Person person : expected) {
+            expectedIds.add(person.id);
+        }
+        
+        for (Person person : actual) {
+            actualIds.add(person.id);
+        }
+        
+        assertEquals(expectedIds, actualIds);
     }
 }
