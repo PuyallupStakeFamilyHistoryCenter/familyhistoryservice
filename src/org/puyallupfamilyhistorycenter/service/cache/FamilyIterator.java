@@ -29,6 +29,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import org.puyallupfamilyhistorycenter.service.models.Person;
+import org.puyallupfamilyhistorycenter.service.models.PersonBuilder;
 import org.puyallupfamilyhistorycenter.service.models.PersonReference;
 
 /**
@@ -148,7 +149,11 @@ public class FamilyIterator implements Iterator<Person> {
         }
         
         if (innerCurrent != null) {
-            return source.get(innerCurrent.getId(), accessToken);
+            try {
+                return source.get(innerCurrent.getId(), accessToken);
+            } catch (Exception e) {
+                return new PersonBuilder().withName(innerCurrent.getName()).withId(innerCurrent.getId()).withGender(innerCurrent.getGender()).build();
+            }
         }
         
         return null;

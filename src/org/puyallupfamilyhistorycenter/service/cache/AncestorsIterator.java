@@ -28,7 +28,9 @@ package org.puyallupfamilyhistorycenter.service.cache;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Queue;
+import org.jboss.logging.Logger;
 import org.puyallupfamilyhistorycenter.service.models.Person;
+import org.puyallupfamilyhistorycenter.service.models.PersonBuilder;
 import org.puyallupfamilyhistorycenter.service.models.PersonReference;
 
 /**
@@ -38,6 +40,7 @@ import org.puyallupfamilyhistorycenter.service.models.PersonReference;
 
 
 public class AncestorsIterator implements Iterator<Person> {
+    private static final Logger logger = Logger.getLogger(AncestorsIterator.class);
 
     private final String personId;
     private final int maxDepth;
@@ -64,8 +67,17 @@ public class AncestorsIterator implements Iterator<Person> {
 
     @Override
     public Person next() {
-        PersonReference next = frontier.remove();
-        Person person = source.get(next.getId(), accessToken);
+        PersonReference next = null;
+        Person person = null;
+        while (person == null) {
+            try {
+                next = frontier.remove();
+                person = source.get(next.getId(), accessToken);
+            } catch (Exception e) {
+                logger.warn("Failed to get person " + next.getId() + "; attempting to recover", e);
+                person = new PersonBuilder().withName(next.getName()).withId(next.getId()).withGender(next.getGender()).build();
+            }
+        }
         
         if (next.getDepth() < maxDepth) {
             if (person.parents != null) {
