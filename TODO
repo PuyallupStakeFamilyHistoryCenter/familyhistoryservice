@@ -196,6 +196,7 @@ Add picture to the individual page         DONE
 Set up accordian for groups of controls
 Add 'report a problem' button for bug reports
 Use custom number pad for PIN
+Menu clicks should renew controller lease
 
 Display:
 *Experiment with setting font sizes with vh,vw,vmin,and vmax css units (adaptive display sizing)

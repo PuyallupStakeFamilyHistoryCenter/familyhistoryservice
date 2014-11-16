@@ -460,7 +460,7 @@ POSSIBILITY OF SUCH DAMAGE.
     
     function sendQuestion(questionAndAnswers) {
         questionAndAnswers.responseType = "question";
-        ws.socketSend("send " + displayName + " " + JSON.stringify(questionAndAnswers));
+        sendToDisplay(JSON.stringify(questionAndAnswers));
     }
     
     var totalCorrect = 0;
