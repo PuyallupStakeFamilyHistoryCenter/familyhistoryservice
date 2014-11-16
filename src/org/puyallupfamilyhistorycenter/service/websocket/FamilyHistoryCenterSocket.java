@@ -43,8 +43,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
-import java.util.concurrent.Callable;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import javax.crypto.SecretKeyFactory;
@@ -119,12 +119,12 @@ public class FamilyHistoryCenterSocket {
         }
     }
     
-    private static final ScheduledExecutorService cleanupService = Executors.newScheduledThreadPool(1);
+    private static final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
     static {
-        cleanupService.schedule(new Callable<Void>() {
+        scheduler.scheduleWithFixedDelay(new Runnable() {
 
             @Override
-            public Void call() throws Exception {
+            public void run() {
                 Iterator<Map.Entry<String, Long>> it = tokenLastUse.entrySet().iterator();
                 while (it.hasNext()) {
                     Map.Entry<String, Long> entry = it.next();
@@ -138,15 +138,13 @@ public class FamilyHistoryCenterSocket {
                         it.remove();
                     }
                 }
-                
-                return null;
             }
         
-        }, 1, TimeUnit.MINUTES);
-        cleanupService.schedule(new Callable<Void>() {
+        }, 1, 1, TimeUnit.MINUTES);
+        scheduler.scheduleWithFixedDelay(new Runnable() {
 
             @Override
-            public Void call() throws Exception {
+            public void run() {
                 Iterator<Map.Entry<String, UserContext>> it = userContextMap.entrySet().iterator();
                 while (it.hasNext()) {
                     Map.Entry<String, UserContext> entry = it.next();
@@ -160,11 +158,9 @@ public class FamilyHistoryCenterSocket {
                 }
                 
                 resendUserListToControllers();
-                
-                return null;
             }
         
-        }, 1, TimeUnit.MINUTES);
+        }, 1, 1, TimeUnit.MINUTES);
     }
 
     public FamilyHistoryCenterSocket() {
@@ -576,7 +572,7 @@ public class FamilyHistoryCenterSocket {
     
     protected static void deactivateUserToken(String token) throws IOException {
         RemoteEndpoint controllerEndpoint = tokenControllerMap.remove(token);
-        controllerEndpoint.sendString("nav controller-login");
+        controllerEndpoint.sendString("{\"responseType\":\"nav\",\"dest\":\"controller-login\"}");
         controllerEndpoint.sendString(getErrorResponse("logged out due to inactivity"));
     }
     

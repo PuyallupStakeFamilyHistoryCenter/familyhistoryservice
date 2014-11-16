@@ -176,6 +176,7 @@ public class Precacher {
     
     public static interface PrecacheListener {
         void onPrecache(PrecacheEvent event);
+        void onFinish();
     }
     
     public static class PrecacheEvent {

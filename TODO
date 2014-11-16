@@ -43,6 +43,7 @@ Location cache
 Allow timeouts on requests
 Retire websocket instance if precache event fails to send
 Throttle precaching messages
+Progress bar should change color when past 4 generations
 
 Puzzle:
 Wire puzzle settings into display          DONE
