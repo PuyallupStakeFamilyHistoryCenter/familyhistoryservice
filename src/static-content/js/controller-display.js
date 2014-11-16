@@ -164,7 +164,7 @@ var defaultSettings = {
             attached: function() {
                 $.cookie("display-name", displayName);
                 console.info("Found token '" + token + "'");
-                ws.socketSend("nav " + displayName + " " + "display-login");
+                navigateDisplay("display-login");
                 navigate("controller-login");
             },
             name: function(obj) {
@@ -173,7 +173,7 @@ var defaultSettings = {
             token: function(response) {
                 setUsername(response.username);
                 token = response.token;
-                ws.socketSend("nav " + displayName + " " + "display-main");
+                navigateDisplay("display-main");
                 clearHistory();
                 navigate("controller-main");
             },
@@ -195,7 +195,7 @@ var defaultSettings = {
         logOut: function() {
             ws.socketSend("logout " + token);
             token = null;
-            ws.socketSend("nav " + displayName + " display-login");
+            navigateDisplay("display-login");
             navigate("controller-login");
         },
         destroyAccessToken: function(userId, pin) {
@@ -351,11 +351,11 @@ function clearHistory() {
 }
 
 function navigateDisplay(dest) {
-    ws.socketSend("nav " + displayName + " " + dest);
+    sendToDisplay(JSON.stringify({responseType:"nav",dest:dest}));
 }
 
 function sendToDisplay(message) {
-    ws.socketSend("send " + displayName + " " + message);
+    ws.socketSend("send " + token + " " + displayName + " " + message);
 }
 
 function setHeaderName(headerName) {}

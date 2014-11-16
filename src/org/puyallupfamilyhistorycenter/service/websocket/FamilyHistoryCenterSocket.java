@@ -391,16 +391,10 @@ public class FamilyHistoryCenterSocket {
                 }
                 
                 case "send": {
+                    token = scanner.next();
                     String id = scanner.next();
                     String toSend = scanner.nextLine();
                     sendToDisplay(id, toSend);
-                    break;
-                }
-
-                case "nav": {
-                    String id = scanner.next();
-                    String dest = scanner.next();
-                    sendToDisplay(id, "{\"responseType\":\"nav\",\"dest\":\"" + dest + "\"}");
                     break;
                 }
                 
