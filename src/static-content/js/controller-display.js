@@ -244,32 +244,40 @@ function messageHandler(message) {
 }
 
 var logger = {
-    error: function (message) {
-        log("danger", "<strong>Error:</strong> " + message);
+    error: function (message, ttl) {
+        log("danger", "<strong>Error:</strong> " + message, ttl);
     },
 
-    warn: function (message) {
-        log("warning", "<strong>Warning:</strong> " + message);
+    warn: function (message, ttl) {
+        log("warning", "<strong>Warning:</strong> " + message, ttl);
     },
 
-    info: function (message) {
-        log("info", "<strong>Info:</strong> " + message);
+    info: function (message, ttl) {
+        log("info", "<strong>Info:</strong> " + message, ttl);
     },
 
-    success: function (message) {
-        log("success", message);
+    success: function (message, ttl) {
+        log("success", message, ttl);
     },
     
     clear: function() {
         clearLog();
     }
-}
+};
 
-function log(level, message) {
+function log(level, message, ttl) {
     //TODO: Add timeout parameter for messages to disappear
-    $("#messages").append('<div class="alert alert-' + level + ' alert-dismissible" role="alert">'+
+    var id = Math.round(Math.random() * 10000);
+    $("#messages").append('<div id="message-'+id+'" class="alert alert-' + level + ' alert-dismissible" role="alert">'+
             '<button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>' + 
             message + '</div>');
+    
+    if (!ttl) {
+        ttl = 5000;
+    }
+    setTimeout(function() {
+        $("#messages").remove("#message-" + id);
+    }, ttl);
 }
 
 function clearLog() {
