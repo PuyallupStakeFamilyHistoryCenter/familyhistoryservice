@@ -33,23 +33,44 @@ POSSIBILITY OF SUCH DAMAGE.
 </div>
 
 <script>
+    var letters = ["A", "B", "C", "D", "E", "F"];
+    var fullText;
+    var questionAndAnswers;
     settings.local = {
         verbs: {
             question: function(obj) {
+                questionAndAnswers = obj;
+                
                 $("#question").html(obj.question);
                 $("#answers").html("");
+                
+                fullText = obj.question + ",,, Is the answer,, ";
                 $.each(obj.answers, function(index, answer) {
                     console.info("Display got answer " + JSON.stringify(answer));
-                    $("#answers").append("<li class='list-group-item' data-id='" + answer.index + "'>" + answer.text + "<span class='glyphicon glyphicon-ok' style='float: right; display: none' ></span><span class='glyphicon glyphicon-remove' style='float: right; display: none' ></span></li>");
+                    $("#answers").append("<li class='list-group-item' data-id='" + answer.index + "'>" + (index + 1) + ". " + answer.text + "<span class='glyphicon glyphicon-ok' style='float: right; display: none' ></span><span class='glyphicon glyphicon-remove' style='float: right; display: none' ></span></li>");
+                    fullText += (index === obj.answers.length - 1 ? " or " : "") + (index + 1) + ",, " + answer.text + ",,, ";
                 });
+                
+                say(fullText);
+            },
+            read: function(obj) {
+                say(fullText);
             },
             correctAnswer: function(obj) {
                 $("li[data-id=" + obj.index + "]").addClass("list-group-item-success").children(".glyphicon-ok").show();
                 incrementAnswers(true);
+                
+                if (filterArray(questionAndAnswers.answers, "index=" + obj.index)[0].hint) {
+                    say(filterArray(questionAndAnswers.answers, "index=" + obj.index)[0].hint);
+                }
             },
             incorrectAnswer: function(obj) {
                 $("li[data-id=" + obj.index + "]").addClass("list-group-item-danger").children(".glyphicon-remove").show();
                 incrementAnswers(false);
+                
+                if (filterArray(questionAndAnswers.answers, "index=" + obj.index)[0].hint) {
+                    say(filterArray(questionAndAnswers.answers, "index=" + obj.index)[0].hint);
+                }
             }
         }
     };
@@ -63,5 +84,14 @@ POSSIBILITY OF SUCH DAMAGE.
         totalAnswered++;
         
 //        $("#score").html(totalCorrect + "/" + totalAnswered + " (" + Math.round(totalCorrect * 10000 / totalAnswered) / 100 + "%)")
+    }
+    
+    function say(message) {
+        speechSynthesis.cancel();
+        var msg = new SpeechSynthesisUtterance();
+        msg.lang = "en-US";
+        msg.text = message;
+
+        speechSynthesis.speak(msg);
     }
 </script>
