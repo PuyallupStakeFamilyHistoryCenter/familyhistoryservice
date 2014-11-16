@@ -26,6 +26,7 @@ Limit precaching to a configurable depth   DONE
 File cacher should fall back to cached file even if expired DONE
 Add progress bar for caching               DONE
 Progress bar should never regress          DONE
+Throttle precaching messages               DONE
 *Create clean-up script to clear cache occasionally
 *Ensure security of living person data
     Filter living children out of person
@@ -42,7 +43,6 @@ Progress bar should never regress          DONE
 Location cache
 Allow timeouts on requests
 Retire websocket instance if precache event fails to send
-Throttle precaching messages
 Progress bar should change color when past 4 generations
 
 Puzzle:

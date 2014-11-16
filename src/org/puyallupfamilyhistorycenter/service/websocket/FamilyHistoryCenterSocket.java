@@ -47,6 +47,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 import org.apache.commons.codec.binary.Base64;
@@ -425,13 +426,44 @@ public class FamilyHistoryCenterSocket {
                     }
                     
                     final String finalUserId = userId;
+                    final AtomicReference currentEvent = new AtomicReference();
+                    final Future<?> progressThrottle = scheduler.scheduleAtFixedRate(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            Precacher.PrecacheEvent event = (Precacher.PrecacheEvent) currentEvent.get();
+                            UserContext context = userContextMap.get(finalUserId);
+                            if (event != null && context != null) {
+                                Iterator<String> it = context.tokens.iterator();
+                                while (it.hasNext()) {
+                                    String token = it.next();
+                                    try {
+                                        tokenControllerMap.get(token).sendString(GSON.toJson(event));
+                                    } catch (Exception e) {
+                                        logger.warn("Failed to notify controller " + token + " about precache event; removing");
+                                        it.remove();
+                                        tokenControllerMap.remove(token);
+                                    }
+                                }
+                            }
+                        }
+                    }, 10, 10, TimeUnit.SECONDS);
+                    
                     Precacher precacher = new Precacher(accessToken, 10);
                     precacher.addPrecacheListener(new Precacher.PrecacheListener() {
 
                         @Override
                         public void onPrecache(Precacher.PrecacheEvent event) {
+                            currentEvent.set(event);
+                        }
+
+                        @Override
+                        public void onFinish() {
+                            progressThrottle.cancel(false);
                             UserContext context = userContextMap.get(finalUserId);
-                            if (context != null) {
+                            Precacher.PrecacheEvent previousEvent = (Precacher.PrecacheEvent) currentEvent.get();
+                            Precacher.PrecacheEvent event = new Precacher.PrecacheEvent(previousEvent.totalCached + previousEvent.totalQueueSize, 0, 0, previousEvent.currentGeneration);
+                            if (event != null && context != null) {
                                 Iterator<String> it = context.tokens.iterator();
                                 while (it.hasNext()) {
                                     String token = it.next();
