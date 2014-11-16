@@ -62,6 +62,8 @@ POSSIBILITY OF SUCH DAMAGE.
                 
                 if (filterArray(questionAndAnswers.answers, "index=" + obj.index)[0].hint) {
                     say(filterArray(questionAndAnswers.answers, "index=" + obj.index)[0].hint);
+                } else {
+                    say(filterArray(questionAndAnswers.answers, "index=" + obj.index)[0].text + ",, is correct")
                 }
             },
             incorrectAnswer: function(obj) {
@@ -70,6 +72,8 @@ POSSIBILITY OF SUCH DAMAGE.
                 
                 if (filterArray(questionAndAnswers.answers, "index=" + obj.index)[0].hint) {
                     say(filterArray(questionAndAnswers.answers, "index=" + obj.index)[0].hint);
+                } else {
+                    say(filterArray(questionAndAnswers.answers, "index=" + obj.index)[0].text + ",, is not correct")
                 }
             }
         }
@@ -89,7 +93,7 @@ POSSIBILITY OF SUCH DAMAGE.
     function say(message) {
         speechSynthesis.cancel();
         var msg = new SpeechSynthesisUtterance();
-        msg.lang = "en-US";
+        msg.lang = "en-GB";
         msg.text = message;
 
         speechSynthesis.speak(msg);
