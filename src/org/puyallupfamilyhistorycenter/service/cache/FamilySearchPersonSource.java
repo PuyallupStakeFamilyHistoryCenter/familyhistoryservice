@@ -26,10 +26,11 @@
 package org.puyallupfamilyhistorycenter.service.cache;
 
 import com.google.gson.Gson;
-import com.sun.istack.logging.Logger;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.regex.Pattern;
+import org.apache.log4j.Logger;
 import org.familysearch.api.client.ft.FamilySearchFamilyTree;
 import org.familysearch.api.client.ft.FamilyTreePersonState;
 import org.gedcomx.conclusion.Name;
@@ -39,6 +40,9 @@ import org.gedcomx.rs.client.PersonParentsState;
 import org.gedcomx.rs.client.PersonSpousesState;
 import org.gedcomx.rs.client.SourceDescriptionsState;
 import org.gedcomx.source.SourceDescription;
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 import org.puyallupfamilyhistorycenter.service.models.Fact;
 import org.puyallupfamilyhistorycenter.service.models.Person;
 import org.puyallupfamilyhistorycenter.service.models.PersonBuilder;
@@ -96,12 +100,11 @@ public class FamilySearchPersonSource implements Source<Person> {
                     Fact[] facts = new Fact[originalFacts.size()];
                     int index = 0;
                     for (org.gedcomx.conclusion.Fact originalFact : originalFacts) {
-                        String date = originalFact.getDate() == null ? null : originalFact.getDate().getOriginal();
                         String sortableDate = originalFact.getDate() == null ? null : originalFact.getDate().getFormal();
                         String place = originalFact.getPlace() == null ? null : originalFact.getPlace().getOriginal();
                         facts[index++] = new Fact(
                                 originalFact.getKnownType().name(), 
-                                date, 
+                                formatDate(sortableDate), 
                                 sortableDate,
                                 place);
                     }
@@ -153,13 +156,13 @@ public class FamilySearchPersonSource implements Source<Person> {
                         Fact[] facts = new Fact[originalFacts.size()];
                         int index = 0;
                         for (org.gedcomx.conclusion.Fact originalFact : originalFacts) {
-                            String date = originalFact.getDate() == null ? null : originalFact.getDate().getOriginal();
+                            String sortableDate = originalFact.getDate() == null ? null : originalFact.getDate().getFormal();
                             String place = originalFact.getPlace() == null ? null : originalFact.getPlace().getOriginal();
                             String type = originalFact.getKnownType() == null ? "UNKNOWN" : originalFact.getKnownType().name();
                             facts[index++] = new Fact(
                                     type, 
-                                    date, 
-                                    null, //TODO: Extract real timestamp from this
+                                    formatDate(sortableDate), 
+                                    sortableDate,
                                     place);
                         }
 
@@ -173,5 +176,50 @@ public class FamilySearchPersonSource implements Source<Person> {
             }
         }
         return refs;
+    }
+
+    private static FormatterCollection[] formatters = {
+        new FormatterCollection(Pattern.compile("\\+\\d+\\-\\d+\\-\\d+"),
+                DateTimeFormat.forPattern("+yyyy-M-d").withZoneUTC(), 
+                DateTimeFormat.forPattern("d MMMM yyy").withZoneUTC()),
+        new FormatterCollection(Pattern.compile("\\+\\d+\\-\\d+"),
+                DateTimeFormat.forPattern("+yyyy-M").withZoneUTC(), 
+                DateTimeFormat.forPattern("MMMM yyy").withZoneUTC()),
+        new FormatterCollection(Pattern.compile("\\+\\d+"),
+                DateTimeFormat.forPattern("+yyyy").withZoneUTC(), 
+                DateTimeFormat.forPattern("yyy").withZoneUTC()),
+    };
+    protected static String formatDate(String sortableDate) {
+        if (sortableDate == null) {
+            return null;
+        }
+        
+        FormatterCollection collection = null;
+        for (FormatterCollection c : formatters) {
+            if (c.pattern.matcher(sortableDate).matches()) {
+                collection = c;
+                break;
+            }
+        }
+        
+        if (collection == null) {
+            logger.warn(sortableDate + " doesn't match any known date format");
+            return null;
+        }
+        
+        DateTime inputDate = collection.inputFormatter.parseDateTime(sortableDate);
+        return collection.outputFormatter.print(inputDate);
+    }
+    
+    private static class FormatterCollection {
+        public final Pattern pattern;
+        public final DateTimeFormatter inputFormatter;
+        public final DateTimeFormatter outputFormatter;
+
+        public FormatterCollection(Pattern pattern, DateTimeFormatter inputFormatter, DateTimeFormatter outputFormatter) {
+            this.pattern = pattern;
+            this.inputFormatter = inputFormatter;
+            this.outputFormatter = outputFormatter;
+        }
     }
 }
