@@ -87,7 +87,7 @@ Load the tree instead of just the family   DONE
 Make app controls a tab                    DONE
 Arrange like family tree                   DONE
 Use person chooser for the person-details page DONE
-Allow searching and sorting of ancestors
+Allow navigating in tree
 Spacing between tabs and controls
 Allow choosing person/family/ancestors/descendants DONE
 Allow choosing depth for ancestors/descendants
@@ -201,9 +201,10 @@ Display:
 
 Kiosk:
 Show FS permissions dialog                 DONE
-*Revoke access token if permissions rejected
 Show permissions dialog while loading user DONE
 Kiosk should reload page to clear all fields DONE
+*Remove permissions dialog (it's now native)
+PIN shouldn't be easy (e.g. 1234)
 
 Library:
 Separate query params for page and fragment DONE
@@ -215,8 +216,9 @@ Reload display causes "display * is already connected" DONE
 Unit tests should use JSON responses       DONE
 Finish wiring dependencies via Spring      DONE
 Move developer id into config file (not in Git) DONE
-Delay loading of controller in split mode DONE
+Delay loading of controller in split mode  DONE
 Split mode controller shouldn't cover display DONE
+Support approximate dates and date ranges  DONE
 *Figure out deployment strategy
 *Turn features on/off for split/normal mode
 Figure out why log4j via Ivy isn't working
