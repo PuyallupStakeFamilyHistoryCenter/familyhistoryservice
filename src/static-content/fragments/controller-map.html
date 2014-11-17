@@ -48,7 +48,8 @@ POSSIBILITY OF SUCH DAMAGE.
     <button class="btn btn-primary btn-lg invisible"><span class="glyphicon glyphicon-arrow-left"></span></button>
     <button class="btn btn-primary btn-lg invisible"><span class="glyphicon glyphicon-arrow-right"></span></button>
     <button class="btn btn-primary btn-lg invisible"><span class="glyphicon glyphicon-arrow-right"></span></button>
-    <button id="send-person" class="btn btn-primary btn-lg">Send</button>
+    <button id="retreat-tour-btn" class="btn btn-warning btn-lg">Retreat</button>
+    <button id="advance-tour-btn" class="btn btn-warning btn-lg">Advance</button>
 </div>
 
 <script>
@@ -70,8 +71,11 @@ POSSIBILITY OF SUCH DAMAGE.
     $("#zoom-in-btn").click(function (e) {
         sendToDisplay("{\"responseType\":\"zoom-in\"}");
     });
-    $("#send-person").click(function (e) {
-        ws.socketSend("send-family " + token + " " + displayName + " KWJH-B6Z");
+    $("#retreat-tour-btn").click(function (e) {
+        sendToDisplay("{\"responseType\":\"retreatTour\"}");
+    });
+    $("#advance-tour-btn").click(function (e) {
+        sendToDisplay("{\"responseType\":\"advanceTour\"}");
     });
     
     setHeaderName("Map");

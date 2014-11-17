@@ -122,10 +122,12 @@ Add blurb to map markers                   DONE
 Add outline of states                      DONE
 *Fix buttons in split mode
 *Map doesn't display locations in split mode
+*Tags attached to wrong markers
 Maybe add spiral effect from RootsMapper
 Load Google Maps API only once
 Add multi-generation map mode
 Remove parents from family mode
+Color code markers
 
 Person detail:
 Fix birth and death dates                  DONE
@@ -174,7 +176,8 @@ Require at least 2 answers                 DONE
 
 Media:
 Add video selection screen                 DONE
-Add video controls to controller
+Add video controls to controller           DONE
+Allow displaying discussion points after video
 
 Display main:
 Put sample content into carousel           DONE
@@ -245,3 +248,8 @@ Network issues (work on wifi strength)!!
 Add path from ancestor to root
 Time out (auto-dismiss) error messages
 Keep display from timing out
+Header jumps down after login
+
+1 Make text bigger!
+2 Directed tour
+3 Get iPad apps working

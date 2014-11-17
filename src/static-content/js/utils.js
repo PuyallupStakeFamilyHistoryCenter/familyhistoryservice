@@ -199,3 +199,12 @@ function filterArray(array, rawFilters) {
     return currentArray;
 }
 
+function say(message) {
+    speechSynthesis.cancel();
+    var msg = new SpeechSynthesisUtterance();
+    msg.lang = "en-GB";
+    msg.text = message;
+
+    speechSynthesis.speak(msg);
+}
+

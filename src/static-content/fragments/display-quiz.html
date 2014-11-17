@@ -89,13 +89,4 @@ POSSIBILITY OF SUCH DAMAGE.
         
 //        $("#score").html(totalCorrect + "/" + totalAnswered + " (" + Math.round(totalCorrect * 10000 / totalAnswered) / 100 + "%)")
     }
-    
-    function say(message) {
-        speechSynthesis.cancel();
-        var msg = new SpeechSynthesisUtterance();
-        msg.lang = "en-GB";
-        msg.text = message;
-
-        speechSynthesis.speak(msg);
-    }
 </script>
