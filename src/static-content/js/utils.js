@@ -91,6 +91,16 @@ function sortFacts(facts) {
     return facts;
 }
 
+function removeDuplicates(facts) {
+    var uniqueFacts = [];
+    $.each(facts, function(index, fact) {
+        if ($.inArray(fact, uniqueFacts) === -1) {
+            uniqueFacts.push(fact);
+        }
+    });
+    return uniqueFacts;
+}
+
 function rand(min, max) {
     return Math.floor(Math.random() * (max - min)) + min;
 }
