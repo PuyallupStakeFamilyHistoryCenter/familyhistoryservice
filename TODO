@@ -44,6 +44,7 @@ Location cache
 Allow timeouts on requests
 Retire websocket instance if precache event fails to send
 Progress bar should change color when past 4 generations
+Allow force-refresh of people
 
 Puzzle:
 Wire puzzle settings into display          DONE
@@ -210,7 +211,7 @@ Kiosk:
 Show FS permissions dialog                 DONE
 Show permissions dialog while loading user DONE
 Kiosk should reload page to clear all fields DONE
-*Remove permissions dialog (it's now native)
+*Remove permissions dialog (it's now native) DONE
 PIN shouldn't be easy (e.g. 1234)
 
 Library:
@@ -226,6 +227,7 @@ Move developer id into config file (not in Git) DONE
 Delay loading of controller in split mode  DONE
 Split mode controller shouldn't cover display DONE
 Support approximate dates and date ranges  DONE
+*Add third-party website links
 *Figure out deployment strategy
 *Turn features on/off for split/normal mode
 Figure out why log4j via Ivy isn't working
@@ -240,7 +242,7 @@ Add guided tour of ancestors
     Show tour on Google Earth with stock and real images
     Have quiz on people and places visited
 Fix ivy classpath
-*Add third-party website links
+Allow tagging people for future follow-up
 
 
 Set max zoom in map                        ?
@@ -250,8 +252,8 @@ Network issues (work on wifi strength)!!
 Add path from ancestor to root
 Time out (auto-dismiss) error messages
 Keep display from timing out
-Header jumps down after login
+*Header jumps down after login
 
 1 Make text bigger!
-2 Directed tour
 3 Get iPad apps working
+4 Header jumps down after login
