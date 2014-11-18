@@ -110,26 +110,27 @@ POSSIBILITY OF SUCH DAMAGE.
                         ws.socketSend("send-" + choiceType + " " + token + " " + displayName + " " + id);
                     }
 
-                    if (target) {
-                        innerNavigate("controller-" + target, "#controls").then(function () {
-                            $("#controls-btn").show();
-                            if (!showPersonDetail) {
-                                $("#people-btn").removeClass("active");
-                                $("#controls-btn").click().addClass("active");
 
-                                if (!sendPeople) {
-                                    ws.socketSend("get-" + choiceType + " " + token + " " + id);
-                                }
-                            }
-                        });
-                    }
-
-                    if (showPersonDetail) {
-                        innerNavigate("display-person-detail?hide_image=true&person_id=" + id, "#person-info").then(function () {
+                    innerNavigate("display-person-detail?hide_image=true&person_id=" + id, "#person-info").then(function () {
+                        if (showPersonDetail) {
                             $("#people-btn").removeClass("active");
                             $("#person-info-btn").show().click().addClass("active");
-                        });
-                    }
+                            if (!sendPeople) {
+                                ws.socketSend("get-" + choiceType + " " + token + " " + id);
+                            }
+                        }
+                        if (target) {
+                            innerNavigate("controller-" + target, "#controls").then(function () {
+                                    $("#controls-btn").show();
+                                    if (!showPersonDetail) {
+                                        $("#people-btn").removeClass("active");
+                                        $("#controls-btn").click().addClass("active");
+
+                                    }
+                            });
+                        }
+                    });
+                    
                 });
             }
         }

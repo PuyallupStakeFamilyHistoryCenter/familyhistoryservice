@@ -27,6 +27,8 @@ POSSIBILITY OF SUCH DAMAGE.
 
 <script>
     var target = getParameterByName("target");
+    var showPersonDetail = !getParameterByName("hidePersonDetail");
+    var sendPeople = !getParameterByName("getPeople");
 
     settings.local = {
         verbs: {
@@ -42,14 +44,26 @@ POSSIBILITY OF SUCH DAMAGE.
                     var data = $(this).attr("data-image");
                     var obj = JSON.parse(data);
                     sendToDisplay("{\"responseType\":\"personImage\",\"personImage\":" + data + "}");
+                    
+                    innerNavigate("display-person-detail?hide_image=true&person_id=" + obj.id, "#person-info").then(function () {
+                        if (showPersonDetail) {
+                            $("#images-btn").removeClass("active");
+                            $("#person-info-btn").show().click().addClass("active");
+                            if (!sendPeople) {
+                                ws.socketSend("get-" + choiceType + " " + token + " " + obj.id);
+                            }
+                        }
+                        if (target) {
+                            innerNavigate("controller-" + target, "#controls").then(function () {
+                                    $("#controls-btn").show();
+                                    if (!showPersonDetail) {
+                                        $("#images-btn").removeClass("active");
+                                        $("#controls-btn").click().addClass("active");
 
-                    //navigate("controller-" + target);
-                    innerNavigate("controller-" + target, "#controls");
-                    innerNavigate("display-person-detail?hide_image=true&person_id=" + obj.id, "#person-info");
-
-                    $("#images-btn").removeClass("active");
-                    $("#person-info-btn").show().click().addClass("active");
-                    $("#controls-btn").show();
+                                    }
+                            });
+                        }
+                    });
                 });
             }
         }
