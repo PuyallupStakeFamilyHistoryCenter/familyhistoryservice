@@ -131,7 +131,7 @@ POSSIBILITY OF SUCH DAMAGE.
         }, 60000);
 
         console.info("Getting access token from FamilySearch");
-//        FamilySearch.getAccessToken().then(function (accessToken) {
+        FamilySearch.getAccessToken().then(function (accessToken) {
             
             logger.clear();
             clearTimeout(timeout);
@@ -139,13 +139,13 @@ POSSIBILITY OF SUCH DAMAGE.
                 reset("Timeout setting PIN. Please log in again");
             }, 60000);
 
-//            FamilySearch.getCurrentUser().then(function (result) {
-//                var user = result.getUser();
-//                var displayName = user.displayName;
-//                var userId = user.personId;
-                var displayName = "Willow Ufgood"; //["Willow Ufgood", "Luke Skywalker", "Indiana Jones"][//Choose random element];
-                var userId = "AEF-2344";        //TODO
-                var accessToken = "fake-access-token-replace-with-actual";
+            FamilySearch.getCurrentUser().then(function (result) {
+                var user = result.getUser();
+                var displayName = user.displayName;
+                var userId = user.personId;
+//                var displayName = "Willow Ufgood"; //["Willow Ufgood", "Luke Skywalker", "Indiana Jones"][//Choose random element];
+//                var userId = "AEF-2344";        //TODO
+//                var accessToken = "fake-access-token-replace-with-actual";
 
                 $("#user-name").html(displayName);
 
@@ -179,10 +179,10 @@ POSSIBILITY OF SUCH DAMAGE.
                         reset(null, 5000);
                     }, 10000);
                 });
-//            });
-//        }).fail(function(message) {
-//            logger.error("Failed to log in to FamilySearch: " + message);
-//        });
+            });
+        }).fail(function(message) {
+            logger.error("Failed to log in to FamilySearch: " + message);
+        });
     });
 
     function reset(message) {
