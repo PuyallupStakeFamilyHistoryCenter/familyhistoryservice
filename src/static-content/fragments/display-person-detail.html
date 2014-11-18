@@ -116,7 +116,7 @@ POSSIBILITY OF SUCH DAMAGE.
                 $("#spouse").append(decodeURI(spouse.name) + "<br>");
                 if (spouse.facts) {
                     $.each(spouse.facts, function(index, fact) {
-                        $("#spouse").append("<span style='margin-left:10px'><emph>" + fact.type + "</emph>" + fact.date + " - " + fact.place + "</span><br>");
+                        $("#spouse").append("<span style='margin-left:10px'><emph>" + fact.type + "</emph> - " + fact.date + " - " + fact.place + "</span><br>");
                     });
                 }
             });

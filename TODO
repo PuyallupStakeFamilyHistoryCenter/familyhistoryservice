@@ -27,18 +27,14 @@ File cacher should fall back to cached file even if expired DONE
 Add progress bar for caching               DONE
 Progress bar should never regress          DONE
 Throttle precaching messages               DONE
-*Create clean-up script to clear cache occasionally
-*Ensure security of living person data
-    Filter living children out of person
-    Partition living person in-memory cache
-        OR
-    Don't display/cache living people
-        OR
+Ensure security of living person data      DONE
+    Filter living children out of person   DONE
     Show only placeholder for living people DONE
 *Speed up caching
     Add thread(s)                          DONE
     Use getAncestory function to get several generations at once
     Rethink get person logic to reduce wasted downloads
+*Create clean-up script to clear cache occasionally
 *Implement listDescendants
 Location cache
 Allow timeouts on requests
@@ -127,23 +123,24 @@ Fix mouse zoom (pinch) in split mode       DONE
 Add blurb to map markers                   DONE
 Add outline of states                      DONE
 Directed/narrated tour                     DONE
-*Fix buttons in split mode
-*Map doesn't display locations in split mode
-*Tags attached to wrong markers
+Tags attached to wrong markers             DONE
+Map doesn't display locations in split mode DONE
+Fix buttons in split mode                  DONE
 Maybe add spiral effect from RootsMapper
 Load Google Maps API only once
 Add multi-generation map mode
 Remove parents from family mode
-Color code markers
+Color-code markers?
 Narrated tour should be less repetitive
+Narrated tour doesn't work on iPad
 
 Person detail:
 Fix birth and death dates                  DONE
 Add parents                                DONE
 Add marriage date/place to spouse          DONE
 Display more/all facts                     DONE
+Add space between marriage event and date  DONE
 Filter marriage details
-Add space between marriage event and date
 
 Statistics:
 Implement basic family statistics
