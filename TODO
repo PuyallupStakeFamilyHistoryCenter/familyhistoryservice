@@ -64,12 +64,12 @@ Don't reset game on size change if the size doesn't actually change DONE
 Figure out why puzzle scrolls in split mode DONE
 Set up image chooser                       DONE
 Keep puzzle pieces from starting off the screen DONE
-*Test on iPad in split mode
-*Fix piece rotation in split mode          ?
-*Fix z-order in split mode                 ?
+*Test on iPad in split mode                DONE
+*Fix piece rotation in split mode          DONE
+*Fix z-order in split mode                 DONE
 Add person info on controller-puzzle       DONE
+Back button in puzzle goes back to main screen instead of games screen DONE
 Make piece shapes more interesting
-Back button in puzzle goes back to main screen instead of games screen
 Allow display to signal to controller when puzzle is finished
 
 Image cacher:
@@ -80,8 +80,10 @@ Add get people with images call            DONE
 Make app controls a tab                    DONE
 Style tabs correctly                       DONE
 Image choice persists from puzzle to color DONE
-*Split mode on iPad: images don't load
+*Split mode on iPad: images don't load     DONE
 Spacing between tabs and controls
+*Paginate to prevent scrolling issues on iPad
+*Load controls first, then person-details (to prevent "unrecognized command" issues)
 
 Person chooser:
 Move person-chooser from controller-person-detail
@@ -154,6 +156,7 @@ Allow assigning variables names for reuse  DONE
 Shuffle answers                           DONE
 Allow more complex filters (e.g. >, >=)    DONE
 React on display to correct and incorrect answers DONE
+Require at least 2 answers                 DONE
 *Add more questions
 *BUG: How are null and null related? Mother and daughter
 Allow selection of people
@@ -165,6 +168,7 @@ Difficulty levels
 Automatically grade questions based on answer frequency
 Automatically grade answers based on answer frequency
 Automatically progress difficulty based on performance
+*Image questions no longer appear
 Fix image questions
     Image questions should use persona info from FS
     OR
@@ -175,7 +179,6 @@ Figure out why some answers are 'undefined'
 Allow conditionals (e.g. "gender=Female?her:his")
 Conditionalize relationship questions
 More advanced duplicate answer detection
-Require at least 2 answers                 DONE
 
 Media:
 Add video selection screen                 DONE
