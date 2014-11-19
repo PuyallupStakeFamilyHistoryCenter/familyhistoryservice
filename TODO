@@ -201,8 +201,8 @@ Add back button to standard header         DONE
 Make header opaque so scrolling doesn't look weird DONE
 Add picture to the individual page         DONE
 Header jumps down after login              DONE
-*Clear logged-in name when logged out
-*Turn off log-out button when logged out
+Clear logged-in name when logged out       DONE
+Turn off log-out button when logged out    DONE
 *Fix log-out button in split mode
 *Disable navigation when logged out
 *Return/done should submit login form
