@@ -90,11 +90,11 @@ Arrange like family tree                   DONE
 Use person chooser for the person-details page DONE
 Allow choosing person/family/ancestors/descendants DONE
 Load controls first, then person-details (to prevent "unrecognized command" issues) DONE
+'Person' granularity doesn't work (in quiz) DONE
 Allow navigating in tree
 Spacing between tabs and controls
 Allow choosing depth for ancestors/descendants
 Show loading spinner while waiting for server
-'Person' granularity doesn't work (in quiz)
 Add path from ancestor to root
 
 Color:

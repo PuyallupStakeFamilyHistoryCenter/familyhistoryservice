@@ -181,11 +181,12 @@ POSSIBILITY OF SUCH DAMAGE.
         {
             prerequisites: [
                 'name',
-                'images.0',
-                '*gender=${gender},images !contains image.name,id!=${id}'
+                'images.0'
             ],
             constants: {
                 image: "images.*",
+                otherPerson1: '*gender=${gender},images !contains image.name',
+                otherPerson2: '*gender=${gender},images !contains image,id!=${otherPerson1.id}.name'
             },
             question: "Who is this?<br><img src='${image}' style='max-width:600px; max-height:600px' />",
             answers: [
@@ -194,10 +195,10 @@ POSSIBILITY OF SUCH DAMAGE.
                     hint: "Correct!" 
                 },
                 { 
-                    text: '${*gender=${gender},images !contains image.name,id!=${id}}'
+                    text: '${otherPerson1.name}'
                 },
                 { 
-                    text: '${*gender!=${gender},images !contains image.name,id!=${id}}'
+                    text: '${otherPerson2.name}'
                 },
             ],
         },
@@ -222,6 +223,8 @@ POSSIBILITY OF SUCH DAMAGE.
         },
         {
             prerequisites: [
+                'child.name',
+                'parent.name',
             ],
             constants: {
                 child: "*gender=Female",
@@ -500,6 +503,4 @@ POSSIBILITY OF SUCH DAMAGE.
     $("#read-question").click(function() {
         sendToDisplay(JSON.stringify({responseType:"read"}));
     });
-    
-    ws.socketSend("get-ancestors " + token + " " + settings.userId);
 </script>
