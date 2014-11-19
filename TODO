@@ -11,7 +11,7 @@ Delete access token on log out             DONE
     allow client-side caching (static-resources images) DONE
     allow client-side caching (image-cache)
     add server threads
-Add method for authenticating with devices
+?Add method for authenticating with devices
 
 
 Socket:
@@ -30,18 +30,18 @@ Throttle precaching messages               DONE
 Ensure security of living person data      DONE
     Filter living children out of person   DONE
     Show only placeholder for living people DONE
+Retire websocket instance if precache event fails to send DONE
 *Speed up caching
     Add thread(s)                          DONE
     Use getAncestory function to get several generations at once
     Rethink get person logic to reduce wasted downloads
 *Create clean-up script to clear cache occasionally
 *Implement listDescendants
-Location cache
-Allow timeouts on requests
-Retire websocket instance if precache event fails to send
-Progress bar should change color when past 4 generations
-Allow force-refresh of people
+*Progress bar should change color when past 4 generations
 Stop sending precache status after caching complete
+Allow force-refresh of people
+Allow timeouts on requests
+Location cache
 
 Puzzle:
 Wire puzzle settings into display          DONE
@@ -94,6 +94,8 @@ Allow navigating in tree
 Spacing between tabs and controls
 Allow choosing depth for ancestors/descendants
 Show loading spinner while waiting for server
+'Person' granularity doesn't work (in quiz)
+Add path from ancestor to root
 
 Color:
 Add coloring game to menu                  DONE
@@ -102,15 +104,15 @@ Move image to opposite side from menu      DONE
 Fix brush                                  DONE
 Limit coloring to inside image             DONE
 Allow brush resizing                       DONE
-Move palate and brushes to controller?     DONE
+Move palate and brushes to controller      DONE
 *Set up print function
 *Set up email function
-Add different brush types?
 Rearrange colors more logically
 Add more color options
 Change mouse pointer
-Undo feature?
 Transparent images show logo in background
+?Add different brush types
+?Undo feature
 
 Life map:
 Test map movement (changed to 'send' commands; removed native 'move' commands) DONE
@@ -130,9 +132,10 @@ Maybe add spiral effect from RootsMapper
 Load Google Maps API only once
 Add multi-generation map mode
 Remove parents from family mode
-Color-code markers?
 Narrated tour should be less repetitive
 Narrated tour doesn't work on iPad
+?Color-code markers
+?Set max zoom in map
 
 Person detail:
 Fix birth and death dates                  DONE
@@ -203,10 +206,10 @@ Header jumps down after login              DONE
 *Fix log-out button in split mode
 *Disable navigation when logged out
 *Return/done should submit login form
+*Menu clicks should renew controller lease
 Set up accordian for groups of controls
 Add 'report a problem' button for bug reports
 Use custom number pad for PIN
-Menu clicks should renew controller lease
 
 Display:
 *Experiment with setting font sizes with vh,vw,vmin,and vmax css units (adaptive display sizing)
@@ -250,11 +253,8 @@ Fix ivy classpath
 Allow tagging people for future follow-up
 
 
-Set max zoom in map                        ?
 No feedback when something appears on display
-They spent a long time on the family>individual app
 Network issues (work on wifi strength)!!
-Add path from ancestor to root
 Time out (auto-dismiss) error messages
 Keep display from timing out
 
