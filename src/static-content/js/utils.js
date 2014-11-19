@@ -135,7 +135,7 @@ function filterArray(array, rawFilters) {
     var currentArray = array;
     $.each(split, function (index, rawFilter) {
         var newArray = [];
-        var filterRegex = /([a-z0-9]+)(=|<|<=|>|>=|!=|∋|∌| contains | !contains )([a-z0-9]+)/i;
+        var filterRegex = /([a-z0-9]+)(=|<=|<|>=|>|!=|∋|∌| contains | !contains )(.+)/i;
         var filterMatches = rawFilter.match(filterRegex);
         if (!filterMatches || filterMatches.length < 4) {
             return [];
@@ -200,6 +200,8 @@ function filterArray(array, rawFilters) {
                         newArray.push(arrayValue);
                     }
                     break;
+                default:
+                    throw new Error("Filter " + rawFilter + " contains invalid operator " + operator + "; context: " + rawFilters);
             }
         });
 

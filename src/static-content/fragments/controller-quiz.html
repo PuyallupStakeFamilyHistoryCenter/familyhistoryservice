@@ -55,18 +55,18 @@ POSSIBILITY OF SUCH DAMAGE.
         {
             prerequisites: [
                 'name',
-                'facts.Birth.date',
-                'facts.Death.date'
+                'facts.*type=Birth.date',
+                'facts.*type=Death.date'
             ],
             question: "When was ${name} born?",
             answers: [
                 { 
-                    text: '${facts.Birth.date}', 
-                    hint: "Correct! ${name} was born on ${facts.Birth.date} in ${facts.Birth.place} to ${parents.0.name} and ${parents.1.name}" 
+                    text: '${facts.*type=Birth.date}', 
+                    hint: "Correct! ${name} was born on ${facts.*type=Birth.date} in ${facts.*type=Birth.place} to ${parents.0.name} and ${parents.1.name}" 
                 },
                 { 
-                    text: '${facts.Death.date}', 
-                    hint: "No, but ${name} died on ${facts.Death.date} in ${facts.Death.place}" 
+                    text: '${facts.*type=Death.date}', 
+                    hint: "No, but ${name} died on ${facts.*type=Death.date} in ${facts.*type=Death.place}" 
                 },
                 { 
                     text: '${*.facts.*.date}'
@@ -79,13 +79,13 @@ POSSIBILITY OF SUCH DAMAGE.
         {
             prerequisites: [
                 'name',
-                'facts.Birth.place'
+                'facts.*type=Birth.place'
             ],
             question: "Where was ${name} born?",
             answers: [
                 { 
-                    text: '${facts.Birth.place}', 
-                    hint: "Correct! ${name} was born on ${facts.Birth.date} in ${facts.Birth.place} to ${parents.0.name} and ${parents.1.name}" 
+                    text: '${facts.*type=Birth.place}', 
+                    hint: "Correct! ${name} was born on ${facts.*type=Birth.date} in ${facts.*type=Birth.place} to ${parents.0.name} and ${parents.1.name}" 
                 },
                 { 
                     text: '${*.facts.*.place}'
@@ -110,7 +110,7 @@ POSSIBILITY OF SUCH DAMAGE.
             answers: [
                 { 
                     text: '${parents.*gender=Male.name} and ${parents.*gender=Female.name}', 
-                    hint: "Correct! ${name} was born on ${facts.Birth.date} in ${facts.Birth.place} to ${parents.*gender=Male.name} and ${parents.*gender=Female.name}" 
+                    hint: "Correct! ${name} was born on ${facts.*type=Birth.date} in ${facts.*type=Birth.place} to ${parents.*gender=Male.name} and ${parents.*gender=Female.name}" 
                 },
                 { 
                     text: '${children.*gender=Male.name} and ${children.*gender=Female.name}', 
@@ -128,26 +128,26 @@ POSSIBILITY OF SUCH DAMAGE.
             prerequisites: [
                 'name',
                 'spouses.0.name',
-                'spouses.0.facts.Marriage.date',
-                'facts.Birth.date',
-                'facts.Death.date'
+                'spouses.0.facts.*type=Marriage.date',
+                'facts.*type=Birth.date',
+                'facts.*type=Death.date'
             ],
             question: "When were ${name} and ${spouses.0.name} married?",
             answers: [
                 { 
-                    text: '${spouses.0.facts.Marriage.date}', 
-                    hint: "Correct! ${name} and ${spouses.0.name} married on ${spouses.0.facts.Marriage.date} in ${spouses.0.facts.Marriage.place}" 
+                    text: '${spouses.0.facts.*type=Marriage.date}', 
+                    hint: "Correct! ${name} and ${spouses.0.name} married on ${spouses.0.facts.*type=Marriage.date} in ${spouses.0.facts.*type=Marriage.place}" 
                 },
                 { 
-                    text: '${facts.Birth.date}', 
-                    hint: "No, but ${name} was born on ${facts.Birth.date} in ${facts.Birth.place}" 
+                    text: '${facts.*type=Birth.date}', 
+                    hint: "No, but ${name} was born on ${facts.*type=Birth.date} in ${facts.*type=Birth.place}" 
                 },
                 { 
-                    text: '${facts.Death.date}', 
-                    hint: "No, but ${name} died on ${facts.Death.date} in ${facts.Death.place}" 
+                    text: '${facts.*type=Death.date}', 
+                    hint: "No, but ${name} died on ${facts.*type=Death.date} in ${facts.*type=Death.place}" 
                 },
                 { 
-                    text: '${*.spouses.*.facts.Marriage.date}'
+                    text: '${*.spouses.*.facts.*type=Marriage.date}'
                 },
             ],
         },
@@ -155,26 +155,26 @@ POSSIBILITY OF SUCH DAMAGE.
             prerequisites: [
                 'name',
                 'spouses.0.name',
-                'spouses.0.facts.Marriage.place',
-                'facts.Birth.place',
-                'facts.Death.place'
+                'spouses.0.facts.*type=Marriage.place',
+                'facts.*type=Birth.place',
+                'facts.*type=Death.place'
             ], //TODO: use a constant for spouse so any spouse may be selected not just the first
             question: "Where were ${name} and ${spouses.0.name} married?",
             answers: [
                 { 
-                    text: '${spouses.0.facts.Marriage.place}', 
-                    hint: "Correct! ${name} and ${spouses.0.name} married on ${spouses.0.facts.Marriage.date} in ${spouses.0.facts.Marriage.place}" 
+                    text: '${spouses.0.facts.*type=Marriage.place}', 
+                    hint: "Correct! ${name} and ${spouses.0.name} married on ${spouses.0.facts.*type=Marriage.date} in ${spouses.0.facts.*type=Marriage.place}" 
                 },
                 { 
-                    text: '${facts.Birth.place}', 
-                    hint: "No, but ${name} was born on ${facts.Birth.date} in ${facts.Birth.place}" 
+                    text: '${facts.*type=Birth.place}', 
+                    hint: "No, but ${name} was born on ${facts.*type=Birth.date} in ${facts.*type=Birth.place}" 
                 },
                 { 
-                    text: '${facts.Death.place}', 
-                    hint: "No, but ${name} died on ${facts.Death.date} in ${facts.Death.place}" 
+                    text: '${facts.*type=Death.place}', 
+                    hint: "No, but ${name} died on ${facts.*type=Death.date} in ${facts.*type=Death.place}" 
                 },
                 { 
-                    text: '${*.spouses.*.facts.Marriage.place}'
+                    text: '${*.spouses.*.facts.*type=Marriage.place}'
                 },
             ],
         },
@@ -185,8 +185,9 @@ POSSIBILITY OF SUCH DAMAGE.
             ],
             constants: {
                 image: "images.*",
-                otherPerson1: '*gender=${gender},images !contains image.name',
-                otherPerson2: '*gender=${gender},images !contains image,id!=${otherPerson1.id}.name'
+                otherPerson1: '*gender=${gender},images !contains ${image}',
+                otherPerson2: '*gender=${gender},images !contains ${image},id!=${otherPerson1.id}',
+                otherPerson3: '*images !contains ${image},id!=${otherPerson1.id},id!=${otherPerson2.id}'
             },
             question: "Who is this?<br><img src='${image}' style='max-width:600px; max-height:600px' />",
             answers: [
@@ -199,6 +200,9 @@ POSSIBILITY OF SUCH DAMAGE.
                 },
                 { 
                     text: '${otherPerson2.name}'
+                },
+                { 
+                    text: '${otherPerson3.name}'
                 },
             ],
         },
@@ -316,10 +320,9 @@ POSSIBILITY OF SUCH DAMAGE.
             var maxTries = 100;
             var currentTry = 0;
             for (var j = 0; !questionAndAnswers && j < 100; j++) {
-                resolvedConstants = {};
                 var person = getRandomElement(filterArray(people, "living=false"));
 
-                if (satisfiesPrerequisites(person, template.prerequisites)) {
+                if (satisfiesPrerequisites(person, template.prerequisites) && resolveConstants(template, person)) {
                     questionAndAnswers = createQuestion(person, template);
                     
                     if (questionAndAnswers && questionAndAnswers.answers.length < 2) {
@@ -339,18 +342,24 @@ POSSIBILITY OF SUCH DAMAGE.
         $("#read-question").show();
     }
     
-    var resolvedConstants;
+    function resolveConstants(template, person) {
+        var allResolved = true;
+        resolvedConstants = [];
+        if (template.constants) {
+            Object.keys(template.constants).forEach(function(key) {
+                resolvedConstants[key] = resolveChildProperty(person, replaceVariables(person, template.constants[key]));
+                allResolved &= resolvedConstants[key];
+            });
+            console.info("Resolved constants " + JSON.stringify(resolvedConstants));
+        }
+        return allResolved;
+    }
+    
+    var resolvedConstants = [];
     function createQuestion(person, template) {
         var questionAndAnswers = {};
             
         console.info("Trying to create question " + JSON.stringify(template) + " for person " + JSON.stringify(person));
-        
-        if (template.constants) {
-            Object.keys(template.constants).forEach(function(key) {
-                resolvedConstants[key] = resolveChildProperty(person, template.constants[key]);
-            });
-            console.info("Resolved constants " + JSON.stringify(resolvedConstants));
-        }
         
         questionAndAnswers.question = replaceVariables(person, template.question);
         questionAndAnswers.answers = [];
@@ -443,13 +452,6 @@ POSSIBILITY OF SUCH DAMAGE.
                     currentObject = getRandomElement(filterArray(currentObject, key.substr(1)));
                 } else if (resolvedConstants[key] && index === 0) {
                     currentObject = resolvedConstants[key];
-                } else if (index > 0 && split[index-1] === "facts") {
-                    // Loop through facts until found
-                    $.each(currentObject, function(index, fact) {
-                        if (fact.type === key) {
-                            currentObject = fact;
-                        }
-                    });
                 } else if (currentObject && currentObject[key]) {
                     currentObject = currentObject[key];
                 } else {

@@ -541,12 +541,13 @@ QUnit.module("Test quiz functions", {
 QUnit.cases([
     { title: "Empty", person:{}, path:"", expected: null },
     { title: "Name", person:{name:"Graham Tibbitts"}, path:"name", expected: "Graham Tibbitts"},
-    { title: "Birth date", person:{name:"Graham Tibbitts", facts:[{type:"Birth",date:"2014-10-27"}]}, path:"facts.Birth.date", expected: "2014-10-27"},
+    { title: "Facts generic filter", person:{name:"Graham Tibbitts", facts:[{type:"Birth",date:"2014-10-27"}]}, path:"facts.*type=Birth.date", expected: "2014-10-27"},
     { title: "Array index", person:{name:"Graham Tibbitts", spouses:[{id:"asdf",name:"Katrina Tibbitts"}]}, path:"spouses.0.id", expected: "asdf"},
     { title: "Star operator array single option", person:{name:"Graham Tibbitts", spouses:[{id:"asdf",name:"Katrina Tibbitts"}]}, path:"spouses.*.id", expected: "asdf"},
     { title: "Star operator array multiple options", person:{name:"Graham Tibbitts", children:[{id:"asdf",name:"Allison Tibbitts"},{id:"asdf",name:"James Tibbitts"}]}, path:"children.*.id", expected: "asdf"},
-    { title: "Star operator object", person:{name:"Graham Tibbitts", children:[{id:"asdf"}]}, path:"children.0.*", expected: "asdf"},
-    { title: "Star operator person", person:{}, people:[{name:"Graham Tibbitts"}], path: "*.name", expected: "Graham Tibbitts"}
+//    { title: "Star operator object", person:{name:"Graham Tibbitts", children:[{id:"asdf"}]}, path:"children.0.*", expected: "asdf"},
+    { title: "Star operator person", person:{}, people:[{name:"Graham Tibbitts"}], path: "*.name", expected: "Graham Tibbitts"},
+    { title: "Star operator person w/ filter", person:{}, people:[{name:"Graham Tibbitts",gender:"Male"},{name:"Allison Tibbitts",gender:"Female"}], path: "*gender=Male.name", expected: "Graham Tibbitts"}
 ]).test("Test resolveChildProperty", function(params, assert) {
     assert.expect(1);
     QUnit.stop();
@@ -566,8 +567,8 @@ QUnit.cases([
     { title: "Living", person:{living:true}, prerequisites:[], expected: false },
     { title: "Missing name", person:{}, prerequisites:["name"], expected: false },
     { title: "Name", person:{name:"Graham Tibbitts"}, prerequisites:["name"], expected: true },
-    { title: "Name and missing birth date", person:{name:"Graham Tibbitts"}, prerequisites:["name", "facts.Birth.date"], expected: false },
-    { title: "Name and birth date", person:{name:"Graham Tibbitts", facts:[{type:"Birth",date:"2014-10-27"}]}, prerequisites:["name", "facts.Birth.date"], expected: true },
+    { title: "Name and missing birth date", person:{name:"Graham Tibbitts"}, prerequisites:["name", "facts.*type=Birth.date"], expected: false },
+    { title: "Name and birth date", person:{name:"Graham Tibbitts", facts:[{type:"Birth",date:"2014-10-27"}]}, prerequisites:["name", "facts.*type=Birth.date"], expected: true },
 ]).test("Test satisfiesPrerequisites", function(params, assert) {
     assert.expect(1);
     QUnit.stop();
@@ -583,7 +584,7 @@ QUnit.cases([
 QUnit.cases([
     { title: "Empty", person:{}, original:"", expected: "" },
     { title: "Name", person:{name:"Graham Tibbitts"}, original:"My name is ${name}", expected: "My name is Graham Tibbitts" },
-    { title: "Name and birth date", person:{name:"Graham Tibbitts", facts:[{type:"Birth",date:"2014-10-27"}]}, original: "${name} was born on ${facts.Birth.date}", expected: "Graham Tibbitts was born on 2014-10-27" },
+    { title: "Name and birth date", person:{name:"Graham Tibbitts", facts:[{type:"Birth",date:"2014-10-27"}]}, original: "${name} was born on ${facts.*type=Birth.date}", expected: "Graham Tibbitts was born on 2014-10-27" },
     { title: "Array length", person:{children:[{},{},{}]}, original:"I have ${children.length} children", expected: "I have 3 children" },
     { title: "Compound", person:{parents:[{id:"ASDF-123",gender:"Male"},{id:"QWER-456",gender:"Female"}]}, people:[{id:"ASDF-123",name:"Graham Tibbitts"}], original:"My father's name is ${*id=${parents.*gender=Male.id}.name}", expected: "My father's name is Graham Tibbitts" },
 ]).test("Test replaceVariables", function(params, assert) {
