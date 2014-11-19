@@ -276,7 +276,7 @@ function log(level, message, ttl) {
         ttl = 5000;
     }
     setTimeout(function() {
-        $("#messages").remove("#message-" + id);
+        $("#messages").children("#message-" + id).remove();
     }, ttl);
 }
 

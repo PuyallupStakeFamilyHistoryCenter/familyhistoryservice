@@ -203,6 +203,7 @@ Add picture to the individual page         DONE
 Header jumps down after login              DONE
 Clear logged-in name when logged out       DONE
 Turn off log-out button when logged out    DONE
+Time out (auto-dismiss) error messages     DONE
 *Fix log-out button in split mode
 *Disable navigation when logged out
 *Return/done should submit login form
@@ -255,7 +256,6 @@ Allow tagging people for future follow-up
 
 No feedback when something appears on display
 Network issues (work on wifi strength)!!
-Time out (auto-dismiss) error messages
 Keep display from timing out
 
 1 Make text bigger!
