@@ -298,8 +298,6 @@ public class FamilyHistoryCenterSocket {
                     }
                     String accessToken = tokenToAccessToken(token);
                     
-                    //TODO: Check token
-                    //TODO: Actually get family
                     List<Person> family = personDao.listImmediateFamily(personId, accessToken);
                     if (!family.isEmpty()) {
                         response = getPeopleResponse(family);
@@ -327,8 +325,6 @@ public class FamilyHistoryCenterSocket {
                     String personId = scanner.next();
                     String accessToken = tokenToAccessToken(token);
                     
-                    //TODO: Check token
-                    //TODO: Actually get family
                     List<Person> family = personDao.listAncestors(personId, 4, accessToken);
                     if (!family.isEmpty()) {
                         response = getPeopleResponse(family);
@@ -357,7 +353,6 @@ public class FamilyHistoryCenterSocket {
                     String paginationKey = null;
                     String accessToken = tokenToAccessToken(token);
                     
-                    //TODO: Actually get descendents
                     List<Person> family = personDao.listDescendants(personId, 2, accessToken);
                     if (!family.isEmpty()) {
                         response = getPeopleResponse(family);
@@ -419,6 +414,7 @@ public class FamilyHistoryCenterSocket {
                         throw new IllegalStateException("Access token does not match userId");
                     }
                     
+                    //TODO: Factor this out into separate class (it's pretty complicated
                     final String finalUserId = userId;
                     final AtomicReference currentEvent = new AtomicReference();
                     final Future<?> progressThrottle = scheduler.scheduleAtFixedRate(new Runnable() {
@@ -456,8 +452,8 @@ public class FamilyHistoryCenterSocket {
                             progressThrottle.cancel(false);
                             UserContext context = userContextMap.get(finalUserId);
                             Precacher.PrecacheEvent previousEvent = (Precacher.PrecacheEvent) currentEvent.get();
-                            Precacher.PrecacheEvent event = new Precacher.PrecacheEvent(previousEvent.totalCached + previousEvent.totalQueueSize, 0, 0, previousEvent.currentGeneration);
-                            if (event != null && context != null) {
+                            if (previousEvent != null && context != null) {
+                                Precacher.PrecacheEvent event = new Precacher.PrecacheEvent(previousEvent.totalCached + previousEvent.totalQueueSize, 0, 0, previousEvent.currentGeneration);
                                 Iterator<String> it = context.tokens.iterator();
                                 while (it.hasNext()) {
                                     String token = it.next();
@@ -470,6 +466,11 @@ public class FamilyHistoryCenterSocket {
                                     }
                                 }
                             }
+                        }
+
+                        @Override
+                        public void onCancel() {
+                            progressThrottle.cancel(false);
                         }
                     });
                     precacher.precache();

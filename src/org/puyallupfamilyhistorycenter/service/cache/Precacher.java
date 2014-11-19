@@ -158,6 +158,10 @@ public class Precacher {
     //                            logger.info("Person " + person.name + " has no children on record");
     //                        }
     //                    }
+                    
+                    for (PrecacheListener listener : listeners) {
+                        listener.onFinish();
+                    }
                 }
             }));
         }
@@ -166,6 +170,9 @@ public class Precacher {
     public void cancel() {
         for (Future future : futures) {
             future.cancel(true);
+        }
+        for (PrecacheListener listener : listeners) {
+            listener.onCancel();
         }
         logger.info("Cancelling precaching");
     }
@@ -177,6 +184,7 @@ public class Precacher {
     public static interface PrecacheListener {
         void onPrecache(PrecacheEvent event);
         void onFinish();
+        void onCancel();
     }
     
     public static class PrecacheEvent {
