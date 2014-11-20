@@ -345,6 +345,13 @@ function popHistory() {
     return item;
 }
 
+function peekHistory() {
+    if (!navHistory || !navHistory.length) {
+        return null;
+    }
+    return navHistory[navHistory.length - 1];
+}
+
 function clearHistory() {
     $("#back-btn").hide();
     navHistory = [];

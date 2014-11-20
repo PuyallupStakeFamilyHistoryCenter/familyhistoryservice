@@ -45,6 +45,9 @@ POSSIBILITY OF SUCH DAMAGE.
             <input type="radio" name="choice-type" value="descendants">Descendants
         </label>
     </div>
+    <div id="return-to-root" style="display: none;">
+        <button id="root-btn" class="btn btn-lg btn-default">Return to root</button>
+    </div>
     <div>
         <div id="gen-0" style="height: 640px; width: 20%; float: left;"></div>
         <div id="gen-1" style="height: 640px; width: 20%; float: left;"></div>
@@ -65,10 +68,14 @@ POSSIBILITY OF SUCH DAMAGE.
     var target = getParameterByName("target");
     var showPersonDetail = !getParameterByName("hidePersonDetail");
     var sendPeople = !getParameterByName("getPeople");
+    var rootId = !getParameterByName("rootPersonId") ? settings.userId : getParameterByName("rootPersonId");
 
     function recursivelyAddButtons(person, personMap, index, depth) {
         console.info("Adding person " + JSON.stringify(person) + " to #gen-" + depth + "-" + index)
-        $("#gen-" + depth + "-" + index).append("<button class='btn btn-default person-btn' style='position: absolute; left: 0; top: calc(50% - 19px); z-index: 100;' data-id='" + person.id + "'>" + person.name + "</button>");
+        $("#gen-" + depth + "-" + index).append("<div id='btns-"+ depth + "-" + index + "' style='position: absolute; left: 0; top: calc(50% - 19px); z-index: 100; display: inline-block; white-space: nowrap;' ><button class='btn btn-default person-btn' data-id='" + person.id + "'>" + person.name + "</button></div>");
+        if (person.id !== rootId) {
+            $("#btns-" + depth + "-" + index).append("<button class='btn btn-default target-btn' data-id='" + person.id + "'><span class='glyphicon glyphicon-tree-deciduous'></span></button>");
+        }
         $("#connector-" + depth + "-" + index).removeClass("invisible");
 
         if (person.parents) {
@@ -132,6 +139,15 @@ POSSIBILITY OF SUCH DAMAGE.
                     });
                     
                 });
+                
+                $(".target-btn").click(function() {
+                    console.info("Attempting to change root person");
+                    var currentPage = peekHistory();
+                    var id = $(this).attr("data-id");
+                    navigate(currentPage + "&rootPersonId=" + id).then(function() {
+                        popHistory(); //Attempt to remove page load from history
+                    });
+                });
             }
         }
     }
@@ -154,10 +170,21 @@ POSSIBILITY OF SUCH DAMAGE.
         $("#controls").show();
     });
 
+    if (rootId !== settings.userId) {
+        $("#return-to-root").show();
+    } else {
+        console.info("Root button hidden because " + rootId + " equals " + settings.userId);
+    }
+    $("#root-btn").click(function(e){
+        console.info("Attempting to change root person");
+        var currentPage = peekHistory();
+        navigate(currentPage);
+    });
+
     $(".type-btn").click(function (e) {
         choiceType = $(this).children("input").val();
     });
-
+    
     if (!choiceType) {
         choiceType = "ancestors";
         $("#choice-type-btns").show();
@@ -214,5 +241,5 @@ POSSIBILITY OF SUCH DAMAGE.
     }
 
     build();
-    ws.socketSend("get-ancestors " + token + " " + settings.userId);
+    ws.socketSend("get-ancestors " + token + " " + rootId);
 </script>
