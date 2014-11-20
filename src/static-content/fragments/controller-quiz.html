@@ -227,85 +227,107 @@ POSSIBILITY OF SUCH DAMAGE.
         },
         {
             prerequisites: [
-                'child.name',
-                'parent.name',
+                'name',
+                'parents.0.name',
             ],
             constants: {
-                child: "*gender=Female",
-                parent: "child.parents.*gender=Female"
+                parent: "parents.*"
             },
-            question: "How are ${parent.name} and ${child.name} related?",
+            question: "How are ${parent.name} and ${name} related?",
             answers: [
                 { 
-                    text: 'Mother and daughter',
+                    text: 'Parent and child',
                     hint: "Correct!"
                 },
                 { 
-                    text: 'Mother and son',
-                    hint: "${child.name} isn't a boy!"
+                    text: 'Siblings',
                 },
                 { 
-                    text: 'Grandmother and granddaughter',
+                    text: 'Grandparent and grandchild',
                 },
                 { 
-                    text: 'Grandmother and grandson',
+                    text: 'Spouses',
                 },
             ],
         },
         {
             prerequisites: [
-                "children.*gender=Female",
-                "parents.*gender=Female"
+                'children.0.name',
+                'parents.0.name',
             ],
             constants: {
-                child: "children.*gender=Female",
-                parent: "parents.*gender=Female"
+                child: "children.*",
+                parent: "parents.*"
             },
             question: "How are ${parent.name} and ${child.name} related?",
             answers: [
                 { 
-                    text: 'Grandmother and granddaughter',
-                    hint: "Correct!" 
+                    text: 'Grandparent and grandchild',
+                    hint: "Correct!"
                 },
                 { 
-                    text: 'Grandmother and grandson',
-                    hint: "${child.name} isn't a boy!"
+                    text: 'Parent and child',
                 },
                 { 
-                    text: 'Mother and daughter',
+                    text: 'Siblings',
                 },
                 { 
-                    text: 'Mother and son',
+                    text: 'Spouses',
                 },
             ],
         },
         {
             prerequisites: [
-                "children.*gender=Female",
-                "children.*gender=Female,id!=${child.id}"
+                'children.0.name',
+                'children.1.name',
             ],
             constants: {
-                child1: "children.*gender=Female",
-                child2: "children.*gender=Female,id!=${child1.id}"
+                child1: "children.*",
+                child2: "children.*id!=${child1.id}"
             },
             question: "How are ${child1.name} and ${child2.name} related?",
             answers: [
                 { 
-                    text: 'Sisters',
-                    hint: "Correct!" 
+                    text: 'Siblings',
+                    hint: "Correct!"
                 },
                 { 
-                    text: 'Brother and sister',
-                    hint: "${child1.name} and ${child2.name} are both female!"
+                    text: 'Parent and child',
                 },
                 { 
-                    text: 'Father and daughter',
+                    text: 'Grandparent and grandchild',
                 },
                 { 
-                    text: 'Mother and daughter',
+                    text: 'Spouses',
                 },
             ],
-        }
+        },
+        {
+            prerequisites: [
+                'parents.0.name',
+                'parents.1.name',
+            ],
+            constants: {
+                parent1: "parents.*",
+                parent2: "parents.*id!=${parent1.id}"
+            },
+            question: "How are ${parent1.name} and ${parent2.name} related?",
+            answers: [
+                { 
+                    text: 'Spouses',
+                    hint: "Correct!"
+                },
+                { 
+                    text: 'Parent and child',
+                },
+                { 
+                    text: 'Grandparent and grandchild',
+                },
+                { 
+                    text: 'Siblings',
+                },
+            ],
+        },
         
         //Question ideas
         //
@@ -348,7 +370,7 @@ POSSIBILITY OF SUCH DAMAGE.
         if (template.constants) {
             Object.keys(template.constants).forEach(function(key) {
                 resolvedConstants[key] = resolveChildProperty(person, replaceVariables(person, template.constants[key]));
-                allResolved &= resolvedConstants[key];
+                allResolved = allResolved && (resolvedConstants[key]?true:false);
             });
             console.info("Resolved constants " + JSON.stringify(resolvedConstants));
         }
