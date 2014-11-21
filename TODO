@@ -80,8 +80,9 @@ Style tabs correctly                       DONE
 Image choice persists from puzzle to color DONE
 Split mode on iPad: images don't load      DONE
 Load controls first, then person-details (to prevent "unrecognized command" issues) DONE
-Spacing between tabs and controls
 *Paginate to prevent scrolling issues on iPad
+Spacing between tabs and controls
+Remove duplicate images
 
 Person chooser:
 Move person-chooser from controller-person-detail
@@ -93,6 +94,7 @@ Allow choosing person/family/ancestors/descendants DONE
 Load controls first, then person-details (to prevent "unrecognized command" issues) DONE
 'Person' granularity doesn't work (in quiz) DONE
 Allow navigating in tree                   DONE
+*Rethink design
 Spacing between tabs and controls
 Allow choosing depth for ancestors/descendants
 Show loading spinner while waiting for server
@@ -130,6 +132,8 @@ Directed/narrated tour                     DONE
 Tags attached to wrong markers             DONE
 Map doesn't display locations in split mode DONE
 Fix buttons in split mode                  DONE
+*Make map popups larger
+*Add "# had # children: #, #, and, #" fact
 Lerah Ellis (LZJ8-4KJ) doesn't show death and burial events in tour
 Load Google Maps API only once
 Add multi-generation map mode
@@ -159,12 +163,12 @@ Allow star operator to filter on gender, etc DONE
 Allow filter based on main person's attributes DONE
 Show stats on display                      DONE
 Allow assigning variables names for reuse  DONE
-Shuffle answers                           DONE
+Shuffle answers                            DONE
 Allow more complex filters (e.g. >, >=)    DONE
 React on display to correct and incorrect answers DONE
 Require at least 2 answers                 DONE
+BUG: How are null and null related? Mother and daughter DONE
 *Add more questions
-*BUG: How are null and null related? Mother and daughter
 Image questions no longer appear (image URL contains '.', which is reserved)
 Allow selection of people
 Difficulty levels
@@ -189,7 +193,8 @@ More advanced duplicate answer detection
 Media:
 Add video selection screen                 DONE
 Add video controls to controller           DONE
-Allow displaying discussion points after video
+Add support for videos from lds.org
+Allow displaying discussion points after videos
 
 Display main:
 Put sample content into carousel           DONE

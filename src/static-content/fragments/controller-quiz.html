@@ -402,6 +402,13 @@ POSSIBILITY OF SUCH DAMAGE.
                     if (!answer.text || questionAndAnswers.answers[i].text === answer.text) {
                         duplicate = true;
                         break;
+                    } else if (questionAndAnswers.answers[i].text.indexOf(",") >= 0 && answer.text.indexOf(",") >= 0) {
+                        var commaPos1 = questionAndAnswers.answers[i].text.indexOf(",");
+                        var commaPos2 = answer.text.indexOf(",");
+                        var part1 = questionAndAnswers.answers[i].text.substr(0, commaPos1);
+                        var part2 = answer.text.substr(0, commaPos2);
+                        
+                        duplicate = part1 === part2;
                     }
                 }
                 currentTry++;
