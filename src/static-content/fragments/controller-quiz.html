@@ -126,25 +126,30 @@ POSSIBILITY OF SUCH DAMAGE.
         },
         {
             prerequisites: [
-                'name',
-                'spouses.0.name',
-                'spouses.0.facts.*type=Marriage.date',
-                'facts.*type=Birth.date',
-                'facts.*type=Death.date'
             ],
-            question: "When were ${name} and ${spouses.0.name} married?",
+            constants: {
+                spouse: 'spouses.*',
+                spouseName: 'spouse.name',
+                marriage: 'spouse.facts.*type=Marriage',
+                marriageDate: 'marriage.date',
+                birth: 'facts.*type=Birth',
+                death: 'facts.*type=Death',
+                birthDate: 'birth.date',
+                deathDate: 'death.date'
+            },
+            question: "When were ${name} and ${spouseName} married?",
             answers: [
                 { 
-                    text: '${spouses.0.facts.*type=Marriage.date}', 
-                    hint: "Correct! ${name} and ${spouses.0.name} married on ${spouses.0.facts.*type=Marriage.date} in ${spouses.0.facts.*type=Marriage.place}" 
+                    text: '${marriageDate}', 
+                    hint: "Correct! ${name} and ${spouseName} married on ${marriageDate} in ${marriage.place}" 
                 },
                 { 
-                    text: '${facts.*type=Birth.date}', 
-                    hint: "No, but ${name} was born on ${facts.*type=Birth.date} in ${facts.*type=Birth.place}" 
+                    text: '${birthDate}', 
+                    hint: "No, but ${name} was born on ${birthDate} in ${birth.place}" 
                 },
                 { 
-                    text: '${facts.*type=Death.date}', 
-                    hint: "No, but ${name} died on ${facts.*type=Death.date} in ${facts.*type=Death.place}" 
+                    text: '${deathDate}', 
+                    hint: "No, but ${name} died on ${deathDate} in ${death.place}" 
                 },
                 { 
                     text: '${*.spouses.*.facts.*type=Marriage.date}'
