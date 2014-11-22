@@ -168,9 +168,10 @@ Allow more complex filters (e.g. >, >=)    DONE
 React on display to correct and incorrect answers DONE
 Require at least 2 answers                 DONE
 BUG: How are null and null related? Mother and daughter DONE
+Allow selection of people                  DONE
+More advanced duplicate answer detection   DONE
 *Add more questions
 Image questions no longer appear (image URL contains '.', which is reserved)
-Allow selection of people
 Difficulty levels
     Configurable # answers
     Give questions difficulty grades
@@ -188,7 +189,6 @@ Allow reporting problems with question/answers
 Figure out why some answers are 'undefined'
 Allow conditionals (e.g. "gender=Female?her:his")
 Conditionalize relationship questions
-More advanced duplicate answer detection
 
 Media:
 Add video selection screen                 DONE
