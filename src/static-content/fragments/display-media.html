@@ -31,12 +31,22 @@ POSSIBILITY OF SUCH DAMAGE.
 
 <script>
     var player, ready;
+    var playlist;
     
     settings.local = {
         verbs: {
             youtube: function (obj) {
                 console.info("Embedding video from YouTube");
-                if (ready) player.loadVideoById(obj.id);
+                if (ready) {
+                    playlist = [obj];
+                    playNext();
+                }
+            },
+            composition: function (obj) {
+                if (ready) {
+                    playlist = obj.parts;
+                    playNext();
+                }
             },
             pause: function () {
                 if (ready) player.pauseVideo();
@@ -74,6 +84,29 @@ POSSIBILITY OF SUCH DAMAGE.
     }
     
     function onPlayerStateChange(event) {
-        console.info("Player state change event " + JSON.stringify(event));
+        switch (event.data) {
+            case YT.PlayerState.ENDED:
+                playNext();
+                break;
+        }
+    }
+    
+    function playNext() {
+        if (playlist && playlist.length > 0) {
+            play(playlist.shift());
+        }
+    }
+    
+    function play(video) {
+        var config = {
+            'videoId': video.id,
+            'startSeconds': video.start,
+            'endSeconds': video.end
+        }
+        if (video.wait) {
+            player.cueVideoById(config);
+        } else {
+            player.loadVideoById(config);
+        }
     }
 </script>
