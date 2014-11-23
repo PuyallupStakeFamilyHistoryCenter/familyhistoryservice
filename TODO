@@ -212,7 +212,7 @@ Header jumps down after login              DONE
 Clear logged-in name when logged out       DONE
 Turn off log-out button when logged out    DONE
 Time out (auto-dismiss) error messages     DONE
-*Fix log-out button in split mode
+Fix log-out button in split mode           DONE
 *Disable navigation when logged out
 *Return/done should submit login form
 *Menu clicks should renew controller lease
