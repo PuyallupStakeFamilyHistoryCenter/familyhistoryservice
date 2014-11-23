@@ -219,4 +219,12 @@ function say(message) {
 
     speechSynthesis.speak(msg);
 }
+    
+function formatPlace(answer) {
+    var formatted = answer
+            .replace(/usa|united states/gi, "")
+            .replace(/,\s*/, ", ")
+            .replace(/^[,\s]+|[,\s]+$/g, "");
+    return formatted;
+}
 

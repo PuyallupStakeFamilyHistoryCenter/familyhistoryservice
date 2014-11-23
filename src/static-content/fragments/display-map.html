@@ -280,7 +280,7 @@ POSSIBILITY OF SUCH DAMAGE.
             var t = tour[tourPosition];
             map.panTo(t.position);
             map.setZoom(10);
-            t.infowindow.setContent("<div style='width: 200px'>"+t.blurb+"</div>");
+            t.infowindow.setContent("<div style='font-size: 3vmax;'>"+t.blurb+"</div>");
             t.infowindow.open(map, t.marker);
             say(t.blurb);
         } else {
@@ -329,7 +329,7 @@ POSSIBILITY OF SUCH DAMAGE.
         var message = fact.type + ": " + fact.place + " " + fact.date;
         if (factTypeVerbMap[fact.type]) {
             var v = factTypeVerbMap[fact.type];
-            message = fact.name + " " + v.verb + " in " + fact.place + " " + v.connector + " " + fact.date;
+            message = fact.name + " " + v.verb + " in " + formatPlace(fact.place) + " " + v.connector + " " + fact.date;
         }
         return message;
     }
