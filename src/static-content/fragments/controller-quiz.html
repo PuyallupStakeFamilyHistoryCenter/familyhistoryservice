@@ -406,7 +406,7 @@ POSSIBILITY OF SUCH DAMAGE.
             var maxTries = 10;
             do {
                 duplicate = false;
-                answer.text = replaceVariables(person, answerTemplate.text);
+                answer.text = formatAnswer(replaceVariables(person, answerTemplate.text));
                 for (var i = 0; i < questionAndAnswers.answers.length; i++) {
                     if (!answer.text) {
                         duplicate = true;
@@ -551,8 +551,17 @@ POSSIBILITY OF SUCH DAMAGE.
                 .replace(/[\s,]+/g, " ")
                 .replace(/\./g, "")
                 .replace(/usa|united states/g, "")
-                .replace(/^[,\s]+|[,\s]+$/, "")
-                .replace(/\b(?=[0-9])/, "/") + '/';
+                .replace(/^[,\s]+|[,\s]+$/g, "")
+                .replace(/\b(\d)/g, "/$1")
+                .replace(/(\d)\b/g, "$1/");
         return canonicalized;
+    }
+    
+    function formatAnswer(answer) {
+        var formatted = answer
+                .replace(/usa|united states/gi, "")
+                .replace(/,\s*/, ", ")
+                .replace(/^[,\s]+|[,\s]+$/g, "");
+        return formatted;
     }
 </script>
