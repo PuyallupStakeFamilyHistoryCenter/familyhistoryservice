@@ -197,7 +197,8 @@ Conditionalize relationship questions
 
 Sliding tiles:
 Basic implementation                       DONE
-Tiles can become stuck in desktop mode
+Tiles can become stuck in desktop mode     DONE
+Check for win and display last piece
 
 Media:
 Add video selection screen                 DONE

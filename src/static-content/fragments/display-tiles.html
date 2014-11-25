@@ -262,6 +262,9 @@ POSSIBILITY OF SUCH DAMAGE.
     }
     
     function touchStart(x, y) {
+        if (lastClicked) {
+            return; //Don't allow a new click before the old one is complete
+        }
         findClickedPiece(x, y);
         if (lastClicked) {
             lastX = x;
