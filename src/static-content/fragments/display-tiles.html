@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<!--
+Copyright (c) 2014, tibbitts
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+* Redistributions of source code must retain the above copyright notice, this
+  list of conditions and the following disclaimer.
+* Redistributions in binary form must reproduce the above copyright notice,
+  this list of conditions and the following disclaimer in the documentation
+  and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+POSSIBILITY OF SUCH DAMAGE.
+-->
+
+<canvas id="canvas" width="1" height="1" style="position:fixed; top: 0px; left: 0px;"></canvas>
+
+<script>
+    console.info("Starting tile game display");
+    settings.local = {
+        verbs: {
+            personImage: function(obj) {
+                initPuzzle(obj.personImage.url);
+            }
+        }
+    };
+    
+    var canvas,context,image;
+    var pieces, emptyPiece;
+    var imageWidth, imageHeight;
+    var lastClicked, lastX, lastY;
+    var possibleDeltas = [
+        [0,1],[0,-1],[1,0],[-1,0]
+    ];
+    
+    function initPuzzle(url) {
+        canvas = document.getElementById("canvas");
+        context = canvas.getContext("2d");
+        pieces = [];
+        dragging = false;
+        if (!url) {
+            return;
+        }
+        image = new Image();
+        image.src = url;
+        
+        
+        image.crossOrigin = "Anonymous";
+        image.onload = function () {
+            resize();
+            
+            var pieceNum = 0;
+            var piecesDeep = 4; //config.depth;
+            var pieceHeight = Math.floor(image.height / piecesDeep);
+            imageHeight = piecesDeep * pieceHeight;
+            var piecesAcross = Math.max(Math.round(image.width / pieceHeight), 1);
+            var pieceWidth = Math.floor(image.width / piecesAcross);
+            imageWidth = piecesAcross * pieceWidth;
+            
+            for (var x = 0, i = 0; x < imageWidth; x += pieceWidth, i++) {
+                pieces.push([]);
+                for (var y = 0, j = 0; y < imageHeight; y += pieceHeight, j++) {
+                    var destx = x * scale;
+                    var desty = y * scale;
+                    var piece = {
+                        targetX: x,
+                        targetY: y,
+                        actualX: destx,
+                        actualY: desty,
+                        width: pieceWidth,
+                        height: pieceHeight,
+                        i: i,
+                        j: j,
+                        empty: (i === piecesAcross - 1 && j === piecesDeep - 1)
+                    }
+                    pieces[i].push(piece);
+                    if (i === piecesAcross - 1 && j === piecesDeep - 1) {
+                        emptyPiece = piece;
+                    }
+                }
+            }
+            
+            shuffle(pieces);
+            draw();
+            
+        };
+
+        canvas.onmousedown = function (e) {
+            touchStart(e.pageX - canvas.offsetLeft, e.pageY - canvas.offsetTop);
+        };
+
+        canvas.onmousemove = function (e) {
+            touchMove(e.pageX - canvas.offsetLeft, e.pageY - canvas.offsetTop);
+        };
+
+        canvas.onmouseup = function (e) {
+            touchEnd();
+        };
+
+        canvas.addEventListener("touchstart", function (e) {
+            if (e.touches.length > 1)
+                return;
+            touchStart(e.touches[0].pageX - canvas.offsetLeft, e.touches[0].pageY - canvas.offsetTop);
+            e.preventDefault();
+        }, false);
+
+        canvas.addEventListener("touchmove", function (e) {
+            if (e.touches.length > 1)
+                return;
+            touchMove(e.touches[0].pageX - canvas.offsetLeft, e.touches[0].pageY - canvas.offsetTop);
+            e.preventDefault();
+        }, false);
+
+        canvas.addEventListener("touchend", function (e) {
+            touchEnd();
+            e.preventDefault();
+        }, false);
+
+        $(window).resize(new function() {
+            resize();
+            draw();
+        });
+    }
+
+    /*
+     * Finds the topmost piece that is on the given coordinants
+     */
+    function findClickedPiece(x, y) {
+        var lastIndex;
+        $.each(possibleDeltas, function(index, d) {
+            var i = emptyPiece.i + d[0];
+            var j = emptyPiece.j + d[1];
+            
+            var piece = pieces[i] ? pieces[i][j] : null;
+            if (piece &&
+                    x >= piece.actualX && x < piece.actualX + piece.width * scale &&
+                    y >= piece.actualY && y < piece.actualY + piece.height * scale &&
+                    !piece.found) {
+                lastIndex = i;
+                lastClicked = pieces[i][j];
+            }
+        });
+    }
+    
+    function resize() {
+        canvas.width = window.innerWidth - 16;
+        canvas.height = window.innerHeight - 16;
+            
+        scale = Math.min(canvas.width/image.width, canvas.height/image.height);
+    }
+
+    function draw() {
+        canvas.width = canvas.width; //Reset canvas
+
+        drawBoard();
+
+        for (var i = 0; i < pieces.length; i++) {
+            for (var j = 0; j < pieces[i].length; j++) {
+                drawPiece(pieces[i][j]);
+            }
+        }
+    }
+
+    function drawBoard() {
+        context.fillStyle = "white";
+        context.fillRect(0,0,canvas.width,canvas.height);
+        context.fillRect(0, 0, imageWidth * scale, imageHeight * scale);
+        context.strokeRect(0, 0, imageWidth * scale, imageHeight * scale);
+
+        // TODO: Setup config
+//        if (config.thumbnail) {
+//            var thumbnailWidth = Math.min(canvas.width - image.width*scale - 10, image.width*scale/2);
+//            var thumbnailScale = thumbnailWidth / imageWidth;
+//            context.drawImage(image, 0, 0, imageWidth, imageHeight, imageWidth * scale + 10, 0, thumbnailWidth, imageHeight * thumbnailScale);
+//        }
+    }
+
+    function drawPiece(p) {
+        if (p === null || p.empty)
+            return;
+
+        context.save();
+        context.translate(p.actualX + p.width / 2 * scale, p.actualY + p.height / 2 * scale);
+        if (p.rotation !== 0) {
+            context.rotate(p.rotation);
+        }
+
+        context.beginPath();
+        context.moveTo(-p.width * 1 / 2 * scale, -p.height / 2 * scale);
+        context.lineTo(p.width * 1 / 2 * scale, -p.height / 2 * scale);
+        context.lineTo(p.width * 1 / 2 * scale, p.height * 1 / 2 * scale);
+        context.lineTo(-p.width * 1 / 2 * scale, p.height * 1 / 2 * scale);
+        context.lineTo(-p.width * 1 / 2 * scale, -p.height / 2 * scale);
+        context.closePath();
+
+        context.save();
+        context.clip();
+        context.drawImage(image,
+                -(p.targetX + p.width / 2) * scale, //Canvas position
+                -(p.targetY + p.height / 2) * scale,
+                image.width * scale, //Canvas size
+                image.height * scale);
+        context.restore();
+        if (!p.found) {
+            context.stroke();
+        }
+        context.restore();
+    }
+    
+    function shuffle() {
+        swapEventually(500);
+        function swapEventually(depth) {
+            swapRandom();
+            if (depth > 0) {
+                setTimeout(function() {swapEventually(depth-1)}, 0);
+            }
+        }
+    }
+    
+    function swapRandom() {
+        var i = emptyPiece.i;
+        var j = emptyPiece.j;
+        var delta;
+        do {
+            delta = getRandomElement(possibleDeltas);
+        } while (i + delta[0] < 0 || i + delta[0] >= pieces.length ||
+                j + delta[1] < 0 || j + delta[1] >= pieces[i].length);
+        
+        swap(i, j, i + delta[0], j + delta[1]);
+    }
+    
+    function swap(i1, j1, i2, j2) {
+        var piece1 = pieces[i1][j1];
+        var piece2 = pieces[i2][j2];
+        var tx = piece1.actualX;
+        var ty = piece1.actualY;
+        piece1.actualX = piece2.actualX;
+        piece1.actualY = piece2.actualY;
+        piece1.i = i2;
+        piece1.j = j2;
+        piece2.actualX = tx;
+        piece2.actualY = ty;
+        piece2.i = i1;
+        piece2.j = j1;
+        
+        pieces[i1][j1] = piece2;
+        pieces[i2][j2] = piece1;
+        
+        draw();
+    }
+    
+    function touchStart(x, y) {
+        findClickedPiece(x, y);
+        if (lastClicked) {
+            lastX = x;
+            lastY = y;
+            lastClicked.originalX = lastClicked.actualX;
+            lastClicked.originalY = lastClicked.actualY;
+        }
+    }
+
+    function touchMove(x, y) {
+        if (lastClicked) {
+            lastClicked.actualX += x - lastX;
+            lastClicked.actualY += y - lastY;
+            lastX = x;
+            lastY = y;
+            
+            if (lastClicked.actualX < lastClicked.originalX && lastClicked.actualX < emptyPiece.actualX) {
+                lastClicked.actualX = Math.min(lastClicked.originalX, emptyPiece.actualX);
+            } else if (lastClicked.actualX > lastClicked.originalX && lastClicked.actualX > emptyPiece.actualX) {
+                lastClicked.actualX = Math.max(lastClicked.originalX, emptyPiece.actualX);
+            }
+            
+            if (lastClicked.actualY < lastClicked.originalY && lastClicked.actualY < emptyPiece.actualY) {
+                lastClicked.actualY = Math.min(lastClicked.originalY, emptyPiece.actualY);
+            } else if (lastClicked.actualY > lastClicked.originalY && lastClicked.actualY > emptyPiece.actualY) {
+                lastClicked.actualY = Math.max(lastClicked.originalY, emptyPiece.actualY);
+            }
+
+            draw();
+        }
+    }
+
+    function touchEnd() {
+        if (lastClicked) {
+            var selfDist = Math.pow((lastClicked.originalX - lastClicked.actualX)*(lastClicked.originalX - lastClicked.actualX) + (lastClicked.originalY - lastClicked.actualY)*(lastClicked.originalY - lastClicked.actualY), .5);
+            var emptyDist = Math.pow((emptyPiece.actualX - lastClicked.actualX)*(emptyPiece.actualX - lastClicked.actualX) + (emptyPiece.actualY - lastClicked.actualY)*(emptyPiece.actualY - lastClicked.actualY), .5);
+            
+            lastClicked.actualX = lastClicked.originalX;
+            lastClicked.actualY = lastClicked.originalY;
+            if (emptyDist < selfDist) {
+                swap(emptyPiece.i, emptyPiece.j, lastClicked.i, lastClicked.j);
+            }
+            
+            lastClicked = null;
+            
+            draw();
+        }
+    }
+
+</script>

@@ -94,6 +94,7 @@ Allow choosing person/family/ancestors/descendants DONE
 Load controls first, then person-details (to prevent "unrecognized command" issues) DONE
 'Person' granularity doesn't work (in quiz) DONE
 Allow navigating in tree                   DONE
+*Horizontal scrolling on ipad
 *Rethink design
 Spacing between tabs and controls
 Allow choosing depth for ancestors/descendants
@@ -134,6 +135,10 @@ Map doesn't display locations in split mode DONE
 Fix buttons in split mode                  DONE
 *Make map popups larger
 *Add "# had # children: #, #, and, #" fact
+*Show controls immediately after clicking on person
+Show thumbnail map on side of map
+Show events on controller (map) and click on them
+Zoom and pan between locations
 Lerah Ellis (LZJ8-4KJ) doesn't show death and burial events in tour
 Load Google Maps API only once
 Add multi-generation map mode
@@ -261,6 +266,9 @@ Add guided tour of ancestors
 Fix ivy classpath
 Allow tagging people for future follow-up
 
+Game ideas:
+Sliding tile game
+
 
 
 DEMO NOTES
@@ -268,4 +276,24 @@ DEMO NOTES
 No feedback when something appears on display
 Network issues (work on wifi strength)!!
 Keep display from timing out
+Billion graves for images of tombstones
 
+Logging in is hard
+Display doesn't work well on a wide screen
+Display text is too small
+Person-details show relation to person
+Children in person-details aren't sorted
+Image chooser- group by person
+Give some context for the person
+In quiz, give relationship
+Which of the following is one of your great*grandparents?
+Map: show overview of all events at end
+FIX PIN PAD
+Map context with zoom
+Don't override manual zoom level
+Give worksheet with scavenger hunt questions
+Which ancestors are immigrants (born in one country, died in another)?
+Go straight to controls form
+Paginate the images in image chooser
+Horizontal scrolling on iPad
+Add external links
