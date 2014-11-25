@@ -195,6 +195,10 @@ Figure out why some answers are 'undefined'
 Allow conditionals (e.g. "gender=Female?her:his")
 Conditionalize relationship questions
 
+Sliding tiles:
+Basic implementation                       DONE
+Tiles can become stuck in desktop mode
+
 Media:
 Add video selection screen                 DONE
 Add video controls to controller           DONE
@@ -297,3 +301,4 @@ Go straight to controls form
 Paginate the images in image chooser
 Horizontal scrolling on iPad
 Add external links
+Fade out mouse pointer on display

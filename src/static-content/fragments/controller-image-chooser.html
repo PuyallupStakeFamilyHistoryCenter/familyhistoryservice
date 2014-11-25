@@ -25,46 +25,34 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 -->
 
+<!--<link type="text/css" rel="stylesheet" href="simplePagination.css"/>-->
+<script src="js/jquery.simplePagination.js" ></script>
+
 <script>
     var target = getParameterByName("target");
     var showPersonDetail = !getParameterByName("hidePersonDetail");
     var sendPeople = !getParameterByName("getPeople");
+    var personImages;
+    var pageSize = 20;
 
     settings.local = {
         verbs: {
             images: function (obj) {
-                var images = obj.images;
-                $.each(images, function (index, image) {
-                    $("#images").append("<button class='btn btn-default img-btn' style='display: none;' data-image='" + JSON.stringify(image) + "'><img style='max-width:100px; max-height: 100px;' src='" + image.url + "' /></button>")
+                personImages = obj.images;
+                
+                $("#pagination").pagination({
+                    items: personImages.length,
+                    itemsOnPage: pageSize,
+                    displayedPages: 3,
+                    cssStyle: 'dark-theme',
+                    prevText: "<span class='glyphicon glyphicon-chevron-left'></span>",
+                    nextText: "<span class='glyphicon glyphicon-chevron-right'></span>",
+                    onPageClick: function(pageNumber, event) {
+                        showPage(pageNumber-1);
+                    }
                 });
-                $(".img-btn img").load(function (e) {
-                    $(this).parent().show();
-                });
-                $(".img-btn").click(function (e) {
-                    var data = $(this).attr("data-image");
-                    var obj = JSON.parse(data);
-                    sendToDisplay("{\"responseType\":\"personImage\",\"personImage\":" + data + "}");
-                    
-                    innerNavigate("display-person-detail?hide_image=true&person_id=" + obj.id, "#person-info").then(function () {
-                        if (showPersonDetail) {
-                            $("#images-btn").removeClass("active");
-                            $("#person-info-btn").show().click().addClass("active");
-                            if (!sendPeople) {
-                                ws.socketSend("get-" + choiceType + " " + token + " " + obj.id);
-                            }
-                        }
-                        if (target) {
-                            innerNavigate("controller-" + target, "#controls").then(function () {
-                                    $("#controls-btn").show();
-                                    if (!showPersonDetail) {
-                                        $("#images-btn").removeClass("active");
-                                        $("#controls-btn").click().addClass("active");
-
-                                    }
-                            });
-                        }
-                    });
-                });
+                
+                showPage(0);
             }
         }
     }
@@ -77,8 +65,13 @@ POSSIBILITY OF SUCH DAMAGE.
     <li id="person-info-btn" style="display: none" ><a href="#person-info" role="tab" data-toggle="tab">Person</a></li>
     <li id="controls-btn" style="display: none" ><a href="#controls" role="tab" data-toggle="tab">Controls</a></li>
 </ul>
-<div id="images">
+<div id="images-wrapper">
+    <div id="images">
 
+    </div>
+    <div id="pagination">
+
+    </div>
 </div>
 <div id="person-info" style="display: none;">
 
@@ -89,22 +82,58 @@ POSSIBILITY OF SUCH DAMAGE.
 
 <script>
     $("#images-btn").click(function (e) {
-        $("#images").show();
+        $("#images-wrapper").show();
         $("#person-info").hide();
         $("#controls").hide();
     });
 
     $("#person-info-btn").click(function (e) {
-        $("#images").hide();
+        $("#images-wrapper").hide();
         $("#person-info").show();
         $("#controls").hide();
     });
 
     $("#controls-btn").click(function (e) {
-        $("#images").hide();
+        $("#images-wrapper").hide();
         $("#person-info").hide();
         $("#controls").show();
     });
+    
+    function showPage(pageNum) {
+        $("#images").html("");
+        for (var i = pageSize * pageNum; i < Math.min(personImages.length, pageSize * (pageNum + 1)); i++) {
+            var image = personImages[i];
+            $("#images").append("<button class='btn btn-default img-btn' style='display: none;' data-image='" + JSON.stringify(image) + "'><img style='max-width:100px; max-height: 100px;' src='" + image.url + "' /></button>")
+        }
+        $(".img-btn img").load(function (e) {
+            $(this).parent().show();
+        });
+        $(".img-btn").click(function (e) {
+            var data = $(this).attr("data-image");
+            var obj = JSON.parse(data);
+            sendToDisplay("{\"responseType\":\"personImage\",\"personImage\":" + data + "}");
+
+            innerNavigate("display-person-detail?hide_image=true&person_id=" + obj.id, "#person-info").then(function () {
+                if (showPersonDetail) {
+                    $("#images-btn").removeClass("active");
+                    $("#person-info-btn").show().click().addClass("active");
+                    if (!sendPeople) {
+                        ws.socketSend("get-" + choiceType + " " + token + " " + obj.id);
+                    }
+                }
+                if (target) {
+                    innerNavigate("controller-" + target, "#controls").then(function () {
+                            $("#controls-btn").show();
+                            if (!showPersonDetail) {
+                                $("#images-btn").removeClass("active");
+                                $("#controls-btn").click().addClass("active");
+
+                            }
+                    });
+                }
+            });
+        });
+    }
 
     function innerNavigate(dest, selector, timeout) {
         if (!timeout) {

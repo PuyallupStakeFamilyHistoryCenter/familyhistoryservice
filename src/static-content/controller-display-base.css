@@ -62,3 +62,11 @@ invisible {
 .nav-tabs>li>a {
     border: 1px solid #282828
 }
+
+.btn>a {
+    color: white
+}
+
+.btn>a:hover {
+    color: white
+}
