@@ -29,10 +29,29 @@ POSSIBILITY OF SUCH DAMAGE.
 
 <script>
     console.info("Starting tile game display");
+    
+    var config = {
+        depth: 4,
+        thumbnail: true,
+    };
+    
     settings.local = {
         verbs: {
+            depth: function (obj) {
+                var newDepth = obj.value;
+                if (config.depth !== newDepth) { 
+                    config.depth = newDepth;
+                    initPuzzle();
+                }
+            },
+            thumbnail: function (obj) {
+                config.thumbnail = obj.value
+                draw();
+            },
+            reset: initPuzzle,
             personImage: function(obj) {
-                initPuzzle(obj.personImage.url);
+                imageUrl = obj.personImage.url;
+                initPuzzle();
             }
         }
     };
@@ -44,17 +63,19 @@ POSSIBILITY OF SUCH DAMAGE.
     var possibleDeltas = [
         [0,1],[0,-1],[1,0],[-1,0]
     ];
+    var imageUrl;
     
-    function initPuzzle(url) {
+    function initPuzzle() {
+        if (!imageUrl) {
+            return;
+        }
+        
         canvas = document.getElementById("canvas");
         context = canvas.getContext("2d");
         pieces = [];
         dragging = false;
-        if (!url) {
-            return;
-        }
         image = new Image();
-        image.src = url;
+        image.src = imageUrl;
         
         
         image.crossOrigin = "Anonymous";
@@ -63,14 +84,14 @@ POSSIBILITY OF SUCH DAMAGE.
             
             var piecesDeep, pieceHeight, piecesAcross, pieceWidth;
             if (image.height > image.width) {
-                piecesDeep = 4; //config.depth;
+                piecesDeep = config.depth;
                 pieceHeight = Math.floor(image.height / piecesDeep);
                 imageHeight = piecesDeep * pieceHeight;
                 piecesAcross = Math.max(Math.round(image.width / pieceHeight), 1);
                 pieceWidth = Math.floor(image.width / piecesAcross);
                 imageWidth = piecesAcross * pieceWidth;
             } else {
-                piecesAcross = 4;
+                piecesAcross = config.depth;
                 pieceWidth = Math.floor(image.width / piecesAcross);
                 imageWidth = piecesAcross * pieceWidth;
                 piecesDeep = Math.max(Math.round(image.height / pieceWidth), 1);
@@ -192,12 +213,11 @@ POSSIBILITY OF SUCH DAMAGE.
         context.fillRect(0, 0, imageWidth * scale, imageHeight * scale);
         context.strokeRect(0, 0, imageWidth * scale, imageHeight * scale);
 
-        // TODO: Setup config
-//        if (config.thumbnail) {
-//            var thumbnailWidth = Math.min(canvas.width - image.width*scale - 10, image.width*scale/2);
-//            var thumbnailScale = thumbnailWidth / imageWidth;
-//            context.drawImage(image, 0, 0, imageWidth, imageHeight, imageWidth * scale + 10, 0, thumbnailWidth, imageHeight * thumbnailScale);
-//        }
+        if (config.thumbnail) {
+            var thumbnailWidth = Math.min(canvas.width - image.width*scale - 10, image.width*scale/2);
+            var thumbnailScale = thumbnailWidth / imageWidth;
+            context.drawImage(image, 0, 0, imageWidth, imageHeight, imageWidth * scale + 10, 0, thumbnailWidth, imageHeight * thumbnailScale);
+        }
     }
 
     function drawPiece(p) {

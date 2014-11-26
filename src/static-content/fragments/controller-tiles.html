@@ -24,3 +24,31 @@ CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 -->
+
+
+<button class="btn btn-danger btn-lg" id="resetButton" type="button">Reset</button>
+<div class="btn-group btn-group-lg" data-toggle="buttons">
+    <label class="btn btn-default">
+        <input type="radio" name="difficulty" value="3">Easy
+    </label>
+    <label class="btn btn-default active">
+        <input type="radio" name="difficulty" value="4" checked="">Medium
+    </label>
+    <label class="btn btn-default">
+        <input type="radio" name="difficulty" value="5">Hard
+    </label>
+    <label class="btn btn-default">
+        <input type="radio" name="difficulty" value="6">Insane
+    </label>
+</div>
+
+<script>
+
+    $('input[name=difficulty]:radio').change(function () {
+        sendToDisplay("{\"responseType\":\"depth\",\"value\":" + $(this).val() + "}");
+    });
+    
+    $("#resetButton").click(function () {
+        sendToDisplay("{\"responseType\":\"reset\"}");
+    });
+</script>

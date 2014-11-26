@@ -514,10 +514,6 @@ POSSIBILITY OF SUCH DAMAGE.
         }
     }
 
-    function rand(min, max) {
-        return Math.random() * (max - min) + min;
-    }
-
     function cloneObject(obj) {
         var serialized = window.JSON.stringify(obj);
         var clone = window.JSON.parse(serialized);
