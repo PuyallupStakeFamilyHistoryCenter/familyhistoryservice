@@ -195,12 +195,22 @@ POSSIBILITY OF SUCH DAMAGE.
             resize();
             
             var pieceNum = 0;
-            var piecesDeep = config.depth;
-            var pieceHeight = Math.floor(image.height / piecesDeep);
-            imageHeight = piecesDeep * pieceHeight;
-            var piecesAcross = Math.max(Math.round(image.width / pieceHeight), 1);
-            var pieceWidth = Math.floor(image.width / piecesAcross);
-            imageWidth = piecesAcross * pieceWidth;
+            var piecesDeep, pieceHeight, piecesAcross, pieceWidth;
+            if (image.height > image.width) {
+                piecesDeep = config.depth;
+                pieceHeight = Math.floor(image.height / piecesDeep);
+                imageHeight = piecesDeep * pieceHeight;
+                piecesAcross = Math.max(Math.round(image.width / pieceHeight), 1);
+                pieceWidth = Math.floor(image.width / piecesAcross);
+                imageWidth = piecesAcross * pieceWidth;
+            } else {
+                piecesAcross = config.depth;
+                pieceWidth = Math.floor(image.width / piecesAcross);
+                imageWidth = piecesAcross * pieceWidth;
+                piecesDeep = Math.max(Math.round(image.height / pieceWidth), 1);
+                pieceHeight = Math.floor(image.height / piecesDeep);
+                imageHeight = piecesDeep * pieceHeight;
+            }
             var pNSMap = {};
             var pWEMap = {};
             for (var x = 0; x < imageWidth; x += pieceWidth) {

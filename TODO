@@ -66,6 +66,7 @@ Test on iPad in split mode                 DONE
 Fix piece rotation in split mode           DONE
 Fix z-order in split mode                  DONE
 Add person info on controller-puzzle       DONE
+Landscape puzzles are much harder
 Back button in puzzle goes back to main screen instead of games screen DONE
 Make piece shapes more interesting
 Allow display to signal to controller when puzzle is finished
@@ -198,6 +199,7 @@ Conditionalize relationship questions
 Sliding tiles:
 Basic implementation                       DONE
 Tiles can become stuck in desktop mode     DONE
+Landscape puzzles are much harder          DONE
 Check for win and display last piece
 
 Media:
