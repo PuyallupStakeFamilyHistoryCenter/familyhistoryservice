@@ -35,10 +35,7 @@ POSSIBILITY OF SUCH DAMAGE.
                     <div id="cached-prg" class="progress-bar progress-bar-success" style="width: 0%">
                         <span class="sr-only"></span>
                     </div>
-                    <div id="queue-size-prg" class="progress-bar progress-bar-warning" style="width: 0%">
-                        <span class="sr-only"></span>
-                    </div>
-                    <div id="unvisited-prg" class="progress-bar progress-bar-danger" style="width: 0%">
+                    <div id="uncached-prg" class="progress-bar progress-bar-danger" style="width: 0%">
                         <span class="sr-only"></span>
                     </div>
                 </div>
@@ -64,8 +61,15 @@ POSSIBILITY OF SUCH DAMAGE.
             
             var total = cached + queueSize + unvisited;
             $("#cached-prg").css("width", ((cached / total) * 100) + "%");
-            $("#queue-size-prg").css("width", ((queueSize / total) * 100) + "%");
-            $("#unvisited-prg").css("width", ((unvisited / total) * 100) + "%");
+            $("#uncached-prg").css("width", (((queueSize + unvisited) / total) * 100) + "%");
+            
+            if (currentGeneration > 4) {
+                $("#cached-prg").addClass("progress-bar-success").removeClass("progress-bar-warning");
+                $("#uncached-prg").addClass("progress-bar-warning").removeClass("progress-bar-danger");
+            } else {
+                $("#cached-prg").addClass("progress-bar-warning").removeClass("progress-bar-success");
+                $("#uncached-prg").addClass("progress-bar-danger").removeClass("progress-bar-warning");
+            }
         }
     };
     
