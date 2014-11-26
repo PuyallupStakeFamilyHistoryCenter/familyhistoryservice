@@ -61,13 +61,22 @@ POSSIBILITY OF SUCH DAMAGE.
         image.onload = function () {
             resize();
             
-            var pieceNum = 0;
-            var piecesDeep = 4; //config.depth;
-            var pieceHeight = Math.floor(image.height / piecesDeep);
-            imageHeight = piecesDeep * pieceHeight;
-            var piecesAcross = Math.max(Math.round(image.width / pieceHeight), 1);
-            var pieceWidth = Math.floor(image.width / piecesAcross);
-            imageWidth = piecesAcross * pieceWidth;
+            var piecesDeep, pieceHeight, piecesAcross, pieceWidth;
+            if (image.height > image.width) {
+                piecesDeep = 4; //config.depth;
+                pieceHeight = Math.floor(image.height / piecesDeep);
+                imageHeight = piecesDeep * pieceHeight;
+                piecesAcross = Math.max(Math.round(image.width / pieceHeight), 1);
+                pieceWidth = Math.floor(image.width / piecesAcross);
+                imageWidth = piecesAcross * pieceWidth;
+            } else {
+                piecesAcross = 4;
+                pieceWidth = Math.floor(image.width / piecesAcross);
+                imageWidth = piecesAcross * pieceWidth;
+                piecesDeep = Math.max(Math.round(image.height / pieceWidth), 1);
+                pieceHeight = Math.floor(image.height / piecesDeep);
+                imageHeight = piecesDeep * pieceHeight;
+            }
             
             for (var x = 0, i = 0; x < imageWidth; x += pieceWidth, i++) {
                 pieces.push([]);
@@ -84,16 +93,20 @@ POSSIBILITY OF SUCH DAMAGE.
                         i: i,
                         j: j,
                         empty: (i === piecesAcross - 1 && j === piecesDeep - 1)
-                    }
+                    };
                     pieces[i].push(piece);
                     if (i === piecesAcross - 1 && j === piecesDeep - 1) {
                         emptyPiece = piece;
-                    }
+                    };
                 }
             }
             
-            shuffle(pieces);
             draw();
+            
+            setTimeout(function() {
+                shuffle(pieces);
+                draw();
+            }, 2000);
             
         };
 
@@ -220,12 +233,8 @@ POSSIBILITY OF SUCH DAMAGE.
     }
     
     function shuffle() {
-        swapEventually(500);
-        function swapEventually(depth) {
+        for (var i = 0; i < 500; i++) {
             swapRandom();
-            if (depth > 0) {
-                setTimeout(function() {swapEventually(depth-1)}, 0);
-            }
         }
     }
     
@@ -257,8 +266,6 @@ POSSIBILITY OF SUCH DAMAGE.
         
         pieces[i1][j1] = piece2;
         pieces[i2][j2] = piece1;
-        
-        draw();
     }
     
     function touchStart(x, y) {
