@@ -68,4 +68,9 @@ POSSIBILITY OF SUCH DAMAGE.
             $("#unvisited-prg").css("width", ((unvisited / total) * 100) + "%");
         }
     };
+    
+    function resetCacheProgress() {
+        $("#progress-div").hide();
+        previousCached = 0;
+    }
 </script>  

@@ -31,6 +31,7 @@ Ensure security of living person data      DONE
     Filter living children out of person   DONE
     Show only placeholder for living people DONE
 Retire websocket instance if precache event fails to send DONE
+Progress bar should reset when switch user DONE
 *Speed up caching
     Add thread(s)                          DONE
     Use getAncestory function to get several generations at once

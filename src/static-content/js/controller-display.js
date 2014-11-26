@@ -195,6 +195,7 @@ var defaultSettings = {
         logOut: function() {
             ws.socketSend("logout " + token);
             token = null;
+            resetCacheProgress();
             navigateDisplay("display-login");
             navigate("controller-login");
         },
