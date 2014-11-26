@@ -98,6 +98,7 @@ Load controls first, then person-details (to prevent "unrecognized command" issu
 Allow navigating in tree                   DONE
 *Horizontal scrolling on ipad
 *Rethink design
+*Add 'loading' animation
 Spacing between tabs and controls
 Allow choosing depth for ancestors/descendants
 Show loading spinner while waiting for server
@@ -226,10 +227,11 @@ Clear logged-in name when logged out       DONE
 Turn off log-out button when logged out    DONE
 Time out (auto-dismiss) error messages     DONE
 Fix log-out button in split mode           DONE
+Allow switching the root person            DONE
 *Disable navigation when logged out
 *Return/done should submit login form
 *Menu clicks should renew controller lease
-*Allow switching the root person
+*Hide menu button on log in screen
 Add 'report a problem' button for bug reports
 ?Use custom number pad for PIN
 ?Set up accordian for groups of controls

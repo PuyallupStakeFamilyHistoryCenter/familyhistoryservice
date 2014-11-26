@@ -74,8 +74,10 @@ public class AncestorsIterator implements Iterator<Person> {
                 next = frontier.remove();
                 person = source.get(next.getId(), accessToken);
             } catch (Exception e) {
-                logger.warn("Failed to get person " + next.getId() + "; attempting to recover", e);
-                person = new PersonBuilder().withName(next.getName()).withId(next.getId()).withGender(next.getGender()).build();
+                if (next != null) {
+                    logger.warn("Failed to get person " + next.getId() + "; attempting to recover", e);
+                    person = new PersonBuilder().withName(next.getName()).withId(next.getId()).withGender(next.getGender()).build();
+                }
             }
         }
         

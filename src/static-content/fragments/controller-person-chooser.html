@@ -69,6 +69,7 @@ POSSIBILITY OF SUCH DAMAGE.
     var showPersonDetail = !getParameterByName("hidePersonDetail");
     var sendPeople = !getParameterByName("getPeople");
     var rootId = !getParameterByName("rootPersonId") ? settings.userId : getParameterByName("rootPersonId");
+    var loggedInUser = !getParameterByName("loggedInUser") ? settings.userId : getParameterByName("loggedInUser");
 
     function recursivelyAddButtons(person, personMap, index, depth) {
         console.info("Adding person " + JSON.stringify(person) + " to #gen-" + depth + "-" + index)
@@ -177,7 +178,7 @@ POSSIBILITY OF SUCH DAMAGE.
         $("#controls").show();
     });
 
-    if (rootId !== settings.userId) {
+    if (rootId !== loggedInUser) {
         $("#return-to-root").show();
     } else {
         console.info("Root button hidden because " + rootId + " equals " + settings.userId);
@@ -185,7 +186,9 @@ POSSIBILITY OF SUCH DAMAGE.
     $("#root-btn").click(function(e){
         console.info("Attempting to change root person");
         var currentPage = peekHistory();
-        navigate(currentPage);
+        navigate(currentPage + "&rootPersonId=" + loggedInUser).then(function() {
+            popHistory();
+        });
     });
 
     $(".type-btn").click(function (e) {
