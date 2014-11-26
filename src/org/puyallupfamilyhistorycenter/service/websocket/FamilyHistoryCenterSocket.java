@@ -131,11 +131,7 @@ public class FamilyHistoryCenterSocket {
                     Map.Entry<String, Long> entry = it.next();
                     if (entry.getValue() + tokenInactivityTimeout < System.currentTimeMillis()) {
                         String token = entry.getKey();
-                        try {
-                            deactivateUserToken(token);
-                        } catch (IOException ex) {
-                            logger.error("Failed to delete token " + token + " controller has probably already disconnected", ex);
-                        }
+                        deactivateUserToken(token, "Logged out due to inactivity");
                         it.remove();
                     }
                 }
@@ -497,7 +493,7 @@ public class FamilyHistoryCenterSocket {
                         // TODO: Revoke access token
                         userContextMap.remove(userId);
                         for (String t : userContext.tokens) {
-                            deactivateUserToken(t);
+                            deactivateUserToken(t, "User " + userContext.userName + " logged out of the system");
                         }
                         userId = null;
                         
@@ -597,10 +593,16 @@ public class FamilyHistoryCenterSocket {
         }
     }
     
-    protected static void deactivateUserToken(String token) throws IOException {
-        RemoteEndpoint controllerEndpoint = tokenControllerMap.remove(token);
-        controllerEndpoint.sendString("{\"responseType\":\"nav\",\"dest\":\"controller-login\"}");
-        controllerEndpoint.sendString(getErrorResponse("logged out due to inactivity"));
+    protected static void deactivateUserToken(String token, String message) throws IOException {
+        try {
+            RemoteEndpoint controllerEndpoint = tokenControllerMap.remove(token);
+            controllerEndpoint.sendString("{\"responseType\":\"nav\",\"dest\":\"controller-login\"}");
+            if (message != null) {
+                controllerEndpoint.sendString(getErrorResponse(message));
+            }
+        } catch (Exception e) {
+            //Eat these exceptions
+        }
     }
     
     protected static String newSalt() {
