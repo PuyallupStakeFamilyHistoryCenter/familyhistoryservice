@@ -32,13 +32,13 @@ Ensure security of living person data      DONE
     Show only placeholder for living people DONE
 Retire websocket instance if precache event fails to send DONE
 Progress bar should reset when switch user DONE
+Progress bar should change color when past 4 generations DONE
+Implement listDescendants DONE
 *Speed up caching
     Add thread(s)                          DONE
     Use getAncestory function to get several generations at once
     Rethink get person logic to reduce wasted downloads
 *Create clean-up script to clear cache occasionally
-*Implement listDescendants
-*Progress bar should change color when past 4 generations
 Stop sending precache status after caching complete
 Allow force-refresh of people
 Allow timeouts on requests
@@ -229,6 +229,7 @@ Fix log-out button in split mode           DONE
 *Disable navigation when logged out
 *Return/done should submit login form
 *Menu clicks should renew controller lease
+*Allow switching the root person
 Add 'report a problem' button for bug reports
 ?Use custom number pad for PIN
 ?Set up accordian for groups of controls

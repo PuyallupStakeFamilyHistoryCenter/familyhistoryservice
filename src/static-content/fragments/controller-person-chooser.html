@@ -96,6 +96,12 @@ POSSIBILITY OF SUCH DAMAGE.
             }
         }
     }
+    
+    function addRootSpouses(person) {
+        $.each(person.spouses, function(index, spouse) {
+            $("#btns-0-0").append("<div style='padding-top: 10px;'><button class='btn btn-default person-btn' data-id='" + spouse.id + "'>" + spouse.name + "</button><button class='btn btn-default target-btn' data-id='" + spouse.id + "'><span class='glyphicon glyphicon-tree-deciduous'></span></button></div>");
+        });
+    }
 
     settings.local = {
         verbs: {
@@ -108,6 +114,7 @@ POSSIBILITY OF SUCH DAMAGE.
                 });
 
                 recursivelyAddButtons(people[0], peopleIndex, 0, 0);
+                addRootSpouses(people[0]);
 
                 $(".person-btn").click(function (e) {
                     logger.clear();
