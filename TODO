@@ -82,7 +82,7 @@ Style tabs correctly                       DONE
 Image choice persists from puzzle to color DONE
 Split mode on iPad: images don't load      DONE
 Load controls first, then person-details (to prevent "unrecognized command" issues) DONE
-*Paginate to prevent scrolling issues on iPad
+Paginate to prevent scrolling issues on iPad DONE
 Spacing between tabs and controls
 Remove duplicate images
 
@@ -99,6 +99,7 @@ Allow navigating in tree                   DONE
 *Horizontal scrolling on ipad
 *Rethink design
 *Add 'loading' animation
+Don't show 'focus' button if a person has no parents on record
 Spacing between tabs and controls
 Allow choosing depth for ancestors/descendants
 Show loading spinner while waiting for server
@@ -136,9 +137,11 @@ Directed/narrated tour                     DONE
 Tags attached to wrong markers             DONE
 Map doesn't display locations in split mode DONE
 Fix buttons in split mode                  DONE
-*Make map popups larger
+Make map popups larger                     DONE
 *Add "# had # children: #, #, and, #" fact
 *Show controls immediately after clicking on person
+*Show only three life events (birth, marriage, and death)
+*Zoom for context
 Show thumbnail map on side of map
 Show events on controller (map) and click on them
 Zoom and pan between locations
@@ -228,6 +231,7 @@ Turn off log-out button when logged out    DONE
 Time out (auto-dismiss) error messages     DONE
 Fix log-out button in split mode           DONE
 Allow switching the root person            DONE
+*Simplify menu
 *Disable navigation when logged out
 *Return/done should submit login form
 *Menu clicks should renew controller lease
@@ -263,6 +267,7 @@ Support approximate dates and date ranges  DONE
 *Add third-party website links
 *Figure out deployment strategy
 *Turn features on/off for split/normal mode
+*Don't auto-disconnect controller (or increase timeout)
 Figure out why log4j via Ivy isn't working
 Move css files into folder
 Move test files into folder
@@ -307,5 +312,8 @@ Which ancestors are immigrants (born in one country, died in another)?
 Go straight to controls form
 Paginate the images in image chooser
 Horizontal scrolling on iPad
-Add external links
 Fade out mouse pointer on display
+
+Fix logging in via iPad
+Dismiss popup in maps (via controller)
+Auto-reconnect login screen

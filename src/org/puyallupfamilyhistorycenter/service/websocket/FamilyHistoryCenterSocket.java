@@ -593,7 +593,7 @@ public class FamilyHistoryCenterSocket {
         }
     }
     
-    protected static void deactivateUserToken(String token, String message) throws IOException {
+    protected static void deactivateUserToken(String token, String message) {
         try {
             RemoteEndpoint controllerEndpoint = tokenControllerMap.remove(token);
             controllerEndpoint.sendString("{\"responseType\":\"nav\",\"dest\":\"controller-login\"}");
