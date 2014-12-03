@@ -374,9 +374,9 @@ public class FamilyHistoryCenterSocket {
                 case "get-ancestor-images": {
                     token = scanner.next();
                     String personId = scanner.next();
-                    List<PersonImage> images = personDao.listAncestorImages(personId, 5, token);
+                    List<Person> people = personDao.listAncestorsWithImages(personId, 5, token);
                     
-                    response = getImagesResponse(images);
+                    response = getPeopleResponse(people);
                     
                     break;
                 }

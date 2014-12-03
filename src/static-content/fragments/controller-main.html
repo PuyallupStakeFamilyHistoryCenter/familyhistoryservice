@@ -34,28 +34,31 @@ POSSIBILITY OF SUCH DAMAGE.
             label: "Main",
             buttons: [
                 {
-                    name: "maps",
-                    label: "Maps",
-                    image: "old-world-map.jpg",
-                    child: "maps"
-                },
-                {
                     name: "your-family",
                     label: "Your family",
                     image: "old-family.jpg",
                     child: "yourfamily",
                 },
                 {
-                    name: "media",
-                    label: "Media",
-                    image: "tutorials.jpg",
-                    nav: "media"
+                    name: "maps",
+                    label: "Maps",
+                    image: "old-world-map.jpg",
+                    nav: "person-chooser?type=person&target=map",
+                    display: "map"
                 },
                 {
-                    name: "games",
-                    label: "Games",
-                    image: "old-game.jpg",
-                    child: "games",
+                    name: "images",
+                    label: "Images",
+                    image: "images.jpg",
+                    nav: "image-chooser?hidePersonDetail",
+                    display: "person-detail"
+                },
+                {
+                    name: "quiz",
+                    label: "Quiz",
+                    image: "quiz.jpg",
+                    nav: "person-chooser?target=quiz&getPeople&hidePersonDetail",
+                    display: "quiz"
                 }
             ]
         },

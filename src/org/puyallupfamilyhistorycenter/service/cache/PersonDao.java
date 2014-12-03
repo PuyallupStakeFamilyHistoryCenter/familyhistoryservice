@@ -77,8 +77,8 @@ public class PersonDao {
         return traverse(new AncestorsIterator(personId, maxDepth, source, accessToken));
     }
     
-    public List<PersonImage> listAncestorImages(String personId, int maxDepth, String accessToken) {
-        return extractImages(new AncestorsIterator(personId, maxDepth, source, accessToken));
+    public List<Person> listAncestorsWithImages(String personId, int maxDepth, String accessToken) {
+        return extractPeopleWithImages(new AncestorsIterator(personId, maxDepth, source, accessToken));
     }
     
     /**
@@ -96,16 +96,14 @@ public class PersonDao {
         return IteratorUtils.toList(iterator);
     }
     
-    private List<PersonImage> extractImages(final Iterator<Person> it) {
-        List<PersonImage> images = new ArrayList<>();
+    private List<Person> extractPeopleWithImages(final Iterator<Person> it) {
+        List<Person> people = new ArrayList<>();
         while (it.hasNext()) {
             Person p = it.next();
-            if (p.images != null) {
-                for (String url : p.images) {
-                    images.add(new PersonImage(p.id, url));
-                }
+            if (p.images != null && p.images.length > 0) {
+                people.add(p);
             }
         }
-        return images;
+        return people;
     } 
 }

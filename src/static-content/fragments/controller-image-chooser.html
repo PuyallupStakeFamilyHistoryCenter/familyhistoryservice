@@ -32,16 +32,16 @@ POSSIBILITY OF SUCH DAMAGE.
     var target = getParameterByName("target");
     var showPersonDetail = !getParameterByName("hidePersonDetail");
     var sendPeople = !getParameterByName("getPeople");
-    var personImages;
-    var pageSize = 20;
+    var people;
+    var pageSize = 5;
 
     settings.local = {
         verbs: {
-            images: function (obj) {
-                personImages = obj.images;
+            people: function (obj) {
+                people = obj.people;
                 
                 $("#pagination").pagination({
-                    items: personImages.length,
+                    items: people.length,
                     itemsOnPage: pageSize,
                     displayedPages: 3,
                     cssStyle: 'dark-theme',
@@ -101,9 +101,14 @@ POSSIBILITY OF SUCH DAMAGE.
     
     function showPage(pageNum) {
         $("#images").html("");
-        for (var i = pageSize * pageNum; i < Math.min(personImages.length, pageSize * (pageNum + 1)); i++) {
-            var image = personImages[i];
-            $("#images").append("<button class='btn btn-default img-btn' style='display: none;' data-image='" + JSON.stringify(image) + "'><img style='max-width:100px; max-height: 100px;' src='" + image.url + "' /></button>")
+        for (var i = pageSize * pageNum; i < Math.min(people.length, pageSize * (pageNum + 1)); i++) {
+            var person = people[i];
+            
+            $("#images").append("<h3>" + person.name + "</h3>");
+            $.each(person.images, function(index, image) {
+                var obj = {responseType:"personImage",person:person,url:image};
+                $("#images").append("<button class='btn btn-default img-btn' style='display: none;' data-image='" + JSON.stringify(obj) + "'><img style='max-width:100px; max-height: 100px;' src='" + obj.url + "' /></button>")
+            });
         }
         $(".img-btn img").load(function (e) {
             $(this).parent().show();
@@ -111,14 +116,14 @@ POSSIBILITY OF SUCH DAMAGE.
         $(".img-btn").click(function (e) {
             var data = $(this).attr("data-image");
             var obj = JSON.parse(data);
-            sendToDisplay("{\"responseType\":\"personImage\",\"personImage\":" + data + "}");
+            sendToDisplay(data);
 
-            innerNavigate("display-person-detail?hide_image=true&person_id=" + obj.id, "#person-info").then(function () {
+            innerNavigate("display-person-detail?hide_image=true&person_id=" + obj.person.id, "#person-info").then(function () {
                 if (showPersonDetail) {
                     $("#images-btn").removeClass("active");
                     $("#person-info-btn").show().click().addClass("active");
                     if (!sendPeople) {
-                        ws.socketSend("get-" + choiceType + " " + token + " " + obj.id);
+                        ws.socketSend("get-" + choiceType + " " + token + " " + obj.person.id);
                     }
                 }
                 if (target) {

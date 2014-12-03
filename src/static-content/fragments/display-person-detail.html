@@ -33,7 +33,7 @@ POSSIBILITY OF SUCH DAMAGE.
 
 <div class="media" id="person-bio">
     <a class="pull-left" href="#">
-        <img class="media-object" style="max-width: 400px" id="person-img" src="#" alt="#" />
+        <img class="media-object" style="max-width: 600px" id="person-img" src="#" alt="#" />
     </a>
     <div class="media-body">
         <h2 class="person-name"></h2>
@@ -70,6 +70,10 @@ POSSIBILITY OF SUCH DAMAGE.
         verbs: {
             person: function(obj) {
                 gotPerson(obj.person);
+            },
+            personImage: function(obj) {
+                gotPerson(obj.person);
+                $("#person-img").attr("src", obj.url);
             }
         }
     };
