@@ -102,7 +102,7 @@ public class FamilyHistoryCenterSocket {
         }
     }
     
-    private static final long tokenInactivityTimeout = TimeUnit.MINUTES.toMillis(1); //TODO: Reset this
+    private static final long tokenInactivityTimeout = TimeUnit.MINUTES.toMillis(30); //TODO: Reset this
     private static final long userInactivityTimeout  = TimeUnit.MINUTES.toMillis(60);
     
     private static final Map<String, RemoteEndpoint> remoteDisplays = new HashMap<>();
