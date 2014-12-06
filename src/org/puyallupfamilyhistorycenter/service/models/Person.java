@@ -40,6 +40,7 @@ public class Person {
     public final String id;
     public final String name;
     public final String gender;
+    public String relationship;
     public final boolean living;
     public final Fact[] facts;
     public final PersonReference[] parents;
@@ -58,6 +59,10 @@ public class Person {
         this.spouses = spouses;
         this.children = children;
         this.images = images;
+    }
+    
+    public void setRelationship(String relationship) {
+        this.relationship = relationship;
     }
 
     @Override

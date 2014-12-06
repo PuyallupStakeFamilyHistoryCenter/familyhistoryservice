@@ -25,6 +25,8 @@
  */
 package org.puyallupfamilyhistorycenter.service.cache;
 
+import com.google.common.base.Joiner;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Queue;
@@ -89,6 +91,7 @@ public class AncestorsIterator implements Iterator<Person> {
             }
         }
         
+        addRelationshipToPerson(person, next.getDepth());
         return person;
     }
 
@@ -96,5 +99,20 @@ public class AncestorsIterator implements Iterator<Person> {
     public void remove() {
         throw new UnsupportedOperationException("Not supported");
     }
-    
+
+    protected static void addRelationshipToPerson(Person person, int depth) {
+        String baseRelationship = person.gender.equals("Female") ? "mother" : "father";
+        String relationship;
+        switch (depth) { 
+            case 0: relationship = "self";
+                break;
+            case 1: relationship = baseRelationship;
+                break;
+            case 2: relationship = "grand" + baseRelationship;
+                break;
+            default: relationship = Joiner.on("-").join(Collections.nCopies(depth-2, "great")) + "-grand" + baseRelationship;
+                break;
+        }
+        person.setRelationship(relationship);
+    }
 }
