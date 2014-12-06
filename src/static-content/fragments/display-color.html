@@ -7,9 +7,8 @@
     settings.local = {
         verbs: {
             personImage: function (obj) {
-                var data = obj.personImage;
-                console.info("Got image " + JSON.stringify(data));
-                imagesrc = data.url;
+                console.info("Got image " + JSON.stringify(obj.data));
+                imagesrc = obj.url;
                 init();
             },
             swatch: function(obj) {
