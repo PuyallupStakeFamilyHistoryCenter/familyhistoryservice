@@ -108,11 +108,11 @@ public class AncestorsIterator implements Iterator<Person> {
                 break;
             case 1: relationship = baseRelationship;
                 break;
-            case 2: relationship = "grand" + baseRelationship;
+            case 2: relationship = "grand" + baseRelationship.toLowerCase();
                 break;
-            default: relationship = Joiner.on("-").join(Collections.nCopies(depth-2, "great")) + "-grand" + baseRelationship;
+            default: relationship = Joiner.on("-").join(Collections.nCopies(depth-2, "great")) + "-grand" + baseRelationship.toLowerCase();
                 break;
         }
-        person.setRelationship(relationship);
+        person.setRelationship(relationship.substring(0,1).toUpperCase() + relationship.substring(1));
     }
 }

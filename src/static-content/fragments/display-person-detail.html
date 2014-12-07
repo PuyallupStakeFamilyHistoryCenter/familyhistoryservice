@@ -36,6 +36,7 @@ POSSIBILITY OF SUCH DAMAGE.
         <img class="media-object" style="max-width: 600px" id="person-img" src="#" alt="#" />
     </a>
     <div class="media-body">
+        <h3 class="relationship"></h3>
         <h2 class="person-name"></h2>
         <dl class="dl-horizontal">
             <dt>
@@ -87,7 +88,12 @@ POSSIBILITY OF SUCH DAMAGE.
         } else {
             $("#person-img").hide();
         }
-        $(".person-name").html(person.relationship + " " + person.name);
+        if (person.relationship) {
+            $(".relationship").html(person.relationship);
+        } else {
+            $(".relationship").html("");
+        }
+        $(".person-name").html(person.name);
         
         $("#gender").html(person.gender);
         
