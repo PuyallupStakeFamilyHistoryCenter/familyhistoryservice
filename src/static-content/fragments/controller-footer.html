@@ -35,9 +35,6 @@ POSSIBILITY OF SUCH DAMAGE.
                     <div id="cached-prg" class="progress-bar progress-bar-success" style="width: 0%">
                         <span class="sr-only"></span>
                     </div>
-                    <div id="uncached-prg" class="progress-bar progress-bar-danger" style="width: 0%">
-                        <span class="sr-only"></span>
-                    </div>
                 </div>
             </div> <!-- /.container-fluid -->
         </div>
@@ -52,24 +49,15 @@ POSSIBILITY OF SUCH DAMAGE.
         var unvisited = obj.estimatedUnvisited;
         var currentGeneration = obj.currentGeneration;
         
-        if (queueSize === 0) {
+        if (queueSize === 0 || currentGeneration > 4) {
             $("#progress-div").hide();
         } else if (cached > previousCached) {
             previousCached = cached;
             
             $("#progress-div").show();
             
-            var total = cached + queueSize + unvisited;
+            var total = 64;
             $("#cached-prg").css("width", ((cached / total) * 100) + "%");
-            $("#uncached-prg").css("width", (((queueSize + unvisited) / total) * 100) + "%");
-            
-            if (currentGeneration > 4) {
-                $("#cached-prg").addClass("progress-bar-success").removeClass("progress-bar-warning");
-                $("#uncached-prg").addClass("progress-bar-warning").removeClass("progress-bar-danger");
-            } else {
-                $("#cached-prg").addClass("progress-bar-warning").removeClass("progress-bar-success");
-                $("#uncached-prg").addClass("progress-bar-danger").removeClass("progress-bar-warning");
-            }
         }
     };
     
