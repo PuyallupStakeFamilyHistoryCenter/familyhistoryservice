@@ -89,7 +89,7 @@ POSSIBILITY OF SUCH DAMAGE.
             $("#person-img").hide();
         }
         if (person.relationship) {
-            $(".relationship").html(person.relationship);
+            $(".relationship").html(person.relationship.substr(0,1).toUpperCase() + person.relationship.substr(1));
         } else {
             $(".relationship").html("");
         }

@@ -113,6 +113,6 @@ public class AncestorsIterator implements Iterator<Person> {
             default: relationship = Joiner.on("-").join(Collections.nCopies(depth-2, "great")) + "-grand" + baseRelationship.toLowerCase();
                 break;
         }
-        person.setRelationship(relationship.substring(0,1).toUpperCase() + relationship.substring(1));
+        person.setRelationship(relationship);
     }
 }
