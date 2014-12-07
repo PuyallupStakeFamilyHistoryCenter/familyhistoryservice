@@ -40,12 +40,14 @@ public class Fact {
     public final String type;
     public final String date;
     public final String sortableDate;
+    public final Integer year;
     public final String place;
 
-    public Fact(String type, String date, String sortableDate, String place) {
+    public Fact(String type, String date, String sortableDate, Integer year, String place) {
         this.type = type;
         this.date = date;
         this.sortableDate = sortableDate;
+        this.year = year;
         this.place = place;
     }
 

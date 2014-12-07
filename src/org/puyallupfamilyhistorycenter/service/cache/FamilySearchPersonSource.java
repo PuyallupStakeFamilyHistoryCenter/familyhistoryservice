@@ -102,10 +102,12 @@ public class FamilySearchPersonSource implements Source<Person> {
                     for (org.gedcomx.conclusion.Fact originalFact : originalFacts) {
                         String sortableDate = originalFact.getDate() == null ? null : originalFact.getDate().getFormal();
                         String place = originalFact.getPlace() == null ? null : originalFact.getPlace().getOriginal();
+                        ParsedDate parsedDate = formatDate(sortableDate);
                         facts[index++] = new Fact(
                                 originalFact.getKnownType().name(), 
-                                formatDate(sortableDate), 
+                                parsedDate.formatted, 
                                 sortableDate,
+                                parsedDate.year,
                                 place);
                     }
 
@@ -159,10 +161,12 @@ public class FamilySearchPersonSource implements Source<Person> {
                             String sortableDate = originalFact.getDate() == null ? null : originalFact.getDate().getFormal();
                             String place = originalFact.getPlace() == null ? null : originalFact.getPlace().getOriginal();
                             String type = originalFact.getKnownType() == null ? "UNKNOWN" : originalFact.getKnownType().name();
+                            ParsedDate parsedDate = formatDate(sortableDate);
                             facts[index++] = new Fact(
                                     type, 
-                                    formatDate(sortableDate), 
+                                    parsedDate.formatted, 
                                     sortableDate,
+                                    parsedDate.year,
                                     place);
                         }
 
@@ -216,9 +220,10 @@ public class FamilySearchPersonSource implements Source<Person> {
                 DateTimeFormat.forPattern("+yyyy/").withZoneUTC(), 
                 DateTimeFormat.forPattern("'before' yyy").withZoneUTC()),
     };
-    protected static String formatDate(String sortableDate) {
+    protected static final ParsedDate nullDate = new ParsedDate(null, null);
+    protected static ParsedDate formatDate(String sortableDate) {
         if (sortableDate == null) {
-            return null;
+            return nullDate;
         }
         
         FormatterCollection collection = null;
@@ -231,11 +236,13 @@ public class FamilySearchPersonSource implements Source<Person> {
         
         if (collection == null) {
             logger.warn(sortableDate + " doesn't match any known date format");
-            return null;
+            return nullDate;
         }
         
         DateTime inputDate = collection.inputFormatter.parseDateTime(sortableDate);
-        return collection.outputFormatter.print(inputDate);
+        ParsedDate date = new ParsedDate(inputDate.getYear(), collection.outputFormatter.print(inputDate));
+        
+        return date;
     }
     
     private static class FormatterCollection {
@@ -247,6 +254,16 @@ public class FamilySearchPersonSource implements Source<Person> {
             this.pattern = pattern;
             this.inputFormatter = inputFormatter;
             this.outputFormatter = outputFormatter;
+        }
+    }
+    
+    private static class ParsedDate {
+        public final Integer year;
+        public final String formatted;
+
+        public ParsedDate(Integer year, String formatted) {
+            this.year = year;
+            this.formatted = formatted;
         }
     }
 }
