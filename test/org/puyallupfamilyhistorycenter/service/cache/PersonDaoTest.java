@@ -71,8 +71,8 @@ public class PersonDaoTest {
         
         assertArrayEquals("Facts don't match expected: " + Arrays.deepToString(person.facts),
                 new Fact[] { 
-                    new Fact("birth", "23 December 1897", null, "Hooper, Weber, Utah, United States"),
-                    new Fact("death", "19 January 1985", null, "Logan, Cache, Utah, United States") },
+                    new Fact("birth", "23 December 1897", null, 1897, "Hooper, Weber, Utah, United States"),
+                    new Fact("death", "19 January 1985", null, 1985, "Logan, Cache, Utah, United States") },
                 person.facts);
         assertArrayEquals("Parents don't match expected: " + Arrays.deepToString(person.parents),
                 new PersonReference[] {

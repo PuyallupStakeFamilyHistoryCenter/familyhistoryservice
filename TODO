@@ -9,7 +9,7 @@ Delete access token on log out             DONE
     zip/minify resources (static-resources) DONE
     zip/minify resources (image-cache)      DONE
     allow client-side caching (static-resources images) DONE
-    allow client-side caching (image-cache)
+    allow client-side caching (image-cache) DONE
     add server threads
 ?Add method for authenticating with devices
 
@@ -102,6 +102,7 @@ Load controls first, then person-details (to prevent "unrecognized command" issu
 Allow navigating in tree                   DONE
 Add 'loading' animation                    DONE
 *Rethink design
+*Remove 'descendants' filter
 Don't show 'focus' button if a person has no parents on record
 Spacing between tabs and controls
 Allow choosing depth for ancestors/descendants
@@ -147,6 +148,7 @@ Make map popups larger                     DONE
 *Show controls immediately after clicking on person
 *Show only three life events (birth, marriage, and death)
 *Zoom for context
+*Show buttons for per life event, not forward and backward buttons
 Show thumbnail map on side of map
 Show events on controller (map) and click on them
 Zoom and pan between locations
