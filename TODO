@@ -185,6 +185,7 @@ Require at least 2 answers                 DONE
 BUG: How are null and null related? Mother and daughter DONE
 Allow selection of people                  DONE
 More advanced duplicate answer detection   DONE
+*Read questions and answers separately
 *Add more questions
 Image questions no longer appear (image URL contains '.', which is reserved)
 Difficulty levels

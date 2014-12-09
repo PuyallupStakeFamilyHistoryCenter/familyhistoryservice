@@ -624,4 +624,6 @@ POSSIBILITY OF SUCH DAMAGE.
                 .replace(/(\d)\b/g, "$1/");
         return canonicalized;
     }
+    
+    ws.socketSend("get-ancestors " + token + " " + settings.userId);
 </script>
