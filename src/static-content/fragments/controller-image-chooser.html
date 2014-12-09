@@ -52,6 +52,8 @@ POSSIBILITY OF SUCH DAMAGE.
                     }
                 });
                 
+                $("#loading-div").hide();
+                $("#loaded-div").show();
                 showPage(0);
             }
         }
@@ -60,24 +62,35 @@ POSSIBILITY OF SUCH DAMAGE.
     ws.socketSend("get-ancestor-images " + token + " " + settings.userId);
 </script>
 
-<ul class="nav nav-tabs" id="tabs" role="tablist">
-    <li class="active" id="images-btn" ><a href="#images" role="tab" data-toggle="tab">Images</a></li>
-    <li id="person-info-btn" style="display: none" ><a href="#person-info" role="tab" data-toggle="tab">Person</a></li>
-    <li id="controls-btn" style="display: none" ><a href="#controls" role="tab" data-toggle="tab">Controls</a></li>
-</ul>
-<div id="images-wrapper">
-    <div id="images">
+<div id='loaded-div' style='display: none;'>
+    <ul class="nav nav-tabs" id="tabs" role="tablist">
+        <li class="active" id="images-btn" ><a href="#images" role="tab" data-toggle="tab">Images</a></li>
+        <li id="person-info-btn" style="display: none" ><a href="#person-info" role="tab" data-toggle="tab">Person</a></li>
+        <li id="controls-btn" style="display: none" ><a href="#controls" role="tab" data-toggle="tab">Controls</a></li>
+    </ul>
+    <div id="images-wrapper">
+        <div id="images">
+
+        </div>
+        <div id="pagination">
+
+        </div>
+    </div>
+    <div id="person-info" style="display: none;">
 
     </div>
-    <div id="pagination">
+    <div id="controls" style="display: none;">
 
     </div>
 </div>
-<div id="person-info" style="display: none;">
 
-</div>
-<div id="controls" style="display: none;">
 
+<div id='loading-div' >
+    <div class="progress">
+        <div class="progress-bar progress-bar-default progress-bar-striped active cached-prg" style="width: 100%">
+            Loading...
+        </div>
+    </div>
 </div>
 
 <script>

@@ -25,42 +25,54 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 -->
 
-<ul class="nav nav-tabs" id="tabs" role="tablist">
-    <li class="active" id="people-btn" ><a href="#people" role="tab" data-toggle="tab">People</a></li>
-    <li id="person-info-btn" style="display: none" ><a href="#person-info" role="tab" data-toggle="tab">Person</a></li>
-    <li id="controls-btn" style="display: none" ><a href="#controls" role="tab" data-toggle="tab">Controls</a></li>
-</ul>
-<div id="people">
-    <div id="choice-type-btns" class="btn-group btn-group-lg" style="display: none" data-toggle="buttons" >
-        <label class="btn btn-default type-btn">
-            <input type="radio" name="choice-type" value="person">Person
-        </label>
-        <label class="btn btn-default type-btn">
-            <input type="radio" name="choice-type" value="family">Family
-        </label>
-        <label class="btn btn-default type-btn">
-            <input type="radio" name="choice-type" value="ancestors">Ancestors
-        </label>
-        <label class="btn btn-default type-btn">
-            <input type="radio" name="choice-type" value="descendants">Descendants
-        </label>
+<div id='loaded-div' style='display: none;'>
+    <ul class="nav nav-tabs" id="tabs" role="tablist">
+        <li class="active" id="people-btn" ><a href="#people" role="tab" data-toggle="tab">People</a></li>
+        <li id="person-info-btn" style="display: none" ><a href="#person-info" role="tab" data-toggle="tab">Person</a></li>
+        <li id="controls-btn" style="display: none" ><a href="#controls" role="tab" data-toggle="tab">Controls</a></li>
+    </ul>
+    <div id="people">
+        <div id="choice-type-btns" class="btn-group btn-group-lg" style="display: none" data-toggle="buttons" >
+            <label class="btn btn-default type-btn">
+                <input type="radio" name="choice-type" value="person">Person
+            </label>
+            <label class="btn btn-default type-btn">
+                <input type="radio" name="choice-type" value="family">Family
+            </label>
+            <label class="btn btn-default type-btn">
+                <input type="radio" name="choice-type" value="ancestors">Ancestors
+            </label>
+            <label class="btn btn-default type-btn">
+                <input type="radio" name="choice-type" value="descendants">Descendants
+            </label>
+        </div>
+        <div id="return-to-root" style="display: none;">
+            <button id="root-btn" class="btn btn-lg btn-default">Return to root</button>
+        </div>
+        <div>
+            <div id="gen-0" style="height: 640px; width: 20%; float: left;"></div>
+            <div id="gen-1" style="height: 640px; width: 20%; float: left;"></div>
+            <div id="gen-2" style="height: 640px; width: 20%; float: left;"></div>
+            <div id="gen-3" style="height: 640px; width: 20%; float: left;"></div>
+            <div id="gen-4" style="height: 640px; width: 20%; float: left;"></div>
+        </div>
     </div>
-    <div id="return-to-root" style="display: none;">
-        <button id="root-btn" class="btn btn-lg btn-default">Return to root</button>
+    <div id="person-info" style="display: none;">
+
     </div>
-    <div>
-        <div id="gen-0" style="height: 640px; width: 20%; float: left;"></div>
-        <div id="gen-1" style="height: 640px; width: 20%; float: left;"></div>
-        <div id="gen-2" style="height: 640px; width: 20%; float: left;"></div>
-        <div id="gen-3" style="height: 640px; width: 20%; float: left;"></div>
-        <div id="gen-4" style="height: 640px; width: 20%; float: left;"></div>
+    <div id="controls" style="display: none;">
+
     </div>
 </div>
-<div id="person-info" style="display: none;">
 
-</div>
-<div id="controls" style="display: none;">
 
+
+<div id='loading-div' >
+    <div class="progress">
+        <div class="progress-bar progress-bar-default progress-bar-striped active cached-prg" style="width: 100%">
+            Loading...
+        </div>
+    </div>
 </div>
 
 <script>
@@ -156,6 +168,9 @@ POSSIBILITY OF SUCH DAMAGE.
                         popHistory(); //Attempt to remove page load from history
                     });
                 });
+                
+                $("#loading-div").hide();
+                $("#loaded-div").show();
             }
         }
     }

@@ -85,8 +85,8 @@ Split mode on iPad: images don't load      DONE
 Load controls first, then person-details (to prevent "unrecognized command" issues) DONE
 Paginate to prevent scrolling issues on iPad DONE
 Group images by person                     DONE
+Add 'loading' animation                    DONE
 *Provide default images
-*Add 'loading' animation
 Spacing between tabs and controls
 Remove duplicate images
 
@@ -100,8 +100,8 @@ Allow choosing person/family/ancestors/descendants DONE
 Load controls first, then person-details (to prevent "unrecognized command" issues) DONE
 'Person' granularity doesn't work (in quiz) DONE
 Allow navigating in tree                   DONE
+Add 'loading' animation                    DONE
 *Rethink design
-*Add 'loading' animation
 Don't show 'focus' button if a person has no parents on record
 Spacing between tabs and controls
 Allow choosing depth for ancestors/descendants

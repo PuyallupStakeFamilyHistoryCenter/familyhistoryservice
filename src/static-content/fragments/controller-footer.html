@@ -32,7 +32,7 @@ POSSIBILITY OF SUCH DAMAGE.
         <div class="navbar-collapse">
             <div class="container-fluid">
                 <div class="progress" style="margin: 10px 0">
-                    <div id="cached-prg" class="progress-bar progress-bar-success" style="width: 0%">
+                    <div class="progress-bar progress-bar-success cached-prg" style="width: 0%">
                         <span class="sr-only"></span>
                     </div>
                 </div>
@@ -57,7 +57,7 @@ POSSIBILITY OF SUCH DAMAGE.
             $("#progress-div").show();
             
             var total = 64;
-            $("#cached-prg").css("width", ((cached / total) * 100) + "%");
+            $(".cached-prg").css("width", ((cached / total) * 100) + "%");
         }
     };
     
