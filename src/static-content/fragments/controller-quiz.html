@@ -25,16 +25,27 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 -->
 
-<h3>Answers</h3>
-<div id="score"></div>
-<div id="answers" class="btn-group-vertical">
+<div id='loaded-div' style='display:none;' >
+    <h3>Answers</h3>
+    <div id="score"></div>
+    <div id="answers" class="btn-group-vertical">
+    </div>
+
+    <div id="hint" >
+    </div>
+
+    <button id="new-question" style="display: none;" class="btn btn-lg btn-primary">New question</button>
+    <button id="read-question" style="display: none;" class="btn btn-sm btn-default"><span class="glyphicon glyphicon-volume-up"></span> Read question again</button> 
 </div>
 
-<div id="hint" >
-</div>
 
-<button id="new-question" style="display: none;" class="btn btn-lg btn-primary">New question</button>
-<button id="read-question" style="display: none;" class="btn btn-sm btn-default"><span class="glyphicon glyphicon-volume-up"></span> Read question again</button> 
+<div id='loading-div' >
+    <div class="progress">
+        <div id="cached-prg" class="progress-bar progress-bar-default progress-bar-striped active" style="width: 100%">
+            Loading...
+        </div>
+    </div>
+</div>
 
 <script>
     var people;
@@ -409,6 +420,8 @@ POSSIBILITY OF SUCH DAMAGE.
     ];
     
     function askQuestion() {
+        $("#loading-div").show()
+        $("#loaded-div").hide();
         $("#new-question").show();
         for (var i = 0; !questionAndAnswers && i < 5; i++) {
             var template = getRandomElement(personQuestionTemplates);
@@ -437,6 +450,8 @@ POSSIBILITY OF SUCH DAMAGE.
         sendQuestion(questionAndAnswers);
         setAnswers(questionAndAnswers.answers);
         $("#read-question").show();
+        $("#loading-div").hide();
+        $("#loaded-div").show();
     }
     
     function resolveConstants(template, person) {
