@@ -62,8 +62,12 @@ function getReady() {
     content = $("#content");
     mode = getParameterByName("mode");
     if (!mode) {
-        logger.error("Mode parameter is required");
-        return;
+        mode = getPathComponent(-1);
+        
+        if (!mode) {
+            logger.error("Mode parameter is required");
+            return;
+        }
     }
 
     switch (mode) {
@@ -95,7 +99,7 @@ function setup() {
     if (settings.page.header) {
         pageHeader.html("<h1>" + settings.page.header + "</h1>");
     } else if (settings.page.headerFile) {
-        $.ajax("fragments/"+ settings.page.headerFile)
+        $.ajax("/static-content/fragments/"+ settings.page.headerFile)
         .done(function(data) {
             pageHeader.html(data);
         }).fail(function() {
@@ -106,7 +110,7 @@ function setup() {
     if (settings.page.footer) {
         pageFooter.html("settings.page.footer");
     } else if (settings.page.footerFile) {
-        $.ajax("fragments/"+ settings.page.footerFile)
+        $.ajax("/static-content/fragments/"+ settings.page.footerFile)
         .done(function(data) {
             pageFooter.html(data);
         }).fail(function() {
@@ -216,6 +220,14 @@ var defaultSettings = {
         }
     }
 };
+defaultSettings.games = Object.create(defaultSettings["controller"]);
+defaultSettings.games.begin = function() {
+    if (!urlVars) {
+        urlVars = {};
+    }
+    urlVars["group"] = "games";
+    getDisplayName();
+}
 
 function messageHandler(message) {
     logger.clear();
@@ -291,7 +303,7 @@ function navigate(dest, timeout) {
         timeout = 1000;
     }
     var split = dest.split("?");
-    var actualDest = "fragments/" + split[0] + ".html";
+    var actualDest = "/static-content/fragments/" + split[0] + ".html";
     var tempVars = null;
     if (split.length > 1) {
         actualDest += "?" + split[1];

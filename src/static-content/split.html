@@ -49,16 +49,16 @@ POSSIBILITY OF SUCH DAMAGE.
     </head>
     <body>
         <div class="display" style="-webkit-overflow-scrolling: touch; overflow-y: scroll">
-            <iframe id="display-iframe" src="controller-display-base.html?mode=display" style="width: 100%; height: 100%; border-style: none;" ></iframe>
+            <iframe id="display-iframe" src="display" style="width: 100%; height: 100%; border-style: none;" ></iframe>
         </div>
         <div class="controller" style="-webkit-overflow-scrolling: touch; overflow-y: scroll">
             <iframe id="controller-iframe" style="width: 100%; height: 100%; border-style: none; overflow-x: hidden; float: right;" ></iframe>
         </div>
         
-        <script src="js/jquery-1.11.1.min.js" ></script>
+        <script src="/static-content/js/jquery-1.11.1.min.js" ></script>
         <script>
             $("#display-iframe").load(function() {
-                $("#controller-iframe").attr("src", "controller-display-base.html?mode=controller&group=games")
+                $("#controller-iframe").attr("src", "/games")
             });
                 
                 document.body.addEventListener('touchmove', function(event) {

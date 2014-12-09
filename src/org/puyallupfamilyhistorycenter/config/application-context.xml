@@ -141,8 +141,45 @@ POSSIBILITY OF SUCH DAMAGE.
         </property>
     </bean>
     
-    <bean id="server" class="org.eclipse.jetty.server.Server" init-method="start">
+    <bean id="rewrite-handler" class="org.eclipse.jetty.rewrite.handler.RewriteHandler">
+        <property name="rewriteRequestURI" value="true" />
+        <property name="rewritePathInfo" value="true" />
+        <property name="originalPathAttribute" value="requestedPath" />
+        
+        <property name="rules">
+            <array>
+                <bean class="org.eclipse.jetty.rewrite.handler.RewritePatternRule">
+                    <property name="pattern" value="/display" />
+                    <property name="replacement" value="/static-content/controller-display-base.html" />
+                </bean>
+                <bean class="org.eclipse.jetty.rewrite.handler.RewritePatternRule">
+                    <property name="pattern" value="/controller" />
+                    <property name="replacement" value="/static-content/controller-display-base.html" />
+                </bean>
+                <bean class="org.eclipse.jetty.rewrite.handler.RewritePatternRule">
+                    <property name="pattern" value="/games" />
+                    <property name="replacement" value="/static-content/controller-display-base.html" />
+                </bean>
+                <bean class="org.eclipse.jetty.rewrite.handler.RewritePatternRule">
+                    <property name="pattern" value="/kiosk" />
+                    <property name="replacement" value="/static-content/controller-display-base.html" />
+                </bean>
+                <bean class="org.eclipse.jetty.rewrite.handler.RewritePatternRule">
+                    <property name="pattern" value="/clear-display-name" />
+                    <property name="replacement" value="/static-content/controller-display-base.html" />
+                </bean>
+                <bean class="org.eclipse.jetty.rewrite.handler.RewritePatternRule">
+                    <property name="pattern" value="/split" />
+                    <property name="replacement" value="/static-content/split.html" />
+                </bean>
+            </array>
+        </property>
+        
         <property name="handler" ref="context-handlers" />
+    </bean>
+    
+    <bean id="server" class="org.eclipse.jetty.server.Server" init-method="start">
+        <property name="handler" ref="rewrite-handler" />
         <!-- I didn't think this would work, but it seems to -->
         <property name="connectors">
             <list>

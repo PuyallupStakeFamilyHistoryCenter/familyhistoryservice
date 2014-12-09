@@ -25,8 +25,7 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 -->
 
-<!--<link type="text/css" rel="stylesheet" href="simplePagination.css"/>-->
-<script src="js/jquery.simplePagination.js" ></script>
+<script src="/static-content/js/jquery.simplePagination.js" ></script>
 
 <script>
     var target = getParameterByName("target");
@@ -145,7 +144,7 @@ POSSIBILITY OF SUCH DAMAGE.
             timeout = 1000;
         }
         var split = dest.split("?");
-        var actualDest = "fragments/" + split[0] + ".html";
+        var actualDest = "/static-content/fragments/" + split[0] + ".html";
         var tempVars = null;
         if (split.length > 1) {
             actualDest += "?" + split[1];

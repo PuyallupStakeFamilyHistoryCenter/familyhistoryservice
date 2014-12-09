@@ -55,6 +55,15 @@ function getParameterByName(name) {
     return null;
 }
 
+function getPathComponent(index) {
+    var split = window.location.pathname.split("/");
+    if (index > 0) {
+        return split[index];
+    } else {
+        return split[split.length + index];
+    }
+}
+
 function parseBool(b) {
     return b === "true";
 }
