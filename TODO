@@ -67,8 +67,8 @@ Test on iPad in split mode                 DONE
 Fix piece rotation in split mode           DONE
 Fix z-order in split mode                  DONE
 Add person info on controller-puzzle       DONE
-*Fix image loading
-Landscape puzzles are much harder
+Fix image loading                          DONE
+Landscape puzzles are much harder          DONE
 Back button in puzzle goes back to main screen instead of games screen DONE
 Make piece shapes more interesting
 Allow display to signal to controller when puzzle is finished
@@ -116,7 +116,7 @@ Fix brush                                  DONE
 Limit coloring to inside image             DONE
 Allow brush resizing                       DONE
 Move palate and brushes to controller      DONE
-*Fix image loading
+Fix image loading                          DONE
 *Set up print function
 *Set up email function
 Rearrange colors more logically
@@ -208,7 +208,7 @@ Sliding tiles:
 Basic implementation                       DONE
 Tiles can become stuck in desktop mode     DONE
 Landscape puzzles are much harder          DONE
-*Fix image loading
+Fix image loading                          DONE
 Check for win and display last piece
 
 Media:
@@ -321,3 +321,8 @@ Fade out mouse pointer on display
 Fix logging in via iPad
 Dismiss popup in maps (via controller)
 Auto-reconnect login screen
+
+
+URGENT (complete before leaving):
+Set up admin user on Macbook(s)
+Set up iPads
