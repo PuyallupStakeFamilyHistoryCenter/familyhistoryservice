@@ -85,6 +85,7 @@ Split mode on iPad: images don't load      DONE
 Load controls first, then person-details (to prevent "unrecognized command" issues) DONE
 Paginate to prevent scrolling issues on iPad DONE
 Group images by person                     DONE
+*Provide default images
 Spacing between tabs and controls
 Remove duplicate images
 

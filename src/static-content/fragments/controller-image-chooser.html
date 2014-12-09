@@ -28,6 +28,7 @@ POSSIBILITY OF SUCH DAMAGE.
 <script src="/static-content/js/jquery.simplePagination.js" ></script>
 
 <script>
+    console.info("Starting image chooser");
     var target = getParameterByName("target");
     var showPersonDetail = !getParameterByName("hidePersonDetail");
     var sendPeople = !getParameterByName("getPeople");
@@ -103,7 +104,7 @@ POSSIBILITY OF SUCH DAMAGE.
         for (var i = pageSize * pageNum; i < Math.min(people.length, pageSize * (pageNum + 1)); i++) {
             var person = people[i];
             
-            $("#images").append("<h3>" + person.name + "</h3>");
+            $("#images").append("<h4>" + person.name + "</h4>");
             $.each(person.images, function(index, image) {
                 var obj = {responseType:"personImage",person:person,url:image};
                 $("#images").append("<button class='btn btn-default img-btn' style='display: none;' data-image='" + JSON.stringify(obj) + "'><img style='max-width:100px; max-height: 100px;' src='" + obj.url + "' /></button>")
