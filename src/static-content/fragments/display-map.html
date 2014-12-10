@@ -156,6 +156,8 @@ POSSIBILITY OF SUCH DAMAGE.
         map.setMapTypeId('ancestor_map');
 
         geocoder = new google.maps.Geocoder();
+        
+        google.maps.event.addListener(map, "idle", nextFrame);
     }
 
 
@@ -274,17 +276,74 @@ POSSIBILITY OF SUCH DAMAGE.
         );
     }
     
+    var animationFrames = null;
+    var currentFrame;
     function stepTour(direction) {
+        if (tour[tourPosition]) {
+            tour[tourPosition].infowindow.close();
+        }
         tourPosition += direction;
         if (tour[tourPosition]) {
+            var t = tour[tourPosition];
+            if (tourPosition - direction >= 0 && tourPosition - direction < tour.length) {
+                animationFrames = createAnimationFrames(t.position, tour[tourPosition - direction].position);
+                currentFrame = -1;
+                nextFrame();
+            } else {
+                map.panTo(t.position);
+                map.setZoom(10);
+                t.infowindow.setContent("<div style='font-size: 3vmax;'>"+t.blurb+"</div>");
+                t.infowindow.open(map, t.marker);
+                say(t.blurb);
+            }
+        } else {
+            tourPosition -= direction;
+        }
+    }
+    
+    function createAnimationFrames(p2, p1) {
+        var numFrames = 1; //TODO: make this dynamic based on the distance between
+        var path = [];
+        for (var i = 0; i < numFrames; i++) {
+            //TODO: This will cause some strange behavior if the values 
+            var lat = (p2.lat() - p1.lat()) / numFrames * i + p1.lat();
+            var lng = (p2.lng() - p1.lng()) / numFrames * i + p1.lng();
+            
+            path.push(new google.maps.LatLng(lat, lng));
+        }
+        path.push(p2);
+        
+        var animationFrames = [];
+        for (var i = 1; i < path.length; i++) {
+            animationFrames.push([p1, path[i]]);
+        }
+        for (var i = 1; i < path.length - 1; i++) {
+            animationFrames.push([path[i], p2]);
+        }
+        return animationFrames;
+    }
+    
+    function nextFrame() {
+        if (animationFrames && animationFrames[currentFrame+1]) {
+//            setTimeout(function() {
+                currentFrame++;
+                var f = animationFrames[currentFrame];
+                var bounds = new google.maps.LatLngBounds();
+                bounds.extend(f[0]);
+                bounds.extend(f[1]);
+                map.fitBounds(bounds);
+                if (map.getZoom() > 10) {
+                    map.setZoom(10);
+                } 
+//            },10);
+        } else if (animationFrames) {
+            animationFrames = null;
             var t = tour[tourPosition];
             map.panTo(t.position);
             map.setZoom(10);
             t.infowindow.setContent("<div style='font-size: 3vmax;'>"+t.blurb+"</div>");
             t.infowindow.open(map, t.marker);
             say(t.blurb);
-        } else {
-            tourPosition -= direction;
         }
     }
 
