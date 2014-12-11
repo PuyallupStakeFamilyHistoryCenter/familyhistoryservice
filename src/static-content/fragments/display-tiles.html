@@ -196,13 +196,21 @@ POSSIBILITY OF SUCH DAMAGE.
     }
 
     function draw() {
+        var solved = true;
+        $.each(pieces, function(i, row) {
+            $.each(row, function(j, piece) {
+                if (piece.targetX * scale !== piece.actualX || piece.targetY * scale !== piece.actualY) {
+                    solved = false;
+                }
+            });
+        });
+        
         canvas.width = canvas.width; //Reset canvas
-
         drawBoard();
 
         for (var i = 0; i < pieces.length; i++) {
             for (var j = 0; j < pieces[i].length; j++) {
-                drawPiece(pieces[i][j]);
+                drawPiece(pieces[i][j], solved);
             }
         }
     }
@@ -220,15 +228,12 @@ POSSIBILITY OF SUCH DAMAGE.
         }
     }
 
-    function drawPiece(p) {
-        if (p === null || p.empty)
+    function drawPiece(p, solved) {
+        if (p === null || (p.empty && ! solved))
             return;
 
         context.save();
         context.translate(p.actualX + p.width / 2 * scale, p.actualY + p.height / 2 * scale);
-        if (p.rotation !== 0) {
-            context.rotate(p.rotation);
-        }
 
         context.beginPath();
         context.moveTo(-p.width * 1 / 2 * scale, -p.height / 2 * scale);
@@ -246,7 +251,7 @@ POSSIBILITY OF SUCH DAMAGE.
                 image.width * scale, //Canvas size
                 image.height * scale);
         context.restore();
-        if (!p.found) {
+        if (!solved) {
             context.stroke();
         }
         context.restore();
