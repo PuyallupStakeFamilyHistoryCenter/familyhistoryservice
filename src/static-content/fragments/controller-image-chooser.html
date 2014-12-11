@@ -34,11 +34,22 @@ POSSIBILITY OF SUCH DAMAGE.
     var sendPeople = !getParameterByName("getPeople");
     var people;
     var pageSize = 5;
+    var defaultPeople = [
+        {
+            name: "Demo",
+            images: [
+                "/media/default.jpg"
+            ]
+        }
+    ]
 
     settings.local = {
         verbs: {
             people: function (obj) {
                 people = obj.people;
+                if (!people || !people.length) {
+                    people = defaultPeople;
+                }
                 
                 $("#pagination").pagination({
                     items: people.length,
@@ -58,8 +69,6 @@ POSSIBILITY OF SUCH DAMAGE.
             }
         }
     }
-
-    ws.socketSend("get-ancestor-images " + token + " " + settings.userId);
 </script>
 
 <div id='loaded-div' style='display: none;'>
@@ -189,4 +198,7 @@ POSSIBILITY OF SUCH DAMAGE.
 
         return deferred.promise();
     }
+    
+    settings.local.verbs.people(defaultPeople);
+    ws.socketSend("get-ancestor-images " + token + " " + settings.userId);
 </script>

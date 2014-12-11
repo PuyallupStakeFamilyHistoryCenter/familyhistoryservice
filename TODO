@@ -86,7 +86,7 @@ Load controls first, then person-details (to prevent "unrecognized command" issu
 Paginate to prevent scrolling issues on iPad DONE
 Group images by person                     DONE
 Add 'loading' animation                    DONE
-*Provide default images
+Provide default images                     DONE
 Spacing between tabs and controls
 Remove duplicate images
 
