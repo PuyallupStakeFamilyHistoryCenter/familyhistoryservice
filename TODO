@@ -101,8 +101,8 @@ Load controls first, then person-details (to prevent "unrecognized command" issu
 'Person' granularity doesn't work (in quiz) DONE
 Allow navigating in tree                   DONE
 Add 'loading' animation                    DONE
+Remove 'descendants' filter                DONE
 *Rethink design
-*Remove 'descendants' filter
 Don't show 'focus' button if a person has no parents on record
 Spacing between tabs and controls
 Allow choosing depth for ancestors/descendants
