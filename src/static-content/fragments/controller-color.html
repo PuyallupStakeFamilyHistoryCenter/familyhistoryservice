@@ -57,16 +57,15 @@ POSSIBILITY OF SUCH DAMAGE.
     ];
 
     var brushSizes = [
-        {responseType: "brushSize", size: 1},
-        {responseType: "brushSize", size: 3},
-        {responseType: "brushSize", size: 5},
-        {responseType: "brushSize", size: 7},
-        {responseType: "brushSize", size: 9},
-        {responseType: "brushSize", size: 11}
+        {responseType: "brushSize", size: 3, title: "Small"},
+        {responseType: "brushSize", size: 7, title: "."},
+        {responseType: "brushSize", size: 11, title: ".."},
+        {responseType: "brushSize", size: 15, title: "..."},
+        {responseType: "brushSize", size: 19, title: "Large"}
     ]
 
     $.each(swatches, function (index, swatch) {
-        $("#palate").append("<button class='btn btn-lg btn-default swatch-btn' data-swatch='" + JSON.stringify(swatch) + "' style='background-color: " + swatch.color + "'></button>");
+        $("#palate").append("<button class='btn btn-lg btn-default swatch-btn' data-swatch='" + JSON.stringify(swatch) + "' style='background-color: " + swatch.color + "'>&nbsp;</button>");
     });
 
     $(".swatch-btn").click(function () {
@@ -74,7 +73,7 @@ POSSIBILITY OF SUCH DAMAGE.
     });
 
     $.each(brushSizes, function (index, brushSize) {
-        $("#brush-size").append("<button class='btn btn-lg btn-default brush-size-btn' data-size='" + JSON.stringify(brushSize) + "'>" + brushSize.size + "</button>")
+        $("#brush-size").append("<button class='btn btn-lg btn-default brush-size-btn' data-size='" + JSON.stringify(brushSize) + "'>" + brushSize.title + "</button>")
     })
 
     $(".brush-size-btn").click(function () {
