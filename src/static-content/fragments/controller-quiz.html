@@ -48,7 +48,11 @@ POSSIBILITY OF SUCH DAMAGE.
 </div>
 
 <script>
+    console.info("Starting quiz controller");
+    
     var people;
+    var nextDepth = 1;
+    var currentStreak = 0;
     settings.local = {
         verbs: {
             person: function(obj) {
@@ -57,7 +61,12 @@ POSSIBILITY OF SUCH DAMAGE.
             },
             people: function(obj) {
                 people = obj.people;
-                askQuestion();
+                if (filterArray(people, "living=false").length > 0) {
+                    currentStreak = 0;
+                    askQuestion();
+                } else if (nextDepth <= 10) {
+                    getMoreAncestors();
+                }
             }
         }
     }
@@ -358,35 +367,35 @@ POSSIBILITY OF SUCH DAMAGE.
 //                },
 //            ],
 //        },
-//        {
-//            prerequisites: [
-//                'relationship',
-//            ],
-//            constants: {
-//                person1: '*relationship!=${relationship},gender=${gender},living=false',
-//                person2: '*relationship!=${relationship},gender=${gender},living=false',
-//                person3: '*relationship!=${relationship},gender!=${gender},living=false'
-//            },
-//            question: "Which of the following is your ${relationship}",
-//            answers: [
-//                { 
-//                    text: '${name}',
-//                    hint: "Correct!"
-//                },
-//                { 
-//                    text: '${person1.name}',
-//                    hint: "No ${person1.name} is your ${person1.relationship}!"
-//                },
-//                { 
-//                    text: '${person2.name}',
-//                    hint: "No ${person2.name} is your ${person2.relationship}!"
-//                },
-//                { 
-//                    text: '${person3.name}',
-//                    hint: "'Wrong gender! ${person3.name} is your ${person3.relationship}"
-//                },
-//            ],
-//        },
+        {
+            prerequisites: [
+                'relationship',
+            ],
+            constants: {
+                person1: '*relationship!=${relationship},gender=${gender},living=false',
+                person2: '*relationship!=${relationship},gender=${gender},living=false',
+                person3: '*relationship!=${relationship},gender!=${gender},living=false'
+            },
+            question: "Which of the following is your ${relationship}",
+            answers: [
+                { 
+                    text: '${name}',
+                    hint: "Correct!"
+                },
+                { 
+                    text: '${person1.name}',
+                    hint: "No ${person1.name} is your ${person1.relationship}!"
+                },
+                { 
+                    text: '${person2.name}',
+                    hint: "No ${person2.name} is your ${person2.relationship}!"
+                },
+                { 
+                    text: '${person3.name}',
+                    hint: "'Wrong gender! ${person3.name} is your ${person3.relationship}"
+                },
+            ],
+        },
         {
             prerequisites: [
                 'relationship',
@@ -423,6 +432,15 @@ POSSIBILITY OF SUCH DAMAGE.
         $("#loading-div").show()
         $("#loaded-div").hide();
         $("#new-question").show();
+        if (currentStreak >= 5) {
+            getMoreAncestors();
+            return;
+        } else if (currentStreak <= -15) {
+            nextDepth -= 2;
+            getMoreAncestors();
+            return;
+        }
+        
         for (var i = 0; !questionAndAnswers && i < 5; i++) {
             var template = getRandomElement(personQuestionTemplates);
 
@@ -432,6 +450,7 @@ POSSIBILITY OF SUCH DAMAGE.
             for (var j = 0; !questionAndAnswers && j < 100; j++) {
                 var person = getRandomElement(filterArray(people, "living=false"));
 
+                console.info("Trying to create question " + JSON.stringify(template) + " for person " + JSON.stringify(person));
                 if (satisfiesPrerequisites(person, template.prerequisites) && resolveConstants(template, person)) {
                     questionAndAnswers = createQuestion(person, template);
                     
@@ -462,7 +481,6 @@ POSSIBILITY OF SUCH DAMAGE.
                 resolvedConstants[key] = resolveChildProperty(person, replaceVariables(person, template.constants[key]));
                 allResolved = allResolved && (resolvedConstants[key]?true:false);
             });
-            console.info("Resolved constants " + JSON.stringify(resolvedConstants));
         }
         return allResolved;
     }
@@ -470,8 +488,6 @@ POSSIBILITY OF SUCH DAMAGE.
     var resolvedConstants = [];
     function createQuestion(person, template) {
         var questionAndAnswers = {};
-            
-        console.info("Trying to create question " + JSON.stringify(template) + " for person " + JSON.stringify(person));
         
         questionAndAnswers.question = replaceVariables(person, template.question);
         questionAndAnswers.answers = [];
@@ -606,10 +622,12 @@ POSSIBILITY OF SUCH DAMAGE.
                 $(this).addClass("btn-success");
                 $(this).parent().parent().children().children().prop("disabled", "true");
                 totalCorrect++;
+                currentStreak++;
                 sendToDisplay(JSON.stringify({responseType:"correctAnswer",index:id}));
             } else {
                 $(this).addClass("btn-danger");
                 $(this).prop("disabled", "true");
+                currentStreak--;
                 sendToDisplay(JSON.stringify({responseType:"incorrectAnswer",index:id}));
             }
             
@@ -640,5 +658,11 @@ POSSIBILITY OF SUCH DAMAGE.
         return canonicalized;
     }
     
-    ws.socketSend("get-ancestors " + token + " " + settings.userId);
+    function getMoreAncestors() {
+        ws.socketSend("get-ancestors " + token + " " + settings.userId + " " + nextDepth);
+        nextDepth++;
+    }
+    
+    getMoreAncestors();
+    
 </script>
