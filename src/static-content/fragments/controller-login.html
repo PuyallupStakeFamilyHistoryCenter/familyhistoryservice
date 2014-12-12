@@ -29,11 +29,10 @@ POSSIBILITY OF SUCH DAMAGE.
         <div>
             <form autocomplete="off" id="login-form">
                 <div class="panel-heading"><h3>Login</h3></div>
-                <div id="user-list">
+                <div class="" id="user-list" data-toggle="buttons">
                 </div>
                 <br>
                 <div class="input-group input-group-lg" id="pin-input-div" style="max-width: 200px; display: none;">
-                    <input type="hidden" id="userid-input" />
                     <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
                     <input type="password" id="pin-input" pattern="[0-9]*" maxlength="6" class="form-control" placeholder="PIN" />
                 </div>
@@ -46,6 +45,7 @@ POSSIBILITY OF SUCH DAMAGE.
 </div>
 
 <script>
+    console.info("Starting login screen");
     settings.local = {
         verbs: {
             "user-list": function (response) {
@@ -53,16 +53,14 @@ POSSIBILITY OF SUCH DAMAGE.
                 $("#user-list").html("");
                 for (var i = 0; i < response.users.length; i++) {
                     var user = response.users[i];
-                    $("#user-list").append("<button class='btn btn-lg username-btn" + (selectedUser === user.id ? " btn-warning" : " btn-default") + "' data-user-id='" + user.id + "'>" + user.name + "</button>");
+                    $("#user-list").append("<label class='btn btn-lg btn-default active username-btn'><input type='radio' name='userid-input' id='userid-input' value='"+user.id+"' >"+user.name+"</label>");
                 }
 
                 $(".username-btn").click(function (e) {
-                    e.preventDefault();
-                    var value = $(e.target).attr("data-user-id");
-                    $("#userid-input").val(value);
+                    var value = $(e.target).children("input").val();
                     $(".username-btn").removeClass("btn-warning");
                     $(e.target).addClass("btn-warning");
-                    userName = $(this).html();
+                    //userName = $(this).html();
 
                     if (value === "KWJH-B6Z") {
                         $("#pin-input-div").hide()
@@ -83,7 +81,7 @@ POSSIBILITY OF SUCH DAMAGE.
         logger.clear();
         event.preventDefault();
 
-        var userId = $("#userid-input").val();
+        var userId = $("#userid-input:checked").val();
         var pin = $("#pin-input").val();
 
         if (!userId || !pin) {
@@ -97,7 +95,7 @@ POSSIBILITY OF SUCH DAMAGE.
     });
     
     $("#logout-btn").click(function(event) {
-        var userId = $("#userid-input").val();
+        var userId = $("#userid-input:checked").val();
         var pin = $("#pin-input").val();
 
         if (!userId || !pin) {
