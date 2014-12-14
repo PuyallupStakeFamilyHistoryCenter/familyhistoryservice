@@ -500,6 +500,7 @@ QUnit.cases([
     { title: "Single filter numeric <=", array:[{age:25},{age:26}], filters:"age<=25", expected: [{age:25}] },
     { title: "Single filter numeric <", array:[{age:25},{age:26}], filters:"age<26", expected: [{age:25}] },
     { title: "Single filter numeric !=", array:[{age:25},{age:26}], filters:"age!=26", expected: [{age:25}] },
+    { title: "Single filter no LHS !=", array:["old","young"], filters:"!=old", expected: ["young"] },
     { title: "Array filter ∋", array:[{images:["image1","image2"]},{images:["image2","image3"]}], filters:"images∋image1", expected: [{images:["image1","image2"]}] },
     { title: "Array filter 'contains'", array:[{images:["image1","image2"]},{images:["image2","image3"]}], filters:"images contains image1", expected: [{images:["image1","image2"]}] },
     { title: "Array filter ∌", array:[{images:["image1","image2"]},{images:["image2","image3"]}], filters:"images∌image1", expected: [{images:["image2","image3"]}] },
@@ -547,7 +548,8 @@ QUnit.cases([
     { title: "Star operator array multiple options", person:{name:"Graham Tibbitts", children:[{id:"asdf",name:"Allison Tibbitts"},{id:"asdf",name:"James Tibbitts"}]}, path:"children.*.id", expected: "asdf"},
 //    { title: "Star operator object", person:{name:"Graham Tibbitts", children:[{id:"asdf"}]}, path:"children.0.*", expected: "asdf"},
     { title: "Star operator person", person:{}, people:[{name:"Graham Tibbitts"}], path: "*.name", expected: "Graham Tibbitts"},
-    { title: "Star operator person w/ filter", person:{}, people:[{name:"Graham Tibbitts",gender:"Male"},{name:"Allison Tibbitts",gender:"Female"}], path: "*gender=Male.name", expected: "Graham Tibbitts"}
+    { title: "Star operator person w/ filter", person:{}, people:[{name:"Graham Tibbitts",gender:"Male"},{name:"Allison Tibbitts",gender:"Female"}], path: "*gender=Male.name", expected: "Graham Tibbitts"},
+    { title: "Star operator filter on string", person:{}, people:["filter", "filter", "filter", "filter", "filter", "nofilter"], path: "*!=filter", expected: "nofilter"}
 ]).test("Test resolveChildProperty", function(params, assert) {
     assert.expect(1);
     QUnit.stop();

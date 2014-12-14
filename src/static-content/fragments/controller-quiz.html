@@ -369,6 +369,33 @@ POSSIBILITY OF SUCH DAMAGE.
 //        },
         {
             prerequisites: [
+                'relationship'
+            ],
+            constants: {
+                person1: '*relationship!=${relationship},gender=${gender},living=false',
+                person2: '*relationship!=${relationship},gender=${gender},living=false',
+                person3: '*relationship!=${relationship},gender!=${gender},living=false'
+            },
+            question: "How is ${name} related to you?",
+            answers: [
+                {
+                    text: "Your ${relationship}",
+                    hint: "Correct!"
+                },
+                {
+                    text: "Your ${person1.relationship}",
+                },
+                {
+                    text: "Your ${person2.relationship}",
+                },
+                {
+                    text: "Your ${person3.relationship}",
+                    hint: "Wrong gender!"
+                }
+            ]
+        },
+        {
+            prerequisites: [
                 'relationship',
             ],
             constants: {
@@ -412,13 +439,39 @@ POSSIBILITY OF SUCH DAMAGE.
                     hint: "Correct!"
                 },
                 { 
-                    text: '${stat.*key!=text}',
+                    text: '${stat.*!=${stat.text}}',
                 },
                 { 
-                    text: '${stat.*key!=text}',
+                    text: '${stat.*!=${stat.text}}',
                 },
                 { 
-                    text: '${stat.*key!=text}',
+                    text: '${stat.*!=${stat.text}}',
+                },
+            ],
+        },
+        {
+            prerequisites: [
+                'relationship',
+            ],
+            constants: {
+                stat: 'stats.*',
+                deathYear: 'facts.*type=Death.year',
+                statValue: 'stat.${deathYear}',
+            },
+            question: "What ${stat.text} in ${deathYear} when your ${relationship} ${name} died?",
+            answers: [
+                { 
+                    text: '${stat.${deathYear}}',
+                    hint: "Correct!"
+                },
+                { 
+                    text: '${stat.*!=${stat.text}}',
+                },
+                { 
+                    text: '${stat.*!=${stat.text}}',
+                },
+                { 
+                    text: '${stat.*!=${stat.text}}',
                 },
             ],
         },
@@ -462,7 +515,8 @@ POSSIBILITY OF SUCH DAMAGE.
         }
         
         if (!questionAndAnswers) {
-            logger.error("Failed to create question");
+            //logger.error("Failed to create question");
+            getMoreAncestors();
             return;
         }
         

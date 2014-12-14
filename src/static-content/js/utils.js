@@ -144,7 +144,7 @@ function filterArray(array, rawFilters) {
     var currentArray = array;
     $.each(split, function (index, rawFilter) {
         var newArray = [];
-        var filterRegex = /([a-z0-9]+)(=|<=|<|>=|>|!=|∋|∌| contains | !contains )(.+)/i;
+        var filterRegex = /([a-z0-9]*)(=|<=|<|>=|>|!=|∋|∌| contains | !contains )(.+)/i;
         var filterMatches = rawFilter.match(filterRegex);
         if (!filterMatches || filterMatches.length < 4) {
             return [];
@@ -154,58 +154,60 @@ function filterArray(array, rawFilters) {
         var filterValue = filterMatches[3];
 
         $.each(currentArray, function (index2, arrayValue) {
+            var value = filterKey != null && filterKey.length > 0 ? arrayValue[filterKey] : arrayValue;
+            
             switch (operator) {
                 case "=":
-                    if (arrayValue[filterKey] != null && arrayValue[filterKey].toString && arrayValue[filterKey].toString() === filterValue) {
+                    if (value != null && value.toString && value.toString() === filterValue) {
                         newArray.push(arrayValue);
-                    } else if (arrayValue[filterKey] == filterValue) {
+                    } else if (value == filterValue) {
                         newArray.push(arrayValue);
                     }
                     break;
                 case "!=":
-                    if (arrayValue[filterKey] != null && arrayValue[filterKey].toString && arrayValue[filterKey].toString() !== filterValue) {
+                    if (value != null && value.toString && value.toString() !== filterValue) {
                         newArray.push(arrayValue);
-                    } else if (arrayValue[filterKey] != filterValue) {
+                    } else if (value != filterValue) {
                         newArray.push(arrayValue);
                     }
                     break;
                 case ">":
-                    if (arrayValue[filterKey] != null && arrayValue[filterKey].toString && arrayValue[filterKey].toString() > filterValue) {
+                    if (value != null && value.toString && value.toString() > filterValue) {
                         newArray.push(arrayValue);
-                    } else if (arrayValue[filterKey] > filterValue) {
+                    } else if (value > filterValue) {
                         newArray.push(arrayValue);
                     }
                     break;
                 case ">=":
-                    if (arrayValue[filterKey] != null && arrayValue[filterKey].toString && arrayValue[filterKey].toString() >= filterValue) {
+                    if (value != null && value.toString && value.toString() >= filterValue) {
                         newArray.push(arrayValue);
-                    } else if (arrayValue[filterKey] >= filterValue) {
+                    } else if (value >= filterValue) {
                         newArray.push(arrayValue);
                     }
                     break;
                 case "<":
-                    if (arrayValue[filterKey] != null && arrayValue[filterKey].toString && arrayValue[filterKey].toString() < filterValue) {
+                    if (value != null && value.toString && value.toString() < filterValue) {
                         newArray.push(arrayValue);
-                    } else if (arrayValue[filterKey] < filterValue) {
+                    } else if (value < filterValue) {
                         newArray.push(arrayValue);
                     }
                     break;
                 case "<=":
-                    if (arrayValue[filterKey] != null && arrayValue[filterKey].toString && arrayValue[filterKey].toString() <= filterValue) {
+                    if (value != null && value.toString && value.toString() <= filterValue) {
                         newArray.push(arrayValue);
-                    } else if (arrayValue[filterKey] <= filterValue) {
+                    } else if (value <= filterValue) {
                         newArray.push(arrayValue);
                     }
                     break;
                 case "∋":
                 case " contains ":
-                    if (Array.isArray(arrayValue[filterKey]) && arrayValue[filterKey].indexOf(filterValue) >= 0) {
+                    if (Array.isArray(value) && value.indexOf(filterValue) >= 0) {
                         newArray.push(arrayValue);
                     }
                     break;
                 case "∌":
                 case " !contains ":
-                    if (Array.isArray(arrayValue[filterKey]) && arrayValue[filterKey].indexOf(filterValue) == -1) {
+                    if (Array.isArray(value) && value.indexOf(filterValue) == -1) {
                         newArray.push(arrayValue);
                     }
                     break;

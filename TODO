@@ -191,7 +191,7 @@ More advanced duplicate answer detection   DONE
 Add loading animation                      DONE
 *Read questions and answers separately
 *Add more questions
-Image questions no longer appear (image URL contains '.', which is reserved)
+*Image questions no longer appear (image URL contains '.', which is reserved)
 Difficulty levels
     Configurable # answers
     Give questions difficulty grades
@@ -278,7 +278,7 @@ Support approximate dates and date ranges  DONE
 *Figure out deployment strategy
 *Turn features on/off for split/normal mode
 *Don't auto-disconnect controller (or increase timeout)
-Figure out why log4j via Ivy isn't working
+Figure out why log4j & guava via Ivy aren't working
 Move css files into folder
 Move test files into folder
 Move these TODOs to the shared task board
@@ -314,7 +314,6 @@ Give some context for the person
 In quiz, give relationship
 Which of the following is one of your great*grandparents?
 Map: show overview of all events at end
-FIX PIN PAD
 Map context with zoom
 Don't override manual zoom level
 Give worksheet with scavenger hunt questions
@@ -327,8 +326,3 @@ Fade out mouse pointer on display
 Fix logging in via iPad
 Dismiss popup in maps (via controller)
 Auto-reconnect login screen
-
-
-URGENT (complete before leaving):
-Set up admin user on Macbook(s)
-Set up iPads
