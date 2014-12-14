@@ -258,8 +258,8 @@ Show FS permissions dialog                 DONE
 Show permissions dialog while loading user DONE
 Kiosk should reload page to clear all fields DONE
 Remove permissions dialog (it's now native) DONE
+PIN shouldn't be easy (e.g. 1234)          DONE
 *Remove hard-coded guest user
-PIN shouldn't be easy (e.g. 1234)
 
 Library:
 Separate query params for page and fragment DONE

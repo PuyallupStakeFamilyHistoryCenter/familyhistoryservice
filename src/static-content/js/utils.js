@@ -239,3 +239,6 @@ function formatPlace(answer) {
     return formatted;
 }
 
+function validatePin(pin) {
+    return "01234567890".indexOf(pin) === -1 && "09876543210".indexOf(pin) === -1 && pin.search(/([0-9])\1\1\1/) === -1;
+}

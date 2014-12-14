@@ -164,6 +164,16 @@ POSSIBILITY OF SUCH DAMAGE.
                     if (pin !== pinConfirm) {
                         //TODO: Replace this with actual validation
                         logger.error("PINs don't match");
+                        clearTimeout();
+                        timeout = setTimeout(function () {
+                            reset("Timeout creating PIN. Please log in again.");
+                        }, 60000);
+                        return;
+                    }
+                    
+                    if (!validatePin(pin)) {
+                        logger.error("Pin is too simple: the pin may not be all the same digit, or an ascending or descending run (e.g. '1234', '9876'");
+                        clearTimeout();
                         timeout = setTimeout(function () {
                             reset("Timeout creating PIN. Please log in again.");
                         }, 60000);

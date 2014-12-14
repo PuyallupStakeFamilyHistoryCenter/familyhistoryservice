@@ -512,6 +512,39 @@ QUnit.cases([
     assert.deepEqual(actual, params.expected);
 });
 
+QUnit.cases([
+    { title: "Ascending run 1", input: "1234", output: false },
+    { title: "Ascending run 2", input: "0123", output: false },
+    { title: "Ascending run 3", input: "6789", output: false },
+    { title: "Ascending run 4", input: "7890", output: false },
+    { title: "Descending run 1", input: "0987", output: false },
+    { title: "Descending run 2", input: "9876", output: false },
+    { title: "Descending run 3", input: "4321", output: false },
+    { title: "Descending run 3", input: "3210", output: false },
+    { title: "Single digit 0", input: "0000", output: false },
+    { title: "Single digit 1", input: "1111", output: false },
+    { title: "Single digit 2", input: "2222", output: false },
+    { title: "Single digit 3", input: "3333", output: false },
+    { title: "Single digit 4", input: "4444", output: false },
+    { title: "Single digit 5", input: "5555", output: false },
+    { title: "Single digit 6", input: "6666", output: false },
+    { title: "Single digit 7", input: "7777", output: false },
+    { title: "Single digit 8", input: "8888", output: false },
+    { title: "Single digit 9", input: "9999", output: false },
+    { title: "Good example 1", input: "3764", output: true },
+    { title: "Good example 2", input: "7276", output: true },
+    { title: "Good example 3", input: "9966", output: true },
+    { title: "Good example 4", input: "1763", output: true },
+    { title: "Good example 5", input: "9786", output: true },
+    { title: "Good example 6", input: "6673", output: true },
+    { title: "Good example 7", input: "0918", output: true },
+    { title: "Good example 8", input: "0011", output: true },
+    { title: "Good example 9", input: "8446", output: true }
+]).test("Test PIN validation", function(params, assert) {
+    var result = validatePin(params.input);
+    assert.equal(result, params.output, "Input: " + params.input + " expected: " + params.output + " actual: " + result);
+});
+
 
 
 QUnit.module("Test quiz functions", {
