@@ -48,11 +48,13 @@ var ws = {
         }
         
         console.info("Connecting web socket");
+        var protocol = "wss";
         if (!endpoint) {
             endpoint = window.location.host;
+            protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
         }
         blocking = true;
-        connection = new WebSocket('ws://' + endpoint + '/remote-control/', ['soap', 'xmpp']); //TODO: Use secure web sockets (need certificate)
+        connection = new WebSocket(protocol + '//' + endpoint + '/remote-control/', ['soap', 'xmpp']); //TODO: Use secure web sockets (need certificate)
         
         connection.onmessage = function(message) {
             if (!isOpen) return;
