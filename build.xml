@@ -73,6 +73,11 @@
     <target name="-pre-compile" depends="-ivy-retrieve" />
     <target name="-pre-compile-test" depends="-ivy-retrieve" />
     
+    <target name="-post-jar">
+        <copydir src="src/scripts" dest="${dist.dir}" flatten="true" />
+        <chmod dir="${dist.dir}" includes="*.sh" perm="755" />
+    </target>
+    
     <target name="report" depends="init">
         <mkdir dir="report" />
         <ivy:resolve type="${ivy.resolve.types}"/>

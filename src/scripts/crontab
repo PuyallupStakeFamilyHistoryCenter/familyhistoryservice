@@ -1,0 +1,5 @@
+SHELL=/bin/sh
+MAILTO=admin@puyallupfamilyhistorycenter.org
+
+@reboot "cd $HOME/Dropbox/Install/FHC && ./launch-server.sh >>/var/log/cronrun 2>&1"
+@daily "cd $HOME/Dropbox/Install/FHC && ./launch-server.sh >>/var/log/cronrun 2>&1"
