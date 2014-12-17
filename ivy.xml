@@ -30,5 +30,7 @@
         <!--test-->
         <dependency org="junit" name="junit" rev="4.11"/>
         <dependency org="org.mockito" name="mockito-all" rev="1.9.5" conf="compile-test->default"/>
+        
+        <exclude module="javaee-api" />
     </dependencies>
 </ivy-module>

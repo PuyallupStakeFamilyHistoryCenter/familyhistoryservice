@@ -184,6 +184,7 @@ POSSIBILITY OF SUCH DAMAGE.
         <property name="connectors">
             <list>
                 <ref bean="ssl-connector" /> 
+                <ref bean="plain-connector" /> 
             </list>
         </property>
     </bean>
@@ -231,6 +232,12 @@ POSSIBILITY OF SUCH DAMAGE.
             </array>
         </constructor-arg>
         <property name="port" value="8443" />
+    </bean>
+    
+    <bean id="plain-connector" class="org.eclipse.jetty.server.ServerConnector" >
+        <constructor-arg name="server" ref="server" />
+        <constructor-arg name="factories" ref="http-connection-factory" />
+        <property name="port" value="8080" />
     </bean>
 
 </beans>
