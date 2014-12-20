@@ -78,6 +78,10 @@ function sortFacts(facts) {
             return -1;
         } else if (b.type === "Birth") {
             return 1;
+        } else if (a.type === "Christening") {
+            return -1;
+        } else if (b.type === "Christening") {
+            return 1;
         } else if (a.type === "Burial") {
             return 1;
         } else if (b.type === "Burial") {
