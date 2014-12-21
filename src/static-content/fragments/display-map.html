@@ -31,35 +31,14 @@ POSSIBILITY OF SUCH DAMAGE.
 <script>
     settings.local = {
         verbs: {
-            "move-left": function () {
-                map.panBy(-100, 0);
-            },
-            "move-right": function () {
-                map.panBy(100, 0);
-            },
-            "move-up": function () {
-                map.panBy(0, -100);
-            },
-            "move-down": function () {
-                map.panBy(0, 100);
-            },
-            "zoom-out": function () {
-                map.setZoom(map.zoom - 1);
-            },
-            "zoom-in": function () {
-                map.setZoom(map.zoom + 1);
-            },
             person: function (obj) {
                 graphPerson(obj.person);
             },
             people: function (obj) {
                 graphPeople(obj.people);
             },
-            advanceTour: function (obj) {
-                stepTour(1);
-            },
-            retreatTour: function (obj) {
-                stepTour(-1);
+            selectFact: function (obj) {
+                stepTour(obj.factId);
             }
         }
     };
@@ -243,7 +222,7 @@ POSSIBILITY OF SUCH DAMAGE.
             promises.push(promise);
         });
 
-        tour = ["all"];
+        tour = {"fffffffffff": "all"};
         Promise.all(promises).then(
                 function (results) {
                     var infowindow = new google.maps.InfoWindow();
@@ -259,16 +238,16 @@ POSSIBILITY OF SUCH DAMAGE.
                             markers.push(marker);
                             var contentString = getFactBlurb(fact);
 
-                            tour.push({
+                            tour[fact.id] = {
                                 fact: fact,
                                 position: result,
                                 marker: marker,
                                 infowindow: infowindow,
                                 blurb: contentString
-                            });
+                            };
                         }
                     });
-                    stepTour(1);
+                    stepTour("fffffffffff");
                 },
                 function (error) {
                     console.log(error);
@@ -278,12 +257,13 @@ POSSIBILITY OF SUCH DAMAGE.
     
     var animationFrames = null;
     var currentFrame;
-    function stepTour(direction) {
-        if (tour[tourPosition] && tour[tourPosition].infowindow) {
-            tour[tourPosition].infowindow.close();
+    function stepTour(nextPosition) {
+        var previousValue = tour[tourPosition];
+        if (previousValue && previousValue.infowindow) {
+            previousValue.infowindow.close();
         }
-        tourPosition += direction;
-        if (tour[tourPosition] === "all") {
+        var nextValue = tour[nextPosition];
+        if (nextValue === "all") {
             var bounds = new google.maps.LatLngBounds();
             $.each(tour, function(index, tourSegment) {
                 if (tourSegment !== "all") {
@@ -291,32 +271,31 @@ POSSIBILITY OF SUCH DAMAGE.
                 }
             });
             map.fitBounds(bounds);
-            if (map.getZoom() > 10) {
-                map.setZoom(10);
-            } 
-        } else if (tour[tourPosition]) {
-            var t = tour[tourPosition];
-            if (tour[tourPosition - direction] && tour[tourPosition - direction].position) {
-                animationFrames = createAnimationFrames(t.position, tour[tourPosition - direction].position);
+            if (map.getZoom() > 5) {
+                map.setZoom(5);
+            }
+            tourPosition = null;
+        } else if (nextValue) {
+            if (previousValue && previousValue.position) {
+                animationFrames = createAnimationFrames(nextValue.position, previousValue.position);
                 currentFrame = -1;
                 nextFrame();
             } else {
-                map.panTo(t.position);
+                map.panTo(nextValue.position);
                 map.setZoom(10);
-                t.infowindow.setContent("<div style='font-size: 3vmax;'>"+t.blurb+"</div>");
-                t.infowindow.open(map, t.marker);
-                say(t.blurb);
+                nextValue.infowindow.setContent("<div style='font-size: 3vmax;'>"+nextValue.blurb+"</div>");
+                nextValue.infowindow.open(map, nextValue.marker);
+                say(nextValue.blurb);
             }
-        } else {
-            tourPosition -= direction;
+            tourPosition = nextPosition;
         }
+        
     }
     
     function createAnimationFrames(p2, p1) {
         var numFrames = 1; //TODO: make this dynamic based on the distance between
         var path = [];
         for (var i = 0; i < numFrames; i++) {
-            //TODO: This will cause some strange behavior if the values 
             var lat = (p2.lat() - p1.lat()) / numFrames * i + p1.lat();
             var lng = (p2.lng() - p1.lng()) / numFrames * i + p1.lng();
             
@@ -336,17 +315,15 @@ POSSIBILITY OF SUCH DAMAGE.
     
     function nextFrame() {
         if (animationFrames && animationFrames[currentFrame+1]) {
-//            setTimeout(function() {
-                currentFrame++;
-                var f = animationFrames[currentFrame];
-                var bounds = new google.maps.LatLngBounds();
-                bounds.extend(f[0]);
-                bounds.extend(f[1]);
-                map.fitBounds(bounds);
-                if (map.getZoom() > 10) {
-                    map.setZoom(10);
-                } 
-//            },10);
+            currentFrame++;
+            var f = animationFrames[currentFrame];
+            var bounds = new google.maps.LatLngBounds();
+            bounds.extend(f[0]);
+            bounds.extend(f[1]);
+            map.fitBounds(bounds);
+            if (map.getZoom() > 10) {
+                map.setZoom(10);
+            } 
         } else if (animationFrames) {
             animationFrames = null;
             var t = tour[tourPosition];

@@ -25,7 +25,7 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 -->
 
-<div>
+<!--<div>
     <button id="retreat-tour-btn" class="btn btn-warning btn-lg"><span class="glyphicon glyphicon-chevron-left"></span></button>
     <button id="advance-tour-btn" class="btn btn-warning btn-lg"><span class="glyphicon glyphicon-chevron-right"></span></button>
     <button class="btn btn-primary btn-lg invisible"><span class="glyphicon glyphicon-arrow-left"></span></button>
@@ -36,33 +36,69 @@ POSSIBILITY OF SUCH DAMAGE.
     <button class="btn btn-primary btn-lg invisible"><span class="glyphicon glyphicon-arrow-left"></span></button>
     <button class="btn btn-primary btn-lg invisible"><span class="glyphicon glyphicon-arrow-left"></span></button>
     <button id="zoom-out-btn" class="btn btn-primary btn-lg"><span class="glyphicon glyphicon-zoom-out"></span></button>
+</div>-->
+<div id="fact-btns">
+    
 </div>
 
 <script>
-    $("#left-btn").click(function (e) {
-        sendToDisplay("{\"responseType\":\"move-left\"}");
-    });
-    $("#right-btn").click(function (e) {
-        sendToDisplay("{\"responseType\":\"move-right\"}");
-    });
-    $("#up-btn").click(function (e) {
-        sendToDisplay("{\"responseType\":\"move-up\"}");
-    });
-    $("#down-btn").click(function (e) {
-        sendToDisplay("{\"responseType\":\"move-down\"}");
-    });
-    $("#zoom-out-btn").click(function (e) {
-        sendToDisplay("{\"responseType\":\"zoom-out\"}");
-    });
-    $("#zoom-in-btn").click(function (e) {
-        sendToDisplay("{\"responseType\":\"zoom-in\"}");
-    });
-    $("#retreat-tour-btn").click(function (e) {
-        sendToDisplay("{\"responseType\":\"retreatTour\"}");
-    });
-    $("#advance-tour-btn").click(function (e) {
-        sendToDisplay("{\"responseType\":\"advanceTour\"}");
-    });
+    console.info("Starting maps controller")
+    settings.local = {
+        verbs: {
+            person: function(obj) {
+                $("#fact-btns").html("");
+                
+                var facts = obj.person.facts;
+                
+                $.each(obj.person.spouses, function(index, spouse) {
+                    facts = facts.concat(spouse.facts);
+                });
+                
+                var sortedFacts = sortFacts(facts);
+                
+                $("#fact-btns").append("<div><button class='btn btn-lg .btn-warning fact-btn' data-fact-index='fffffffffff'>Overview</button></div>");
+                $.each(sortedFacts, function(index, fact) {
+                    if (fact.place) {
+                        $("#fact-btns").append("<div><button class='btn btn-lg btn-default fact-btn' data-fact-index='"+fact.id+"'>" + fact.type + " - " + fact.date + "</button></div>");
+                    }
+                });
+                
+                $(".fact-btn").click(function(e) {
+                    sendToDisplay(JSON.stringify({responseType:"selectFact", factId: $(this).attr("data-fact-index")}))
+                    $(".fact-btn").removeClass("btn-warning").addClass("btn-default");
+                    $(this).removeClass("btn-default").addClass("btn-warning");
+                });
+                
+                sendToDisplay(JSON.stringify(obj))
+            }
+        }
+    }
+    
+//    $("#left-btn").click(function (e) {
+//        sendToDisplay("{\"responseType\":\"move-left\"}");
+//    });
+//    $("#right-btn").click(function (e) {
+//        sendToDisplay("{\"responseType\":\"move-right\"}");
+//    });
+//    $("#up-btn").click(function (e) {
+//        sendToDisplay("{\"responseType\":\"move-up\"}");
+//    });
+//    $("#down-btn").click(function (e) {
+//        sendToDisplay("{\"responseType\":\"move-down\"}");
+//    });
+//    $("#zoom-out-btn").click(function (e) {
+//        sendToDisplay("{\"responseType\":\"zoom-out\"}");
+//    });
+//    $("#zoom-in-btn").click(function (e) {
+//        sendToDisplay("{\"responseType\":\"zoom-in\"}");
+//    });
+//    $("#retreat-tour-btn").click(function (e) {
+//        sendToDisplay("{\"responseType\":\"retreatTour\"}");
+//    });
+//    $("#advance-tour-btn").click(function (e) {
+//        sendToDisplay("{\"responseType\":\"advanceTour\"}");
+//    });
     
     setHeaderName("Map");
+    
 </script>

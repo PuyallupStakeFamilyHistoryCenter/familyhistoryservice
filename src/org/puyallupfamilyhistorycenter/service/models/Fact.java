@@ -26,6 +26,7 @@
 package org.puyallupfamilyhistorycenter.service.models;
 
 import java.util.ArrayList;
+import java.util.concurrent.atomic.AtomicLong;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -37,6 +38,8 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 
 
 public class Fact {
+    public static final AtomicLong nextId = new AtomicLong();
+    public final String id = Long.toHexString(nextId.incrementAndGet());
     public final String type;
     public final String date;
     public final String sortableDate;
