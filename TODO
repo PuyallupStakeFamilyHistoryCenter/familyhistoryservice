@@ -241,11 +241,12 @@ Turn off log-out button when logged out    DONE
 Time out (auto-dismiss) error messages     DONE
 Fix log-out button in split mode           DONE
 Allow switching the root person            DONE
-*Simplify menu
-*Disable navigation when logged out
-*Return/done should submit login form
+Hide menu button on log in screen          DONE
+Simplify menu                              DONE
+Disable navigation when logged out         DONE
+Return/done should submit login form       DONE
 *Menu clicks should renew controller lease
-*Hide menu button on log in screen
+*Incorrect PIN should focus PIN input
 Add 'report a problem' button for bug reports
 ?Use custom number pad for PIN
 ?Set up accordian for groups of controls
@@ -327,3 +328,5 @@ Fade out mouse pointer on display
 Fix logging in via iPad
 Dismiss popup in maps (via controller)
 Auto-reconnect login screen
+
+Puzzle not working on iPad

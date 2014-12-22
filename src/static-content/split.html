@@ -43,16 +43,25 @@ POSSIBILITY OF SUCH DAMAGE.
                 top: 0px;
                 width: 30%;
                 height: 100%;
-                z-index: 999
+            }
+            .display, .controller {
+                -webkit-overflow-scrolling: touch;
+                //overflow-y: scroll
+            }
+            .display iframe, .controller iframe {
+                width: 100%;
+                height: 100%;
+                border-style: none;
+                overflow: hidden;
             }
         </style>
     </head>
     <body>
-        <div class="display" style="-webkit-overflow-scrolling: touch; overflow-y: scroll">
-            <iframe id="display-iframe" src="display" style="width: 100%; height: 100%; border-style: none;" ></iframe>
+        <div class="display" >
+            <iframe id="display-iframe" src="display" ></iframe>
         </div>
-        <div class="controller" style="-webkit-overflow-scrolling: touch; overflow-y: scroll">
-            <iframe id="controller-iframe" style="width: 100%; height: 100%; border-style: none; overflow-x: hidden; float: right;" ></iframe>
+        <div class="controller" >
+            <iframe id="controller-iframe" ></iframe>
         </div>
         
         <script src="/static-content/js/jquery-1.11.1.min.js" ></script>
@@ -61,9 +70,9 @@ POSSIBILITY OF SUCH DAMAGE.
                 $("#controller-iframe").attr("src", "/games")
             });
                 
-                document.body.addEventListener('touchmove', function(event) {
-                    event.preventDefault();
-                }, false); 
+            document.body.addEventListener('touchmove', function(event) {
+                event.preventDefault();
+            }, false); 
         </script>
     </body>
 </html>
