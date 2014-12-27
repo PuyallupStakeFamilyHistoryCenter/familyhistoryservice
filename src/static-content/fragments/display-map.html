@@ -39,6 +39,9 @@ POSSIBILITY OF SUCH DAMAGE.
             },
             selectFact: function (obj) {
                 stepTour(obj.factId);
+            },
+            zoom: function (obj) {
+                setZoom(Number(obj.zoom));
             }
         }
     };
@@ -379,6 +382,10 @@ POSSIBILITY OF SUCH DAMAGE.
             message = fact.name + " " + v.verb + " in " + formatPlace(fact.place) + " " + v.connector + " " + fact.date;
         }
         return message;
+    }
+    
+    function setZoom(zoom) {
+        map.setZoom(zoom);
     }
 
     resize();

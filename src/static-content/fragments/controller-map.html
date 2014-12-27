@@ -25,18 +25,25 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 -->
 
-<!--<div>
-    <button id="retreat-tour-btn" class="btn btn-warning btn-lg"><span class="glyphicon glyphicon-chevron-left"></span></button>
-    <button id="advance-tour-btn" class="btn btn-warning btn-lg"><span class="glyphicon glyphicon-chevron-right"></span></button>
-    <button class="btn btn-primary btn-lg invisible"><span class="glyphicon glyphicon-arrow-left"></span></button>
-    <button id="zoom-in-btn" class="btn btn-primary btn-lg"><span class="glyphicon glyphicon-zoom-in"></span></button>
-</div>
-<div>
-    <button class="btn btn-primary btn-lg invisible"><span class="glyphicon glyphicon-arrow-left"></span></button>
-    <button class="btn btn-primary btn-lg invisible"><span class="glyphicon glyphicon-arrow-left"></span></button>
-    <button class="btn btn-primary btn-lg invisible"><span class="glyphicon glyphicon-arrow-left"></span></button>
-    <button id="zoom-out-btn" class="btn btn-primary btn-lg"><span class="glyphicon glyphicon-zoom-out"></span></button>
-</div>-->
+<dl>
+    <dt>Zoom</dt>
+    <dd>
+        <div class="btn-group btn-group-lg" data-toggle="buttons">
+            <label class="btn btn-default">
+                <input type="radio" name="zoom" value="10">City
+            </label>
+            <label class="btn btn-default active">
+                <input type="radio" name="zoom" value="7">State
+            </label>
+            <label class="btn btn-default">
+                <input type="radio" name="zoom" value="5">Country
+            </label>
+            <label class="btn btn-default">
+                <input type="radio" name="zoom" value="3">World
+            </label>
+        </div>
+    </dd>
+</dl>
 <div id="fact-btns">
     
 </div>
@@ -74,18 +81,9 @@ POSSIBILITY OF SUCH DAMAGE.
         }
     }
     
-//    $("#left-btn").click(function (e) {
-//        sendToDisplay("{\"responseType\":\"move-left\"}");
-//    });
-//    $("#right-btn").click(function (e) {
-//        sendToDisplay("{\"responseType\":\"move-right\"}");
-//    });
-//    $("#up-btn").click(function (e) {
-//        sendToDisplay("{\"responseType\":\"move-up\"}");
-//    });
-//    $("#down-btn").click(function (e) {
-//        sendToDisplay("{\"responseType\":\"move-down\"}");
-//    });
+    $("[name=zoom]").change(function (e) {
+        sendZoom($(this).val());
+    });
 //    $("#zoom-out-btn").click(function (e) {
 //        sendToDisplay("{\"responseType\":\"zoom-out\"}");
 //    });
@@ -98,6 +96,10 @@ POSSIBILITY OF SUCH DAMAGE.
 //    $("#advance-tour-btn").click(function (e) {
 //        sendToDisplay("{\"responseType\":\"advanceTour\"}");
 //    });
+    
+    function sendZoom(zoom) {
+        sendToDisplay(JSON.stringify({responseType:"zoom", zoom: zoom}));
+    }
     
     setHeaderName("Map");
     
