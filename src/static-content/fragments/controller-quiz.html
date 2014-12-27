@@ -487,7 +487,7 @@ POSSIBILITY OF SUCH DAMAGE.
                         questionAndAnswers = null;
                     }
                     
-                    questionKey = questionAndAnswers.question + "||" _ questionAndAnswers.answers[0];
+                    questionKey = questionAndAnswers.question + "||" + questionAndAnswers.answers[0];
                     if (questionLastUse[questionKey] && Date.now() - questionLastUse[questionKey] < 60000) {
                         questionAndAnswers = null;
                     }
