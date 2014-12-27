@@ -449,38 +449,13 @@ POSSIBILITY OF SUCH DAMAGE.
                 },
             ],
         },
-        {
-            prerequisites: [
-                'relationship',
-            ],
-            constants: {
-                stat: 'stats.*',
-                deathYear: 'facts.*type=Death.year',
-                statValue: 'stat.${deathYear}',
-            },
-            question: "What ${stat.text} in ${deathYear} when your ${relationship} ${name} died?",
-            answers: [
-                { 
-                    text: '${stat.${deathYear}}',
-                    hint: "Correct!"
-                },
-                { 
-                    text: '${stat.*!=${stat.text}}',
-                },
-                { 
-                    text: '${stat.*!=${stat.text}}',
-                },
-                { 
-                    text: '${stat.*!=${stat.text}}',
-                },
-            ],
-        },
         
         //Question ideas
         // How many siblings did your (father|mother|grandfather|grandmother) have?
         // What (was the price of cornflakes|was the average hourly wage|percent of the United States was employed in agriculture) when your (father|mother|grandfather|etc) was (born|25)?
     ];
     
+    var questionLastUse = {};
     function askQuestion() {
         $("#loading-div").show()
         $("#loaded-div").hide();
@@ -494,6 +469,7 @@ POSSIBILITY OF SUCH DAMAGE.
             return;
         }
         
+        var questionKey = "";
         for (var i = 0; !questionAndAnswers && i < 5; i++) {
             var template = getRandomElement(personQuestionTemplates);
 
@@ -510,6 +486,11 @@ POSSIBILITY OF SUCH DAMAGE.
                     if (questionAndAnswers && questionAndAnswers.answers.length < 2) {
                         questionAndAnswers = null;
                     }
+                    
+                    questionKey = questionAndAnswers.question + "||" _ questionAndAnswers.answers[0];
+                    if (questionLastUse[questionKey] && Date.now() - questionLastUse[questionKey] < 60000) {
+                        questionAndAnswers = null;
+                    }
                 }
             }
         }
@@ -520,6 +501,7 @@ POSSIBILITY OF SUCH DAMAGE.
             return;
         }
         
+        questionLastUse[questionKey] = Date.now();
         sendQuestion(questionAndAnswers);
         setAnswers(questionAndAnswers.answers);
         $("#read-question").show();
