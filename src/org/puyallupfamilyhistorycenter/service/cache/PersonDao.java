@@ -73,12 +73,12 @@ public class PersonDao {
      * @param accessToken 
      * @return an iterator over the ancestors of the given person
      */
-    public List<Person> listAncestors(String personId, int maxDepth, String accessToken) {
-        return traverse(new AncestorsIterator(personId, maxDepth, source, accessToken));
+    public List<Person> listAncestors(String personId, int maxDepth, String accessToken, boolean cacheOnly) {
+        return traverse(new AncestorsIterator(personId, maxDepth, source, accessToken, cacheOnly));
     }
     
     public List<Person> listAncestorsWithImages(String personId, int maxDepth, String accessToken) {
-        return extractPeopleWithImages(new AncestorsIterator(personId, maxDepth, source, accessToken));
+        return extractPeopleWithImages(new AncestorsIterator(personId, maxDepth, source, accessToken, true));
     }
     
     /**

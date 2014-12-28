@@ -48,13 +48,15 @@ public class AncestorsIterator implements Iterator<Person> {
     private final int maxDepth;
     private final Source<Person> source;
     private final String accessToken;
+    private final boolean cacheOnly;
     private final Queue<PersonReference> frontier = new LinkedList<>();
     
-    AncestorsIterator(String personId, int maxDepth, Source<Person> source, String accessToken) {
+    AncestorsIterator(String personId, int maxDepth, Source<Person> source, String accessToken, boolean cacheOnly) {
         this.personId = personId;
         this.maxDepth = maxDepth;
         this.source = source;
         this.accessToken = accessToken;
+        this.cacheOnly = cacheOnly;
         
         Person root = source.get(personId, accessToken);
         if (root != null) {
@@ -73,7 +75,9 @@ public class AncestorsIterator implements Iterator<Person> {
         Person person = null;
         while (person == null) {
             try {
-                next = frontier.remove();
+                do {
+                    next = frontier.remove();
+                } while (!frontier.isEmpty() && (!cacheOnly || !source.has(next.getId())));
                 person = source.get(next.getId(), accessToken);
             } catch (Exception e) {
                 if (next != null) {

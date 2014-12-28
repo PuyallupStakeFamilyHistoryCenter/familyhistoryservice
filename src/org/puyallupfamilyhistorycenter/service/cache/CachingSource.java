@@ -68,6 +68,14 @@ public class CachingSource<E> implements Source<E> {
         return value;
     }
 
+    @Override
+    public boolean has(String id) {
+        if (cache.containsKey(id)) {
+            return true;
+        }
+        return false; // This logic is deliberately more complicated than necessary for debugging
+    }
+
     public void setDecider(ShouldCacheDecider<E> decider) {
         this.decider = decider;
     }

@@ -325,7 +325,7 @@ public class FamilyHistoryCenterSocket {
                         depth = scanner.nextInt();
                     }
                     
-                    List<Person> family = personDao.listAncestors(personId, depth, accessToken);
+                    List<Person> family = personDao.listAncestors(personId, depth, accessToken, true);
                     if (!family.isEmpty()) {
                         response = getPeopleResponse(family);
                     } else {
@@ -340,7 +340,7 @@ public class FamilyHistoryCenterSocket {
                     String displayId = scanner.next();
                     String personId = scanner.next();
                     String accessToken = tokenToAccessToken(token);
-                    List<Person> family = personDao.listAncestors(personId, 4, accessToken);
+                    List<Person> family = personDao.listAncestors(personId, 4, accessToken, true);
                     
                     sendToDisplay(displayId, getPeopleResponse(family));
                     

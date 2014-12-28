@@ -23,16 +23,19 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-
 package org.puyallupfamilyhistorycenter.service.cache;
+
+import org.puyallupfamilyhistorycenter.service.models.Person;
 
 /**
  *
  * @author tibbitts
  */
+public class AllowAllDecider implements CachingSource.ShouldCacheDecider<Person> {
 
-
-public interface Source<E> {
-    boolean has(String id);
-    E get(String id, String accessToken);
+    @Override
+    public boolean shouldCache(Person value) {
+        return true;
+    }
+    
 }

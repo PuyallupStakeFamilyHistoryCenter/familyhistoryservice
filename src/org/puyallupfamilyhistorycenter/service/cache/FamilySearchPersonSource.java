@@ -135,6 +135,11 @@ public class FamilySearchPersonSource implements Source<Person> {
         }
     }
 
+    @Override
+    public boolean has(String id) {
+        return true;
+    }
+
     private PersonReference[] fsPersonsToPersonRefs(List<org.gedcomx.conclusion.Person> persons, List<Relationship> relationships) {
         if (persons == null) {
             return null;

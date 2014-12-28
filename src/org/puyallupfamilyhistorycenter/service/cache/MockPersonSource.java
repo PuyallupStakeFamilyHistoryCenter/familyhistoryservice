@@ -26,6 +26,7 @@
 
 package org.puyallupfamilyhistorycenter.service.cache;
 
+import com.google.common.collect.ImmutableSet;
 import com.google.gson.Gson;
 import org.puyallupfamilyhistorycenter.service.models.Person;
 
@@ -273,5 +274,18 @@ public class MockPersonSource implements Source<Person> {
 
         return GSON.fromJson(personJson, Person.class);
     }
-    
+
+    @Override
+    public boolean has(String id) {
+        return ImmutableSet.<String>builder()
+                .add("KWCB-HZV")
+                .add("KWC6-X7D")
+                .add("KWZP-8K5")
+                .add("KWZP-8KG")
+                .add("KWCB-HZ2")
+                .add("KWJJ-4XH")
+                .add("KJWD-Z94")
+                .build()
+                .contains(id);
+    }
 }
