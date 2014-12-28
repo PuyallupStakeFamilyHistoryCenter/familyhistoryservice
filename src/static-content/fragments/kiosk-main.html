@@ -128,7 +128,7 @@ POSSIBILITY OF SUCH DAMAGE.
 
         timeout = setTimeout(function () {
             reset("Timeout logging into FamilySearch. Please try again.");
-        }, 60000);
+        }, 300000);
 
         console.info("Getting access token from FamilySearch");
         FamilySearch.getAccessToken().then(function (accessToken) {
@@ -137,7 +137,7 @@ POSSIBILITY OF SUCH DAMAGE.
             clearTimeout(timeout);
             timeout = setTimeout(function () {
                 reset("Timeout setting PIN. Please log in again");
-            }, 60000);
+            }, 300000);
 
             FamilySearch.getCurrentUser().then(function (result) {
                 var user = result.getUser();
@@ -167,7 +167,7 @@ POSSIBILITY OF SUCH DAMAGE.
                         clearTimeout();
                         timeout = setTimeout(function () {
                             reset("Timeout creating PIN. Please log in again.");
-                        }, 60000);
+                        }, 300000);
                         return;
                     }
                     
@@ -176,7 +176,7 @@ POSSIBILITY OF SUCH DAMAGE.
                         clearTimeout();
                         timeout = setTimeout(function () {
                             reset("Timeout creating PIN. Please log in again.");
-                        }, 60000);
+                        }, 300000);
                         return;
                     }
 
