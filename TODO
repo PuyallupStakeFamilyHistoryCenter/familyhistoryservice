@@ -87,6 +87,7 @@ Paginate to prevent scrolling issues on iPad DONE
 Group images by person                     DONE
 Add 'loading' animation                    DONE
 Provide default images                     DONE
+*Back button should go back to image choice screen
 Spacing between tabs and controls
 Remove duplicate images
 
@@ -102,6 +103,7 @@ Load controls first, then person-details (to prevent "unrecognized command" issu
 Allow navigating in tree                   DONE
 Add 'loading' animation                    DONE
 Remove 'descendants' filter                DONE
+*Back button should go to the family tree
 *Rethink design
 Don't show 'focus' button if a person has no parents on record
 Spacing between tabs and controls
@@ -144,11 +146,11 @@ Tags attached to wrong markers             DONE
 Map doesn't display locations in split mode DONE
 Fix buttons in split mode                  DONE
 Make map popups larger                     DONE
+Zoom for context                           DONE
+Show buttons for per life event, not forward and backward buttons DONE
 *Add "# had # children: #, #, and, #" fact
 *Show controls immediately after clicking on person
 *Show only three life events (birth, marriage, and death)
-*Zoom for context
-*Show buttons for per life event, not forward and backward buttons
 Show thumbnail map on side of map
 Show events on controller (map) and click on them
 Zoom and pan between locations
@@ -169,6 +171,7 @@ Add marriage date/place to spouse          DONE
 Display more/all facts                     DONE
 Add space between marriage event and date  DONE
 Filter marriage details                    DONE
+Set max-height on image
 
 Statistics:
 Implement basic family statistics
