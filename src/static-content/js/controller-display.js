@@ -139,7 +139,7 @@ function getDisplayName() {
 var defaultSettings = {
     display: {
         title: "Display",
-        header: '<img style="width: 100%" src="/media/logo.png" alt="Puyallup Family History Center logo" />',
+        header: '<img style="width: 50%" src="/media/logo.png" alt="Puyallup Family History Center logo" />',
         contentPadding: false,
         verbs: {
             standby: function() {
@@ -209,7 +209,7 @@ var defaultSettings = {
     },
     kiosk: {
         title: "Kiosk",
-        header: '<img src="/media/logo.png" alt="Puyallup Family History Center logo" />',
+        header: '<img src="/media/logo.png" style="width: 50%" alt="Puyallup Family History Center logo" />',
         contentPadding: false,
         verbs:{},
         begin: function() {
