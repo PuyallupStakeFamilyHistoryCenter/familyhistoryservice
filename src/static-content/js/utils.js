@@ -226,8 +226,10 @@ function filterArray(array, rawFilters) {
     return currentArray;
 }
 
-function say(message) {
-    speechSynthesis.cancel();
+function say(message, cancel) {
+    if (cancel) {
+        speechSynthesis.cancel();
+    }
     var msg = new SpeechSynthesisUtterance();
     msg.lang = "en-GB";
     msg.text = message;

@@ -192,7 +192,7 @@ BUG: How are null and null related? Mother and daughter DONE
 Allow selection of people                  DONE
 More advanced duplicate answer detection   DONE
 Add loading animation                      DONE
-*Read questions and answers separately
+Read questions and answers separately      DONE
 *Add more questions
 *Image questions no longer appear (image URL contains '.', which is reserved)
 Difficulty levels

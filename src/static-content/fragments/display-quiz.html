@@ -34,7 +34,8 @@ POSSIBILITY OF SUCH DAMAGE.
 
 <script>
     var letters = ["A", "B", "C", "D", "E", "F"];
-    var fullText;
+    var questionText;
+    var answerText;
     var questionAndAnswers;
     settings.local = {
         verbs: {
@@ -44,17 +45,20 @@ POSSIBILITY OF SUCH DAMAGE.
                 $("#question").html(obj.question);
                 $("#answers").html("");
                 
-                fullText = obj.question + ",,, Is the answer,, ";
+                questionText = obj.question + ',,, ';
+                answerText = "Is the answer,, ";
                 $.each(obj.answers, function(index, answer) {
                     console.info("Display got answer " + JSON.stringify(answer));
                     $("#answers").append("<li class='list-group-item' data-id='" + answer.index + "'>" + (index + 1) + ". " + answer.text + "<span class='glyphicon glyphicon-ok' style='float: right; display: none' ></span><span class='glyphicon glyphicon-remove' style='float: right; display: none' ></span></li>");
-                    fullText += (index === obj.answers.length - 1 ? " or " : "") + (index + 1) + ",, " + answer.text + ",,, ";
+                    answerText += (index === obj.answers.length - 1 ? " or " : "") + (index + 1) + ",, " + answer.text + ",,, ";
                 });
                 
-                say(fullText);
+                say(questionText, true);
+                say(answerText, false);
             },
             read: function(obj) {
-                say(fullText);
+                say(questionText, true);
+                say(answerText, false);
             },
             correctAnswer: function(obj) {
                 $("li[data-id=" + obj.index + "]").addClass("list-group-item-success").children(".glyphicon-ok").show();
