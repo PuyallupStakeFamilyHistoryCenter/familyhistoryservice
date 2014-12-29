@@ -288,7 +288,7 @@ POSSIBILITY OF SUCH DAMAGE.
                 map.setZoom(10);
                 nextValue.infowindow.setContent("<div style='font-size: 3vmax;'>"+nextValue.blurb+"</div>");
                 nextValue.infowindow.open(map, nextValue.marker);
-                say(nextValue.blurb);
+                say(nextValue.blurb, true);
             }
             tourPosition = nextPosition;
         }
@@ -334,7 +334,7 @@ POSSIBILITY OF SUCH DAMAGE.
             map.setZoom(10);
             t.infowindow.setContent("<div style='font-size: 3vmax;'>"+t.blurb+"</div>");
             t.infowindow.open(map, t.marker);
-            say(t.blurb);
+            say(t.blurb, true);
         }
     }
 

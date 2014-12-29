@@ -65,9 +65,9 @@ POSSIBILITY OF SUCH DAMAGE.
                 incrementAnswers(true);
                 
                 if (filterArray(questionAndAnswers.answers, "index=" + obj.index)[0].hint) {
-                    say(filterArray(questionAndAnswers.answers, "index=" + obj.index)[0].hint);
+                    say(filterArray(questionAndAnswers.answers, "index=" + obj.index)[0].hint, true);
                 } else {
-                    say(filterArray(questionAndAnswers.answers, "index=" + obj.index)[0].text + ",, is correct")
+                    say(filterArray(questionAndAnswers.answers, "index=" + obj.index)[0].text + ",, is correct", true)
                 }
             },
             incorrectAnswer: function(obj) {
@@ -75,9 +75,9 @@ POSSIBILITY OF SUCH DAMAGE.
                 incrementAnswers(false);
                 
                 if (filterArray(questionAndAnswers.answers, "index=" + obj.index)[0].hint) {
-                    say(filterArray(questionAndAnswers.answers, "index=" + obj.index)[0].hint);
+                    say(filterArray(questionAndAnswers.answers, "index=" + obj.index)[0].hint, true);
                 } else {
-                    say(filterArray(questionAndAnswers.answers, "index=" + obj.index)[0].text + ",, is not correct")
+                    say(filterArray(questionAndAnswers.answers, "index=" + obj.index)[0].text + ",, is not correct", true)
                 }
             }
         }
