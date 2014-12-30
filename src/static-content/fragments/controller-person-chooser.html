@@ -26,43 +26,28 @@ POSSIBILITY OF SUCH DAMAGE.
 -->
 
 <div id='loaded-div' style='display: none;'>
-    <ul class="nav nav-tabs" id="tabs" role="tablist">
-        <li class="active" id="people-btn" ><a href="#people" role="tab" data-toggle="tab">People</a></li>
-        <li id="person-info-btn" style="display: none" ><a href="#person-info" role="tab" data-toggle="tab">Person</a></li>
-        <li id="controls-btn" style="display: none" ><a href="#controls" role="tab" data-toggle="tab">Controls</a></li>
-    </ul>
-    <div id="people">
-        <div id="choice-type-btns" class="btn-group btn-group-lg" style="display: none" data-toggle="buttons" >
-            <label class="btn btn-default type-btn">
-                <input type="radio" name="choice-type" value="person">Person
-            </label>
-            <label class="btn btn-default type-btn">
-                <input type="radio" name="choice-type" value="family">Family
-            </label>
-            <label class="btn btn-default type-btn">
-                <input type="radio" name="choice-type" value="ancestors">Ancestors
-            </label>
-        </div>
-        <div id="return-to-root" style="display: none;">
-            <button id="root-btn" class="btn btn-lg btn-default">Return to root</button>
-        </div>
-        <div>
-            <div id="gen-0" style="height: 640px; width: 20%; float: left;"></div>
-            <div id="gen-1" style="height: 640px; width: 20%; float: left;"></div>
-            <div id="gen-2" style="height: 640px; width: 20%; float: left;"></div>
-            <div id="gen-3" style="height: 640px; width: 20%; float: left;"></div>
-            <div id="gen-4" style="height: 640px; width: 20%; float: left;"></div>
-        </div>
+    <div id="choice-type-btns" class="btn-group btn-group-lg" style="display: none" data-toggle="buttons" >
+        <label class="btn btn-default type-btn">
+            <input type="radio" name="choice-type" value="person">Person
+        </label>
+        <label class="btn btn-default type-btn">
+            <input type="radio" name="choice-type" value="family">Family
+        </label>
+        <label class="btn btn-default type-btn">
+            <input type="radio" name="choice-type" value="ancestors">Ancestors
+        </label>
     </div>
-    <div id="person-info" style="display: none;">
-
+    <div id="return-to-root" style="display: none;">
+        <button id="root-btn" class="btn btn-lg btn-default">Return to root</button>
     </div>
-    <div id="controls" style="display: none;">
-
+    <div>
+        <div id="gen-0" style="height: 640px; width: 20%; float: left;"></div>
+        <div id="gen-1" style="height: 640px; width: 20%; float: left;"></div>
+        <div id="gen-2" style="height: 640px; width: 20%; float: left;"></div>
+        <div id="gen-3" style="height: 640px; width: 20%; float: left;"></div>
+        <div id="gen-4" style="height: 640px; width: 20%; float: left;"></div>
     </div>
 </div>
-
-
 
 <div id='loading-div' >
     <div class="progress">
@@ -75,7 +60,6 @@ POSSIBILITY OF SUCH DAMAGE.
 <script>
     var choiceType = getParameterByName("type");
     var target = getParameterByName("target");
-    var showPersonDetail = !getParameterByName("hidePersonDetail");
     var sendPeople = !getParameterByName("getPeople");
     var rootId = !getParameterByName("rootPersonId") ? settings.userId : getParameterByName("rootPersonId");
     var loggedInUser = !getParameterByName("loggedInUser") ? settings.userId : getParameterByName("loggedInUser");
@@ -139,26 +123,12 @@ POSSIBILITY OF SUCH DAMAGE.
                         ws.socketSend("send-" + choiceType + " " + token + " " + displayName + " " + id);
                     }
 
-
-                    innerNavigate("display-person-detail?hide_image=true&person_id=" + id, "#person-info").then(function () {
-                        if (showPersonDetail) {
-                            $("#people-btn").removeClass("active");
-                            $("#person-info-btn").show().click().addClass("active");
-                        }
-                        if (target) {
-                            innerNavigate("controller-" + target, "#controls").then(function () {
-                                $("#controls-btn").show();
-                                if (!showPersonDetail) {
-                                    $("#people-btn").removeClass("active");
-                                    $("#controls-btn").click().addClass("active");
-
-                                }
-                                if (!sendPeople) {
+                    if (target) {
+                        navigate("controller-" + target).then(
+                                function() {
                                     ws.socketSend("get-" + choiceType + " " + token + " " + id);
-                                }
-                            });
-                        }
-                    });
+                                });
+                    }
                     
                 });
                 
@@ -176,24 +146,6 @@ POSSIBILITY OF SUCH DAMAGE.
             }
         }
     }
-
-    $("#people-btn").click(function (e) {
-        $("#people").show();
-        $("#person-info").hide();
-        $("#controls").hide();
-    });
-
-    $("#person-info-btn").click(function (e) {
-        $("#people").hide();
-        $("#person-info").show();
-        $("#controls").hide();
-    });
-
-    $("#controls-btn").click(function (e) {
-        $("#people").hide();
-        $("#person-info").hide();
-        $("#controls").show();
-    });
 
     if (rootId !== loggedInUser) {
         $("#return-to-root").show();
@@ -216,45 +168,8 @@ POSSIBILITY OF SUCH DAMAGE.
         choiceType = "ancestors";
         $("#choice-type-btns").show();
     }
-
-    function innerNavigate(dest, selector, timeout) {
-        if (!timeout) {
-            timeout = 1000;
-        }
-        var split = dest.split("?");
-        var actualDest = "/static-content/fragments/" + split[0] + ".html";
-        var tempVars = null;
-        if (split.length > 1) {
-            actualDest += "?" + split[1];
-            tempVars = getUrlVars(split[1]);
-        }
-        var deferred = new $.Deferred();
-
-        console.info("Navigating to " + actualDest);
-        $.ajax(actualDest)
-                .done(
-                        function (data) {
-                            settings.local = {verbs: {}};
-                            fragmentVars = tempVars;
-                            $(selector).html(data);
-
-                            deferred.resolve();
-                        }
-                ).fail(
-                function (response) {
-                    logger.error("Could not load " + actualDest + " - " + response.statusText);
-                    deferred.reject();
-                }
-        );
-        setTimeout(function () {
-            deferred.reject();
-            //throw new Error("Timed out while loading " + dest);
-        }, timeout);
-
-        return deferred.promise();
-    }
-
-    function build() {
+    
+    function buildTree() {
         for (var i = 0; i < 5; i++) {
             var pow = Math.pow(2, i);
             var percentHeight = 100 / pow;
@@ -267,6 +182,6 @@ POSSIBILITY OF SUCH DAMAGE.
         }
     }
 
-    build();
+    buildTree();
     ws.socketSend("get-ancestors " + token + " " + rootId);
 </script>

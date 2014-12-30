@@ -30,7 +30,6 @@ POSSIBILITY OF SUCH DAMAGE.
 <script>
     console.info("Starting image chooser");
     var target = getParameterByName("target");
-    var showPersonDetail = !getParameterByName("hidePersonDetail");
     var sendPeople = !getParameterByName("getPeople");
     var people;
     var pageSize = 5;
@@ -72,11 +71,6 @@ POSSIBILITY OF SUCH DAMAGE.
 </script>
 
 <div id='loaded-div' style='display: none;'>
-    <ul class="nav nav-tabs" id="tabs" role="tablist">
-        <li class="active" id="images-btn" ><a href="#images" role="tab" data-toggle="tab">Images</a></li>
-        <li id="person-info-btn" style="display: none" ><a href="#person-info" role="tab" data-toggle="tab">Person</a></li>
-        <li id="controls-btn" style="display: none" ><a href="#controls" role="tab" data-toggle="tab">Controls</a></li>
-    </ul>
     <div id="images-wrapper">
         <div id="images">
 
@@ -84,12 +78,6 @@ POSSIBILITY OF SUCH DAMAGE.
         <div id="pagination">
 
         </div>
-    </div>
-    <div id="person-info" style="display: none;">
-
-    </div>
-    <div id="controls" style="display: none;">
-
     </div>
 </div>
 
@@ -103,24 +91,6 @@ POSSIBILITY OF SUCH DAMAGE.
 </div>
 
 <script>
-    $("#images-btn").click(function (e) {
-        $("#images-wrapper").show();
-        $("#person-info").hide();
-        $("#controls").hide();
-    });
-
-    $("#person-info-btn").click(function (e) {
-        $("#images-wrapper").hide();
-        $("#person-info").show();
-        $("#controls").hide();
-    });
-
-    $("#controls-btn").click(function (e) {
-        $("#images-wrapper").hide();
-        $("#person-info").hide();
-        $("#controls").show();
-    });
-    
     function showPage(pageNum) {
         $("#images").html("");
         for (var i = pageSize * pageNum; i < Math.min(people.length, pageSize * (pageNum + 1)); i++) {
@@ -140,65 +110,12 @@ POSSIBILITY OF SUCH DAMAGE.
             var obj = JSON.parse(data);
             sendToDisplay(data);
 
-            innerNavigate("display-person-detail?hide_image=true&person_id=" + obj.person.id, "#person-info").then(function () {
-                if (showPersonDetail) {
-                    $("#images-btn").removeClass("active");
-                    $("#person-info-btn").show().click().addClass("active");
-                    if (!sendPeople) {
-                        ws.socketSend("get-" + choiceType + " " + token + " " + obj.person.id);
-                    }
-                }
-                if (target) {
-                    innerNavigate("controller-" + target, "#controls").then(function () {
-                            $("#controls-btn").show();
-                            if (!showPersonDetail) {
-                                $("#images-btn").removeClass("active");
-                                $("#controls-btn").click().addClass("active");
-
-                            }
-                    });
-                }
-            });
+            if (target) {
+                navigate("controller-" + target);
+            }
         });
     }
 
-    function innerNavigate(dest, selector, timeout) {
-        if (!timeout) {
-            timeout = 1000;
-        }
-        var split = dest.split("?");
-        var actualDest = "/static-content/fragments/" + split[0] + ".html";
-        var tempVars = null;
-        if (split.length > 1) {
-            actualDest += "?" + split[1];
-            tempVars = getUrlVars(split[1]);
-        }
-        var deferred = new $.Deferred();
-
-        console.info("Navigating to " + actualDest);
-        $.ajax(actualDest)
-                .done(
-                        function (data) {
-                            settings.local = {verbs: {}};
-                            fragmentVars = tempVars;
-                            $(selector).html(data);
-
-                            deferred.resolve();
-                        }
-                ).fail(
-                function (response) {
-                    logger.error("Could not load " + actualDest + " - " + response.statusText);
-                    deferred.reject();
-                }
-        );
-        setTimeout(function () {
-            deferred.reject();
-            //throw new Error("Timed out while loading " + dest);
-        }, timeout);
-
-        return deferred.promise();
-    }
-    
     settings.local.verbs.people(defaultPeople);
     ws.socketSend("get-ancestor-images " + token + " " + settings.userId);
 </script>
