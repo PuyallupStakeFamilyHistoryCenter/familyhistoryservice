@@ -80,6 +80,10 @@ POSSIBILITY OF SUCH DAMAGE.
                     draw();
                 }
             },
+            snap: function (obj) {
+                config.snap = obj.value;
+                draw();
+            },
             snapOnDrag: function (obj) {
                 config.snapOnDrag = obj.value;
             },
@@ -281,7 +285,7 @@ POSSIBILITY OF SUCH DAMAGE.
             lastX = x;
             lastY = y;
 
-            if (config.snapOnDrag) {
+            if (config.snap && config.snapOnDrag) {
                 checkForCorrectPlacement();
             }
             draw();
@@ -289,7 +293,7 @@ POSSIBILITY OF SUCH DAMAGE.
     }
 
     function touchEnd() {
-        if (!config.snapOnDrag) {
+        if (config.snap && !config.snapOnDrag) {
             checkForCorrectPlacement();
         }
         lastClicked = null;
@@ -306,7 +310,7 @@ POSSIBILITY OF SUCH DAMAGE.
             }
             lastRotation = r;
 
-            if (config.snapOnDrag) {
+            if (config.snap && config.snapOnDrag) {
                 checkForCorrectPlacement();
             }
             draw();
@@ -346,7 +350,7 @@ POSSIBILITY OF SUCH DAMAGE.
             if (piece !== null &&
                     x >= piece.actualX && x < piece.actualX + piece.width * scale &&
                     y >= piece.actualY && y < piece.actualY + piece.height * scale &&
-                    !piece.found) {
+                    (!piece.found || !config.snap)) {
                 lastIndex = i;
                 lastClicked = pieces[i];
             }
@@ -458,7 +462,7 @@ POSSIBILITY OF SUCH DAMAGE.
                 image.width * scale, //Canvas size
                 image.height * scale);
         context.restore();
-        if (!p.found) {
+        if (!p.found || !config.snap) {
             context.stroke();
         }
         context.restore();

@@ -87,7 +87,7 @@ Paginate to prevent scrolling issues on iPad DONE
 Group images by person                     DONE
 Add 'loading' animation                    DONE
 Provide default images                     DONE
-*Back button should go back to image choice screen
+Back button should go back to image choice screen DONE
 Spacing between tabs and controls
 Remove duplicate images
 
@@ -103,8 +103,8 @@ Load controls first, then person-details (to prevent "unrecognized command" issu
 Allow navigating in tree                   DONE
 Add 'loading' animation                    DONE
 Remove 'descendants' filter                DONE
-*Back button should go to the family tree
-*Rethink design
+Back button should go to the family tree   DONE
+Rethink design                             DONE
 Don't show 'focus' button if a person has no parents on record
 Spacing between tabs and controls
 Allow choosing depth for ancestors/descendants
@@ -148,11 +148,11 @@ Fix buttons in split mode                  DONE
 Make map popups larger                     DONE
 Zoom for context                           DONE
 Show buttons for per life event, not forward and backward buttons DONE
+Show controls immediately after clicking on person DONE
+Show events on controller (map) and click on them DONE
 *Add "# had # children: #, #, and, #" fact
-*Show controls immediately after clicking on person
 *Show only three life events (birth, marriage, and death)
-Show thumbnail map on side of map
-Show events on controller (map) and click on them
+?Show thumbnail map on side of map
 Zoom and pan between locations
 Lerah Ellis (LZJ8-4KJ) doesn't show death and burial events in tour
 Load Google Maps API only once

@@ -101,6 +101,14 @@ POSSIBILITY OF SUCH DAMAGE.
         <dd>
             <div class="btn-group btn-group-lg" data-toggle="buttons">
                 <label class="btn btn-default">
+                    <input type="checkbox" name="snap" id="snap">Snap in place
+                </label>
+            </div>
+        </dd>
+
+        <dd>
+            <div class="btn-group btn-group-lg" data-toggle="buttons">
+                <label class="btn btn-default">
                     <input type="checkbox" name="snapOnDrag" id="snapOnDrag">Snap on drag
                 </label>
             </div>
@@ -153,6 +161,7 @@ POSSIBILITY OF SUCH DAMAGE.
             protrusions: true,
             backgroundTransparency: 50,
             thumbnail: false,
+            snap: true,
             snapThreshold: 15,
             snapOnDrag: true,
             presort: false,
@@ -163,6 +172,7 @@ POSSIBILITY OF SUCH DAMAGE.
             protrusions: true,
             backgroundTransparency: 75,
             thumbnail: false,
+            snap: true,
             snapThreshold: 10,
             snapOnDrag: false,
             presort: true,
@@ -173,6 +183,7 @@ POSSIBILITY OF SUCH DAMAGE.
             protrusions: true,
             backgroundTransparency: 100,
             thumbnail: true,
+            snap: true,
             snapThreshold: 10,
             snapOnDrag: false,
             presort: true,
@@ -183,6 +194,7 @@ POSSIBILITY OF SUCH DAMAGE.
             protrusions: false,
             backgroundTransparency: 100,
             thumbnail: true,
+            snap: false,
             snapThreshold: 10,
             snapOnDrag: false,
             presort: false,
@@ -205,6 +217,7 @@ POSSIBILITY OF SUCH DAMAGE.
         initRadio("[name=depth]", settings.config.depth);
         initCheckbox("[name=protrusions]", settings.config.protrusions);
         initCheckbox("[name=rotate]", settings.config.rotate);
+        initCheckbox("[name=snap]", settings.config.snap);
         initCheckbox("[name=snapOnDrag]", settings.config.snapOnDrag);
         initRadio("[name=snapThreshold]", settings.config.snapThreshold);
         initCheckbox("[name=presort]", settings.config.presort);
@@ -225,6 +238,10 @@ POSSIBILITY OF SUCH DAMAGE.
 
     $("[name=rotate]").change(function () {
         sendToDisplay("{\"responseType\":\"rotate\",\"value\":" + $(this).prop('checked') + "}");
+    });
+
+    $("[name=snap]").change(function () {
+        sendToDisplay("{\"responseType\":\"snap\",\"value\":" + $(this).prop('checked') + "}");
     });
 
     $("[name=snapOnDrag]").change(function () {
@@ -259,6 +276,7 @@ POSSIBILITY OF SUCH DAMAGE.
         sendToDisplay("{\"responseType\":\"depth\",\"value\":" + config.depth + "}");
         sendToDisplay("{\"responseType\":\"protrusions\",\"value\":" + config.protrusions + "}");
         sendToDisplay("{\"responseType\":\"rotate\",\"value\":" + config.rotate + "}");
+        sendToDisplay("{\"responseType\":\"snap\",\"value\":" + config.snap + "}");
         sendToDisplay("{\"responseType\":\"snapOnDrag\",\"value\":" + config.snapOnDrag + "}");
         sendToDisplay("{\"responseType\":\"snapThreshold\",\"value\":" + config.snapThreshold + "}");
         sendToDisplay("{\"responseType\":\"presort\",\"value\":" + config.presort + "}");
