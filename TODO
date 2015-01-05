@@ -172,6 +172,7 @@ Display more/all facts                     DONE
 Add space between marriage event and date  DONE
 Filter marriage details                    DONE
 Set max-height on image
+*Ensure all of data fits on the screen
 
 Statistics:
 Implement basic family statistics
@@ -305,7 +306,6 @@ Sliding tile game
 DEMO NOTES
 
 No feedback when something appears on display
-Network issues (work on wifi strength)!!
 Keep display from timing out
 Billion graves for images of tombstones
 

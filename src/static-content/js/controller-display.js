@@ -139,7 +139,7 @@ function getDisplayName() {
 var defaultSettings = {
     display: {
         title: "Display",
-        header: '<img style="width: 50%" src="/media/logo.png" alt="Puyallup Family History Center logo" />',
+        headerFile: 'display-header.html',
         contentPadding: false,
         verbs: {
             standby: function() {
