@@ -24,3 +24,21 @@ CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 -->
+
+<button class="stats-btn btn btn-lg btn-default" data-command="lifespan">Life span</button>
+<button class="stats-btn btn btn-lg btn-default" data-command="familySize">Family size</button>
+<button class="stats-btn btn btn-lg btn-default" data-command="birthCountry">Birth country</button>
+<button class="stats-btn btn btn-lg btn-default" data-command="deathCountry">Death country</button>
+<button class="stats-btn btn btn-lg btn-default" data-command="emmigrantCountry">Emmigrant country</button>
+<button class="stats-btn btn btn-lg btn-default" data-command="immigrantCountry">Immigrant country</button>
+<button class="stats-btn btn btn-lg btn-default" data-command="sourceDestCountry">Source->destination frequency</button>
+<button class="stats-btn btn btn-lg btn-default" data-command="birthCountryMap">Birth country map</button>
+
+<script>
+    ws.socketSend("send-ancestor-stats " + token + " " + displayName + " " + settings.userId);
+    
+    $(".stats-btn").click(function(e) {
+        var command = $(this).attr("data-command");
+        sendToDisplay(JSON.stringify({responseType: command}));
+    })
+</script>

@@ -64,6 +64,22 @@ public class Person {
     public void setRelationship(String relationship) {
         this.relationship = relationship;
     }
+    
+    public Fact getFact(String type) {
+        if (facts == null || type == null) {
+            return null;
+        }
+        
+        Fact selectedFact = null;
+        for (Fact fact : facts) {
+            if (type.equalsIgnoreCase(fact.type)) {
+                selectedFact = fact;
+                break;
+            }
+        }
+        
+        return selectedFact;
+    }
 
     @Override
     public int hashCode() {

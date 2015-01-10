@@ -61,6 +61,7 @@ import org.familysearch.api.client.ft.FamilySearchFamilyTree;
 import org.gedcomx.rs.client.PersonState;
 import org.puyallupfamilyhistorycenter.service.SpringContextInitializer;
 import org.puyallupfamilyhistorycenter.service.cache.Precacher;
+import org.puyallupfamilyhistorycenter.service.models.Statistics;
 import org.puyallupfamilyhistorycenter.service.models.Person;
 import org.puyallupfamilyhistorycenter.service.models.PersonImage;
 
@@ -385,6 +386,27 @@ public class FamilyHistoryCenterSocket {
                     break;
                 }
                 
+                case "get-ancestor-stats": {
+                    token = scanner.next();
+                    String personId = scanner.next();
+                    List<Person> people = personDao.listAncestors(personId, 10, token, true);
+                    
+                    response = getStatisticsResponse(new Statistics(people));
+                    
+                    break;
+                }
+                
+                case "send-ancestor-stats": {
+                    token = scanner.next();
+                    String displayId = scanner.next();
+                    String personId = scanner.next();
+                    List<Person> people = personDao.listAncestors(personId, 10, token, true);
+                    
+                    sendToDisplay(displayId, getStatisticsResponse(new Statistics(people)));
+                    
+                    break;
+                }
+                
                 case "send": {
                     token = scanner.next();
                     String id = scanner.next();
@@ -657,6 +679,10 @@ public class FamilyHistoryCenterSocket {
     protected static String getImagesResponse(List<PersonImage> images) {
         return "{\"responseType\":\"images\",\"images\":"+GSON.toJson(images)+"}";
     }
+
+    protected static String getStatisticsResponse(Statistics statistics) {
+        return "{\"responseType\":\"stats\",\"stats\":"+GSON.toJson(statistics)+"}";
+    }
     
     protected static boolean isDisplayActive(String displayId) {
         boolean alreadyConnected = true;
@@ -672,6 +698,7 @@ public class FamilyHistoryCenterSocket {
         RemoteEndpoint displayEndpoint = remoteDisplays.get(id);
         if (displayEndpoint != null) {
             try {
+                logger.info("Sending '" + message + "' to display " + id);
                 displayEndpoint.sendString(message);
             } catch (Exception e) {
                 throw new IllegalStateException("failed to communicate with display " + id + ": " + e.getMessage());

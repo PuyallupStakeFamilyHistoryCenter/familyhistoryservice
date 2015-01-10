@@ -31,7 +31,6 @@ import java.util.Iterator;
 import java.util.List;
 import org.apache.commons.collections4.IteratorUtils;
 import org.puyallupfamilyhistorycenter.service.models.Person;
-import org.puyallupfamilyhistorycenter.service.models.PersonImage;
 
 /**
  *
@@ -70,7 +69,8 @@ public class PersonDao {
      * Get an iterator over ancestor records for the given person
      * @param personId The person whose ancestry to get
      * @param maxDepth The number of levels to descend into the tree
-     * @param accessToken 
+     * @param accessToken Access token allowing data to be downloaded from FamilySearchOs
+     * @param cacheOnly 
      * @return an iterator over the ancestors of the given person
      */
     public List<Person> listAncestors(String personId, int maxDepth, String accessToken, boolean cacheOnly) {
