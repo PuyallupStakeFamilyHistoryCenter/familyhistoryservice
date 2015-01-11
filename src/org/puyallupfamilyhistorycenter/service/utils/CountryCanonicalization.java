@@ -27,6 +27,7 @@ package org.puyallupfamilyhistorycenter.service.utils;
 
 import java.util.HashMap;
 import java.util.Map;
+import org.apache.commons.lang3.text.WordUtils;
 
 /**
  *
@@ -45,16 +46,17 @@ public class CountryCanonicalization {
             "south carolina", "california", "ca", "nevada", "nv", "arizona", "az",
             "idaho", "id", "washington", "wa", "dc", "washington dc", "iowa", "ia",
             "montana", "mt", "minnesota", "mn", "oregon", "or", "new mexico", "nm",
-            "del", "illn", "colorado", "co", "us", "cn"
+            "del", "illn", "colorado", "co", "us", "cn", "pocatello bannock idaho",
+            "unted states", "wilkes county georgia", "new london county"
         },
         "england", new String[] {
             "eng", "engl", "bristol"
         },
         "denmark", new String[] {
-            "den", "dnmr", "danmark", "denm", "lindelse", "bodilsker"
+            "den", "dnmr", "danmark", "denm", "lindelse", "bodilsker", "odense"
         },
         "sweden", new String[] {
-            "swed", "swdn", "j sweden"
+            "swed", "swdn", "j sweden", "swe", "skonberga ostergot sweden"
         },
         "germany", new String[] {
             "alemania", "deutschland"
@@ -72,7 +74,7 @@ public class CountryCanonicalization {
             "scot", "sctl"
         },
         "wales", new String[] {
-            "wals"
+            "wals", "so wales"
         }
     };
     
@@ -98,6 +100,6 @@ public class CountryCanonicalization {
         if (invertedMappings.containsKey(sanitized)) {
             sanitized = invertedMappings.get(sanitized);
         }
-        return sanitized;
+        return WordUtils.capitalize(sanitized);
     }
 }
