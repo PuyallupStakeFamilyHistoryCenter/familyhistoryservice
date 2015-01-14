@@ -25,14 +25,27 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 -->
 
-<button class="stats-btn btn btn-lg btn-default" data-command="lifespan">Life span</button>
-<button class="stats-btn btn btn-lg btn-default" data-command="familySize">Family size</button>
-<button class="stats-btn btn btn-lg btn-default" data-command="birthCountry">Birth country</button>
-<button class="stats-btn btn btn-lg btn-default" data-command="deathCountry">Death country</button>
-<button class="stats-btn btn btn-lg btn-default" data-command="emmigrantCountry">Emmigrant country</button>
-<button class="stats-btn btn btn-lg btn-default" data-command="immigrantCountry">Immigrant country</button>
-<button class="stats-btn btn btn-lg btn-default" data-command="sourceDestCountry">Source->destination frequency</button>
-<button class="stats-btn btn btn-lg btn-default" data-command="birthCountryMap">Birth country map</button>
+<button class="stats-btn btn btn-lg btn-default" data-command="lifespan" data-type="chart" >Life span</button>
+<button class="stats-btn btn btn-lg btn-default" data-command="familySize" data-type="chart">Family size</button>
+<button class="stats-btn btn btn-lg btn-default" data-command="birthCountry" data-type="chart">Birth country</button>
+<button class="stats-btn btn btn-lg btn-default" data-command="deathCountry" data-type="chart">Death country</button>
+<button class="stats-btn btn btn-lg btn-default" data-command="emmigrantCountry" data-type="chart">Emmigrant birth country</button>
+<button class="stats-btn btn btn-lg btn-default" data-command="immigrantCountry" data-type="chart">Immigrant death country</button>
+<button class="stats-btn btn btn-lg btn-default" data-command="sourceDestCountry" data-type="chart">Source->destination frequency</button>
+<button class="stats-btn btn btn-lg btn-default" data-command="birthCountryMap" data-type="map">Birth country map</button>
+<button class="stats-btn btn btn-lg btn-default" data-command="emmigrantCountryMap" data-type="map">Emmigrant birth country map</button>
+
+<div id="scope-btn-div" class="panel panel-default" style="display: none">
+    <div class="panel-body">
+        <button class="scope-btn btn btn-default" data-command="scopeWorld">World</button>
+        <button class="scope-btn btn btn-default" data-command="scopeNorthAmerica">North America</button>
+        <button class="scope-btn btn btn-default" data-command="scopeSouthAmerica">South America</button>
+        <button class="scope-btn btn btn-default" data-command="scopeEurope">Europe</button>
+        <button class="scope-btn btn btn-default" data-command="scopeAfrica">Africa</button>
+        <button class="scope-btn btn btn-default" data-command="scopeAsia">Asia</button>
+        <button class="scope-btn btn btn-default" data-command="scopeOceania">Oceania</button>
+    </div>
+</div>
 
 <script>
     ws.socketSend("send-ancestor-stats " + token + " " + displayName + " " + settings.userId);
@@ -40,5 +53,16 @@ POSSIBILITY OF SUCH DAMAGE.
     $(".stats-btn").click(function(e) {
         var command = $(this).attr("data-command");
         sendToDisplay(JSON.stringify({responseType: command}));
-    })
+        
+        if ($(this).attr("data-type") === "map") {
+            $("#scope-btn-div").show();
+        } else {
+            $("#scope-btn-div").hide();
+        }
+    });
+    
+    $(".scope-btn").click(function(e) {
+        var command = $(this).attr("data-command");
+        sendToDisplay(JSON.stringify({responseType: command}));
+    });
 </script>

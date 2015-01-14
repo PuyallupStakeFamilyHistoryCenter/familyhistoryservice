@@ -47,19 +47,22 @@ public class CountryCanonicalization {
             "idaho", "id", "washington", "wa", "dc", "washington dc", "iowa", "ia",
             "montana", "mt", "minnesota", "mn", "oregon", "or", "new mexico", "nm",
             "del", "illn", "colorado", "co", "us", "cn", "pocatello bannock idaho",
-            "unted states", "wilkes county georgia", "new london county"
+            "unted states", "wilkes county georgia", "new london county", "va or md",
+            "new hampshire", "british colonial america"
         },
         "england", new String[] {
             "eng", "engl", "bristol"
         },
         "denmark", new String[] {
-            "den", "dnmr", "danmark", "denm", "lindelse", "bodilsker", "odense"
+            "den", "dnmr", "danmark", "denm", "lindelse", "bodilsker", "odense", "viborg",
+            "denmr", "dnemark"
         },
         "sweden", new String[] {
-            "swed", "swdn", "j sweden", "swe", "skonberga ostergot sweden"
+            "swed", "swdn", "j sweden", "swe", "skonberga ostergot sweden",
+            "vastebyhuseby ostergotland sweden"
         },
         "germany", new String[] {
-            "alemania", "deutschland"
+            "alemania", "deutschland", "preussen"
         },
         "canada", new String[] {
             "ontario", "nova scotia"
@@ -75,6 +78,9 @@ public class CountryCanonicalization {
         },
         "wales", new String[] {
             "wals", "so wales"
+        },
+        "ireland", new String[] {
+            "northern ireland"
         }
     };
     
