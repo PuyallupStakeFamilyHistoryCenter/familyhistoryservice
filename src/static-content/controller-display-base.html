@@ -69,6 +69,20 @@ POSSIBILITY OF SUCH DAMAGE.
                 getReady();
             });
         </script>
+        
+        <style>
+            .beacon {
+                z-index: 1000;
+                position: fixed;
+                top: 2%;
+                right: 2%;
+                width: 3%;
+                height: 3%;
+                border-radius: 50%;
+                background-color: red;
+                display: none;
+            }
+        </style>
     </head>
     <body>
         <div class="container" >
@@ -84,5 +98,7 @@ POSSIBILITY OF SUCH DAMAGE.
             <div id="page-footer">
             </div>
         </div>
+            
+        <div class="beacon"></div>
     </body>
 </html>

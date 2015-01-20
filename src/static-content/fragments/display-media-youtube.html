@@ -25,30 +25,28 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 -->
 
-<style>
-    .player {
-        position: fixed;
-        left: 0px;
-        top: 0px;
-        right: 0px;
-        bottom: 0px;
-    }
-</style>
-
-<div id="media-holder" class="player embed-responsive embed-responsive-16by9">
-    <iframe id="player" style="border-style: none"></iframe>
+<div id="media-holder" class="embed-responsive embed-responsive-16by9">
+    <iframe id="player" style="height: 100%; width: 100%; position: fixed; top: 0; left: 0;" type="text/html" src="https://www.youtube.com/embed/-DpJ85617hc?controls=0&disablekb=1&enablejsapi=1&fs=1&modestbranding=1&rel=0" frameborder="0"></iframe>
 </div>
 
 <script>
-    console.info("Starting video display")
     var player, ready;
     var playlist;
     
     settings.local = {
         verbs: {
-            localVideo: function (obj) {
-                console.info("Embedding video from website");
-                if (ready) player.loadVideo(obj);
+            youtube: function (obj) {
+                console.info("Embedding video from YouTube");
+                if (ready) {
+                    playlist = [obj];
+                    playNext();
+                }
+            },
+            composition: function (obj) {
+                if (ready) {
+                    playlist = obj.parts;
+                    playNext();
+                }
             },
             pause: function () {
                 if (ready) player.pauseVideo();
@@ -88,11 +86,58 @@ POSSIBILITY OF SUCH DAMAGE.
                 }
             }
         }
-    };
-    
-    $("#player").load(function() {
-        player = document.getElementById("player").contentWindow;
-        ready = true;
+    }
+
+    $("#player").load(function () {
+        try {
+            //Test if YouTube API already loaded
+            onYouTubeIframeAPIReady();
+        } catch (e) {
+            var tag = document.createElement('script');
+
+            tag.src = "https://www.youtube.com/iframe_api";
+            var player = document.getElementById("player");
+            player.parentNode.insertBefore(tag, player);
+        }
     });
-    $("#player").attr("src", "/static-content/video-player.html");
+
+    function onYouTubeIframeAPIReady() {
+        player = new YT.Player('player', {
+            events: {
+                'onReady': onPlayerReady,
+                'onStateChange': onPlayerStateChange
+            }
+        });
+    }
+    
+    function onPlayerReady(event) {
+        ready = true;
+    }
+    
+    function onPlayerStateChange(event) {
+        switch (event.data) {
+            case YT.PlayerState.ENDED:
+                playNext();
+                break;
+        }
+    }
+    
+    function playNext() {
+        if (playlist && playlist.length > 0) {
+            play(playlist.shift());
+        }
+    }
+    
+    function play(video) {
+        var config = {
+            'videoId': video.id,
+            'startSeconds': video.start,
+            'endSeconds': video.end
+        }
+        if (video.wait) {
+            player.cueVideoById(config);
+        } else {
+            player.loadVideoById(config);
+        }
+    }
 </script>

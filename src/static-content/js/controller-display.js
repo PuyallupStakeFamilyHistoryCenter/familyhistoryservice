@@ -37,7 +37,13 @@ var settings = {
             nav: function(cmd) {
                 navigate(cmd.dest);
             },
-            "user-list": doNothing
+            "user-list": doNothing,
+            identifyDisplay: function() {
+                $(".beacon").show();
+                setTimeout(function() {
+                    $(".beacon").hide();
+                },1000);
+            }
         }
     },
     page: {verbs:{}},
@@ -205,6 +211,19 @@ var defaultSettings = {
         },
         destroyAccessToken: function(userId, pin) {
             ws.socketSend("destroy-access-token " + userId + " " + pin);
+        }
+    },
+    presenter: {
+        title: "Presenter",
+        header: '',
+        headerFile: 'controller-header.html',
+        footerFile: 'controller-footer.html',
+        contentPadding: true,
+        begin: function() {
+            navigate("presenter-attach");
+        },
+        verbs: {
+            
         }
     },
     kiosk: {

@@ -44,30 +44,31 @@ POSSIBILITY OF SUCH DAMAGE.
 </div>
 
 <script>
-    settings.local = {
-        verbs: {
-            videosList: function(obj) {
-                createMediaButtons(obj.videosList);
-            }
-        }
-    }
+    var videos = [
+        {
+            id: "ivuO-0jfYiM",
+            title: "Opening Video",
+            responseType: "youtube"
+        },
+        {
+            id: "GCCIiFij7tg",
+            title: "Closing Video",
+            responseType: "youtube"
+        },
+    ];
     
-    function createMediaButtons(videos) {
-        console.info("Creating media buttons");
-        
-        $("#media-buttons").html("");
-        $.each(videos, function(index, video) {
-            $("#media-buttons").append("<button class='btn btn-lg btn-default media-btn' data-video='" + JSON.stringify(video) + "' >"+video.id+"</button>")
-        });
-
-        $(".media-btn").click(function() {
-            sendToDisplay($(this).attr("data-video"));
-            $("#controls-tab").show().click().addClass("active");
-            $("#media-tab").removeClass("active");
-            $("#pause-btn").show();
-            $("#play-btn").hide();
-        });
-    }
+    console.info("Creating media buttons");
+    $.each(videos, function(index, video) {
+        $("#media-buttons").append("<button class='btn btn-lg btn-default media-btn' data-video='" + JSON.stringify(video) + "' ><span class='btn-nav' style='background-image: url(\"/image-cache?ref=https%3A%2F%2Fimg.youtube.com%2Fvi%2F"+ video.id +"%2Fsddefault.jpg\"); background-repeat: no-repeat; background-attachment: local; background-position: center; background-size:200px 150px '></span></button>")
+    });
+    
+    $(".media-btn").click(function() {
+        sendToDisplay($(this).attr("data-video"));
+        $("#controls-tab").show().click().addClass("active");
+        $("#media-tab").removeClass("active");
+        $("#pause-btn").show();
+        $("#play-btn").hide();
+    });
     
     $("#media-tab").click(function (e) {
         $("#media-buttons").show();
@@ -94,6 +95,4 @@ POSSIBILITY OF SUCH DAMAGE.
     $(".auto-wire").click(function (e) {
         sendToDisplay(JSON.stringify({responseType:$(this).attr("data-action")}));
     });
-    
-    ws.socketSend("listVideos");
 </script>

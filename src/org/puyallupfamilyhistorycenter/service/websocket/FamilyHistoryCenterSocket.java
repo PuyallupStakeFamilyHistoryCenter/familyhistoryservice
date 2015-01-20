@@ -27,6 +27,7 @@
 package org.puyallupfamilyhistorycenter.service.websocket;
 
 import com.google.gson.Gson;
+import java.io.File;
 import org.puyallupfamilyhistorycenter.service.cache.PersonDao;
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -35,6 +36,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -51,6 +53,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.io.filefilter.WildcardFileFilter;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.eclipse.jetty.websocket.api.RemoteEndpoint;
@@ -64,6 +67,7 @@ import org.puyallupfamilyhistorycenter.service.cache.Precacher;
 import org.puyallupfamilyhistorycenter.service.models.Statistics;
 import org.puyallupfamilyhistorycenter.service.models.Person;
 import org.puyallupfamilyhistorycenter.service.models.PersonImage;
+import org.puyallupfamilyhistorycenter.service.models.Video;
 
 /**
  *
@@ -226,6 +230,21 @@ public class FamilyHistoryCenterSocket {
                 case "display-name": {
                     String id = Integer.toHexString(rand.nextInt());
                     response = "{\"responseType\":\"name\",\"name\":\""+id+"\"}";
+                    break;
+                }
+                
+                case "listDisplays": {
+                    response = "{\"responseType\":\"displays\",\"displays\":"+GSON.toJson(remoteDisplays.keySet())+"}";
+                    break;
+                }
+                
+                case "pingDisplay": {
+                    String id = scanner.next();
+                    if (!isDisplayActive(id)) {
+                        response = getErrorResponse("Display " + id + " is not active");
+                    } else {
+                        sendToDisplay(id, getIndentifyDisplayResponse());
+                    }
                     break;
                 }
 
@@ -538,6 +557,18 @@ public class FamilyHistoryCenterSocket {
                     response = generateNewUserListResponse();
                     break;
                 }
+                
+                case "listVideos": {
+                    File videosDir = new File(System.getProperty("user.home") + "/Dropbox/Videos");
+                    String[] videoFiles = videosDir.list(new WildcardFileFilter("*.mp4"));
+                    List<Video> videos = new ArrayList<>(videoFiles.length);
+                    for (String videoFile : videoFiles) {
+                        videos.add(new Video("/videos/" + videoFile));
+                    }
+                    
+                    response = "{\"responseType\":\"videosList\",\"videosList\":" + GSON.toJson(videos) + "}";
+                    break;
+                }
 
                 default:
                     throw new IllegalStateException("unrecognized command '" + message + "'");
@@ -682,6 +713,10 @@ public class FamilyHistoryCenterSocket {
 
     protected static String getStatisticsResponse(Statistics statistics) {
         return "{\"responseType\":\"stats\",\"stats\":"+GSON.toJson(statistics)+"}";
+    }
+    
+    protected static String getIndentifyDisplayResponse() {
+        return "{\"responseType\":\"identifyDisplay\"}";
     }
     
     protected static boolean isDisplayActive(String displayId) {
