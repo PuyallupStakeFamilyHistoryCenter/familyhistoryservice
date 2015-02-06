@@ -237,7 +237,17 @@ var defaultSettings = {
         gotAccessToken: function(userId, userName, pin, accessToken) {
             ws.socketSend("access-token " + userId + " " + encodeURI(userName) + " " + pin + " " + accessToken);
         }
-    }
+    },
+    "change-display-name": {
+        title: "Change display name",
+        headerFile: 'display-header.html',
+        contentPadding: false,
+        verbs: {
+        },
+        begin: function() {
+                navigate("controller-set-display-name");
+        },
+    },
 };
 defaultSettings.games = Object.create(defaultSettings["controller"]);
 defaultSettings.games.begin = function() {

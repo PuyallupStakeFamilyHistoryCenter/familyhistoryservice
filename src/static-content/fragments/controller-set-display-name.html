@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <!--
-Copyright (c) 2014, tibbitts
+Copyright (c) 2015, tibbitts
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -24,7 +24,14 @@ CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 -->
-<div class="alert alert-success" id="display-name-alert">Please connect a controller to '<span id="display-name-output"></span>'</div>
+
+<input type="text" id="display-name-input" />
+<button id="submit" >Change display name</button>
+
 <script>
-    $("#display-name-output").html(displayName);
+    console.info("Starting change display name screen")
+    $("#submit").click(function(e) {
+        displayName = $("#display-name-input").val();
+        $.cookie("display-name", displayName);
+    });
 </script>

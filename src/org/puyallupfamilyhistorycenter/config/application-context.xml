@@ -196,6 +196,10 @@ POSSIBILITY OF SUCH DAMAGE.
                     <property name="replacement" value="/static-content/controller-display-base.html" />
                 </bean>
                 <bean class="org.eclipse.jetty.rewrite.handler.RewritePatternRule">
+                    <property name="pattern" value="/change-display-name" />
+                    <property name="replacement" value="/static-content/controller-display-base.html" />
+                </bean>
+                <bean class="org.eclipse.jetty.rewrite.handler.RewritePatternRule">
                     <property name="pattern" value="/split" />
                     <property name="replacement" value="/static-content/split.html" />
                 </bean>
