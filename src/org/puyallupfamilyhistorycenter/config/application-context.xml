@@ -220,6 +220,10 @@ POSSIBILITY OF SUCH DAMAGE.
         </property>
     </bean>
     
+    <bean id="serverLifecycleManager" class="org.puyallupfamilyhistorycenter.service.ServletLifecycleManager" init-method="start">
+        <property name="server" ref="server" />
+    </bean>
+    
     <!--SSL context factory-->
     <bean id="ssl-context-factory" class="org.eclipse.jetty.util.ssl.SslContextFactory" >
         <property name="keyStorePath" value="keystore" />

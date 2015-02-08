@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, tibbitts
+ * Copyright (c) 2015, tibbitts
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -23,35 +23,13 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-
 package org.puyallupfamilyhistorycenter.service;
-
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationEvent;
-import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
  *
  * @author tibbitts
  */
-
-
-public class SpringContextInitializer {
-    private static final Object lock = new Object();
-    private static ApplicationContext context;
-    
-    public static ApplicationContext getContext() {
-        synchronized (lock) {
-            if (context == null) {
-                context = new ClassPathXmlApplicationContext("classpath:org/puyallupfamilyhistorycenter/config/application-context.xml");
-            }
-        }
-        
-        return context;
-    }
-    
-    public static void resetContext() {
-        ((ConfigurableApplicationContext) context).refresh();
-    }
+public enum LifecycleAction {
+    RESTART,
+    TERMINATE
 }

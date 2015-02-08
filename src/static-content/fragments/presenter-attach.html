@@ -25,7 +25,27 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 -->
 
+<div id="admin-btns">
+    <button class="btn btn-lg btn-danger" id="resetButton" >Restart server</button>
+</div>
 <div id="display-btns"></div>
+<div class="modal fade" id="confirmModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">Reset server...</h4>
+      </div>
+      <div class="modal-body">
+        Do you really want to restart the server? All users will have to log in again and all cached data will be lost
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+        <button id="confirmButton" type="button" class="btn btn-primary">Restart server</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <script>
     settings.local = {
@@ -55,6 +75,15 @@ POSSIBILITY OF SUCH DAMAGE.
             ws.socketSend("pingDisplay " + displayId);
         });
     }
+    
+    $("#resetButton").click(function() {
+        $("#confirmModal").modal();
+    });
+    
+    $("#confirmButton").click(function() {
+        $("#confirmModal").modal("hide");
+        ws.socketSend("restart-server")
+    });
     
     ws.socketSend("listDisplays");
 </script>

@@ -27,9 +27,6 @@
 package org.puyallupfamilyhistorycenter.service;
 
 
-import org.eclipse.jetty.server.Server;
-
-
 
 /**
  *
@@ -37,7 +34,7 @@ import org.eclipse.jetty.server.Server;
  */
 public class FamilyHistoryCacheServlet {
     public static void main(String[] args) throws ClassNotFoundException, InstantiationException, IllegalAccessException, Exception {
-        Server server = SpringContextInitializer.getContext().getBean(Server.class);
-        server.join();
+        SpringContextInitializer.getContext().getBean(ServletLifecycleManager.class);
+        ServletLifecycleManager.join();
     }
 }

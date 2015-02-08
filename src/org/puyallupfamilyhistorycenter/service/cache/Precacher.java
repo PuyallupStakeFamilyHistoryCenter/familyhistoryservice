@@ -139,6 +139,7 @@ public class Precacher {
                         try {
                             Thread.sleep(6000);
                         } catch (InterruptedException e) {
+                            Thread.interrupted();
                         }
                     }
 
@@ -168,9 +169,7 @@ public class Precacher {
     }
 
     public void cancel() {
-        for (Future future : futures) {
-            future.cancel(true);
-        }
+        executor.shutdownNow();
         for (PrecacheListener listener : listeners) {
             listener.onCancel();
         }

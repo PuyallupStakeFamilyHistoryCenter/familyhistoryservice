@@ -43,6 +43,24 @@ var settings = {
                 setTimeout(function() {
                     $(".beacon").hide();
                 },1000);
+            },
+            scheduleReload: function(obj) {
+                var remaining = obj.delay;
+                $("body").append("<div class='modal fade' id='reloadModal' tabindex='-1' role='dialog' aria-labelledby='myModalLabel' aria-hidden='true'><div class='modal-dialog modal-sm'><div class='modal-content'><div class='modal-body'><h3>This page will reload in <span id='reloadTime'></span> seconds</h3></div></div></div></div>");
+                $("#reloadModal").modal({
+                    backdrop: "static",
+                    keyboard: false
+                });
+                var countdownFunction = function() {
+                    if (remaining > 0) {
+                        $("#reloadTime").html(remaining/1000);
+                        setTimeout(countdownFunction,1000);
+                        remaining -= 1000;
+                    } else {
+                        location.reload();
+                    }
+                }
+                countdownFunction();
             }
         }
     },

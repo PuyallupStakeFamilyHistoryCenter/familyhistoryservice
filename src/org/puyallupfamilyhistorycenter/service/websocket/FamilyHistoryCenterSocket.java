@@ -26,6 +26,7 @@
 
 package org.puyallupfamilyhistorycenter.service.websocket;
 
+import org.puyallupfamilyhistorycenter.service.ServletLifecycleManager;
 import com.google.gson.Gson;
 import java.io.File;
 import org.puyallupfamilyhistorycenter.service.cache.PersonDao;
@@ -50,6 +51,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.logging.Level;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 import org.apache.commons.codec.binary.Base64;
@@ -112,6 +114,7 @@ public class FamilyHistoryCenterSocket {
     
     private static final Map<String, RemoteEndpoint> remoteDisplays = new HashMap<>();
     private static final Map<String, RemoteEndpoint> remoteControllers = new HashMap<>();
+    private static final Set<RemoteEndpoint> otherRemotes = new HashSet<>();
     private static final Map<String, RemoteEndpoint> tokenControllerMap = new HashMap<>();
     private static final Map<String, String> tokenUserIdMap = new HashMap<>();
     private static final Map<String, Long> tokenLastUse = new HashMap<>();
@@ -166,8 +169,7 @@ public class FamilyHistoryCenterSocket {
     }
 
     public FamilyHistoryCenterSocket() {
-        String salt = newSalt();
-        userContextMap.put("KWJH-B6Z", new UserContext("KWJH-B6Z", "Guest account", hashPin("1234", salt), null, null));
+        setGuestUser();
     }
     
     @OnWebSocketConnect
@@ -189,6 +191,36 @@ public class FamilyHistoryCenterSocket {
                 case "ping":
                     response = "{\"responseType\":\"pong\"}";
                     break;
+                    
+                case "restart-server": {
+                    Iterator<UserContext> it = userContextMap.values().iterator();
+                    while (it.hasNext()) {
+                        UserContext context = it.next();
+                        //TODO: Invalidate access tokens
+                        if (context.precacher != null) {
+                            context.precacher.cancel();
+                            it.remove();
+                        }
+                    }
+                    
+                    for (RemoteEndpoint endpoint : remoteDisplays.values()) {
+                        scheduleReload(endpoint, 10);
+                    }
+                    remoteDisplays.clear();
+                    
+                    for (RemoteEndpoint endpoint : remoteControllers.values()) {
+                        scheduleReload(endpoint, 15);
+                    }
+                    remoteControllers.clear();
+                    
+                    for (RemoteEndpoint endpoint : otherRemotes) {
+                        scheduleReload(endpoint, 15);
+                    }
+                    otherRemotes.clear();
+                    
+                    ServletLifecycleManager.restart();
+                    break;
+                }
 
                 case "controller": {
                     String id = scanner.next();
@@ -234,6 +266,9 @@ public class FamilyHistoryCenterSocket {
                 }
                 
                 case "listDisplays": {
+                    //TODO: Perhaps move this to a different
+                    otherRemotes.add(session.getRemote());
+                    
                     response = "{\"responseType\":\"displays\",\"displays\":"+GSON.toJson(remoteDisplays.keySet())+"}";
                     break;
                 }
@@ -435,6 +470,8 @@ public class FamilyHistoryCenterSocket {
                 }
                 
                 case "get-app-key": {
+                    otherRemotes.add(session.getRemote());
+                    
                     response = "{\"responseType\":\"app-key\",\"key\":\"" + appKeyConfig.appKey + "\",\"environment\":\"" + appKeyConfig.environment + "\"}";
                     
                     break;
@@ -511,7 +548,7 @@ public class FamilyHistoryCenterSocket {
 
                         @Override
                         public void onCancel() {
-                            progressThrottle.cancel(false);
+                            progressThrottle.cancel(true);
                         }
                     });
                     precacher.precache();
@@ -662,6 +699,11 @@ public class FamilyHistoryCenterSocket {
         }
     }
     
+    protected void setGuestUser() {
+        String salt = newSalt();
+        userContextMap.put("KWJH-B6Z", new UserContext("KWJH-B6Z", "Guest account", hashPin("1234", salt), null, null));
+    }
+    
     protected static String newSalt() {
         byte[] salt = new byte[16];
         rand.nextBytes(salt);
@@ -693,6 +735,14 @@ public class FamilyHistoryCenterSocket {
         
         String secondHash = hashPin(pin, salt, iterations);
         return secondHash.equals(hashedPin);
+    }
+
+    private void scheduleReload(RemoteEndpoint endpoint, int delay) {
+        try {
+            endpoint.sendString("{\"responseType\":\"scheduleReload\",\"delay\":"+(delay*1000)+"}");
+        } catch (IOException ex) {
+            //DO NOTHING
+        }
     }
     
     protected static String getErrorResponse(String message) {
