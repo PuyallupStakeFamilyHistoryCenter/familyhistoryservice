@@ -106,7 +106,7 @@ public class PersonDaoTest {
     @Test
     public void testTraverseAncestors() {
         System.out.println("testTraverseAncestors");
-        List<Person> people = dao.listAncestors("KWCB-HZV", 10, "");
+        List<Person> people = dao.listAncestors("KWCB-HZV", 10, "", false);
         assertIdsEqual(ancestors, people);
     }
 

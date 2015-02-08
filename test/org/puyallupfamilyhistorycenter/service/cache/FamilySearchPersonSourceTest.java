@@ -84,7 +84,7 @@ public class FamilySearchPersonSourceTest {
      */
     @Test
     public void testFormatDate() {
-        assertEquals(expected, FamilySearchPersonSource.formatDate(input));
+        assertEquals(expected, FamilySearchPersonSource.formatDate(input).formatted);
     }
     
 }

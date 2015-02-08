@@ -262,7 +262,7 @@ public class FamilySearchPersonSource implements Source<Person> {
         }
     }
     
-    private static class ParsedDate {
+    public static class ParsedDate {
         public final Integer year;
         public final String formatted;
 
