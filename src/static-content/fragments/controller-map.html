@@ -84,18 +84,6 @@ POSSIBILITY OF SUCH DAMAGE.
     $("[name=zoom]").change(function (e) {
         sendZoom($(this).val());
     });
-//    $("#zoom-out-btn").click(function (e) {
-//        sendToDisplay("{\"responseType\":\"zoom-out\"}");
-//    });
-//    $("#zoom-in-btn").click(function (e) {
-//        sendToDisplay("{\"responseType\":\"zoom-in\"}");
-//    });
-//    $("#retreat-tour-btn").click(function (e) {
-//        sendToDisplay("{\"responseType\":\"retreatTour\"}");
-//    });
-//    $("#advance-tour-btn").click(function (e) {
-//        sendToDisplay("{\"responseType\":\"advanceTour\"}");
-//    });
     
     function sendZoom(zoom) {
         sendToDisplay(JSON.stringify({responseType:"zoom", zoom: zoom}));

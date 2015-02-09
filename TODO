@@ -11,6 +11,7 @@ Delete access token on log out             DONE
     allow client-side caching (static-resources images) DONE
     allow client-side caching (image-cache) DONE
     add server threads
+*Send summary email on logout
 ?Add method for authenticating with devices
 
 
@@ -34,6 +35,7 @@ Retire websocket instance if precache event fails to send DONE
 Progress bar should reset when switch user DONE
 Progress bar should change color when past 4 generations DONE
 Implement listDescendants DONE
+*Mine for ordinances
 *Speed up caching
     Add thread(s)                          DONE
     Use getAncestory function to get several generations at once
@@ -194,6 +196,7 @@ Allow selection of people                  DONE
 More advanced duplicate answer detection   DONE
 Add loading animation                      DONE
 Read questions and answers separately      DONE
+Give relationship to current person        DONE
 *Add more questions
 *Image questions no longer appear (image URL contains '.', which is reserved)
 Difficulty levels
@@ -257,6 +260,7 @@ Add 'report a problem' button for bug reports
 
 Display:
 *Experiment with setting font sizes with vh,vw,vmin,and vmax css units (adaptive display sizing)
+Fade out mouse pointer
 
 Kiosk:
 Show FS permissions dialog                 DONE
@@ -306,30 +310,18 @@ Sliding tile game
 DEMO NOTES
 
 No feedback when something appears on display
-Keep display from timing out
-Billion graves for images of tombstones
 
 Logging in is hard
 Display doesn't work well on a wide screen
 Display text is too small
 Children in person-details aren't sorted
 Give some context for the person
-In quiz, give relationship
-Which of the following is one of your great*grandparents?
-Map: show overview of all events at end
-Map context with zoom
-Don't override manual zoom level
 Give worksheet with scavenger hunt questions
-Which ancestors are immigrants (born in one country, died in another)?
 Go straight to controls form
-Horizontal scrolling on iPad
-Fade out mouse pointer on display
 
 Fix logging in via iPad
-Dismiss popup in maps (via controller)
 Auto-reconnect login screen
 
 Meeting notes:
 Register IP: 10.154.51.1
 Map should begin on world map
-Mine family tree for people who need ordinances; send email
