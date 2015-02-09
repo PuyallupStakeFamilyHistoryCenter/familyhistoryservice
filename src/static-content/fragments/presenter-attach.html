@@ -25,10 +25,34 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 -->
 
-<div id="admin-btns">
-    <button class="btn btn-lg btn-danger" id="resetButton" >Restart server</button>
+<div class="row">
+    <div class="col-md-6">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">Displays</h3>
+            </div>
+            <div class="panel-body" id="display-btns"></div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">Users</h3>
+            </div>
+            <div class="panel-body" id="user-btns"></div>
+        </div>
+    </div>
 </div>
-<div id="display-btns"></div>
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title">Admin</h3>
+    </div>
+    <div class="panel-body" id="admin-btns">
+        <button class="btn btn-lg btn-danger" id="resetButton" >Restart server</button>
+    </div>
+</div>
+
+
 <div class="modal fade" id="confirmModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -53,6 +77,10 @@ POSSIBILITY OF SUCH DAMAGE.
             displays: function(obj) {
                 var displays = obj.displays;
                 setupDisplayButtons(displays);
+            },
+            "user-list": function(obj) {
+                var users = obj.users;
+                setupUserButtons(users);
             }
         }
     }
@@ -76,6 +104,19 @@ POSSIBILITY OF SUCH DAMAGE.
         });
     }
     
+    function setupUserButtons(users) {
+        $("#user-btns").html();
+        
+        $.each(users, function(index, user) {
+            $("#user-btns").append("<div><button class='btn btn-lg btn-default user-btn' data-user='"+user.id+"'>" + user.name + "</button></div>")
+        })
+        
+        $(".user-btn").click(function() {
+            var userId = $(this).attr("data-user");
+            navigate("presenter-user-details?user-id=" + userId);
+        });
+    }
+    
     $("#resetButton").click(function() {
         $("#confirmModal").modal();
     });
@@ -85,5 +126,7 @@ POSSIBILITY OF SUCH DAMAGE.
         ws.socketSend("restart-server")
     });
     
+    setHeaderName("Presenter")
     ws.socketSend("listDisplays");
+    ws.socketSend("list-current-users");
 </script>
