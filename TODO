@@ -292,7 +292,6 @@ Figure out why log4j & guava via Ivy aren't working
 Move css files into folder
 Move test files into folder
 Move these TODOs to the shared task board
-Show and hide controller in split mode should respond to swipe gesture
 Get unit tests working again
 Add search feature (to search for ancestors)
 Allow members to see ordinance information
@@ -306,7 +305,7 @@ Email:
 Test email with real server
 Get email address at login                 DONE
 Comb tree for waiting ancestors
-Send email at log-off
+Send email at log-off                      DONE
 Make email text configurable
 ?Allow saving and sending attachments
 ?Save and send quiz scores (and perhaps suggest areas of study)

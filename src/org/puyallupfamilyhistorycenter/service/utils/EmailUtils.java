@@ -67,7 +67,7 @@ public class EmailUtils {
                               emailAddress);
             msg.setSubject("Thanks for visiting!");
             msg.setSentDate(new Date());
-            msg.setText(buildFinalEmailBody(personName, prospects));
+            msg.setContent(buildFinalEmailBody(personName, prospects), "text/html");
             Transport.send(msg);
         } catch (MessagingException mex) {
             System.out.println("send failed, exception: " + mex);
