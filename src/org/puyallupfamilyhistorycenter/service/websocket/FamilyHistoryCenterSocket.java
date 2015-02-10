@@ -63,13 +63,13 @@ import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.*;
 import org.familysearch.api.client.UserState;
 import org.familysearch.api.client.ft.FamilySearchFamilyTree;
-import org.gedcomx.rs.client.PersonState;
 import org.puyallupfamilyhistorycenter.service.SpringContextInitializer;
 import org.puyallupfamilyhistorycenter.service.cache.Precacher;
 import org.puyallupfamilyhistorycenter.service.models.Statistics;
 import org.puyallupfamilyhistorycenter.service.models.Person;
 import org.puyallupfamilyhistorycenter.service.models.PersonImage;
 import org.puyallupfamilyhistorycenter.service.models.Video;
+import org.puyallupfamilyhistorycenter.service.utils.EmailUtils;
 
 /**
  *
@@ -158,7 +158,9 @@ public class FamilyHistoryCenterSocket {
                     if (entry.getValue().lastUsed + userInactivityTimeout < System.currentTimeMillis()) {
                         String userId = entry.getKey();
                         // TODO: Figure out how to invalidate access token
-                        String accessToken = userContextMap.remove(userId).accessToken;
+                        String accessToken = entry.getValue().accessToken;
+                        
+                        sendFinalEmail(userId);
                         
                         it.remove();
                     }
@@ -577,6 +579,7 @@ public class FamilyHistoryCenterSocket {
                     UserContext userContext = userContextMap.get(userId);
                     if (userContext != null && validatePin(pin, userContext.hashedPin)) {
                         // TODO: Revoke access token
+                        sendFinalEmail(userId);
                         userContextMap.remove(userId);
                         for (String t : userContext.tokens) {
                             deactivateUserToken(t, "User " + userContext.userName + " logged out of the system");
@@ -701,6 +704,11 @@ public class FamilyHistoryCenterSocket {
         } catch (Exception e) {
             //Eat these exceptions
         }
+    }
+
+    private static void sendFinalEmail(String userId) {
+        UserContext context = userContextMap.get(userId);
+        EmailUtils.sendFinalEmail(context.userName, context.userEmail, null);
     }
     
     protected void setGuestUser() {
