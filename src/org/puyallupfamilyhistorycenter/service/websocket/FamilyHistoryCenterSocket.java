@@ -51,7 +51,6 @@ import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.logging.Level;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 import org.apache.commons.codec.binary.Base64;
@@ -62,6 +61,7 @@ import org.eclipse.jetty.websocket.api.RemoteEndpoint;
 
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.*;
+import org.familysearch.api.client.UserState;
 import org.familysearch.api.client.ft.FamilySearchFamilyTree;
 import org.gedcomx.rs.client.PersonState;
 import org.puyallupfamilyhistorycenter.service.SpringContextInitializer;
@@ -90,17 +90,19 @@ public class FamilyHistoryCenterSocket {
     private static final class UserContext {
         public final String userName;
         public final String userId;
+        public final String userEmail;
         public final String hashedPin;
         public final String accessToken;
         public long lastUsed;
         public final Set<String> tokens; //TODO: Rename to prevent confusion with access token
         public final Precacher precacher;
-        public UserContext(String userId, String userName, String hashedPin, String accessToken, Precacher precacher) {
-            this(userId, userName, hashedPin, accessToken, precacher, new HashSet<String>());
+        public UserContext(String userId, String userName, String userEmail, String hashedPin, String accessToken, Precacher precacher) {
+            this(userId, userName, userEmail, hashedPin, accessToken, precacher, new HashSet<String>());
         }
-        public UserContext(String userId, String userName, String hashedPin, String accessToken, Precacher precacher, Set<String> tokens) {
+        public UserContext(String userId, String userName, String userEmail, String hashedPin, String accessToken, Precacher precacher, Set<String> tokens) {
             this.userName = userName;
             this.userId = userId;
+            this.userEmail = userEmail;
             this.hashedPin = hashedPin;
             this.accessToken = accessToken;
             this.lastUsed = System.currentTimeMillis();
@@ -486,11 +488,13 @@ public class FamilyHistoryCenterSocket {
 
                     FamilySearchFamilyTree tree = FamilyHistoryFamilyTree.getInstance(accessToken);
 
-                    PersonState person = tree.readPersonForCurrentUser();
+                    UserState user = tree.readCurrentUser();
 
-                    if (person == null || !person.getSelfUri().getPath().endsWith(userId)) {
+                    if (user == null || !user.getSelfUri().getPath().endsWith(userId)) {
                         throw new IllegalStateException("Access token does not match userId");
                     }
+                    
+                    String email = user.getUser().getEmail();
                     
                     //TODO: Factor this out into separate class (it's pretty complicated
                     final String finalUserId = userId;
@@ -560,7 +564,7 @@ public class FamilyHistoryCenterSocket {
                             tokens = oldContext.tokens;
                         }
                     }
-                    userContextMap.put(userId, new UserContext(userId, userName, pin, accessToken, precacher, tokens));
+                    userContextMap.put(userId, new UserContext(userId, userName, email, pin, accessToken, precacher, tokens));
                     
                     resendUserListToControllers();
                     break;
@@ -701,7 +705,7 @@ public class FamilyHistoryCenterSocket {
     
     protected void setGuestUser() {
         String salt = newSalt();
-        userContextMap.put("KWJH-B6Z", new UserContext("KWJH-B6Z", "Guest account", hashPin("1234", salt), null, null));
+        userContextMap.put("KWJH-B6Z", new UserContext("KWJH-B6Z", "Guest account", null, hashPin("1234", salt), null, null));
     }
     
     protected static String newSalt() {
