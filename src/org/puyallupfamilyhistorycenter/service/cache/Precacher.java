@@ -27,6 +27,8 @@ package org.puyallupfamilyhistorycenter.service.cache;
 
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -41,6 +43,7 @@ import org.gedcomx.rs.client.PersonState;
 import org.puyallupfamilyhistorycenter.service.SpringContextInitializer;
 import org.puyallupfamilyhistorycenter.service.models.Person;
 import org.puyallupfamilyhistorycenter.service.models.PersonReference;
+import org.puyallupfamilyhistorycenter.service.models.PersonTemple;
 import org.puyallupfamilyhistorycenter.service.websocket.FamilyHistoryFamilyTree;
 
 /**
@@ -50,10 +53,12 @@ import org.puyallupfamilyhistorycenter.service.websocket.FamilyHistoryFamilyTree
 public class Precacher {
     private static final Logger logger = Logger.getLogger(Precacher.class);
     private static final Source<Person> source;
+    private static final Source<PersonTemple> templeSource;
     private static final ExecutorService executor = Executors.newCachedThreadPool();
 
     static {
         source = (Source<Person>) SpringContextInitializer.getContext().getBean("in-memory-source");
+        templeSource = (Source<PersonTemple>) SpringContextInitializer.getContext().getBean("temple-source");
     }
 
     private static class PrecacheObject {
@@ -71,12 +76,14 @@ public class Precacher {
     private final int maxDepth;
     private final Set<Future> futures;
     private final Set<PrecacheListener> listeners;
+    private final List<PersonTemple> prospects;
 
     public Precacher(String accessToken, int maxDepth) {
         this.accessToken = accessToken;
         this.maxDepth = maxDepth;
         this.futures = new HashSet<>();
         this.listeners = new HashSet<>();
+        this.prospects = new LinkedList<>();
     }
 
     public void precache() {
@@ -118,6 +125,14 @@ public class Precacher {
                                     leafNodes.add(precacheObject);
                                 }
                                 
+                                PersonTemple personTemple = templeSource.get(precacheObject.id, accessToken);
+                                if (personTemple.hasOrdinancesReady()) {
+                                    prospects.add(personTemple);
+                                } 
+                                
+                                //TODO: User the temple source to get ordinance info and
+                                //      add prospects
+                                
                                 int totalPrecachedValue = totalPrecached.incrementAndGet();
                                 int queueSize = frontier.size();
                                 int currentGeneration = precacheObject.depth;
@@ -143,6 +158,7 @@ public class Precacher {
                         }
                     }
 
+                    //TODO: Use depth-first search to find people with unfinished ordinances
     //                    while(!leafNodes.isEmpty()) {
     //                        PrecacheObject precacheObject = leafNodes.remove();
     //                        currentLeafs.remove(precacheObject.id);
@@ -200,5 +216,9 @@ public class Precacher {
             this.estimatedUnvisited = estimatedUnvisited;
             this.currentGeneration = currentGeneration;
         }
+    }
+    
+    public List<PersonTemple> getProspects() {
+        return Collections.unmodifiableList(prospects);
     }
 }

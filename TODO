@@ -306,6 +306,7 @@ Test email with real server
 Get email address at login                 DONE
 Comb tree for waiting ancestors
 Send email at log-off                      DONE
+Fix prospect URL
 Make email text configurable
 ?Allow saving and sending attachments
 ?Save and send quiz scores (and perhaps suggest areas of study)

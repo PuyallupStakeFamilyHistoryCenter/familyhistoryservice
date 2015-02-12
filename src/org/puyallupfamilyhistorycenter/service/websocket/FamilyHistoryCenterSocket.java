@@ -708,7 +708,7 @@ public class FamilyHistoryCenterSocket {
 
     private static void sendFinalEmail(String userId) {
         UserContext context = userContextMap.get(userId);
-        EmailUtils.sendFinalEmail(context.userName, context.userEmail, null);
+        EmailUtils.sendFinalEmail(context.userName, context.userEmail, context.precacher.getProspects());
     }
     
     protected void setGuestUser() {

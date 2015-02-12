@@ -35,6 +35,7 @@ import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.MimeMessage;
 import org.puyallupfamilyhistorycenter.service.models.Person;
+import org.puyallupfamilyhistorycenter.service.models.PersonTemple;
 
 /**
  *
@@ -58,7 +59,7 @@ public class EmailUtils {
     }
 
     
-    public static void sendFinalEmail(String personName, String emailAddress, Iterable<Person> prospects) {
+    public static void sendFinalEmail(String personName, String emailAddress, Iterable<PersonTemple> prospects) {
         
         try {
             MimeMessage msg = new MimeMessage(session);
@@ -74,10 +75,12 @@ public class EmailUtils {
         }
     }
     
-    protected static String buildFinalEmailBody(String personName, Iterable<Person> prospects) {
+    protected static String buildFinalEmailBody(String personName, Iterable<PersonTemple> prospects) {
         StringBuilder builder = new StringBuilder();
         //TODO: Make this configurable
-        builder.append("<p>Dear " + personName + ",</p>"
+        builder.append("<p>Dear ")
+                .append(personName)
+                .append(",</p>"
                 + "<p>Thank you for visiting the Puyallup Stake Family History Center Discovery Room. "
                 + "We hope that you have been inspired to learn more about your family and participate "
                 + "in family history work.</p>"
@@ -88,14 +91,18 @@ public class EmailUtils {
         if (prospects != null) {
             boolean firstProspect = true;
             
-            for (Person prospect : prospects) {
+            for (PersonTemple prospect : prospects) {
                 if (firstProspect) {
                     builder.append("<p>While scanning through your family tree we noticed the following members "
                             + "of your family whose temple work does not appear to be finished. Please consider "
                             + "helping fix that.</p><ul>");
                     firstProspect = false;
                 }
-                builder.append("<li><a href='https://familysearch.org/"+prospect.id+"'>"+prospect.name+"</a></li>");
+                builder.append("<li><a href='https://familysearch.org/tree/#view=ancestor&person=")
+                        .append(prospect.id)
+                        .append("'>")
+                        .append(prospect.name)
+                        .append("</a></li>");
             }
             
             if (!firstProspect) {
