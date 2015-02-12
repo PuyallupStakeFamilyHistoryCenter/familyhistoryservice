@@ -63,6 +63,7 @@ import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.*;
 import org.familysearch.api.client.UserState;
 import org.familysearch.api.client.ft.FamilySearchFamilyTree;
+import org.gedcomx.rs.client.PersonState;
 import org.puyallupfamilyhistorycenter.service.SpringContextInitializer;
 import org.puyallupfamilyhistorycenter.service.cache.Precacher;
 import org.puyallupfamilyhistorycenter.service.models.Statistics;
@@ -490,11 +491,13 @@ public class FamilyHistoryCenterSocket {
 
                     FamilySearchFamilyTree tree = FamilyHistoryFamilyTree.getInstance(accessToken);
 
-                    UserState user = tree.readCurrentUser();
+                    PersonState person = tree.readPersonForCurrentUser();
 
-                    if (user == null || !user.getSelfUri().getPath().endsWith(userId)) {
+                    if (person == null || !person.getSelfUri().getPath().endsWith(userId)) {
                         throw new IllegalStateException("Access token does not match userId");
                     }
+                    
+                    UserState user = tree.readCurrentUser();
                     
                     String email = user.getUser().getEmail();
                     

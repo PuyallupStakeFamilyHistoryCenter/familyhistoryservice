@@ -34,6 +34,7 @@ import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.MimeMessage;
+import org.apache.log4j.Logger;
 import org.puyallupfamilyhistorycenter.service.models.PersonTemple;
 
 /**
@@ -41,6 +42,7 @@ import org.puyallupfamilyhistorycenter.service.models.PersonTemple;
  * @author tibbitts
  */
 public class EmailUtils {
+    private static final Logger logger = Logger.getLogger(EmailUtils.class);
     private static final Properties props = new Properties();
     private static final Session session;
     static {
@@ -69,6 +71,7 @@ public class EmailUtils {
             msg.setSentDate(new Date());
             msg.setContent(buildFinalEmailBody(personName, prospects), "text/html");
             Transport.send(msg);
+            logger.info("Sent email to " + personName + " at " + emailAddress);
         } catch (MessagingException mex) {
             System.out.println("send failed, exception: " + mex);
         }

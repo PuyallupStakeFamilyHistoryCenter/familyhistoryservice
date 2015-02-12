@@ -67,6 +67,8 @@ POSSIBILITY OF SUCH DAMAGE.
         <constructor-arg ref="in-memory-source" />
     </bean>
     
+    <bean id="temple-source" class="org.puyallupfamilyhistorycenter.service.cache.FamilySearchPersonTempleSource" />
+    
     <!--Web socket-->
     <bean id="web-socket-handler" class="org.puyallupfamilyhistorycenter.service.websocket.FamilyHistoryCenterWebSocketHandler" />
     <bean id="web-socket-resource" class="org.eclipse.jetty.util.resource.Resource" factory-method="newResource" >

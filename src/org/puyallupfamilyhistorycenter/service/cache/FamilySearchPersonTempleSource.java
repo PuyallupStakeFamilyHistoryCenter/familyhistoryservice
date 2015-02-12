@@ -64,7 +64,7 @@ public class FamilySearchPersonTempleSource implements Source<PersonTemple> {
     @Override
     public PersonTemple get(String id, String accessToken) {
         try {
-            URL url = new URL("https://familysearch.org/tree-data/reservations/person/"+id+"/ordinances?_=1423624410559&locale=en&owner=MMJ3-XMN&restrictOrdinancesToImmediateFamilyEx=false&tz=480");
+            URL url = new URL("https://familysearch.org/tree-data/reservations/person/"+id+"/ordinances?_=1423624410559&locale=en&owner=MMJ3-XMN&restrictOrdinancesToImmediateFamilyEx=false&tz=480&access_token="+accessToken);
             HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
 //            conn.addRequestProperty("Connection", "keep-alive");
             conn.addRequestProperty("Accept", "application/json, text/plain, */*");

@@ -61,7 +61,7 @@ public class FamilySearchPersonSource implements Source<Person> {
     @Override
     public Person get(String personId, String accessToken) {
         try {
-            //TODO: See if we can cache this FamilySearchFmailyTree instance
+            //TODO: See if we can cache this FamilySearchFamilyTree instance
             FamilySearchFamilyTree ft = FamilyHistoryFamilyTree.getInstance(accessToken);
             FamilyTreePersonState state = ft.readPersonById(personId);
 
