@@ -36,9 +36,6 @@ import static org.junit.Assert.*;
 public class PersonTempleTest {
 
     String responseWithReadyOrdinances = "{\n"
-            + "    \"status\": \"OK\",\n"
-            + "    \"statusText\": null,\n"
-            + "    \"data\": {\n"
             + "        \"id\": \"LJP7-JNK\",\n"
             + "        \"name\": \"Arthur G Ellis\",\n"
             + "        \"givenName\": \"Arthur G\",\n"
@@ -268,14 +265,9 @@ public class PersonTempleTest {
             + "            }\n"
             + "        ],\n"
             + "        \"hasPossibleDuplicates\": null\n"
-            + "    },\n"
-            + "    \"statuses\": null\n"
             + "}";
 
     String responseWithRequiresPermission = "{\n"
-            + "    \"status\": \"OK\",\n"
-            + "    \"statusText\": null,\n"
-            + "    \"data\": {\n"
             + "        \"id\": \"LJP7-JNK\",\n"
             + "        \"name\": \"Arthur G Ellis\",\n"
             + "        \"givenName\": \"Arthur G\",\n"
@@ -505,14 +497,9 @@ public class PersonTempleTest {
             + "            }\n"
             + "        ],\n"
             + "        \"hasPossibleDuplicates\": null\n"
-            + "    },\n"
-            + "    \"statuses\": null\n"
             + "}";
 
-    String responseWithClaimedOrdinances = "    {\n"
-            + "        \"status\": \"OK\",\n"
-            + "        \"statusText\": null,\n"
-            + "        \"data\": {\n"
+    String responseWithClaimedOrdinances = "{\n"
             + "            \"id\": \"LJP7-JNK\",\n"
             + "            \"name\": \"Arthur G Ellis\",\n"
             + "            \"givenName\": \"Arthur G\",\n"
@@ -742,14 +729,9 @@ public class PersonTempleTest {
             + "                }\n"
             + "            ],\n"
             + "            \"hasPossibleDuplicates\": null\n"
-            + "        },\n"
-            + "        \"statuses\": null\n"
             + "    }";
 
     String responseWithCompletedOrdinances = "{\n"
-            + "    \"status\": \"OK\",\n"
-            + "    \"statusText\": null,\n"
-            + "    \"data\": {\n"
             + "        \"id\": \"KCS5-8CD\",\n"
             + "        \"name\": \"George Washington &quot;GW&quot; Neely Nealy\",\n"
             + "        \"givenName\": \"George Washington &quot;GW&quot;\",\n"
@@ -1049,24 +1031,22 @@ public class PersonTempleTest {
             + "            }\n"
             + "        ],\n"
             + "        \"hasPossibleDuplicates\": null\n"
-            + "    },\n"
-            + "    \"statuses\": null\n"
             + "}";
 
     private static Gson GSON = new Gson();
     
     @Test
     public void testFromJson() {
-        PersonTemple pt = GSON.fromJson(responseWithReadyOrdinances, PersonTempleResponse.class).data;
+        PersonTemple pt = GSON.fromJson(responseWithReadyOrdinances, PersonTemple.class);
         assertTrue(pt.hasOrdinancesReady());
         
-        pt = GSON.fromJson(responseWithClaimedOrdinances, PersonTempleResponse.class).data;
+        pt = GSON.fromJson(responseWithClaimedOrdinances, PersonTemple.class);
         assertFalse(pt.hasOrdinancesReady());
         
-        pt = GSON .fromJson(responseWithCompletedOrdinances, PersonTempleResponse.class).data;
+        pt = GSON .fromJson(responseWithCompletedOrdinances, PersonTemple.class);
         assertFalse(pt.hasOrdinancesReady());
         
-        pt = GSON .fromJson(responseWithRequiresPermission, PersonTempleResponse.class).data;
+        pt = GSON .fromJson(responseWithRequiresPermission, PersonTemple.class);
         assertFalse(pt.hasOrdinancesReady());
     }
 

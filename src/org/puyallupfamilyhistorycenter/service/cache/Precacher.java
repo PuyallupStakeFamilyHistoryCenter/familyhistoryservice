@@ -126,12 +126,9 @@ public class Precacher {
                                 }
                                 
                                 PersonTemple personTemple = templeSource.get(precacheObject.id, accessToken);
-                                if (personTemple.hasOrdinancesReady()) {
+                                if (personTemple != null && personTemple.hasOrdinancesReady()) {
                                     prospects.add(personTemple);
                                 } 
-                                
-                                //TODO: User the temple source to get ordinance info and
-                                //      add prospects
                                 
                                 int totalPrecachedValue = totalPrecached.incrementAndGet();
                                 int queueSize = frontier.size();
