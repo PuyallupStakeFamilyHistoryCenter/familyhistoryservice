@@ -25,12 +25,12 @@
  */
 package org.puyallupfamilyhistorycenter.service.utils;
 
+import com.google.gson.Gson;
 import java.util.ArrayList;
 import java.util.Arrays;
 import org.junit.Test;
 import static org.junit.Assert.*;
-import org.puyallupfamilyhistorycenter.service.models.Person;
-import org.puyallupfamilyhistorycenter.service.models.PersonBuilder;
+import org.puyallupfamilyhistorycenter.service.models.PersonTemple;
 
 /**
  *
@@ -53,22 +53,22 @@ public class EmailUtilsTest {
     public void testBuildFinalEmailBodyEmptyProspects() {
         String expected = "<p>Dear Graham Tibbitts,</p><p>Thank you for visiting the Puyallup Stake Family History Center Discovery Room. We hope that you have been inspired to learn more about your family and participate in family history work.</p><p>There are several classes and workshops available at the Center to teach to how to work in the different aspects of family history, like research or indexing. Check out the class schedule and sign up for any that interest you.</p><p>Sincerely,</p><p>The staff at the Puyallup Stake Family History Center</p>";
         
-        //String actual = EmailUtils.buildFinalEmailBody("Graham Tibbitts", new ArrayList<Person>());
-//        
-//        System.out.println(actual);
-//        
-//        assertEquals(expected, actual);
+        String actual = EmailUtils.buildFinalEmailBody("Graham Tibbitts", new ArrayList<PersonTemple>());
+        
+        System.out.println(actual);
+        
+        assertEquals(expected, actual);
     }
     
     @Test
     public void testBuildFinalEmailBodyWithProspects() {
         String expected = "<p>Dear Graham Tibbitts,</p><p>Thank you for visiting the Puyallup Stake Family History Center Discovery Room. We hope that you have been inspired to learn more about your family and participate in family history work.</p><p>There are several classes and workshops available at the Center to teach to how to work in the different aspects of family history, like research or indexing. Check out the class schedule and sign up for any that interest you.</p><p>While scanning through your family tree we noticed the following members of your family whose temple work does not appear to be finished. Please consider helping fix that.</p><ul><li><a href='https://familysearch.org/tree/#view=ancestor&person=FDU-2NQQ'>Theodore Tarkin</a></li></ul><p>Sincerely,</p><p>The staff at the Puyallup Stake Family History Center</p>";
         
-        //String actual = EmailUtils.buildFinalEmailBody("Graham Tibbitts", Arrays.asList(new PersonBuilder().withName("Theodore Tarkin").withGender("MALE").withId("FDU-2NQQ").build()));
-//        
-//        System.out.println(actual);
-//        
-//        assertEquals(expected, actual);
+        String actual = EmailUtils.buildFinalEmailBody("Graham Tibbitts", Arrays.asList(new Gson().fromJson("{\"name\":\"Theodore Tarkin\",\"id\":\"FDU-2NQQ\"}", PersonTemple.class)));
+        
+        System.out.println(actual);
+        
+        assertEquals(expected, actual);
     }
     
 }

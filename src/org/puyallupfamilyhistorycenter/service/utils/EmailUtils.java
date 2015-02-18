@@ -35,6 +35,7 @@ import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.MimeMessage;
 import org.apache.log4j.Logger;
+import org.puyallupfamilyhistorycenter.service.ApplicationProperties;
 import org.puyallupfamilyhistorycenter.service.models.PersonTemple;
 
 /**
@@ -63,15 +64,17 @@ public class EmailUtils {
     public static void sendFinalEmail(String personName, String emailAddress, Iterable<PersonTemple> prospects) {
         
         try {
-            MimeMessage msg = new MimeMessage(session);
-            msg.setFrom();
-            msg.setRecipients(Message.RecipientType.TO,
-                              emailAddress);
-            msg.setSubject("Thanks for visiting!");
-            msg.setSentDate(new Date());
-            msg.setContent(buildFinalEmailBody(personName, prospects), "text/html");
-            Transport.send(msg);
-            logger.info("Sent email to " + personName + " at " + emailAddress);
+            if (ApplicationProperties.enableEmail()) {
+                MimeMessage msg = new MimeMessage(session);
+                msg.setFrom();
+                msg.setRecipients(Message.RecipientType.TO,
+                                  emailAddress);
+                msg.setSubject("Thanks for visiting!");
+                msg.setSentDate(new Date());
+                msg.setContent(buildFinalEmailBody(personName, prospects), "text/html");
+                Transport.send(msg);
+                logger.info("Sent email to " + personName + " at " + emailAddress);
+            }
         } catch (MessagingException mex) {
             System.out.println("send failed, exception: " + mex);
         }
@@ -80,24 +83,21 @@ public class EmailUtils {
     protected static String buildFinalEmailBody(String personName, Iterable<PersonTemple> prospects) {
         StringBuilder builder = new StringBuilder();
         //TODO: Make this configurable
-        builder.append("<p>Dear ")
-                .append(personName)
-                .append(",</p>"
-                + "<p>Thank you for visiting the Puyallup Stake Family History Center Discovery Room. "
-                + "We hope that you have been inspired to learn more about your family and participate "
-                + "in family history work.</p>"
-                + "<p>There are several classes and workshops available at the Center to teach to how to "
-                + "work in the different aspects of family history, like research or indexing. Check out "
-                + "the class schedule and sign up for any that interest you.</p>");
+        builder.append("<p>")
+                .append(ApplicationProperties.getEmailSalutation().replaceAll("\n", "</p><p>").replaceAll("\\$\\{personName\\}", personName))
+                .append("</p>")
+                .append("<p>")
+                .append(ApplicationProperties.getEmailBody().replaceAll("\n", "</p><p>"))
+                .append("</p>");
         
         if (prospects != null) {
             boolean firstProspect = true;
             
             for (PersonTemple prospect : prospects) {
                 if (firstProspect) {
-                    builder.append("<p>While scanning through your family tree we noticed the following members "
-                            + "of your family whose temple work does not appear to be finished. Please consider "
-                            + "helping fix that.</p><ul>");
+                    builder.append("<p>")
+                            .append(ApplicationProperties.getEmailProspectsExplanation().replaceAll("\n", "</p><p>"))
+                            .append("</p><ul>");
                     firstProspect = false;
                 }
                 builder.append("<li><a href='https://familysearch.org/tree/#view=ancestor&person=")
@@ -112,7 +112,9 @@ public class EmailUtils {
             }
         }
         
-        builder.append("<p>Sincerely,</p><p>The staff at the Puyallup Stake Family History Center</p>");
+        builder.append("<p>")
+                .append(ApplicationProperties.getEmailSignature().replaceAll("\n", "</p><p>"))
+                .append("</p>");
         
         return builder.toString();
     }
