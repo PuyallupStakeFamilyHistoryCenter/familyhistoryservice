@@ -25,13 +25,18 @@
  */
 package org.puyallupfamilyhistorycenter.service;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.eclipse.jetty.server.Server;
+import static org.puyallupfamilyhistorycenter.service.SpringContextInitializer.resetContext;
 
 /**
  * Manages the life-cycle of the server, allowing the server to be
@@ -111,6 +116,17 @@ public class ServletLifecycleManager {
     }
     
     private static void doRestart() {
-        SpringContextInitializer.resetContext();
+        File launchServerScript = new File("run-server.sh");
+        if (launchServerScript.exists()) {
+            try {
+                //This is pretty hacky, but it should be safe for now
+                Runtime.getRuntime().exec(new String[] {"/bin/sh", "-c", launchServerScript.getCanonicalPath()});
+                System.exit(0);
+            } catch (IOException ex) {
+                throw new IllegalStateException("Failed to run restart script '" + launchServerScript + "'", ex);
+            }
+        } else {
+            SpringContextInitializer.resetContext();
+        }
     }
 }
