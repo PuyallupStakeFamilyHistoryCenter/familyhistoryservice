@@ -3,7 +3,12 @@ dist
 nbproject/private/
 report/
 .jacocoverage/
-keystore
+keystore*
+*.crt
+*.csr
+*.key
+*.pem
+*.srl
 log/*
 *.DS_Store
 src/org/puyallupfamilyhistorycenter/config/*.properties

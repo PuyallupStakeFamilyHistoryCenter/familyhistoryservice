@@ -329,5 +329,6 @@ Fix logging in via iPad
 Auto-reconnect login screen
 
 Meeting notes:
-Register IP: 10.154.51.1
+Rebuild keystore from newly generated cert
+Write up instructions for renewing CA and host certs (and for dealing with changing IP)
 Map should begin on world map

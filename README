@@ -1,0 +1,33 @@
+
+
+###Creating a root key###
+
+Run the following commands to generate a root certificate and key you'll use to sign the device keys:
+
+$ openssl genrsa -out rootCA.key 2048
+$ openssl req -x509 -new -nodes -key rootCA.key -days 1024 -out rootCA.pem
+
+This certificate (stored in rootCA.pem) can be imported as a trusted CA on devices you own
+so that certificates signed with the key (rootCA.key) will be implicitly trusted.
+
+The key should be kept secret; if it is leaked then third parties could begin to
+generate certificates that would be trusted by your devices.
+
+
+###Generating new certificate:###
+
+From a directory containing the root key and certificate (rootCA.key and rootCA.pem)
+run the following commands:
+
+$ keytool -genkey -alias discoveryroom -keyalg RSA -keystore keystore -keysize 2048
+-- The "first and last name" should be the hostname or IP of the server, or the domain name if applicable
+-- The other fields are less important
+-- Feel free to use the same password for the keystore and the key
+
+$ keytool -certreq -alias discoveryroom -keystore keystore -file mydomain.csr
+$ openssl x509 -req -in mydomain.csr -CA rootCA.pem -CAkey rootCA.key -CAcreateserial -out mydomain.crt -days 500
+$ keytool -import -trustcacerts -alias root -file rootCA.pem -keystore keystore
+$ keytool -import -trustcacerts -alias discoveryroom -file mydomain.crt -keystore keystore
+
+Once the keystore is generated, you need to copy it to your service host and change the
+password hashes in the properties file
