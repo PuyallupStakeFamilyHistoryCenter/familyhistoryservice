@@ -64,6 +64,7 @@ import org.eclipse.jetty.websocket.api.annotations.*;
 import org.familysearch.api.client.UserState;
 import org.familysearch.api.client.ft.FamilySearchFamilyTree;
 import org.gedcomx.rs.client.PersonState;
+import org.puyallupfamilyhistorycenter.service.ApplicationProperties;
 import org.puyallupfamilyhistorycenter.service.SpringContextInitializer;
 import org.puyallupfamilyhistorycenter.service.cache.Precacher;
 import org.puyallupfamilyhistorycenter.service.models.Statistics;
@@ -716,7 +717,8 @@ public class FamilyHistoryCenterSocket {
     
     protected void setGuestUser() {
         String salt = newSalt();
-        userContextMap.put("KWJH-B6Z", new UserContext("KWJH-B6Z", "Guest account", null, hashPin("1234", salt), null, null));
+        String guestUser = ApplicationProperties.getGuestPersonId();
+        userContextMap.put(guestUser, new UserContext(guestUser, "Guest account", null, hashPin("1234", salt), null, null));
     }
     
     protected static String newSalt() {

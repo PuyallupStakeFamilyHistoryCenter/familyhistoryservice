@@ -39,6 +39,7 @@ public class ApplicationProperties {
     private static final String EMAIL_BODY = "emailBody";
     private static final String EMAIL_PROSPECTS_EXPL = "emailProspectsExpl";
     private static final String EMAIL_SIGNATURE = "emailSignature";
+    private static final String GUEST_USER_ID = "guestUserId";
 
     private static final Properties props;
     static {
@@ -68,5 +69,9 @@ public class ApplicationProperties {
     
     public static String getEmailSignature() {
         return props.getProperty(EMAIL_SIGNATURE);
+    }
+
+    public static String getGuestPersonId() {
+        return props.getProperty(GUEST_USER_ID);
     }
 }

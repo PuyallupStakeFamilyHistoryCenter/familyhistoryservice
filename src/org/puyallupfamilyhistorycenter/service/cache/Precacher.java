@@ -40,6 +40,7 @@ import org.apache.log4j.Logger;
 import org.familysearch.api.client.ft.FamilySearchFamilyTree;
 import org.gedcomx.rs.client.PersonSpousesState;
 import org.gedcomx.rs.client.PersonState;
+import org.puyallupfamilyhistorycenter.service.ApplicationProperties;
 import org.puyallupfamilyhistorycenter.service.SpringContextInitializer;
 import org.puyallupfamilyhistorycenter.service.models.Person;
 import org.puyallupfamilyhistorycenter.service.models.PersonReference;
@@ -76,14 +77,14 @@ public class Precacher {
     private final int maxDepth;
     private final Set<Future> futures;
     private final Set<PrecacheListener> listeners;
-    private final List<PersonTemple> prospects;
+//    private final List<PersonTemple> prospects;
 
     public Precacher(String accessToken, int maxDepth) {
         this.accessToken = accessToken;
         this.maxDepth = maxDepth;
         this.futures = new HashSet<>();
         this.listeners = new HashSet<>();
-        this.prospects = new LinkedList<>();
+//        this.prospects = new LinkedList<>();
     }
 
     public void precache() {
@@ -102,6 +103,9 @@ public class Precacher {
                 frontier.add(new PrecacheObject(spouse.getId(), 0));
             }
         }
+        
+        String guestPersonId = ApplicationProperties.getGuestPersonId();
+        frontier.add(new PrecacheObject(guestPersonId, 0));
         
         final AtomicInteger minEstimatedUnvistited = new AtomicInteger(frontier.size() * (int) Math.pow(2, maxDepth));
         
@@ -125,10 +129,10 @@ public class Precacher {
                                     leafNodes.add(precacheObject);
                                 }
                                 
-                                PersonTemple personTemple = templeSource.get(precacheObject.id, accessToken);
-                                if (personTemple != null && personTemple.hasOrdinancesReady()) {
-                                    prospects.add(personTemple);
-                                } 
+//                                PersonTemple personTemple = templeSource.get(precacheObject.id, accessToken);
+//                                if (personTemple != null && personTemple.hasOrdinancesReady()) {
+//                                    prospects.add(personTemple);
+//                                } 
                                 
                                 int totalPrecachedValue = totalPrecached.incrementAndGet();
                                 int queueSize = frontier.size();
@@ -216,6 +220,6 @@ public class Precacher {
     }
     
     public List<PersonTemple> getProspects() {
-        return Collections.unmodifiableList(prospects);
+        return null; //Collections.unmodifiableList(prospects);
     }
 }
