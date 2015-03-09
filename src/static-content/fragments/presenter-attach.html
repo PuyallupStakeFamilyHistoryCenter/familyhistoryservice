@@ -103,24 +103,31 @@ POSSIBILITY OF SUCH DAMAGE.
                 }
             }
         }
-    }
+    };
     
     function setupDisplayButtons(displayIds) {
         $("#display-btns").html("");
         
         $.each(displayIds, function(index, displayId) {
-            $("#display-btns").append("<div><button class='btn btn-lg btn-default display-btn' data-display='"+displayId+"'>"+displayId+"</button><button class='btn btn-lg btn-default ping-display-btn' data-display='"+displayId+"'>Ping</button></div>");
+            $("#display-btns").append("<div><button class='btn btn-lg btn-default display-btn' data-display='"+displayId+"'>"+displayId+"</button>" +
+                    "<button class='btn btn-lg btn-default ping-display-btn' data-display='"+displayId+"'>Ping</button>" + 
+                    "<button class='btn btn-lg btn-default reload-display-btn' data-display='"+displayId+"'><span class='glyphicon glyphicon-refresh' ></span></button></div>");
         });
         
         $(".display-btn").click(function() {
             displayName = $(this).attr("data-display");
             
             navigate("controller-main?group=presenter");
-        })
+        });
         
         $(".ping-display-btn").click(function() {
             var displayId = $(this).attr("data-display");
             ws.socketSend("pingDisplay " + displayId);
+        });
+        
+        $(".reload-display-btn").click(function() {
+            var displayId = $(this).attr("data-display");
+            ws.socketSend("reloadDisplay " + displayId);
         });
     }
     
@@ -128,10 +135,10 @@ POSSIBILITY OF SUCH DAMAGE.
         $("#user-btns").html();
         
         $.each(users, function(index, user) {
-            if (user.name != "Guest account") {
-                $("#user-btns").append("<div><button class='btn btn-lg btn-default user-btn' data-user='"+user.id+"'>" + user.name + "</button><div class='progress' id='"+user.id+"-progress' style='margin: 10px 10px; width: 150px; display: inline-block'><div class='progress-bar progress-bar-success' id='"+user.id+"-cached-prg' style='width: 0%'><span class='sr-only'></span></div></div></div>")
+            if (user.name !== "Guest account") {
+                $("#user-btns").append("<div><button class='btn btn-lg btn-default user-btn' data-user='"+user.id+"'>" + user.name + "</button><div class='progress' id='"+user.id+"-progress' style='margin: 10px 10px; width: 150px; display: inline-block'><div class='progress-bar progress-bar-success' id='"+user.id+"-cached-prg' style='width: 0%'><span class='sr-only'></span></div></div></div>");
             }
-        })
+        });
         
         $(".user-btn").click(function() {
             var userId = $(this).attr("data-user");
@@ -145,11 +152,10 @@ POSSIBILITY OF SUCH DAMAGE.
     
     $("#confirmButton").click(function() {
         $("#confirmModal").modal("hide");
-        ws.socketSend("restart-server")
+        ws.socketSend("restart-server");
     });
     
-    setHeaderName("Presenter")
+    setHeaderName("Presenter");
     ws.socketSend("listDisplays");
-    ws.socketSend("listControllers");
     ws.socketSend("list-current-users");
 </script>

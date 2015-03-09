@@ -295,6 +295,18 @@ public class FamilyHistoryCenterSocket {
                     }
                     break;
                 }
+                
+                case "reloadDisplay": {
+                    String displayName = scanner.next();
+                    if (remoteDisplays.containsKey(displayName)) {
+                        scheduleReload(remoteDisplays.get(displayName), 1);
+                    }
+                    if (remoteControllers.containsKey(displayName)) {
+                        scheduleReload(remoteControllers.get(displayName), 3);
+                    }
+                    
+                    break;
+                }
 
                 case "login": {
                     userId = scanner.next();

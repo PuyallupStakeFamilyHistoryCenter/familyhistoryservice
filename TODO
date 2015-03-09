@@ -270,8 +270,8 @@ PIN shouldn't be easy (e.g. 1234)          DONE
 *Remove hard-coded guest user
 
 Presenter:
+Allow resetting controller and display     DONE
 Add controller to display list
-Allow resetting controller and display
 Show precaching stats per person
 Allow sending bug reports
 
