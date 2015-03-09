@@ -73,13 +73,15 @@ public class Precacher {
         }
     }
 
+    private final String userId;
     private final String accessToken;
     private final int maxDepth;
     private final Set<Future> futures;
     private final Set<PrecacheListener> listeners;
 //    private final List<PersonTemple> prospects;
 
-    public Precacher(String accessToken, int maxDepth) {
+    public Precacher(String userId, String accessToken, int maxDepth) {
+        this.userId = userId;
         this.accessToken = accessToken;
         this.maxDepth = maxDepth;
         this.futures = new HashSet<>();
@@ -144,7 +146,7 @@ public class Precacher {
                                 }
                                 
                                 
-                                PrecacheEvent event = new PrecacheEvent(totalPrecachedValue, queueSize, minEstimatedUnvistited.get(), currentGeneration);
+                                PrecacheEvent event = new PrecacheEvent(userId, totalPrecachedValue, queueSize, minEstimatedUnvistited.get(), currentGeneration);
                                 for (PrecacheListener listener : listeners) {
                                     listener.onPrecache(event);
                                 }
@@ -204,6 +206,7 @@ public class Precacher {
     }
     
     public static class PrecacheEvent {
+        public final String userId;
         public final String responseType = "precacheEvent";
         public final int totalCached;
         public final int totalQueueSize;
@@ -211,7 +214,8 @@ public class Precacher {
         
         public final int currentGeneration;
 
-        public PrecacheEvent(int totalCached, int totalQueueSize, int estimatedUnvisited, int currentGeneration) {
+        public PrecacheEvent(String userId, int totalCached, int totalQueueSize, int estimatedUnvisited, int currentGeneration) {
+            this.userId = userId;
             this.totalCached = totalCached;
             this.totalQueueSize = totalQueueSize;
             this.estimatedUnvisited = estimatedUnvisited;

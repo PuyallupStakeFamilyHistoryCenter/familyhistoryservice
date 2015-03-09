@@ -149,13 +149,12 @@ Map doesn't display locations in split mode DONE
 Fix buttons in split mode                  DONE
 Make map popups larger                     DONE
 Zoom for context                           DONE
+Zoom and pan between locations             DONE
 Show buttons for per life event, not forward and backward buttons DONE
 Show controls immediately after clicking on person DONE
 Show events on controller (map) and click on them DONE
-*Add "# had # children: #, #, and, #" fact
+Map should begin on world map
 *Show only three life events (birth, marriage, and death)
-?Show thumbnail map on side of map
-Zoom and pan between locations
 Lerah Ellis (LZJ8-4KJ) doesn't show death and burial events in tour
 Load Google Maps API only once
 Add multi-generation map mode
@@ -222,7 +221,7 @@ Basic implementation                       DONE
 Tiles can become stuck in desktop mode     DONE
 Landscape puzzles are much harder          DONE
 Fix image loading                          DONE
-Check for win and display last piece
+Check for win and display last piece       DONE
 
 Media:
 Add video selection screen                 DONE
@@ -269,6 +268,12 @@ Kiosk should reload page to clear all fields DONE
 Remove permissions dialog (it's now native) DONE
 PIN shouldn't be easy (e.g. 1234)          DONE
 *Remove hard-coded guest user
+
+Presenter:
+Add controller to display list
+Allow resetting controller and display
+Show precaching stats per person
+Allow sending bug reports
 
 Library:
 Separate query params for page and fragment DONE
@@ -328,7 +333,3 @@ Go straight to controls form
 Fix logging in via iPad
 Auto-reconnect login screen
 
-Meeting notes:
-Rebuild keystore from newly generated cert
-Write up instructions for renewing CA and host certs (and for dealing with changing IP)
-Map should begin on world map

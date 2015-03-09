@@ -118,6 +118,7 @@ public class FamilyHistoryCenterSocket {
     
     private static final Map<String, RemoteEndpoint> remoteDisplays = new HashMap<>();
     private static final Map<String, RemoteEndpoint> remoteControllers = new HashMap<>();
+    private static final Set<RemoteEndpoint> remotePresenters = new HashSet<>();
     private static final Set<RemoteEndpoint> otherRemotes = new HashSet<>();
     private static final Map<String, RemoteEndpoint> tokenControllerMap = new HashMap<>();
     private static final Map<String, String> tokenUserIdMap = new HashMap<>();
@@ -272,10 +273,16 @@ public class FamilyHistoryCenterSocket {
                 }
                 
                 case "listDisplays": {
-                    //TODO: Perhaps move this to a different
+                    //TODO: Perhaps move this to a different 'attach' method, with authenticationß
+                    remotePresenters.add(session.getRemote());
                     otherRemotes.add(session.getRemote());
                     
                     response = "{\"responseType\":\"displays\",\"displays\":"+GSON.toJson(remoteDisplays.keySet())+"}";
+                    break;
+                }
+                
+                case "listControllers": {
+                    response = "{\"responseType\":\"controllers\",\"controllers\":"+GSON.toJson(remoteControllers.keySet())+"}";
                     break;
                 }
                 
@@ -523,11 +530,24 @@ public class FamilyHistoryCenterSocket {
                                         tokenControllerMap.remove(token);
                                     }
                                 }
+                                
+                                Iterator<RemoteEndpoint> rit = remotePresenters.iterator();
+                                while (rit.hasNext()) {
+                                    RemoteEndpoint endpoint = rit.next();
+                                    try {
+                                        endpoint.sendString(GSON.toJson(event));
+                                    } catch (Exception e) {
+                                        logger.warn("Failed to notify presenter about precache event; removing");
+                                        rit.remove();
+                                        otherRemotes.remove(endpoint);
+                                    }
+                                }
                             }
                         }
                     }, 10, 10, TimeUnit.SECONDS);
                     
-                    Precacher precacher = new Precacher(accessToken, 10);
+                    Precacher precacher = new Precacher(userId, accessToken, 10);
+                    
                     precacher.addPrecacheListener(new Precacher.PrecacheListener() {
 
                         @Override
@@ -541,7 +561,7 @@ public class FamilyHistoryCenterSocket {
                             UserContext context = userContextMap.get(finalUserId);
                             Precacher.PrecacheEvent previousEvent = (Precacher.PrecacheEvent) currentEvent.get();
                             if (previousEvent != null && context != null) {
-                                Precacher.PrecacheEvent event = new Precacher.PrecacheEvent(previousEvent.totalCached + previousEvent.totalQueueSize, 0, 0, previousEvent.currentGeneration);
+                                Precacher.PrecacheEvent event = new Precacher.PrecacheEvent(finalUserId, previousEvent.totalCached + previousEvent.totalQueueSize, 0, 0, previousEvent.currentGeneration);
                                 Iterator<String> it = context.tokens.iterator();
                                 while (it.hasNext()) {
                                     String token = it.next();

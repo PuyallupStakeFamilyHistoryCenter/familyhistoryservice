@@ -72,6 +72,7 @@ POSSIBILITY OF SUCH DAMAGE.
 </div>
 
 <script>
+    var previousCached = 0;
     settings.local = {
         verbs: {
             displays: function(obj) {
@@ -81,6 +82,25 @@ POSSIBILITY OF SUCH DAMAGE.
             "user-list": function(obj) {
                 var users = obj.users;
                 setupUserButtons(users);
+            },
+            precacheEvent: function(obj) {
+                var userId = obj.userId;
+                var cached = obj.totalCached;
+                var queueSize = obj.totalQueueSize;
+                var unvisited = obj.estimatedUnvisited;
+                var currentGeneration = obj.currentGeneration;
+
+                var divSelecter = "#" + userId + "-progress";
+                if (queueSize === 0 || currentGeneration > 4) {
+                    $(divSelecter).hide();
+                } else if (cached > previousCached) {
+                    previousCached = cached;
+
+                    $(divSelecter).show();
+
+                    var total = 64;
+                    $("#" + userId + "-cached-prg").css("width", ((cached / total) * 100) + "%");
+                }
             }
         }
     }
@@ -108,7 +128,9 @@ POSSIBILITY OF SUCH DAMAGE.
         $("#user-btns").html();
         
         $.each(users, function(index, user) {
-            $("#user-btns").append("<div><button class='btn btn-lg btn-default user-btn' data-user='"+user.id+"'>" + user.name + "</button></div>")
+            if (user.name != "Guest account") {
+                $("#user-btns").append("<div><button class='btn btn-lg btn-default user-btn' data-user='"+user.id+"'>" + user.name + "</button><div class='progress' id='"+user.id+"-progress' style='margin: 10px 10px; width: 150px; display: inline-block'><div class='progress-bar progress-bar-success' id='"+user.id+"-cached-prg' style='width: 0%'><span class='sr-only'></span></div></div></div>")
+            }
         })
         
         $(".user-btn").click(function() {
@@ -128,5 +150,6 @@ POSSIBILITY OF SUCH DAMAGE.
     
     setHeaderName("Presenter")
     ws.socketSend("listDisplays");
+    ws.socketSend("listControllers");
     ws.socketSend("list-current-users");
 </script>
