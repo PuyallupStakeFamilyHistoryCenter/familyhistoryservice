@@ -91,15 +91,13 @@ POSSIBILITY OF SUCH DAMAGE.
                 var currentGeneration = obj.currentGeneration;
 
                 var divSelecter = "#" + userId + "-progress";
-                if (queueSize === 0 || currentGeneration > 4) {
-                    $(divSelecter).hide();
-                } else if (cached > previousCached) {
+                if (cached > previousCached) {
                     previousCached = cached;
 
                     $(divSelecter).show();
 
-                    var total = 64;
-                    $("#" + userId + "-cached-prg").css("width", ((cached / total) * 100) + "%");
+                    $("#" + userId + "-cached-prg").css("width", ((cached / unvisited) * 100) + "%");
+                    $("#" + userId + "-stats").html("Cached: " + cached + " / " + unvisited + " Gen: " + currentGeneration);
                 }
             }
         }
@@ -136,7 +134,10 @@ POSSIBILITY OF SUCH DAMAGE.
         
         $.each(users, function(index, user) {
             if (user.name !== "Guest account") {
-                $("#user-btns").append("<div><button class='btn btn-lg btn-default user-btn' data-user='"+user.id+"'>" + user.name + "</button><div class='progress' id='"+user.id+"-progress' style='margin: 10px 10px; width: 150px; display: inline-block'><div class='progress-bar progress-bar-success' id='"+user.id+"-cached-prg' style='width: 0%'><span class='sr-only'></span></div></div></div>");
+                $("#user-btns").append("<div><button class='col-md-5 btn btn-lg btn-default user-btn' data-user='"+user.id+"'>" + user.name + "</button>" +
+                        "<div class='col-md-5' style='margin: 10px 10px; display: inline-block'><div id='"+user.id+"-stats'></div>" +
+                        "<div class='progress' id='"+user.id+"-progress' style='margin:0; display: none;'><div class='progress-bar progress-bar-success' id='"+user.id+"-cached-prg' style='width: 0%'><span class='sr-only'></span></div></div>" +
+                        "</div></div>");
             }
         });
         
