@@ -49,6 +49,7 @@ POSSIBILITY OF SUCH DAMAGE.
     </div>
     <div class="panel-body" id="admin-btns">
         <button class="btn btn-lg btn-danger" id="resetButton" >Restart server</button>
+        <button class="btn btn-lg btn-warning" id="reportBugButton" >Report bug</button>
     </div>
 </div>
 
@@ -65,7 +66,43 @@ POSSIBILITY OF SUCH DAMAGE.
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-        <button id="confirmButton" type="button" class="btn btn-primary">Restart server</button>
+        <button id="confirmRestartButton" type="button" class="btn btn-primary">Restart server</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="bugReportModal" tabindex="-1" role="dialog" aria-labelledby="bugReportLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="bugReportLabel">Report bug...</h4>
+      </div>
+      <div class="modal-body">
+          <div id="bugReportInputDiv" >
+              <div class="col-md-8">
+                <div class="input-group">
+                  <span class="input-group-addon"><span class="glyphicon glyphicon-user"></span></span>
+                  <input id="bugReportReporterName" class="form-control" placeholder="Your name" />
+                  <span class="input-group-btn">
+                      <button class="btn btn-warning" id="clearReporterNameButton"><span class="glyphicon glyphicon-remove"></span></button>
+                  </span>
+                </div>
+              </div>
+              
+              <div style="padding-top: 20px" class="col-lg-12">
+                Enter a description of the bug and the steps 
+                required to reproduce it:
+                <textarea class="form-control" rows="5" id="bugReportBody" ></textarea>
+              </div>
+              
+              <div style="clear: both"></div>
+          </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+        <button id="confirmBugReportButton" type="button" class="btn btn-primary">Report bug</button>
       </div>
     </div>
   </div>
@@ -108,7 +145,7 @@ POSSIBILITY OF SUCH DAMAGE.
         
         $.each(displayIds, function(index, displayId) {
             $("#display-btns").append("<div><button class='btn btn-lg btn-default display-btn' data-display='"+displayId+"'>"+displayId+"</button>" +
-                    "<button class='btn btn-lg btn-default ping-display-btn' data-display='"+displayId+"'>Ping</button>" + 
+                    "<button class='btn btn-lg btn-default ping-display-btn' data-display='"+displayId+"'><span class='glyphicon glyphicon-bell'></span></span></button>" + 
                     "<button class='btn btn-lg btn-default reload-display-btn' data-display='"+displayId+"'><span class='glyphicon glyphicon-refresh' ></span></button></div>");
         });
         
@@ -151,9 +188,37 @@ POSSIBILITY OF SUCH DAMAGE.
         $("#confirmModal").modal();
     });
     
-    $("#confirmButton").click(function() {
+    $("#confirmRestartButton").click(function() {
         $("#confirmModal").modal("hide");
         ws.socketSend("restart-server");
+    });
+    
+    $("#reportBugButton").click(function() {
+        $("#bugReportBody").val("");
+        $("#bugReportModal").modal();
+    });
+    
+    $("#confirmBugReportButton").click(function() {
+        var reporterName = $("#bugReportReporterName").val();
+        var reportBody = $("#bugReportBody").val();
+        
+        if (reporterName == null || reporterName.length === 0) {
+            logger.error("You must provide your name");
+            return;
+        }
+        
+        if (reportBody == null || reportBody.length === 0) {
+            logger.error("You must provide a report body");
+            return;
+        }
+        
+        ws.socketSend("reportBug " + reporterName.replace(/ /g, "%20") + " " + reportBody.replace(/ /g, "%20"));
+        
+        $("#bugReportModal").modal("hide");
+    });
+    
+    $("#clearReporterNameButton").click(function() {
+        $("#bugReportReporterName").val("").focus();
     });
     
     setHeaderName("Presenter");

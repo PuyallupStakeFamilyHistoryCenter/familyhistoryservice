@@ -28,9 +28,12 @@ package org.puyallupfamilyhistorycenter.service.websocket;
 
 import org.puyallupfamilyhistorycenter.service.ServletLifecycleManager;
 import com.google.gson.Gson;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import org.puyallupfamilyhistorycenter.service.cache.PersonDao;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.URISyntaxException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
@@ -46,6 +49,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
@@ -305,6 +309,25 @@ public class FamilyHistoryCenterSocket {
                         scheduleReload(remoteControllers.get(displayName), 3);
                     }
                     
+                    break;
+                }
+                
+                case "reportBug": {
+                    String reporter = scanner.next().replaceAll("%20", " ");
+                    String reportBody = scanner.next().replaceAll("%20", " ");
+                    String reportId = UUID.randomUUID().toString();
+                    
+                    logger.warn("Bug report " + reportId + " by " + reporter + ": " + reportBody);
+                    
+                    try(PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter("bugReports", true)))) {
+                        out.println(reportId);
+                        out.println(reporter);
+                        out.println(reportBody);
+                        out.println();
+                    } catch (IOException e) {
+                        logger.warn("Failed to record bug report " + reportId);
+                        response = getErrorResponse("Failed to record bug report");
+                    }
                     break;
                 }
 
