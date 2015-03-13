@@ -72,6 +72,26 @@ POSSIBILITY OF SUCH DAMAGE.
   </div>
 </div>
 
+
+<div class="modal fade" id="confirmForceLogoutModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">Force logout <span class="forceLogoutUserName"></span>...</h4>
+      </div>
+      <div class="modal-body">
+          Do you really want to force logout <span class="forceLogoutUserName"></span>?
+        <input type="hidden" id="forceLogoutUserId" />
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+        <button id="confirmForceLogoutButton" type="button" class="btn btn-primary">Force logout</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="modal fade" id="bugReportModal" tabindex="-1" role="dialog" aria-labelledby="bugReportLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -172,7 +192,7 @@ POSSIBILITY OF SUCH DAMAGE.
         $.each(users, function(index, user) {
             if (user.name !== "Guest account") {
                 $("#user-btns").append("<div><div class='btn-group col-sm-6' role='group'><button class='btn btn-default user-btn' data-user='"+user.id+"'>" + user.name + "</button>" +
-                        "<button class='btn btn-danger remove-user-btn' data-user='"+user.id+"'><span class='glyphicon glyphicon-remove'></span></button></div>" +
+                        "<button class='btn btn-danger remove-user-btn' data-user='"+user.id+"' data-user-name='"+user.name+"'><span class='glyphicon glyphicon-remove'></span></button></div>" +
                         "<div class='col-sm-5' style='margin: 10px 10px; display: inline-block'><div id='"+user.id+"-stats'></div>" +
                         "<div class='progress' id='"+user.id+"-progress' style='margin:0; display: none;'><div class='progress-bar progress-bar-success' id='"+user.id+"-cached-prg' style='width: 0%'><span class='sr-only'></span></div></div>" +
                         "</div></div>");
@@ -186,7 +206,10 @@ POSSIBILITY OF SUCH DAMAGE.
         
         $(".remove-user-btn").click(function() {
             var userId = $(this).attr("data-user");
-            ws.socketSend("forceDestroyAccessToken " + userId);
+            var userName = $(this).attr("data-user-name");
+            $("#forceLogoutUserId").val(userId);
+            $(".forceLogoutUserName").html(userName);
+            $("#confirmForceLogoutModal").modal();
         });
     }
     
@@ -197,6 +220,12 @@ POSSIBILITY OF SUCH DAMAGE.
     $("#confirmRestartButton").click(function() {
         $("#confirmModal").modal("hide");
         ws.socketSend("restart-server");
+    });
+    
+    $("#confirmForceLogoutButton").click(function() {
+        $("#confirmForceLogoutModal").modal("hide");
+        var userId = $("#forceLogoutUserId").val();
+        ws.socketSend("forceDestroyAccessToken " + userId);
     });
     
     $("#reportBugButton").click(function() {
