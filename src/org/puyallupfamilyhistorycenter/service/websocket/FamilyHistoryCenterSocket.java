@@ -173,7 +173,7 @@ public class FamilyHistoryCenterSocket {
                     }
                 }
                 
-                resendUserListToControllers();
+                resendUserList();
             }
         
         }, 1, 1, TimeUnit.MINUTES);
@@ -264,6 +264,7 @@ public class FamilyHistoryCenterSocket {
                     if (!isDisplayActive(id)) {
                         remoteDisplays.put(id, session.getRemote());
                         response = "{\"responseType\":\"standby\"}";
+                        resendDisplayList();
                     } else {
                         response = "{\"responseType\":\"error\",\"message\":\"display " + id + " is already connected\"}";
                     }
@@ -281,7 +282,7 @@ public class FamilyHistoryCenterSocket {
                     remotePresenters.add(session.getRemote());
                     otherRemotes.add(session.getRemote());
                     
-                    response = "{\"responseType\":\"displays\",\"displays\":"+GSON.toJson(remoteDisplays.keySet())+"}";
+                    response = getDisplayListResponse();
                     break;
                 }
                 
@@ -627,7 +628,7 @@ public class FamilyHistoryCenterSocket {
                     }
                     userContextMap.put(userId, new UserContext(userId, userName, email, pin, accessToken, precacher, tokens));
                     
-                    resendUserListToControllers();
+                    resendUserList();
                     break;
                 }
 
@@ -649,7 +650,7 @@ public class FamilyHistoryCenterSocket {
                             userContext.precacher.cancel();
                         }
                         
-                        resendUserListToControllers();
+                        resendUserList();
                     } else {
                         throw new IllegalStateException("username and PIN do not match");
                     }
@@ -673,7 +674,7 @@ public class FamilyHistoryCenterSocket {
                             userContext.precacher.cancel();
                         }
                         
-                        resendUserListToControllers();
+                        resendUserList();
                     }
                     break;
                 }
@@ -762,7 +763,7 @@ public class FamilyHistoryCenterSocket {
         return userListBuilder.toString();
     }
     
-    protected static void resendUserListToControllers() {
+    protected static void resendUserList() {
         String listUsersResponse = generateNewUserListResponse();
         Iterator<RemoteEndpoint> it = remoteControllers.values().iterator();
         while (it.hasNext()) {
@@ -775,10 +776,23 @@ public class FamilyHistoryCenterSocket {
         }
         it = remotePresenters.iterator();
         while (it.hasNext()) {
-            RemoteEndpoint controller = it.next();
+            RemoteEndpoint presenter = it.next();
             try {
-                controller.sendString(listUsersResponse);
+                presenter.sendString(listUsersResponse);
             } catch (Exception ex) {
+                it.remove();
+            }
+        }
+    }
+    
+    protected static void resendDisplayList() {
+        String listDisplaysResponse = getDisplayListResponse();
+        Iterator<RemoteEndpoint> it = remotePresenters.iterator();
+        while (it.hasNext()) {
+            RemoteEndpoint presenter = it.next();
+            try {
+                presenter.sendString(listDisplaysResponse);
+            } catch (Exception e) {
                 it.remove();
             }
         }
@@ -870,6 +884,10 @@ public class FamilyHistoryCenterSocket {
     
     protected static String getIndentifyDisplayResponse() {
         return "{\"responseType\":\"identifyDisplay\"}";
+    }
+    
+    protected static String getDisplayListResponse() {
+        return "{\"responseType\":\"displays\",\"displays\":"+GSON.toJson(remoteDisplays.keySet())+"}";
     }
     
     protected static boolean isDisplayActive(String displayId) {
