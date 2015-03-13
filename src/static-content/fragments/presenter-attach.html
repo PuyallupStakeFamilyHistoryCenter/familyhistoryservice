@@ -86,7 +86,7 @@ POSSIBILITY OF SUCH DAMAGE.
                   <span class="input-group-addon"><span class="glyphicon glyphicon-user"></span></span>
                   <input id="bugReportReporterName" class="form-control" placeholder="Your name" />
                   <span class="input-group-btn">
-                      <button class="btn btn-warning" id="clearReporterNameButton"><span class="glyphicon glyphicon-remove"></span></button>
+                      <button class="btn btn-warning" id="clearReporterNameButton" tabindex="-1"><span class="glyphicon glyphicon-remove"></span></button>
                   </span>
                 </div>
               </div>
@@ -167,12 +167,13 @@ POSSIBILITY OF SUCH DAMAGE.
     }
     
     function setupUserButtons(users) {
-        $("#user-btns").html();
+        $("#user-btns").html("");
         
         $.each(users, function(index, user) {
             if (user.name !== "Guest account") {
-                $("#user-btns").append("<div><button class='col-md-5 btn btn-lg btn-default user-btn' data-user='"+user.id+"'>" + user.name + "</button>" +
-                        "<div class='col-md-5' style='margin: 10px 10px; display: inline-block'><div id='"+user.id+"-stats'></div>" +
+                $("#user-btns").append("<div><div class='btn-group col-sm-6' role='group'><button class='btn btn-default user-btn' data-user='"+user.id+"'>" + user.name + "</button>" +
+                        "<button class='btn btn-danger remove-user-btn' data-user='"+user.id+"'><span class='glyphicon glyphicon-remove'></span></button></div>" +
+                        "<div class='col-sm-5' style='margin: 10px 10px; display: inline-block'><div id='"+user.id+"-stats'></div>" +
                         "<div class='progress' id='"+user.id+"-progress' style='margin:0; display: none;'><div class='progress-bar progress-bar-success' id='"+user.id+"-cached-prg' style='width: 0%'><span class='sr-only'></span></div></div>" +
                         "</div></div>");
             }
@@ -181,6 +182,11 @@ POSSIBILITY OF SUCH DAMAGE.
         $(".user-btn").click(function() {
             var userId = $(this).attr("data-user");
             navigate("presenter-user-details?user-id=" + userId);
+        });
+        
+        $(".remove-user-btn").click(function() {
+            var userId = $(this).attr("data-user");
+            ws.socketSend("forceDestroyAccessToken " + userId);
         });
     }
     

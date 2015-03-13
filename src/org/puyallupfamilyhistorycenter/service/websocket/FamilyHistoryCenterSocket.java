@@ -655,6 +655,28 @@ public class FamilyHistoryCenterSocket {
                     }
                     break;
                 }
+                
+                case "forceDestroyAccessToken": {
+                    userId = scanner.next();
+                    
+                    UserContext userContext = userContextMap.get(userId);
+                    if (userContext != null) {
+                        // TODO: Revoke access token
+                        sendFinalEmail(userId);
+                        userContextMap.remove(userId);
+                        for (String t : userContext.tokens) {
+                            deactivateUserToken(t, "User " + userContext.userName + " logged out of the system");
+                        }
+                        userId = null;
+                        
+                        if (userContext.precacher != null) {
+                            userContext.precacher.cancel();
+                        }
+                        
+                        resendUserListToControllers();
+                    }
+                    break;
+                }
 
                 case "list-current-users": {
                     response = generateNewUserListResponse();
@@ -742,9 +764,18 @@ public class FamilyHistoryCenterSocket {
     
     protected static void resendUserListToControllers() {
         String listUsersResponse = generateNewUserListResponse();
-        Iterator<Map.Entry<String, RemoteEndpoint>> it = remoteControllers.entrySet().iterator();
+        Iterator<RemoteEndpoint> it = remoteControllers.values().iterator();
         while (it.hasNext()) {
-            RemoteEndpoint controller = it.next().getValue();
+            RemoteEndpoint controller = it.next();
+            try {
+                controller.sendString(listUsersResponse);
+            } catch (Exception ex) {
+                it.remove();
+            }
+        }
+        it = remotePresenters.iterator();
+        while (it.hasNext()) {
+            RemoteEndpoint controller = it.next();
             try {
                 controller.sendString(listUsersResponse);
             } catch (Exception ex) {

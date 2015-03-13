@@ -188,7 +188,9 @@ public class Precacher {
     }
 
     public void cancel() {
-        executor.shutdownNow();
+        for (Future future : futures) {
+            future.cancel(true);
+        }
         for (PrecacheListener listener : listeners) {
             listener.onCancel();
         }

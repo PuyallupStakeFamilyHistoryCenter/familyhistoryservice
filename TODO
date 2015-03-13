@@ -271,8 +271,9 @@ PIN shouldn't be easy (e.g. 1234)          DONE
 
 Presenter:
 Allow resetting controller and display     DONE
+Show precaching stats per person           DONE
+*Authenticate presenter!
 Add controller to display list
-Show precaching stats per person
 Allow sending bug reports
 
 Library:
