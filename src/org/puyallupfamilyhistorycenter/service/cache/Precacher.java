@@ -42,6 +42,8 @@ import org.gedcomx.rs.client.PersonSpousesState;
 import org.gedcomx.rs.client.PersonState;
 import org.puyallupfamilyhistorycenter.service.ApplicationProperties;
 import org.puyallupfamilyhistorycenter.service.SpringContextInitializer;
+import org.puyallupfamilyhistorycenter.service.models.ImageAndMetadata;
+import org.puyallupfamilyhistorycenter.service.models.KeyAndHeaders;
 import org.puyallupfamilyhistorycenter.service.models.Person;
 import org.puyallupfamilyhistorycenter.service.models.PersonReference;
 import org.puyallupfamilyhistorycenter.service.models.PersonTemple;
@@ -55,11 +57,14 @@ public class Precacher {
     private static final Logger logger = Logger.getLogger(Precacher.class);
     private static final Source<String, Person> source;
     private static final Source<String, PersonTemple> templeSource;
+    private static final Source<KeyAndHeaders, ImageAndMetadata> imageSource;
     private static final ExecutorService executor = Executors.newCachedThreadPool();
+    private static final ExecutorService imageCacheExecutor = Executors.newFixedThreadPool(1);
 
     static {
         source = (Source<String, Person>) SpringContextInitializer.getContext().getBean("in-memory-source");
         templeSource = (Source<String, PersonTemple>) SpringContextInitializer.getContext().getBean("temple-source");
+        imageSource = (Source<KeyAndHeaders, ImageAndMetadata>) SpringContextInitializer.getContext().getBean("image-file-source");
     }
 
     private static class PrecacheObject {
@@ -131,6 +136,17 @@ public class Precacher {
                                     leafNodes.add(precacheObject);
                                 }
                                 
+//                                if (person.images != null) {
+//                                    for (final String imageKey : person.images) {
+//                                        imageCacheExecutor.submit(new Runnable() {
+//
+//                                            @Override
+//                                            public void run() {
+//                                                imageSource.get(new KeyAndHeaders(imageKey, null), accessToken);
+//                                            }
+//                                        });
+//                                    }
+//                                }
 //                                PersonTemple personTemple = templeSource.get(precacheObject.id, accessToken);
 //                                if (personTemple != null && personTemple.hasOrdinancesReady()) {
 //                                    prospects.add(personTemple);
