@@ -28,6 +28,7 @@ package org.puyallupfamilyhistorycenter.service.cache;
 
 import java.io.IOException;
 import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
@@ -70,8 +71,9 @@ public class FamilySearchImageCacheHandler extends AbstractHandler {
             return;
         }
         
-        String id = ref.split("\\?")[0];
-        String queryParams = URLDecoder.decode(ref, StandardCharsets.US_ASCII.name()).split("\\?")[1];
+        String[] urlSplit = URLDecoder.decode(ref, StandardCharsets.US_ASCII.name()).split("\\?");
+        String id = URLEncoder.encode(urlSplit[0], StandardCharsets.US_ASCII.name());
+        String queryParams = urlSplit.length > 1 ? urlSplit[1] : "";
         
         String accessToken = null;
         Map<String, String> headers = new HashMap<>();
@@ -79,7 +81,7 @@ public class FamilySearchImageCacheHandler extends AbstractHandler {
             String[] split = param.split("=");
             if ("access_token".equals(split[0])) {
                 accessToken = split[1];
-            } else {
+            } else if (split[0].length() > 0) {
                 headers.put(split[0], split[1]);
             }
         }

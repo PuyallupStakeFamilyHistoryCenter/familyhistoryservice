@@ -57,7 +57,7 @@ public class FamilySearchImageSource implements Source<KeyAndHeaders, ImageAndMe
     public ImageAndMetadata get(KeyAndHeaders id, String accessToken) {
         HttpURLConnection connection = null;
         try {
-            URL refUrl = new URL(URLDecoder.decode(id.key + "&access_token=" + accessToken, StandardCharsets.US_ASCII.name()));
+            URL refUrl = new URL(URLDecoder.decode(id.key, StandardCharsets.US_ASCII.name()) + (accessToken != null && accessToken.length() > 0 ? "&access_token=" + accessToken : ""));
             connection = (HttpURLConnection) refUrl.openConnection();
 
             for (String headerName : id.headers.keySet()) {
@@ -88,7 +88,9 @@ public class FamilySearchImageSource implements Source<KeyAndHeaders, ImageAndMe
         } catch (IOException ex) {
             throw new IllegalStateException("Failed to get image " + id.key, ex);
         } finally {
-            connection.disconnect();
+            if (connection != null) {
+                connection.disconnect();
+            }
         }
     }
 
