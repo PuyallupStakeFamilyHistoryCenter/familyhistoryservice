@@ -288,13 +288,14 @@ Finish wiring dependencies via Spring      DONE
 Move developer id into config file (not in Git) DONE
 Delay loading of controller in split mode  DONE
 Split mode controller shouldn't cover display DONE
-Support approximate dates and date ranges  DONE*Set up CA and certificates (http://blog.httpwatch.com/2013/12/12/five-tips-for-using-self-signed-ssl-certificates-with-ios/) DONE
-Figure out deployment strategy             DONE
-Turn features on/off for split/normal mode DONE
-Move css files into folder                 DONE
+Support approximate dates and date ranges  DONE
+*Set up CA and certificates (http://blog.httpwatch.com/2013/12/12/five-tips-for-using-self-signed-ssl-certificates-with-ios/)
 *Add third-party website links
+*Figure out deployment strategy
+*Turn features on/off for split/normal mode
 *Don't auto-disconnect controller (or increase timeout)
 Figure out why log4j & guava via Ivy aren't working
+Move css files into folder
 Move test files into folder
 Move these TODOs to the shared task board
 Get unit tests working again
