@@ -33,11 +33,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
 import org.apache.jena.atlas.lib.ActionKeyValue;
 import org.apache.jena.atlas.lib.Cache;
 
@@ -51,7 +47,7 @@ import org.apache.jena.atlas.lib.Cache;
  * @author tibbitts
  * @param <V> the type of mapped values
  */
-public class FileCache<V> implements Cache<String, V> {
+public class FileCache<K, V> implements Cache<K, V> {
     public static final Gson GSON = new Gson();
 
     private final Class<V> clazz;
@@ -76,14 +72,14 @@ public class FileCache<V> implements Cache<String, V> {
     }
 
     @Override
-    public boolean containsKey(String key) {
-        File file = new File(dir, key);
+    public boolean containsKey(K key) {
+        File file = new File(dir, key.toString());
         return file.exists() && 
                 file.lastModified() + ttl > System.currentTimeMillis();
     }
 
     @Override
-    public V get(String key) {
+    public V get(K key) {
         File file = new File(dir, key.toString());
         if (!file.exists()) {
             return null;
@@ -97,10 +93,10 @@ public class FileCache<V> implements Cache<String, V> {
     }
 
     @Override
-    public V put(String key, V value) {
+    public V put(K key, V value) {
         V previousValue = get(key);
         
-        File file = new File(dir, key);
+        File file = new File(dir, key.toString());
         try (Writer writer = new FileWriter(file)) {
             GSON.toJson(value, writer);
         } catch (IOException ex) {
@@ -111,8 +107,8 @@ public class FileCache<V> implements Cache<String, V> {
     }
 
     @Override
-    public boolean remove(String key) {
-        File file = new File(dir, key);
+    public boolean remove(K key) {
+        File file = new File(dir, key.toString());
         if (file.exists()) {
             file.delete();
             return true;
@@ -129,30 +125,31 @@ public class FileCache<V> implements Cache<String, V> {
     }
 
     @Override
-    public Iterator<String> keys() {
-        final File[] files = dir.listFiles();
-        return new Iterator<String>() {
-            int currentIndex = 0;
-            
-            @Override
-            public boolean hasNext() {
-                return currentIndex < files.length;
-            }
-
-            @Override
-            public String next() {
-                return files[currentIndex++].getName();
-            }
-
-            @Override
-            public void remove() {
-                files[currentIndex-1].delete();
-            }
-        };
+    public Iterator<K> keys() {
+//        final File[] files = dir.listFiles();
+//        return new Iterator<K>() {
+//            int currentIndex = 0;
+//            
+//            @Override
+//            public boolean hasNext() {
+//                return currentIndex < files.length;
+//            }
+//
+//            @Override
+//            public K next() {
+//                return files[currentIndex++].getName();
+//            }
+//
+//            @Override
+//            public void remove() {
+//                files[currentIndex-1].delete();
+//            }
+//        };
+        throw new UnsupportedOperationException();
     }
 
     @Override
-    public void setDropHandler(ActionKeyValue<String, V> dropHandler) {
+    public void setDropHandler(ActionKeyValue<K, V> dropHandler) {
         throw new UnsupportedOperationException();
     }
     

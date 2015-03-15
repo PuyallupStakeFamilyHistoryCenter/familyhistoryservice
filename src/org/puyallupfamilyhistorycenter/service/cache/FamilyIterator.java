@@ -79,12 +79,12 @@ public class FamilyIterator implements Iterator<Person> {
     }
     
     private final String personId;
-    private final Source<Person> source;
+    private final Source<String, Person> source;
     private final String accessToken;
     private final Iterator<PersonReference> iterator;
     private PersonReference innerCurrent;
     
-    public FamilyIterator(final String personId, Source<Person> source, String accessToken) {
+    public FamilyIterator(final String personId, Source<String, Person> source, String accessToken) {
         if (personId == null || source == null) {
             throw new IllegalArgumentException("Root and source are required");
         }

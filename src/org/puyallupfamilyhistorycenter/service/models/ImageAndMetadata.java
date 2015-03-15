@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, tibbitts
+ * Copyright (c) 2015, tibbitts
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -23,17 +23,32 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package org.puyallupfamilyhistorycenter.service.cache;
+package org.puyallupfamilyhistorycenter.service.models;
+
+import java.io.File;
+import java.util.Collections;
+import java.util.Map;
+import org.apache.commons.codec.binary.Base64;
 
 /**
  *
  * @author tibbitts
  */
-public class AllowAllDecider implements CachingSource.ShouldCacheDecider<Object> {
-
-    @Override
-    public boolean shouldCache(Object value) {
-        return true;
+public class ImageAndMetadata {
+    public static final File cacheDir = new File("/tmp/fhc/image-cache");
+    static {
+        cacheDir.mkdirs();
     }
     
+    public final String encodedImage;
+    public final Map<String, String> metadata;
+    
+    public ImageAndMetadata(byte[] image, Map<String, String> metadata) {
+        this.encodedImage = Base64.encodeBase64String(image);
+        this.metadata = Collections.unmodifiableMap(metadata);
+    }
+    
+    public byte[] getImageBytes() {
+        return Base64.decodeBase64(encodedImage);
+    }
 }

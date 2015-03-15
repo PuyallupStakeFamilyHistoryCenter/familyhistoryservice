@@ -37,18 +37,18 @@ import org.apache.jena.atlas.lib.Cache;
  *
  * @author tibbitts
  */
-public class CachingSource<E> implements Source<E> {
+public class CachingSource<K, E> implements Source<K, E> {
     
-    private final Source<E> source;
-    private final Cache<String, E> cache;
+    private final Source<K, E> source;
+    private final Cache<K, E> cache;
     private ShouldCacheDecider<E> decider;
-    public CachingSource(Source<E> source, Cache<String, E> cache) {
+    public CachingSource(Source<K, E> source, Cache<K, E> cache) {
         this.source = source;
         this.cache = cache;
     }
 
     @Override
-    public E get(String id, String accessToken) {
+    public E get(K id, String accessToken) {
         if (cache.containsKey(id)) {
             return cache.get(id);
         }
@@ -69,7 +69,7 @@ public class CachingSource<E> implements Source<E> {
     }
 
     @Override
-    public boolean has(String id) {
+    public boolean has(K id) {
         if (cache.containsKey(id)) {
             return true;
         }

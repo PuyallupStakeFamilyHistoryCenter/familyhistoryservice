@@ -36,7 +36,7 @@ import org.puyallupfamilyhistorycenter.service.models.Person;
  */
 
 
-public class MockPersonSource implements Source<Person> {
+public class MockPersonSource implements Source<String, Person> {
     private static final Gson GSON = new Gson();
 
     @Override

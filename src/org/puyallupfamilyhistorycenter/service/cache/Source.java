@@ -32,7 +32,7 @@ package org.puyallupfamilyhistorycenter.service.cache;
  */
 
 
-public interface Source<E> {
-    boolean has(String id);
-    E get(String id, String accessToken);
+public interface Source<K, E> {
+    boolean has(K id);
+    E get(K id, String accessToken);
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, tibbitts
+ * Copyright (c) 2015, tibbitts
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -23,17 +23,26 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package org.puyallupfamilyhistorycenter.service.cache;
+package org.puyallupfamilyhistorycenter.service.models;
+
+import java.util.Collections;
+import java.util.Map;
 
 /**
  *
  * @author tibbitts
  */
-public class AllowAllDecider implements CachingSource.ShouldCacheDecider<Object> {
+public class KeyAndHeaders {
+    public final String key;
+    public final Map<String, String> headers;
+
+    public KeyAndHeaders(String key, Map<String, String> headers) {
+        this.key = key;
+        this.headers = Collections.unmodifiableMap(headers);
+    }
 
     @Override
-    public boolean shouldCache(Object value) {
-        return true;
+    public String toString() {
+        return key;
     }
-    
 }

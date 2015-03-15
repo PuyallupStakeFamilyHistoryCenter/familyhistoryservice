@@ -53,13 +53,13 @@ import org.puyallupfamilyhistorycenter.service.websocket.FamilyHistoryFamilyTree
  */
 public class Precacher {
     private static final Logger logger = Logger.getLogger(Precacher.class);
-    private static final Source<Person> source;
-    private static final Source<PersonTemple> templeSource;
+    private static final Source<String, Person> source;
+    private static final Source<String, PersonTemple> templeSource;
     private static final ExecutorService executor = Executors.newCachedThreadPool();
 
     static {
-        source = (Source<Person>) SpringContextInitializer.getContext().getBean("in-memory-source");
-        templeSource = (Source<PersonTemple>) SpringContextInitializer.getContext().getBean("temple-source");
+        source = (Source<String, Person>) SpringContextInitializer.getContext().getBean("in-memory-source");
+        templeSource = (Source<String, PersonTemple>) SpringContextInitializer.getContext().getBean("temple-source");
     }
 
     private static class PrecacheObject {
