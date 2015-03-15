@@ -25,14 +25,16 @@
  */
 package org.puyallupfamilyhistorycenter.service.cache;
 
+import org.puyallupfamilyhistorycenter.service.models.Person;
+
 /**
  *
  * @author tibbitts
  */
-public class AllowAllDecider implements CachingSource.ShouldCacheDecider<Object> {
+public class AllowAllDecider implements CachingSource.ShouldCacheDecider<Person> {
 
     @Override
-    public boolean shouldCache(Object value) {
+    public boolean shouldCache(Person value) {
         return true;
     }
     

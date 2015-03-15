@@ -69,23 +69,6 @@ POSSIBILITY OF SUCH DAMAGE.
     
     <bean id="temple-source" class="org.puyallupfamilyhistorycenter.service.cache.FamilySearchPersonTempleSource" />
     
-    <bean id="image-source" class="org.puyallupfamilyhistorycenter.service.cache.FamilySearchImageSource" />
-    
-    <bean id="image-class" class="java.lang.Class" factory-method="forName">
-        <constructor-arg value="org.puyallupfamilyhistorycenter.service.models.ImageAndMetadata" />
-    </bean>
-    
-    <bean id="image-file-cache" class="org.puyallupfamilyhistorycenter.service.cache.FileCache" >
-        <constructor-arg ref="image-class" />
-        <constructor-arg value="${image-cache-dir}" />
-        <constructor-arg value="${image-cache-ttl}" />
-    </bean>
-    <bean id="image-file-source" class="org.puyallupfamilyhistorycenter.service.cache.CachingSource">
-        <constructor-arg ref="image-source" />
-        <constructor-arg ref="image-file-cache" />
-        <property name="decider" ref="allow-all-decider" />
-    </bean>
-    
     <!--Web socket-->
     <bean id="web-socket-handler" class="org.puyallupfamilyhistorycenter.service.websocket.FamilyHistoryCenterWebSocketHandler" />
     <bean id="web-socket-resource" class="org.eclipse.jetty.util.resource.Resource" factory-method="newResource" >
@@ -164,9 +147,7 @@ POSSIBILITY OF SUCH DAMAGE.
     </bean>
     
     <!--Image cache-->
-    <bean id="image-cache-handler" class="org.puyallupfamilyhistorycenter.service.cache.FamilySearchImageCacheHandler" >
-        <constructor-arg ref="image-file-source" />
-    </bean>
+    <bean id="image-cache-handler" class="org.puyallupfamilyhistorycenter.service.cache.FamilySearchImageCacheHandler" />
     <bean id="image-cache-context" class="org.eclipse.jetty.server.handler.ContextHandler" >
         <constructor-arg value="/image-cache" />
         <property name="handler" ref="image-cache-handler" />

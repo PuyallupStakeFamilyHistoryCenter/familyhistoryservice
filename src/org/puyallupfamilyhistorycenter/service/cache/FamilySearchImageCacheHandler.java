@@ -26,20 +26,31 @@
 
 package org.puyallupfamilyhistorycenter.service.cache;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.Writer;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Enumeration;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.zip.GZIPOutputStream;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.io.IOUtils;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.AbstractHandler;
-import org.puyallupfamilyhistorycenter.service.models.ImageAndMetadata;
-import org.puyallupfamilyhistorycenter.service.models.KeyAndHeaders;
 
 /**
  *
@@ -48,12 +59,10 @@ import org.puyallupfamilyhistorycenter.service.models.KeyAndHeaders;
 
 
 public class FamilySearchImageCacheHandler extends AbstractHandler {
-
-    private final Source<KeyAndHeaders, ImageAndMetadata> source;
-    public FamilySearchImageCacheHandler(Source<KeyAndHeaders, ImageAndMetadata> source) {
-        this.source = source;
+    public static final File cacheDir = new File("/tmp/fhc/image-cache");
+    static {
+        cacheDir.mkdirs();
     }
-    
 
     @Override
     public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
@@ -71,34 +80,67 @@ public class FamilySearchImageCacheHandler extends AbstractHandler {
             return;
         }
         
-        String[] urlSplit = URLDecoder.decode(ref, StandardCharsets.US_ASCII.name()).split("\\?");
-        String id = URLEncoder.encode(urlSplit[0], StandardCharsets.US_ASCII.name());
-        String queryParams = urlSplit.length > 1 ? urlSplit[1] : "";
+        String filename = ref.replaceAll("access_token.*", "");
+        File cachedFile = new File(cacheDir, filename + ".gz");
+        File metadataFile = new File(cacheDir, filename + ".meta");
         
-        String accessToken = null;
-        Map<String, String> headers = new HashMap<>();
-        for (String param : queryParams.split("&")) {
-            String[] split = param.split("=");
-            if ("access_token".equals(split[0])) {
-                accessToken = split[1];
-            } else if (split[0].length() > 0) {
-                headers.put(split[0], split[1]);
+        if (!cachedFile.exists()) {
+            URL refUrl = new URL(URLDecoder.decode(ref, StandardCharsets.US_ASCII.name()));
+            HttpURLConnection connection = (HttpURLConnection) refUrl.openConnection();
+            Enumeration<String> headerNames = baseRequest.getHeaderNames();
+            for (String headerName = headerNames.nextElement(); headerNames.hasMoreElements(); headerName = headerNames.nextElement()) {
+                connection.setRequestProperty(headerName, baseRequest.getHeader(headerName));
+            }
+            try {
+                if (connection.getResponseCode() / 100 == 2) { // Shorthand for 'is response successful?'
+                    try (OutputStream out = new GZIPOutputStream(new FileOutputStream(cachedFile))) {
+                        IOUtils.copy(connection.getInputStream(), out);
+                    }
+                    
+                    try (Writer writer = new FileWriter(metadataFile)) {
+                        for (String headerName : connection.getHeaderFields().keySet()) {
+                            if (keepHeader(headerName)) {
+                                writer.write(headerName + ":" + connection.getHeaderField(headerName) + '\n');
+                            }
+                        }
+                        writer.write("Content-Encoding:gzip\n");
+                        writer.write("Content-Length:" + cachedFile.length() + '\n');
+                    }
+                } else {
+                    response.sendError(connection.getResponseCode(), connection.getResponseMessage());
+                    return;
+                }
+            } finally {
+                connection.disconnect();
             }
         }
-        KeyAndHeaders idAndHeaders = new KeyAndHeaders(id, headers);
-        ImageAndMetadata image = source.get(idAndHeaders, accessToken);
         
-        if (image == null) {
+        if (!cachedFile.exists()) {
             response.sendError(500, "Failed to retrieve cached file for resource " + ref);
             return;
         }
         
-        for (String headerKey : image.metadata.keySet()) {
-            response.setHeader(headerKey, image.metadata.get(headerKey));
+        try (BufferedReader reader = new BufferedReader(new FileReader(metadataFile))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] split = line.split(":", 2);
+                response.setHeader(split[0], split[1]);
+            }
         }
         
-        response.getOutputStream().write(image.getImageBytes());
+        try (InputStream fin = new FileInputStream(cachedFile)) {
+            IOUtils.copy(fin, response.getOutputStream());
+        }
         
         response.setStatus(200);
+    }
+
+    private static final Set<String> keepHeaders = new HashSet<String>() {{
+        add("Content-Type");
+        add("Last-Modified");
+        add("Etag");
+    }};
+    private boolean keepHeader(String headerName) {
+        return keepHeaders.contains(headerName);
     }
 }

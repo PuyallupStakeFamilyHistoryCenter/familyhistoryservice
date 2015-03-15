@@ -53,7 +53,7 @@ import org.puyallupfamilyhistorycenter.service.websocket.FamilyHistoryFamilyTree
  *
  * @author tibbitts
  */
-public class FamilySearchPersonSource implements Source<String, Person> {
+public class FamilySearchPersonSource implements Source<Person> {
 
     private static final Logger logger = Logger.getLogger(FamilySearchPersonSource.class);
     private static final Gson GSON = new Gson();

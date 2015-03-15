@@ -42,8 +42,6 @@ import org.gedcomx.rs.client.PersonSpousesState;
 import org.gedcomx.rs.client.PersonState;
 import org.puyallupfamilyhistorycenter.service.ApplicationProperties;
 import org.puyallupfamilyhistorycenter.service.SpringContextInitializer;
-import org.puyallupfamilyhistorycenter.service.models.ImageAndMetadata;
-import org.puyallupfamilyhistorycenter.service.models.KeyAndHeaders;
 import org.puyallupfamilyhistorycenter.service.models.Person;
 import org.puyallupfamilyhistorycenter.service.models.PersonReference;
 import org.puyallupfamilyhistorycenter.service.models.PersonTemple;
@@ -55,16 +53,14 @@ import org.puyallupfamilyhistorycenter.service.websocket.FamilyHistoryFamilyTree
  */
 public class Precacher {
     private static final Logger logger = Logger.getLogger(Precacher.class);
-    private static final Source<String, Person> source;
-    private static final Source<String, PersonTemple> templeSource;
-    private static final Source<KeyAndHeaders, ImageAndMetadata> imageSource;
+    private static final Source<Person> source;
+    private static final Source<PersonTemple> templeSource;
     private static final ExecutorService executor = Executors.newCachedThreadPool();
     private static final ExecutorService imageCacheExecutor = Executors.newFixedThreadPool(1);
 
     static {
-        source = (Source<String, Person>) SpringContextInitializer.getContext().getBean("in-memory-source");
-        templeSource = (Source<String, PersonTemple>) SpringContextInitializer.getContext().getBean("temple-source");
-        imageSource = (Source<KeyAndHeaders, ImageAndMetadata>) SpringContextInitializer.getContext().getBean("image-file-source");
+        source = (Source<Person>) SpringContextInitializer.getContext().getBean("in-memory-source");
+        templeSource = (Source<PersonTemple>) SpringContextInitializer.getContext().getBean("temple-source");
     }
 
     private static class PrecacheObject {

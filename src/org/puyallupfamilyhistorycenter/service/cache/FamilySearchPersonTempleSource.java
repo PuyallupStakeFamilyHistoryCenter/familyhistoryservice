@@ -36,7 +36,7 @@ import org.puyallupfamilyhistorycenter.service.models.PersonTemple;
  *
  * @author tibbitts
  */
-public class FamilySearchPersonTempleSource implements Source<String, PersonTemple> {
+public class FamilySearchPersonTempleSource implements Source<PersonTemple> {
     private static final Logger logger = Logger.getLogger(FamilySearchPersonTempleSource.class);
     
     /*

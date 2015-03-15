@@ -39,9 +39,9 @@ import org.puyallupfamilyhistorycenter.service.models.Person;
 
 
 public class PersonDao {
-    private final Source<String, Person> source;
+    private final Source<Person> source;
 
-    public PersonDao(Source<String, Person> source) {
+    public PersonDao(Source<Person> source) {
         this.source = source;
     }
     

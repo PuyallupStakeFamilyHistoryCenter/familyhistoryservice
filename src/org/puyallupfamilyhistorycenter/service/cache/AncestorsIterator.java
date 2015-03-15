@@ -46,12 +46,12 @@ public class AncestorsIterator implements Iterator<Person> {
 
     private final String personId;
     private final int maxDepth;
-    private final Source<String, Person> source;
+    private final Source<Person> source;
     private final String accessToken;
     private final boolean cacheOnly;
     private final Queue<PersonReference> frontier = new LinkedList<>();
     
-    AncestorsIterator(String personId, int maxDepth, Source<String, Person> source, String accessToken, boolean cacheOnly) {
+    AncestorsIterator(String personId, int maxDepth, Source<Person> source, String accessToken, boolean cacheOnly) {
         this.personId = personId;
         this.maxDepth = maxDepth;
         this.source = source;

@@ -44,11 +44,11 @@ public class DescendantsIterator implements Iterator<Person> {
 
     private final String personId;
     private final int maxDepth;
-    private final Source<String, Person> source;
+    private final Source<Person> source;
     private final String accessToken;
     private final Queue<PersonReference> frontier = new LinkedList<>();
     
-    DescendantsIterator(String personId, int maxDepth, Source<String, Person> source, String accessToken) {
+    DescendantsIterator(String personId, int maxDepth, Source<Person> source, String accessToken) {
         this.personId = personId;
         this.maxDepth = maxDepth;
         this.source = source;
