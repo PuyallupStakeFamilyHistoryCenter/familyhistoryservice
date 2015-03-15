@@ -289,7 +289,9 @@ Move developer id into config file (not in Git) DONE
 Delay loading of controller in split mode  DONE
 Split mode controller shouldn't cover display DONE
 Support approximate dates and date ranges  DONE
-*Set up CA and certificates (http://blog.httpwatch.com/2013/12/12/five-tips-for-using-self-signed-ssl-certificates-with-ios/)
+Set up CA and certificates (http://blog.httpwatch.com/2013/12/12/five-tips-for-using-self-signed-ssl-certificates-with-ios/) DONE
+Figure out deployment strategy             DONE
+Turn features on/off for split/normal mode DONE
 *Add third-party website links
 *Figure out deployment strategy
 *Turn features on/off for split/normal mode
