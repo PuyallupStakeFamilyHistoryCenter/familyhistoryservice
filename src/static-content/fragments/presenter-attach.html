@@ -154,7 +154,7 @@ POSSIBILITY OF SUCH DAMAGE.
                     $(divSelecter).show();
 
                     $("#" + userId + "-cached-prg").css("width", ((cached / unvisited) * 100) + "%");
-                    $("#" + userId + "-stats").html("Cached: " + cached + " / " + unvisited + " Gen: " + currentGeneration);
+                    $("#" + userId + "-stats").html(cached + " / " + (unvisited + cached + queueSize) + " Gen: " + currentGeneration);
                 }
             }
         }
