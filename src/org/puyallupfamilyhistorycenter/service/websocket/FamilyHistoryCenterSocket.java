@@ -203,6 +203,11 @@ public class FamilyHistoryCenterSocket {
                     response = "{\"responseType\":\"pong\"}";
                     break;
                     
+                case "reconnect":
+                    //TODO: Be more intelligent about this (displays don't need to reload, controllers do)
+                    scheduleReload(session.getRemote(), 1);
+                    break;
+                    
                 case "restart-server": {
                     Iterator<UserContext> it = userContextMap.values().iterator();
                     while (it.hasNext()) {

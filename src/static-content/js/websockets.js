@@ -30,6 +30,9 @@ var blocking = true;
 var isOpen = false;
 var messageListeners = [];
 var pingTimeout;
+var minReconnectWaitTime = 500;
+var maxReconnectWaitTime = 5000;
+var reconnectWaitTime = minReconnectWaitTime; //ms
 
 var ws = {
     close: function() {
@@ -54,7 +57,7 @@ var ws = {
             protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
         }
         blocking = true;
-        connection = new WebSocket(protocol + '//' + endpoint + '/remote-control/', ['soap', 'xmpp']); //TODO: Use secure web sockets (need certificate)
+        connection = new WebSocket(protocol + '//' + endpoint + '/remote-control/', ['soap', 'xmpp']);
         
         connection.onmessage = function(message) {
             if (!isOpen) return;
@@ -70,6 +73,21 @@ var ws = {
             isOpen = true;
             ping();
             drainQueue();
+            reconnectWaitTime = minReconnectWaitTime;
+        };
+        connection.onclose  = connection.onerror = function(e) {
+            console.warn("Got close or error from web socket: " + JSON.stringify(e) + '; scheduing reconnect attempt in ' + reconnectWaitTime + "ms");
+            isOpen = false;
+            connection = null;
+            messageQueue.push("reconnect");
+            setTimeout(function() {
+                console.info("Attempting to reconnect web socket");
+                ws.connect();
+            }, reconnectWaitTime);
+            reconnectWaitTime *= 2;
+            if (reconnectWaitTime > maxReconnectWaitTime) {
+                reconnectWaitTime = maxReconnectWaitTime;
+            }
         };
         function drainQueue() {
             if (!connection) {
