@@ -335,9 +335,11 @@ function log(level, message, ttl) {
     if (!ttl) {
         ttl = 5000;
     }
-    setTimeout(function() {
-        $("#messages").children("#message-" + id).remove();
-    }, ttl);
+    if (ttl > 0) {
+        setTimeout(function() {
+            $("#messages").children("#message-" + id).remove();
+        }, ttl);
+    }
 }
 
 function clearLog() {

@@ -76,8 +76,11 @@ var ws = {
             drainQueue();
             reconnectWaitTime = minReconnectWaitTime;
         };
-        connection.onclose  = connection.onerror = function(e) {
-            console.warn("Got close or error from web socket: " + JSON.stringify(e) + '; scheduing reconnect attempt in ' + reconnectWaitTime + "ms");
+        connection.onclose  = function(e) {
+            console.warn("Got close or error from web socket: " + JSON.stringify(e) + '; scheduling reconnect attempt in ' + reconnectWaitTime + "ms");
+            if (reconnectWaitTime === minReconnectWaitTime) {
+                logger.warn("Lost connection to server. Attempting to reestablish...", -1);
+            }
             isOpen = false;
             connection = null;
             messageQueue.push("reconnect " + window.location.pathname.substring(1));
