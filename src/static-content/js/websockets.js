@@ -33,6 +33,7 @@ var pingTimeout;
 var minReconnectWaitTime = 500;
 var maxReconnectWaitTime = 5000;
 var reconnectWaitTime = minReconnectWaitTime; //ms
+var reconnectTimeout;
 
 var ws = {
     close: function() {
@@ -79,8 +80,11 @@ var ws = {
             console.warn("Got close or error from web socket: " + JSON.stringify(e) + '; scheduing reconnect attempt in ' + reconnectWaitTime + "ms");
             isOpen = false;
             connection = null;
-            messageQueue.push("reconnect");
-            setTimeout(function() {
+            messageQueue.push("reconnect " + window.location.pathname.substring(1));
+            if (reconnectTimeout) {
+                clearTimeout(reconnectTimeout);
+            }
+            reconnectTimeout = setTimeout(function() {
                 console.info("Attempting to reconnect web socket");
                 ws.connect();
             }, reconnectWaitTime);

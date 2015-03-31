@@ -204,8 +204,15 @@ public class FamilyHistoryCenterSocket {
                     break;
                     
                 case "reconnect":
-                    //TODO: Be more intelligent about this (displays don't need to reload, controllers do)
-                    scheduleReload(session.getRemote(), 1);
+                    String type = scanner.next();
+                    switch (type) {
+                        case "display":
+                            scheduleReload(session.getRemote(), 1);
+                            break;
+                        default:
+                            scheduleReload(session.getRemote(), 5);
+                            break;
+                    }
                     break;
                     
                 case "restart-server": {
