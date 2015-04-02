@@ -28,6 +28,7 @@
 
 var content;
 var mode;
+var reloadScheduled;
 var settings = {
     global: {
         verbs: {
@@ -45,6 +46,9 @@ var settings = {
                 },1000);
             },
             scheduleReload: function(obj) {
+                if (reloadScheduled) return;
+                reloadScheduled = true;
+                
                 var remaining = obj.delay;
                 $("body").append("<div class='modal fade' id='reloadModal' tabindex='-1' role='dialog' aria-labelledby='myModalLabel' aria-hidden='true'><div class='modal-dialog modal-sm'><div class='modal-content'><div class='modal-body'><h3>This page will reload in <span id='reloadTime'></span> seconds</h3></div></div></div></div>");
                 $("#reloadModal").modal({
@@ -59,7 +63,8 @@ var settings = {
                     } else {
                         location.reload();
                     }
-                }
+                };
+                
                 countdownFunction();
             }
         }
