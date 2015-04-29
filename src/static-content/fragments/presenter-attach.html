@@ -50,6 +50,7 @@ POSSIBILITY OF SUCH DAMAGE.
     <div class="panel-body" id="admin-btns">
         <button class="btn btn-lg btn-danger" id="resetButton" >Restart server</button>
         <button class="btn btn-lg btn-warning" id="reportBugButton" >Report bug</button>
+        <button class="btn btn-lg btn-success pull-right" id="checklistButton" >Checklist</button>
     </div>
 </div>
 
@@ -234,6 +235,10 @@ POSSIBILITY OF SUCH DAMAGE.
     $("#reportBugButton").click(function() {
         $("#bugReportBody").val("");
         $("#bugReportModal").modal();
+    });
+    
+    $("#checklistButton").click(function() {
+        navigate("presenter-checklist");
     });
     
     $("#confirmBugReportButton").click(function() {

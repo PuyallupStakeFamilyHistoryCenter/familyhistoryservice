@@ -71,6 +71,8 @@ import org.gedcomx.rs.client.PersonState;
 import org.puyallupfamilyhistorycenter.service.ApplicationProperties;
 import org.puyallupfamilyhistorycenter.service.SpringContextInitializer;
 import org.puyallupfamilyhistorycenter.service.cache.Precacher;
+import org.puyallupfamilyhistorycenter.service.models.Checklist;
+import org.puyallupfamilyhistorycenter.service.models.ChecklistItem;
 import org.puyallupfamilyhistorycenter.service.models.Statistics;
 import org.puyallupfamilyhistorycenter.service.models.Person;
 import org.puyallupfamilyhistorycenter.service.models.PersonImage;
@@ -128,6 +130,7 @@ public class FamilyHistoryCenterSocket {
     private static final Map<String, String> tokenUserIdMap = new HashMap<>();
     private static final Map<String, Long> tokenLastUse = new HashMap<>();
     private static final Map<String, UserContext> userContextMap = new LinkedHashMap<>();
+    private static final Checklist checklist = newChecklist();
     private static final SecureRandom rand;
     static {
         try {
@@ -707,6 +710,19 @@ public class FamilyHistoryCenterSocket {
                     response = "{\"responseType\":\"videosList\",\"videosList\":" + GSON.toJson(videos) + "}";
                     break;
                 }
+                
+                case "getChecklist": {
+                    response = GSON.toJson(checklist);
+                    
+                    break;
+                }
+                
+                case "check": {
+                    String id = scanner.next();
+                    boolean value = scanner.nextBoolean();
+                    checklist.setChecked(id, value);
+                    break;
+                }
 
                 default:
                     throw new IllegalStateException("unrecognized command '" + message + "'");
@@ -924,5 +940,20 @@ public class FamilyHistoryCenterSocket {
         } else {
             throw new IllegalStateException("display not found '" + id + "'");
         }
+    }
+    
+    protected static Checklist newChecklist() {
+        Checklist checklist = new Checklist();
+        checklist.addOpenItem(new ChecklistItem("turn-on-screens", "Turn on screens"));
+        checklist.addOpenItem(new ChecklistItem("turn-on-ipads", "Turn on iPads"));
+        checklist.addOpenItem(new ChecklistItem("reset-server", "Reset server"));
+        checklist.addCloseItem(new ChecklistItem("turn-off-screens", "Turn off screens"));
+        checklist.addCloseItem(new ChecklistItem("turn-off-ipads", "Turn off iPads"));
+        checklist.addCloseItem(new ChecklistItem("wipe-off-ipads", "Wipe off iPads"));
+        checklist.addCloseItem(new ChecklistItem("plug-in-ipads", "Plug in iPads"));
+        checklist.addCloseItem(new ChecklistItem("lock-cabinet", "Lock cabinet"));
+        checklist.addCloseItem(new ChecklistItem("empty-trash", "Empty trash"));
+        
+        return checklist;
     }
 }
