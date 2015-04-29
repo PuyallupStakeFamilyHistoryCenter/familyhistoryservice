@@ -209,6 +209,10 @@ POSSIBILITY OF SUCH DAMAGE.
                     <property name="pattern" value="/auth-redirect.html" />
                     <property name="replacement" value="/static-content/auth-redirect.html" />
                 </bean>
+                <bean class="org.eclipse.jetty.rewrite.handler.RewritePatternRule">
+                    <property name="pattern" value="/account-verification" />
+                    <property name="replacement" value="/static-content/account-verification.html" />
+                </bean>
             </array>
         </property>
         
