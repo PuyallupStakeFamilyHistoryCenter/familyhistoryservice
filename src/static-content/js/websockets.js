@@ -24,6 +24,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+
+var protocol = "ws:";
 var messageQueue = [];
 var connection;
 var blocking = true;
@@ -52,7 +54,9 @@ var ws = {
         }
         
         console.info("Connecting web socket");
-        var protocol = "wss";
+        if (!endpoint) {
+            endpoint = globalEndpoint;
+        }
         if (!endpoint) {
             endpoint = window.location.host;
             protocol = window.location.protocol === "https:" ? "wss:" : "ws:";

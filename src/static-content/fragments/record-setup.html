@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<!--
+Copyright (c) 2015, tibbitts
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+* Redistributions of source code must retain the above copyright notice, this
+  list of conditions and the following disclaimer.
+* Redistributions in binary form must reproduce the above copyright notice,
+  this list of conditions and the following disclaimer in the documentation
+  and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+POSSIBILITY OF SUCH DAMAGE.
+-->
+
+<div>
+    
+</div>
+
+<p>
+Press the start button, then get comfortable and press the wireless shutter release
+button. Record your history, then press the shutter release button when finished.
+</p>
+<button id="capture-btn" class="btn btn-lg btn-default">Start</button>
+<div id="video-frame">
+    
+</div>
+
+<script>
+    var errorCallback = function(e) {
+        console.log('Reeeejected!', e);
+    };
+    $("#capture-btn").click(function() {
+        if (navigator.device) {
+            navigator.device.capture.captureVideo( 
+                function(mediaFiles) {
+                    var i, path, len;
+                    for (i = 0, len = mediaFiles.length; i < len; i += 1) {
+                        file = mediaFiles[i];
+                        
+                        var options = new FileUploadOptions();
+                        options.fileKey = "file";
+                        options.fileName = file.name;
+                        options.mimeType = file.type;
+
+                        var params = {};
+//                        params.value1 = "test";
+//                        params.value2 = "param";
+//
+//                        options.params = params;
+
+                        var ft = new FileTransfer();
+                        ft.upload(fileURI, encodeURI("http://" + globalEndpoint + "/video-upload"), win, errorCallback, options);
+                    }
+                }, errorCallback, {
+                    
+                }
+            );
+        } else {
+            
+//            navigator.webkitGetUserMedia({video: true, audio: true}, function(localMediaStream) {
+//                $("#video-frame").html("<video autoplay></video>")
+//                var video = document.querySelector('video');
+//                video.src = window.URL.createObjectURL(localMediaStream);
+//
+//                // Note: onloadedmetadata doesn't fire in Chrome when using it with getUserMedia.
+//                // See crbug.com/110938.
+//                video.onloadedmetadata = function(e) {
+//                  // Ready to go. Do some stuff.
+//                };
+//              }, errorCallback);
+        }
+    });
+    
+    asdf();
+</script>

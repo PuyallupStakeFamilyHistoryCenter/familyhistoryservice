@@ -195,7 +195,7 @@ POSSIBILITY OF SUCH DAMAGE.
         $.each(group.buttons, function(i, buttonInfo) {
             navButtons.append('<button id="'+buttonInfo.name+'-button" class="btn btn-lg btn-default" style="margin: 5px;" '
                     +(buttonInfo.disabled?"disabled":"")+'>'+
-                    '<span class="btn-nav"><img src="../media/' + buttonInfo.image + '" /></span><br><strong>'+
+                    '<span class="btn-nav"><img src="'+(globalEndpoint?"http://"+globalEndpoint:"..")+'/media/' + buttonInfo.image + '" /></span><br><strong>'+
                     buttonInfo.label + '</strong></button>');
             $("#" + buttonInfo.name + "-button").click(function(e) {
                 if (buttonInfo.nav) {

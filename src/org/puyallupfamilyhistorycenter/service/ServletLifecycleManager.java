@@ -33,10 +33,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.eclipse.jetty.server.Server;
-import static org.puyallupfamilyhistorycenter.service.SpringContextInitializer.resetContext;
 
 /**
  * Manages the life-cycle of the server, allowing the server to be

@@ -28,6 +28,7 @@
 
 var content;
 var mode;
+var globalEndpoint;
 var reloadScheduled;
 var settings = {
     global: {
@@ -128,7 +129,7 @@ function setup() {
     if (settings.page.header) {
         pageHeader.html("<h1>" + settings.page.header + "</h1>");
     } else if (settings.page.headerFile) {
-        $.ajax("/static-content/fragments/"+ settings.page.headerFile)
+        $.ajax((globalEndpoint?"http://"+globalEndpoint:"")+"/static-content/fragments/"+ settings.page.headerFile)
         .done(function(data) {
             pageHeader.html(data);
         }).fail(function() {
@@ -139,7 +140,7 @@ function setup() {
     if (settings.page.footer) {
         pageFooter.html("settings.page.footer");
     } else if (settings.page.footerFile) {
-        $.ajax("/static-content/fragments/"+ settings.page.footerFile)
+        $.ajax((globalEndpoint?"http://"+globalEndpoint:"")+"/static-content/fragments/"+ settings.page.footerFile)
         .done(function(data) {
             pageFooter.html(data);
         }).fail(function() {
@@ -271,6 +272,36 @@ var defaultSettings = {
                 navigate("controller-set-display-name");
         },
     },
+    record: {
+        title: "Record your story",
+        header: '',
+        headerFile: 'controller-header.html',
+        footerFile: 'controller-footer.html',
+        contentPadding: true,
+        verbs: {
+            token: function (response) {
+                setUsername(response.username);
+                token = response.token;
+                clearHistory();
+                navigate("record-setup");
+            },
+            precacheEvent: function (response) {
+                
+            }
+        },
+        begin: function() {
+            navigate("controller-login")
+        },
+        getToken: function(userId, pin) {
+            ws.socketSend("login " + userId + " " + pin);
+        },
+        logOut: function() {
+            ws.socketSend("logout " + token);
+            token = null;
+            resetCacheProgress();
+            navigate("controller-login");
+        },
+    },
 };
 defaultSettings.games = Object.create(defaultSettings["controller"]);
 defaultSettings.games.begin = function() {
@@ -357,7 +388,7 @@ function navigate(dest, timeout) {
         timeout = 1000;
     }
     var split = dest.split("?");
-    var actualDest = "/static-content/fragments/" + split[0] + ".html";
+    var actualDest = (globalEndpoint?"http://"+globalEndpoint:"")+"/static-content/fragments/" + split[0] + ".html";
     var tempVars = null;
     if (split.length > 1) {
         actualDest += "?" + split[1];

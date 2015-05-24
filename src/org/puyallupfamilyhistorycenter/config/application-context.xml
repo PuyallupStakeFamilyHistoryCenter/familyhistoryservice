@@ -153,6 +153,13 @@ POSSIBILITY OF SUCH DAMAGE.
         <property name="handler" ref="image-cache-handler" />
     </bean>
     
+    <!-- Video upload -->
+    <bean id="video-upload-handler" class="org.puyallupfamilyhistorycenter.service.VideoUploadHandler" />
+    <bean id="video-upload-context" class="org.eclipse.jetty.server.handler.ContextHandler" >
+        <constructor-arg value="/video-upload" />
+        <property name="handler" ref="video-upload-context" />
+    </bean>
+    
     <!--Handler collection-->
     <bean id="context-handlers" class="org.eclipse.jetty.server.handler.ContextHandlerCollection">
         <property name="handlers">
@@ -219,8 +226,17 @@ POSSIBILITY OF SUCH DAMAGE.
         <property name="handler" ref="context-handlers" />
     </bean>
     
+    <bean id="cors-filter" class="org.eclipse.jetty.servlets.CrossOriginFilter" >
+        
+    </bean>
+    
+    <bean id="cors-handler" class="org.puyallupfamilyhistorycenter.service.FilterHandler" >
+        <constructor-arg ref="cors-filter" />
+        <constructor-arg ref="rewrite-handler" />
+    </bean>
+    
     <bean id="server" class="org.eclipse.jetty.server.Server" init-method="start">
-        <property name="handler" ref="rewrite-handler" />
+        <property name="handler" ref="cors-handler" />
         <!-- I didn't think this would work, but it seems to -->
         <property name="connectors">
             <list>
