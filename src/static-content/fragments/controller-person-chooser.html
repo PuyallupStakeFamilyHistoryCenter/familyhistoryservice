@@ -92,14 +92,18 @@ POSSIBILITY OF SUCH DAMAGE.
     }
     
     function addRootSpouses(person) {
-        $("#btns-0-0").append("<h5>Spouse</h5>");
-        $.each(person.spouses, function(index, spouse) {
-            $("#btns-0-0").append("<div style='padding-top: 10px;'><button class='btn btn-default person-btn' data-id='" + spouse.id + "'>" + spouse.name + "</button><button class='btn btn-default target-btn' data-id='" + spouse.id + "'><span class='glyphicon glyphicon-tree-deciduous'></span></button></div>");
-        });
-        $("#btns-0-0").append("<h5>Children</h5>");
-        $.each(person.children, function(index, spouse) {
-            $("#btns-0-0").append("<div style='padding-top: 10px;'><button class='btn btn-default person-btn' data-id='" + spouse.id + "'>" + spouse.name + "</button><button class='btn btn-default target-btn' data-id='" + spouse.id + "'><span class='glyphicon glyphicon-tree-deciduous'></span></button></div>");
-        });
+        if (person.spouses) {
+            $("#btns-0-0").append("<h5>Spouse</h5>");
+            $.each(person.spouses, function(index, spouse) {
+                $("#btns-0-0").append("<div style='padding-top: 10px;'><button class='btn btn-default person-btn' data-id='" + spouse.id + "'>" + spouse.name + "</button><button class='btn btn-default target-btn' data-id='" + spouse.id + "'><span class='glyphicon glyphicon-tree-deciduous'></span></button></div>");
+            });
+        }
+        if (person.children) {
+            $("#btns-0-0").append("<h5>Children</h5>");
+            $.each(person.children, function(index, spouse) {
+                $("#btns-0-0").append("<div style='padding-top: 10px;'><button class='btn btn-default person-btn' data-id='" + spouse.id + "'>" + spouse.name + "</button><button class='btn btn-default target-btn' data-id='" + spouse.id + "'><span class='glyphicon glyphicon-tree-deciduous'></span></button></div>");
+            });
+        }
     }
 
     settings.local = {
