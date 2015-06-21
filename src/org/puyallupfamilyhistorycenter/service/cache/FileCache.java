@@ -77,6 +77,10 @@ public class FileCache<V> implements Cache<String, V> {
 
     @Override
     public boolean containsKey(String key) {
+        if (key == null) {
+            return false;
+        }
+        
         File file = new File(dir, key);
         return file.exists() && 
                 file.lastModified() + ttl > System.currentTimeMillis();

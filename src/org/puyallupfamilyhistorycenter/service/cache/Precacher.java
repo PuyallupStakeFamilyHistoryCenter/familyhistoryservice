@@ -122,7 +122,7 @@ public class Precacher {
                             PrecacheObject precacheObject = frontier.remove();
                             try {
                                 Person person = source.get(precacheObject.id, accessToken);
-                                if (person.parents != null && precacheObject.depth < maxDepth) {
+                                if (person != null && person.parents != null && precacheObject.depth < maxDepth) {
                                     for (PersonReference parent : person.parents) {
                                         logger.info(Thread.currentThread().getName() + ": Adding parent " + parent.getName() + " to frontier level " + (precacheObject.depth + 1));
                                         frontier.add(new PrecacheObject(parent.getId(), precacheObject.depth + 1));
@@ -162,6 +162,8 @@ public class Precacher {
                                 for (PrecacheListener listener : listeners) {
                                     listener.onPrecache(event);
                                 }
+                            } catch (NotFoundException ex) {
+                                logger.warn("Failed to get person " + precacheObject.id + "; skipping");
                             } catch (Exception ex) {
                                 logger.warn("Failed to get person " + precacheObject.id + "; skipping", ex);
                             }
