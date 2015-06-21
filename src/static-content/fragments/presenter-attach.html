@@ -130,7 +130,6 @@ POSSIBILITY OF SUCH DAMAGE.
 </div>
 
 <script>
-    var previousCached = 0;
     settings.local = {
         verbs: {
             displays: function(obj) {
@@ -145,14 +144,9 @@ POSSIBILITY OF SUCH DAMAGE.
                 var userId = obj.userId;
                 var cached = obj.totalCached;
 
-                var divSelecter = "#" + userId + "-progress";
-                if (cached > previousCached) {
-                    previousCached = cached;
+                var divSelector = "#" + userId + "-stats";
 
-                    $(divSelecter).show();
-
-                    $("#" + userId + "-stats").html("Cached: " + cached);
-                }
+                $(divSelector).html("Cached: " + cached);
             }
         }
     };
@@ -189,14 +183,14 @@ POSSIBILITY OF SUCH DAMAGE.
         $.each(users, function(index, user) {
             if (user.name !== "Guest account") {
                 $("#user-btns").append(
-                        "<div>" +
-                        "    <div class='btn-group col-sm-6' role='group'>" +
+                        "<div class='col-sm-12'>" +
+                        "    <div class='btn-group col-sm-8' role='group'>" +
                         "        <button class='btn btn-default user-btn' data-user='"+user.id+"'>" + user.name + "</button>" +
                         "        <button class='btn btn-danger remove-user-btn' data-user='"+user.id+"' data-user-name='"+user.name+"'>" +
                         "            <span class='glyphicon glyphicon-remove'></span>" +
                         "        </button>" +
                         "    </div>" +
-                        "    <div class='col-sm-5' style='margin: 10px 10px; display: inline-block'>" +
+                        "    <div class='col-sm-3' style='margin: 10px 10px; display: inline-block'>" +
                         "        <div id='"+user.id+"-stats'></div>" +
                         "    </div>" +
                         "</div>");
