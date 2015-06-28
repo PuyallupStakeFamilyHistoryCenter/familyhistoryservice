@@ -34,6 +34,7 @@ import java.io.FileWriter;
 import org.puyallupfamilyhistorycenter.service.cache.PersonDao;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.net.URISyntaxException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
@@ -68,6 +69,7 @@ import org.eclipse.jetty.websocket.api.annotations.*;
 import org.familysearch.api.client.UserState;
 import org.familysearch.api.client.ft.FamilySearchFamilyTree;
 import org.gedcomx.rs.client.PersonState;
+import org.joda.time.DateTime;
 import org.puyallupfamilyhistorycenter.service.ApplicationProperties;
 import org.puyallupfamilyhistorycenter.service.SpringContextInitializer;
 import org.puyallupfamilyhistorycenter.service.cache.Precacher;
@@ -130,6 +132,7 @@ public class FamilyHistoryCenterSocket {
     private static final Map<String, String> tokenUserIdMap = new HashMap<>();
     private static final Map<String, Long> tokenLastUse = new HashMap<>();
     private static final Map<String, UserContext> userContextMap = new LinkedHashMap<>();
+    private static final Set<String> stackTraces = new HashSet<>();
     private static final Checklist checklist = newChecklist();
     private static final SecureRandom rand;
     static {
@@ -146,14 +149,18 @@ public class FamilyHistoryCenterSocket {
 
             @Override
             public void run() {
-                Iterator<Map.Entry<String, Long>> it = tokenLastUse.entrySet().iterator();
-                while (it.hasNext()) {
-                    Map.Entry<String, Long> entry = it.next();
-                    if (entry.getValue() + tokenInactivityTimeout < System.currentTimeMillis()) {
-                        String token = entry.getKey();
-                        deactivateUserToken(token, "Logged out due to inactivity");
-                        it.remove();
+                try {
+                    Iterator<Map.Entry<String, Long>> it = tokenLastUse.entrySet().iterator();
+                    while (it.hasNext()) {
+                        Map.Entry<String, Long> entry = it.next();
+                        if (entry.getValue() + tokenInactivityTimeout < System.currentTimeMillis()) {
+                            String token = entry.getKey();
+                            deactivateUserToken(token, "Logged out due to inactivity");
+                            it.remove();
+                        }
                     }
+                } catch (Throwable t) {
+                    reportBug(t);
                 }
             }
         
@@ -162,21 +169,25 @@ public class FamilyHistoryCenterSocket {
 
             @Override
             public void run() {
-                Iterator<Map.Entry<String, UserContext>> it = userContextMap.entrySet().iterator();
-                while (it.hasNext()) {
-                    Map.Entry<String, UserContext> entry = it.next();
-                    if (entry.getValue().lastUsed + userInactivityTimeout < System.currentTimeMillis()) {
-                        String userId = entry.getKey();
-                        // TODO: Figure out how to invalidate access token
-                        String accessToken = entry.getValue().accessToken;
-                        
-                        sendFinalEmail(userId);
-                        
-                        it.remove();
+                try {
+                    Iterator<Map.Entry<String, UserContext>> it = userContextMap.entrySet().iterator();
+                    while (it.hasNext()) {
+                        Map.Entry<String, UserContext> entry = it.next();
+                        if (entry.getValue().lastUsed + userInactivityTimeout < System.currentTimeMillis()) {
+                            String userId = entry.getKey();
+                            // TODO: Figure out how to invalidate access token
+                            String accessToken = entry.getValue().accessToken;
+
+                            sendFinalEmail(userId);
+
+                            it.remove();
+                        }
                     }
+
+                    resendUserList();
+                } catch (Throwable t) {
+                    reportBug(t);
                 }
-                
-                resendUserList();
             }
         
         }, 1, 1, TimeUnit.MINUTES);
@@ -331,19 +342,7 @@ public class FamilyHistoryCenterSocket {
                 case "reportBug": {
                     String reporter = scanner.next().replaceAll("%20", " ");
                     String reportBody = scanner.next().replaceAll("%20", " ");
-                    String reportId = UUID.randomUUID().toString();
-                    
-                    logger.warn("Bug report " + reportId + " by " + reporter + ": " + reportBody);
-                    
-                    try(PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter("bugReports", true)))) {
-                        out.println(reportId);
-                        out.println(reporter);
-                        out.println(reportBody);
-                        out.println();
-                    } catch (IOException e) {
-                        logger.warn("Failed to record bug report " + reportId);
-                        response = getErrorResponse("Failed to record bug report");
-                    }
+                    reportBug(reporter, reportBody);
                     break;
                 }
 
@@ -737,6 +736,7 @@ public class FamilyHistoryCenterSocket {
         } catch (Throwable e) {
             logger.error("Unexpected exception: " + e, e);
             response = getErrorResponse(e.getMessage());
+            reportBug(e);
         }
         
         if (session.isOpen()) {
@@ -834,7 +834,7 @@ public class FamilyHistoryCenterSocket {
                 controllerEndpoint.sendString(getErrorResponse(message));
             }
         } catch (Exception e) {
-            //Eat these exceptions
+            reportBug(e);
         }
     }
 
@@ -886,7 +886,7 @@ public class FamilyHistoryCenterSocket {
         try {
             endpoint.sendString("{\"responseType\":\"scheduleReload\",\"delay\":"+(delay*1000)+"}");
         } catch (IOException ex) {
-            //DO NOTHING
+            reportBug(ex);
         }
     }
     
@@ -955,5 +955,35 @@ public class FamilyHistoryCenterSocket {
         checklist.addCloseItem(new ChecklistItem("empty-trash", "Empty trash"));
         
         return checklist;
+    }
+    
+    protected static void reportBug(Throwable t) {
+        try (StringWriter writer = new StringWriter()) {
+            t.printStackTrace(new PrintWriter(writer));
+            String stackTrace = writer.toString();
+            if (!stackTraces.contains(stackTrace)) {
+                stackTraces.add(stackTrace);
+                reportBug("system", stackTrace);
+            }
+        } catch (IOException e) {
+            //DO NOTHING
+        }
+    }
+    
+    protected static void reportBug(String reporter, String reportBody) {
+        
+        String reportId = UUID.randomUUID().toString();
+
+        logger.warn("Bug report " + reportId + " by " + reporter + ": " + reportBody);
+
+        try(PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter("bugReports", true)))) {
+            out.println(reportId);
+            out.println(new DateTime());
+            out.println(reporter);
+            out.println(reportBody);
+            out.println();
+        } catch (IOException e) {
+            throw new IllegalStateException("Failed to record bug report " + reportId);
+        }
     }
 }
