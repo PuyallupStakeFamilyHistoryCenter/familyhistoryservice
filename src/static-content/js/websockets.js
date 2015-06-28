@@ -47,8 +47,8 @@ var ws = {
     },
     connect: function(endpoint) {
         if (connection) {
-            throw new Error("Already connected");
-            //return;
+            //throw new Error("Already connected");
+            return;
         }
         
         console.info("Connecting web socket");

@@ -228,7 +228,9 @@ var defaultSettings = {
         logOut: function() {
             ws.socketSend("logout " + token);
             token = null;
-            resetCacheProgress();
+            if (typeof(resetCacheProgress) === "function") {
+                resetCacheProgress();
+            }
             navigateDisplay("display-login");
             navigate("controller-login");
         },
@@ -289,12 +291,13 @@ function messageHandler(message) {
     }
     
     var obj=JSON.parse(message.data);
-    if (settings.local.verbs[obj.responseType]) {
-        settings.local.verbs[obj.responseType](obj);
-    } else if (settings.page.verbs[obj.responseType]) {
-        settings.page.verbs[obj.responseType](obj);
-    } else if (settings.global.verbs[obj.responseType]) {
-        settings.global.verbs[obj.responseType](obj);
+    if (!settings.local || !settings.page || !settings.global) {
+        throw "Bad settings!";
+    }
+    
+    var verb = settings.local.verbs[obj.responseType] || settings.page.verbs[obj.responseType] || settings.global.verbs[obj.responseType];
+    if (verb) {
+        verb(obj);
     } else {
         var errorMessage;
         if (obj.responseType === "error") {

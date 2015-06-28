@@ -49,7 +49,7 @@ QUnit.cases([
 ]).test("Test messages", function (params, assert) {
     logger[params.level]("MESSAGE");
 
-    assert.equal($("#messages").html(), '<div class="alert alert-' + (params.class ? params.class : params.level) + ' alert-dismissible" role="alert">' +
+    assert.equal($("#messages").html().replace(/ id="message-[0-9]*"/, ""), '<div class="alert alert-' + (params.class ? params.class : params.level) + ' alert-dismissible" role="alert">' +
             '<button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button>' +
             (params.label ? '<strong>' + params.label + ':</strong> ' : '') + 'MESSAGE</div>');
 });
@@ -135,20 +135,12 @@ QUnit.cases([
 QUnit.cases([
     {title: "unknown", mode: "unknown"},
     {title: "kiosk", mode: "kiosk"},
-    {title: "null", mode: null}
-]).test("Test set mode, null display name", function (params, assert) {
-    urlVars = {mode: params.mode};
-    getReady();
-    assert.ok(!displayName, "Display name should be null");
-});
-
-QUnit.cases([
+    {title: "null", mode: null},
     {title: "clear-display-name", mode: "clear-display-name"}
 ]).test("Test set mode, null display name", function (params, assert) {
     urlVars = {mode: params.mode};
     getReady();
     assert.ok(!displayName, "Display name should be null");
-    assert.ok(!$.cookie("display-name"), "Display name cookie should be null");
 });
 
 
@@ -209,7 +201,7 @@ QUnit.module("Test navigation with UI changes", {
 });
 
 QUnit.cases([
-    { title: "controller-login", page: "controller-login", waitForVerb: "user-list", searchFor: ".username-btn", verbResponses: [
+    { title: "controller-login", page: "controller-login", waitForVerb: "user-list", searchFor: "#user-list", verbResponses: [
             { verb: "ping", response: "{\"responseType\":\"pong\"}" },
             { verb: "list-current-users", response: "{\"responseType\":\"user-list\",\"users\":[{\"id\":\"userid1\",\"name\":\"username1\"},{\"id\":\"userid2\",\"name\":\"username2\"}]}" }
     ]},
@@ -296,6 +288,10 @@ QUnit.cases([
     
     urlVars = {mode: "controller"};
     getReady();
+    
+    if (!settings.page) {
+        settings.page = {verbs:{}};
+    }
     
     var timeout = setTimeout(function() {
         QUnit.start();
