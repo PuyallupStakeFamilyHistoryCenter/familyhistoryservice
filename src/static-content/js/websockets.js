@@ -24,6 +24,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+"use strict";
+
 var messageQueue = [];
 var connection;
 var blocking = true;
