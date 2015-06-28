@@ -829,9 +829,11 @@ public class FamilyHistoryCenterSocket {
     protected static void deactivateUserToken(String token, String message) {
         try {
             RemoteEndpoint controllerEndpoint = tokenControllerMap.remove(token);
-            controllerEndpoint.sendString("{\"responseType\":\"nav\",\"dest\":\"controller-login\"}");
-            if (message != null) {
-                controllerEndpoint.sendString(getErrorResponse(message));
+            if (controllerEndpoint != null) {
+                controllerEndpoint.sendString("{\"responseType\":\"nav\",\"dest\":\"controller-login\"}");
+                if (message != null) {
+                    controllerEndpoint.sendString(getErrorResponse(message));
+                }
             }
         } catch (Exception e) {
             reportBug(e);
@@ -840,7 +842,9 @@ public class FamilyHistoryCenterSocket {
 
     private static void sendFinalEmail(String userId) {
         UserContext context = userContextMap.get(userId);
-        EmailUtils.sendFinalEmail(context.userName, context.userEmail, context.precacher.getProspects());
+        if (context != null) {
+            EmailUtils.sendFinalEmail(context.userName, context.userEmail, context.precacher.getProspects());
+        }
     }
     
     protected void setGuestUser() {
