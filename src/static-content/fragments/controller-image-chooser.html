@@ -27,49 +27,6 @@ POSSIBILITY OF SUCH DAMAGE.
 
 <script src="/static-content/js/jquery.simplePagination.js" ></script>
 
-<script>
-    console.info("Starting image chooser");
-    var target = getParameterByName("target");
-    var sendPeople = !getParameterByName("getPeople");
-    var people;
-    var pageSize = 5;
-    var defaultPeople = [
-        {
-            name: "Demo",
-            images: [
-                "/media/default.jpg"
-            ]
-        }
-    ]
-
-    settings.local = {
-        verbs: {
-            people: function (obj) {
-                people = obj.people;
-                if (!people || !people.length) {
-                    people = defaultPeople;
-                }
-                
-                $("#pagination").pagination({
-                    items: people.length,
-                    itemsOnPage: pageSize,
-                    displayedPages: 3,
-                    cssStyle: 'dark-theme',
-                    prevText: "<span class='glyphicon glyphicon-chevron-left'></span>",
-                    nextText: "<span class='glyphicon glyphicon-chevron-right'></span>",
-                    onPageClick: function(pageNumber, event) {
-                        showPage(pageNumber-1);
-                    }
-                });
-                
-                $("#loading-div").hide();
-                $("#loaded-div").show();
-                showPage(0);
-            }
-        }
-    }
-</script>
-
 <div id='loaded-div' style='display: none;'>
     <div id="images-wrapper">
         <div id="images">
@@ -91,19 +48,74 @@ POSSIBILITY OF SUCH DAMAGE.
 </div>
 
 <script>
+    console.info("Starting image chooser");
+    var target = getParameterByName("target");
+    var sendPeople = !getParameterByName("getPeople");
+    var people;
+    var images;
+    var pageSize = 10;
+    var defaultPeople = [
+        {
+            name: "Demo",
+            images: [
+                "/media/default.jpg"
+            ]
+        }
+    ]
+
+    settings.local = {
+        verbs: {
+            people: function (obj) {
+                people = obj.people;
+                if (!people || !people.length) {
+                    people = defaultPeople;
+                }
+                
+                images = [];
+                imageUseMap = {};
+                $.each(people, function(index, person) {
+                    var filteredIndex = 0;
+                    $.each(person.images, function(imageIndex, image) {
+                        if (!imageUseMap[image]) {
+                            images.push({responseType:"personImage", url: image, person: person, imageIndex: filteredIndex++});
+                            imageUseMap[image] = 1;
+                        }
+                    });
+                });
+                
+                $("#pagination").pagination({
+                    items: images.length,
+                    itemsOnPage: pageSize,
+                    displayedPages: 3,
+                    cssStyle: 'dark-theme',
+                    prevText: "<span class='glyphicon glyphicon-chevron-left'></span>",
+                    nextText: "<span class='glyphicon glyphicon-chevron-right'></span>",
+                    onPageClick: function(pageNumber, event) {
+                        showPage(pageNumber-1);
+                    }
+                });
+                
+                $("#loading-div").hide();
+                $("#loaded-div").show();
+                showPage(0);
+            }
+        }
+    }
+    
     function showPage(pageNum) {
         $("#images").html("");
-        for (var i = pageSize * pageNum; i < Math.min(people.length, pageSize * (pageNum + 1)); i++) {
-            var person = people[i];
+        for (var i = pageSize * pageNum; i < Math.min(images.length, pageSize * (pageNum + 1)); i++) {
+            var image = images[i];
             
-            $("#images").append("<h4>" + person.name + "</h4>");
-            $.each(person.images, function(index, image) {
-                var obj = {responseType:"personImage",person:person,url:image};
-                $("#images").append("<button class='btn btn-default img-btn' style='display: none;' data-image='" + JSON.stringify(obj) + "'><img style='max-width:100px; max-height: 100px;' src='" + obj.url + "' /></button>")
-            });
+            if ($("#section-" + image.person.id).length === 0) {
+                $("#images").append("<div id='section-"+image.person.id+"' style='display: none;'><h4>" + image.person.name + 
+                        (image.imageIndex == 0 ? "" : " continued" )+ "</h4></div>");
+            }
+            var imageHtml = "<button class='btn btn-default img-btn' style='display: none;' data-image='" + JSON.stringify(image) + "'><img style='max-width:100px; max-height: 100px;' src='" + image.url + "' /></button>";
+            $("#section-" + image.person.id).append(imageHtml);
         }
         $(".img-btn img").load(function (e) {
-            $(this).parent().show();
+            $(this).parent().show().parent().show();
         });
         $(".img-btn").click(function (e) {
             var data = $(this).attr("data-image");
