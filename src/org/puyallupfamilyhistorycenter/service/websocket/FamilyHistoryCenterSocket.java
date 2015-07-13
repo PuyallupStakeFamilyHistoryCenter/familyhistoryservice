@@ -91,6 +91,9 @@ public class FamilyHistoryCenterSocket {
     private static final Gson GSON = new Gson();
     private static final PersonDao personDao;
     private static final AppKeyConfig appKeyConfig;
+    
+    private static final String OK_RESPONSE = "{\"responseType\":\"ok\"}";
+    
     static {
         personDao = (PersonDao) SpringContextInitializer.getContext().getBean("person-dao");
         appKeyConfig = (AppKeyConfig) SpringContextInitializer.getContext().getBean("app-key-config");
@@ -205,7 +208,7 @@ public class FamilyHistoryCenterSocket {
     @OnWebSocketMessage
     public void handleMessage(Session session, String message) throws IOException, URISyntaxException {
         logger.debug("Got websocket request '" + message + "'");
-        String response = "{\"responseType\":\"ok\"}";
+        String response = OK_RESPONSE;
         try {
             Scanner scanner = new Scanner(message);
             scanner.useDelimiter(" ");
@@ -322,7 +325,7 @@ public class FamilyHistoryCenterSocket {
                     if (!isDisplayActive(id)) {
                         response = getErrorResponse("Display " + id + " is not active");
                     } else {
-                        sendToDisplay(id, getIndentifyDisplayResponse());
+                        response = sendToDisplay(id, getIndentifyDisplayResponse());
                     }
                     break;
                 }
@@ -398,7 +401,7 @@ public class FamilyHistoryCenterSocket {
                     String accessToken = tokenToAccessToken(token);
                     Person person = personDao.getPerson(personId, accessToken);
                     
-                    sendToDisplay(displayId, getPersonResponse(person));
+                    response = sendToDisplay(displayId, getPersonResponse(person));
                     
                     break;
                 }
@@ -429,7 +432,7 @@ public class FamilyHistoryCenterSocket {
                     String accessToken = tokenToAccessToken(token);
                     List<Person> family = personDao.listImmediateFamily(personId, accessToken);
                     
-                    sendToDisplay(displayId, getPeopleResponse(family));
+                    response = sendToDisplay(displayId, getPeopleResponse(family));
                     
                     break;
                 }
@@ -460,7 +463,7 @@ public class FamilyHistoryCenterSocket {
                     String accessToken = tokenToAccessToken(token);
                     List<Person> family = personDao.listAncestors(personId, 4, accessToken, true);
                     
-                    sendToDisplay(displayId, getPeopleResponse(family));
+                    response = sendToDisplay(displayId, getPeopleResponse(family));
                     
                     break;
                 }
@@ -488,7 +491,7 @@ public class FamilyHistoryCenterSocket {
                     String accessToken = tokenToAccessToken(token);
                     List<Person> family = personDao.listDescendants(personId, 3, accessToken);
                     
-                    sendToDisplay(displayId, getPeopleResponse(family));
+                    response = sendToDisplay(displayId, getPeopleResponse(family));
                     
                     break;
                 }
@@ -519,7 +522,7 @@ public class FamilyHistoryCenterSocket {
                     String personId = scanner.next();
                     List<Person> people = personDao.listAncestors(personId, 10, token, true);
                     
-                    sendToDisplay(displayId, getStatisticsResponse(new Statistics(people)));
+                    response = sendToDisplay(displayId, getStatisticsResponse(new Statistics(people)));
                     
                     break;
                 }
@@ -528,7 +531,7 @@ public class FamilyHistoryCenterSocket {
                     token = scanner.next();
                     String id = scanner.next();
                     String toSend = scanner.nextLine();
-                    sendToDisplay(id, toSend);
+                    response = sendToDisplay(id, toSend);
                     break;
                 }
                 
@@ -842,7 +845,7 @@ public class FamilyHistoryCenterSocket {
 
     private static void sendFinalEmail(String userId) {
         UserContext context = userContextMap.get(userId);
-        if (context != null) {
+        if (context != null && context.precacher != null) {
             EmailUtils.sendFinalEmail(context.userName, context.userEmail, context.precacher.getProspects());
         }
     }
@@ -890,7 +893,7 @@ public class FamilyHistoryCenterSocket {
         try {
             endpoint.sendString("{\"responseType\":\"scheduleReload\",\"delay\":"+(delay*1000)+"}");
         } catch (IOException ex) {
-            reportBug(ex);
+            // IGNORE
         }
     }
     
@@ -932,18 +935,22 @@ public class FamilyHistoryCenterSocket {
         return alreadyConnected;
     }
     
-    protected static void sendToDisplay(String id, String message) {
+    protected static String sendToDisplay(String id, String message) {
         RemoteEndpoint displayEndpoint = remoteDisplays.get(id);
         if (displayEndpoint != null) {
             try {
                 logger.info("Sending '" + message + "' to display " + id);
                 displayEndpoint.sendString(message);
+            } catch (IOException e) {
+                //DO NOTHING
+                return getErrorResponse("failed to communicate with display " + id + ": " + e.getMessage());
             } catch (Exception e) {
-                throw new IllegalStateException("failed to communicate with display " + id + ": " + e.getMessage());
+                throw new IllegalStateException("failed to communicate with display " + id + ": " + e.getMessage(), e);
             }
         } else {
             throw new IllegalStateException("display not found '" + id + "'");
         }
+        return OK_RESPONSE;
     }
     
     protected static Checklist newChecklist() {
