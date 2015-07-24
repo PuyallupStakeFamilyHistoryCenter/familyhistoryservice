@@ -941,9 +941,6 @@ public class FamilyHistoryCenterSocket {
             try {
                 logger.info("Sending '" + message + "' to display " + id);
                 displayEndpoint.sendString(message);
-            } catch (IOException e) {
-                //DO NOTHING
-                return getErrorResponse("failed to communicate with display " + id + ": " + e.getMessage());
             } catch (Exception e) {
                 throw new IllegalStateException("failed to communicate with display " + id + ": " + e.getMessage(), e);
             }
