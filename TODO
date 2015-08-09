@@ -319,6 +319,13 @@ Make email text configurable
 ?Allow saving and sending attachments
 ?Save and send quiz scores (and perhaps suggest areas of study)
 
+Video app:
+Set up AWS account                         DONE
+Set up IAM user                            DONE
+Configure IAM credentials (not checked in)
+Allow requesting signed PUT urls
+Allow requesting signed GET urls
+Send email after log out
 
 
 DEMO NOTES

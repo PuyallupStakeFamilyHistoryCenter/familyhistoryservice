@@ -599,7 +599,7 @@ public class FamilyHistoryCenterSocket {
                         }
                     }, 10, 10, TimeUnit.SECONDS);
                     
-                    Precacher precacher = new Precacher(userId, accessToken, 10);
+                    Precacher precacher = new Precacher(userId, accessToken, 8);
                     
                     precacher.addPrecacheListener(new Precacher.PrecacheListener() {
 

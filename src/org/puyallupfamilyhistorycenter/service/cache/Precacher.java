@@ -25,26 +25,24 @@
  */
 package org.puyallupfamilyhistorycenter.service.cache;
 
-import java.util.Collections;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
 import java.util.Set;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.apache.log4j.Logger;
 import org.familysearch.api.client.ft.FamilySearchFamilyTree;
 import org.gedcomx.rs.client.PersonSpousesState;
 import org.gedcomx.rs.client.PersonState;
-import org.puyallupfamilyhistorycenter.service.ApplicationProperties;
 import org.puyallupfamilyhistorycenter.service.SpringContextInitializer;
 import org.puyallupfamilyhistorycenter.service.models.Person;
 import org.puyallupfamilyhistorycenter.service.models.PersonReference;
 import org.puyallupfamilyhistorycenter.service.models.PersonTemple;
+import org.puyallupfamilyhistorycenter.service.utils.managedconcurrency.ExecutorServiceFactory;
+import org.puyallupfamilyhistorycenter.service.utils.managedconcurrency.TagThrottlingExecutorService;
 import org.puyallupfamilyhistorycenter.service.websocket.FamilyHistoryFamilyTree;
 
 /**
@@ -52,23 +50,29 @@ import org.puyallupfamilyhistorycenter.service.websocket.FamilyHistoryFamilyTree
  * @author tibbitts
  */
 public class Precacher {
+    private static final int THREAD_POOL_SIZE = 3;
+    private static final int TOTAL_POOLS = 4;
+    
     private static final Logger logger = Logger.getLogger(Precacher.class);
     private static final Source<Person> source;
-    private static final Source<PersonTemple> templeSource;
-    private static final ExecutorService executor = Executors.newCachedThreadPool();
-    private static final ExecutorService imageCacheExecutor = Executors.newFixedThreadPool(1);
+    private static final ExecutorService executor = new TagThrottlingExecutorService(TOTAL_POOLS, new ExecutorServiceFactory() {
+        @Override
+        public ExecutorService create() {
+            return new ThreadPoolExecutor(THREAD_POOL_SIZE, THREAD_POOL_SIZE, 1, TimeUnit.MINUTES, new LinkedBlockingQueue<Runnable>());
+        }
+    });   
 
     static {
         source = (Source<Person>) SpringContextInitializer.getContext().getBean("in-memory-source");
-        templeSource = (Source<PersonTemple>) SpringContextInitializer.getContext().getBean("temple-source");
     }
 
     private static class PrecacheObject {
-
+        public final String rootId;
         public final String id;
         public final int depth;
 
-        public PrecacheObject(String id, int depth) {
+        public PrecacheObject(String rootId, String id, int depth) {
+            this.rootId = rootId;
             this.id = id;
             this.depth = depth;
         }
@@ -77,7 +81,6 @@ public class Precacher {
     private final String userId;
     private final String accessToken;
     private final int maxDepth;
-    private final Set<Future> futures;
     private final Set<PrecacheListener> listeners;
 //    private final List<PersonTemple> prospects;
 
@@ -85,126 +88,33 @@ public class Precacher {
         this.userId = userId;
         this.accessToken = accessToken;
         this.maxDepth = maxDepth;
-        this.futures = new HashSet<>();
         this.listeners = new HashSet<>();
-//        this.prospects = new LinkedList<>();
+//        this.prospects = new LinkedList<>();Os
     }
 
     public void precache() {
         final FamilySearchFamilyTree tree = FamilyHistoryFamilyTree.getInstance(accessToken);
-        final Queue<PrecacheObject> frontier = new ConcurrentLinkedQueue<>();
-        final Queue<PrecacheObject> leafNodes = new ConcurrentLinkedQueue<>();
-        final Set<String> currentLeafs = Collections.synchronizedSet(new HashSet<String>());
         final AtomicInteger totalPrecached = new AtomicInteger();
+        final AtomicInteger totalInFlight = new AtomicInteger();
+        final AtomicInteger minEstimatedUnvisited = new AtomicInteger((int) Math.pow(2, maxDepth + 1));
         
         PersonState person = tree.readPersonForCurrentUser();
-        frontier.add(new PrecacheObject(person.getPerson().getId(), 0));
-
-        PersonSpousesState spouses = person.readSpouses();
-        if (spouses != null && spouses.getPersons() != null) {
-            for (org.gedcomx.conclusion.Person spouse : spouses.getPersons()) {
-                frontier.add(new PrecacheObject(spouse.getId(), 0));
-            }
-        }
+        totalInFlight.incrementAndGet();
+        executor.submit(new PrecacheTask(new PrecacheObject(person.getPerson().getId(), person.getPerson().getId(), 0), totalPrecached, totalInFlight, minEstimatedUnvisited));
         
-        String guestPersonId = ApplicationProperties.getGuestPersonId();
-        frontier.add(new PrecacheObject(guestPersonId, 0));
+//        PersonSpousesState spouses = person.readSpouses();
+//        if (spouses != null && spouses.getPersons() != null) {
+//            for (org.gedcomx.conclusion.Person spouse : spouses.getPersons()) {
+//                totalInFlight.incrementAndGet();
+//                executor.submit(new PrecacheTask(new PrecacheObject(person.getPerson().getId(), spouse.getId(), 0), totalPrecached, totalInFlight, minEstimatedUnvisited));
+//            }
+//        }
         
-        final AtomicInteger minEstimatedUnvistited = new AtomicInteger(frontier.size() * (int) Math.pow(2, maxDepth));
-        
-        for (int i = 0; i < 3; i++) {
-            futures.add(executor.submit(new Runnable() {
-
-                @Override
-                public void run() {
-                    for (int i = 0; i < 10; i++) {
-                        while (!frontier.isEmpty()) {
-                            PrecacheObject precacheObject = frontier.remove();
-                            try {
-                                Person person = source.get(precacheObject.id, accessToken);
-                                if (person != null && person.parents != null && precacheObject.depth < maxDepth) {
-                                    for (PersonReference parent : person.parents) {
-                                        logger.info(Thread.currentThread().getName() + ": Adding parent " + parent.getName() + " to frontier level " + (precacheObject.depth + 1));
-                                        frontier.add(new PrecacheObject(parent.getId(), precacheObject.depth + 1));
-                                    }
-                                } else {
-                                    logger.info(Thread.currentThread().getName() + ": Adding self " + person.name + " to leaf nodes");
-                                    leafNodes.add(precacheObject);
-                                }
-                                
-//                                if (person.images != null) {
-//                                    for (final String imageKey : person.images) {
-//                                        imageCacheExecutor.submit(new Runnable() {
-//
-//                                            @Override
-//                                            public void run() {
-//                                                imageSource.get(new KeyAndHeaders(imageKey, null), accessToken);
-//                                            }
-//                                        });
-//                                    }
-//                                }
-//                                PersonTemple personTemple = templeSource.get(precacheObject.id, accessToken);
-//                                if (personTemple != null && personTemple.hasOrdinancesReady()) {
-//                                    prospects.add(personTemple);
-//                                } 
-                                
-                                int totalPrecachedValue = totalPrecached.incrementAndGet();
-                                int queueSize = frontier.size();
-                                int currentGeneration = precacheObject.depth;
-                                
-                                int estimatedUnvisited = queueSize * (int) Math.pow(2, maxDepth - currentGeneration) - queueSize;
-                                if (estimatedUnvisited < minEstimatedUnvistited.get()) {
-                                    minEstimatedUnvistited.set(estimatedUnvisited);
-                                }
-                                
-                                
-                                PrecacheEvent event = new PrecacheEvent(userId, totalPrecachedValue, queueSize, minEstimatedUnvistited.get(), currentGeneration);
-                                for (PrecacheListener listener : listeners) {
-                                    listener.onPrecache(event);
-                                }
-                            } catch (NotFoundException ex) {
-                                logger.warn("Failed to get person " + precacheObject.id + "; skipping");
-                            } catch (Exception ex) {
-                                logger.warn("Failed to get person " + precacheObject.id + "; skipping", ex);
-                            }
-                        }
-                        try {
-                            Thread.sleep(6000);
-                        } catch (InterruptedException e) {
-                            Thread.interrupted();
-                        }
-                    }
-
-                    //TODO: Use depth-first search to find people with unfinished ordinances
-    //                    while(!leafNodes.isEmpty()) {
-    //                        PrecacheObject precacheObject = leafNodes.remove();
-    //                        currentLeafs.remove(precacheObject.id);
-    //                        Person person = source.get(precacheObject.id, accessToken);
-    //                        if (person.children != null) {
-    //                            for (PersonReference child : person.children) {
-    //                                if (!currentLeafs.contains(child.getId())) {
-    //                                    logger.info("Adding child " + child.getName() + " to frontier");
-    //                                    leafNodes.add(new PrecacheObject(child.getId(), precacheObject.depth - 1));
-    //                                    currentLeafs.add(child.getId());
-    //                                }
-    //                            }
-    //                        } else {
-    //                            logger.info("Person " + person.name + " has no children on record");
-    //                        }
-    //                    }
-                    
-                    for (PrecacheListener listener : listeners) {
-                        listener.onFinish();
-                    }
-                }
-            }));
-        }
+        //String guestPersonId = ApplicationProperties.getGuestPersonId();
+        //frontier.add(new PrecacheObject(guestPersonId, 0));
     }
 
     public void cancel() {
-        for (Future future : futures) {
-            future.cancel(true);
-        }
         for (PrecacheListener listener : listeners) {
             listener.onCancel();
         }
@@ -241,5 +151,60 @@ public class Precacher {
     
     public List<PersonTemple> getProspects() {
         return null; //Collections.unmodifiableList(prospects);
+    }
+    
+    private class PrecacheTask implements TagThrottlingExecutorService.TaggedRunnable {
+        
+        private final PrecacheObject precacheObject;
+        //private String userId;
+        private final AtomicInteger totalPrecached;
+        private final AtomicInteger totalInFlight;
+        private final AtomicInteger minEstimatedUnvisited;
+        
+        public PrecacheTask(PrecacheObject precacheObject, AtomicInteger totalPrecached, AtomicInteger totalInFlight, AtomicInteger minEstimatedUnvisited) {
+            this.precacheObject = precacheObject;
+            this.totalPrecached = totalPrecached;
+            this.totalInFlight = totalInFlight;
+            this.minEstimatedUnvisited = minEstimatedUnvisited;
+        }
+
+        @Override
+        public String getTag() {
+            return precacheObject.rootId;
+        }
+
+        @Override
+        public void run() {
+            try {
+                Person person = source.get(precacheObject.id, accessToken);
+                if (person != null && person.parents != null && precacheObject.depth < maxDepth) {
+                    for (PersonReference parent : person.parents) {
+                        logger.info(Thread.currentThread().getName() + ": Adding parent " + parent.getName() + " to frontier level " + (precacheObject.depth + 1));
+                        executor.submit(new PrecacheTask(new PrecacheObject(precacheObject.rootId, parent.getId(), precacheObject.depth + 1), totalPrecached, totalInFlight, minEstimatedUnvisited));
+                        totalInFlight.incrementAndGet();
+                    }
+                }
+
+                int totalPrecachedValue = totalPrecached.incrementAndGet();
+                int queueSize = totalInFlight.decrementAndGet();
+                int currentGeneration = precacheObject.depth;
+
+                int estimatedUnvisited = queueSize * (int) Math.pow(2, maxDepth - currentGeneration) - queueSize;
+                if (estimatedUnvisited < minEstimatedUnvisited.get()) {
+                    minEstimatedUnvisited.set(estimatedUnvisited);
+                }
+
+
+                PrecacheEvent event = new PrecacheEvent(userId, totalPrecachedValue, queueSize, minEstimatedUnvisited.get(), currentGeneration);
+                for (PrecacheListener listener : listeners) {
+                    listener.onPrecache(event);
+                }
+            } catch (NotFoundException ex) {
+                logger.warn("Failed to get person " + precacheObject.id + "; skipping");
+            } catch (Exception ex) {
+                logger.warn("Failed to get person " + precacheObject.id + "; skipping", ex);
+            }
+        }
+        
     }
 }
