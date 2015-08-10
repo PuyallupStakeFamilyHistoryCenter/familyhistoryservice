@@ -730,19 +730,20 @@ public class FamilyHistoryCenterSocket {
                 
                 case "signedPutUrl": {
                     token = scanner.next();
+                    String userName = "anonymous";
                     userId = tokenUserIdMap.get(token);
-                    UserContext context = userContextMap.get(userId);
-                    if (context != null) {
-                        String contentType = scanner.next();
-                        URL url = S3Utils.getSignedPutUrl(
-                                ApplicationProperties.getVideoS3Bucket(), 
-                                ApplicationProperties.getVideoS3KeyPrefix() + context.userName + "/" + new DateTime().getMillis(),
-                                contentType
-                        );
-                        response = "{\"responseType\":\"signedPutUrl\",\"signedUrl\":\"" + url.toString() + "\"}";
-                    } else {
-                        getErrorResponse("User not found");
+                    if (userId != null) {
+                        UserContext context = userContextMap.get(userId);
+                        userName = context.userName;
                     }
+                    
+                    String contentType = scanner.next();
+                    URL url = S3Utils.getSignedPutUrl(
+                            ApplicationProperties.getVideoS3Bucket(), 
+                            ApplicationProperties.getVideoS3KeyPrefix() + userName + "/" + new DateTime().getMillis(),
+                            contentType
+                    );
+                    response = "{\"responseType\":\"signedPutUrl\",\"signedUrl\":\"" + url.toString() + "\"}";
                     
                     break;
                 }
