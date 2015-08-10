@@ -46,6 +46,8 @@ Allow force-refresh of people
 Allow timeouts on requests
 Location cache
 Offline: "Failed to get person KWC6-X7D; attempting to recover" doesn't recover
+Limit total number of caching threads      DONE
+Use fairer sub-thread-pool assignment strategy
 
 Puzzle:
 Wire puzzle settings into display          DONE

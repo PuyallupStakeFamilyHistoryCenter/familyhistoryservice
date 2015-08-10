@@ -40,6 +40,10 @@ public class ApplicationProperties {
     private static final String EMAIL_PROSPECTS_EXPL = "emailProspectsExpl";
     private static final String EMAIL_SIGNATURE = "emailSignature";
     private static final String GUEST_USER_ID = "guestUserId";
+    private static final String AWS_ACCESS_KEY = "awsAccessKey";
+    private static final String AWS_SECRET_KEY = "awsSecretKey";
+    private static final String VIDEO_S3_BUCKET = "videoS3Bucket";
+    private static final String VIDEO_S3_KEY_PREFIX = "videoS3KeyPrefix";
 
     private static final Properties props;
     static {
@@ -73,5 +77,21 @@ public class ApplicationProperties {
 
     public static String getGuestPersonId() {
         return props.getProperty(GUEST_USER_ID);
+    }
+    
+    public static String getAWSAccessKey() {
+        return props.getProperty(AWS_ACCESS_KEY);
+    }
+    
+    public static String getAWSSecretKey() {
+        return props.getProperty(AWS_SECRET_KEY);
+    }
+    
+    public static String getVideoS3Bucket() {
+        return props.getProperty(VIDEO_S3_BUCKET);
+    }
+    
+    public static String getVideoS3KeyPrefix() {
+        return props.getProperty(VIDEO_S3_KEY_PREFIX);
     }
 }

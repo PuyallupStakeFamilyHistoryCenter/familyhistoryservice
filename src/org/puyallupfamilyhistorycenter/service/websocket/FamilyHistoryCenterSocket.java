@@ -36,6 +36,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
@@ -80,6 +81,7 @@ import org.puyallupfamilyhistorycenter.service.models.Person;
 import org.puyallupfamilyhistorycenter.service.models.PersonImage;
 import org.puyallupfamilyhistorycenter.service.models.Video;
 import org.puyallupfamilyhistorycenter.service.utils.EmailUtils;
+import org.puyallupfamilyhistorycenter.service.utils.S3Utils;
 
 /**
  *
@@ -669,7 +671,7 @@ public class FamilyHistoryCenterSocket {
                         
                         resendUserList();
                     } else {
-                        throw new IllegalStateException("username and PIN do not match");
+                        getErrorResponse("username and PIN do not match");
                     }
                     break;
                 }
@@ -723,6 +725,25 @@ public class FamilyHistoryCenterSocket {
                     String id = scanner.next();
                     boolean value = scanner.nextBoolean();
                     checklist.setChecked(id, value);
+                    break;
+                }
+                
+                case "signedPutUrl": {
+                    token = scanner.next();
+                    userId = tokenUserIdMap.get(token);
+                    UserContext context = userContextMap.get(userId);
+                    if (context != null) {
+                        String contentType = scanner.next();
+                        URL url = S3Utils.getSignedPutUrl(
+                                ApplicationProperties.getVideoS3Bucket(), 
+                                ApplicationProperties.getVideoS3KeyPrefix() + context.userName + "/" + new DateTime().getMillis(),
+                                contentType
+                        );
+                        response = "{\"responseType\":\"signedPutUrl\",\"signedUrl\":\"" + url.toString() + "\"}";
+                    } else {
+                        getErrorResponse("User not found");
+                    }
+                    
                     break;
                 }
 
