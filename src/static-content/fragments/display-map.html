@@ -158,6 +158,7 @@ POSSIBILITY OF SUCH DAMAGE.
 
     function graphPerson(person) {
         graphPeople([person]);
+        asdf();
     }
 
     function graphPeople(people) {
@@ -166,8 +167,10 @@ POSSIBILITY OF SUCH DAMAGE.
 
         if (people[0].spouses) {
             $.each(people[0].spouses, function (index, spouse) {
-                attachNameToFacts(spouse.facts, people[0].name + " and " + spouse.name)
-                facts = facts.concat(spouse.facts);
+                if (spouse.facts) {
+                    attachNameToFacts(spouse.facts, people[0].name + " and " + spouse.name)
+                    facts = facts.concat(spouse.facts);
+                }
             });
         }
         ;

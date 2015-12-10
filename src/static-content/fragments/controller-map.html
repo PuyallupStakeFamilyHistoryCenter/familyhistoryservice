@@ -65,18 +65,21 @@ POSSIBILITY OF SUCH DAMAGE.
                 
                 $("#fact-btns").append("<div><button class='btn btn-lg .btn-warning fact-btn' data-fact-index='fffffffffff'>Overview</button></div>");
                 $.each(sortedFacts, function(index, fact) {
-                    if (fact.place) {
+                    if (fact && fact.place) {
                         $("#fact-btns").append("<div><button class='btn btn-lg btn-default fact-btn' data-fact-index='"+fact.id+"'>" + fact.type + " - " + fact.date + "</button></div>");
                     }
                 });
                 
                 $(".fact-btn").click(function(e) {
+                    var aFact = sortedFacts[0];
                     sendToDisplay(JSON.stringify({responseType:"selectFact", factId: $(this).attr("data-fact-index")}))
                     $(".fact-btn").removeClass("btn-warning").addClass("btn-default");
                     $(this).removeClass("btn-default").addClass("btn-warning");
                 });
                 
                 sendToDisplay(JSON.stringify(obj))
+                
+                asdf();
             }
         }
     }
