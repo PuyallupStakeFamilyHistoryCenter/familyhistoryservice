@@ -156,8 +156,15 @@ POSSIBILITY OF SUCH DAMAGE.
         
         $.each(displayIds, function(index, displayId) {
             $("#display-btns").append("<div><button class='btn btn-lg btn-default display-btn' data-display='"+displayId+"'>"+displayId+"</button>" +
+                    "<button class='btn btn-lg btn-default survey-btn' data-display='"+displayId+"'><span class='glyphicon glyphicon-comment'></span></span></button>" + 
                     "<button class='btn btn-lg btn-default ping-display-btn' data-display='"+displayId+"'><span class='glyphicon glyphicon-bell'></span></span></button>" + 
                     "<button class='btn btn-lg btn-default reload-display-btn' data-display='"+displayId+"'><span class='glyphicon glyphicon-refresh' ></span></button></div>");
+        });
+        
+        $(".survey-btn").click(function() {
+            displayName = $(this).attr("data-display");
+            
+            ws.socketSend("forceNavigateController " + displayName + " controller-survey");
         });
         
         $(".display-btn").click(function() {
@@ -257,6 +264,8 @@ POSSIBILITY OF SUCH DAMAGE.
     $("#clearReporterNameButton").click(function() {
         $("#bugReportReporterName").val("").focus();
     });
+    
+    
     
     setHeaderName("Presenter");
     ws.socketSend("listDisplays");

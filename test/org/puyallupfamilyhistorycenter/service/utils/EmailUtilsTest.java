@@ -26,6 +26,8 @@
 package org.puyallupfamilyhistorycenter.service.utils;
 
 import com.google.gson.Gson;
+import java.time.LocalDate;
+import java.time.Month;
 import java.util.ArrayList;
 import java.util.Arrays;
 import org.junit.Test;
@@ -67,6 +69,37 @@ public class EmailUtilsTest {
         String actual = EmailUtils.buildFinalEmailBody("Graham Tibbitts", Arrays.asList(new Gson().fromJson("{\"name\":\"Theodore Tarkin\",\"id\":\"FDU-2NQQ\"}", PersonTemple.class)));
         
         System.out.println(actual);
+        
+        assertEquals(expected, actual);
+    }
+
+    /**
+     * Test of sendEmail method, of class EmailUtils.
+     */
+    @Test
+    public void testSendEmail() {
+    }
+
+    @Test
+    public void testBuildReferralEmailBodyOneInterest() {
+        String expected = "<html><head></head><body><img style=\"width:100%\" src=\"http://www.puyallupfamilyhistorycenter.org/uploads/4/8/2/9/4829765/1433113473.png\" alt=\"The Puyllup Family History Center\" /><h3>Dear Brother Snyder,</h3><p><strong>Angela Jolie</strong> from the Tamara Hills Ward visited the Discovery room at the Puyallup Stake Family History Center on January 18, 2016.</p><p>Sister Jolie expressed interest in learning more about <strong>indexing</strong>.</p><p>Please schedule a time for them to meet with a family history consultant so they can learn more about how they can be involved in family history work.</p><p>Thank you for your assistance; we appreciate it.</p><p>The staff at the Puyallup Stake Family History Center</p></body></html>";
+        String actual = EmailUtils.buildReferralEmailBody("Brother Snyder", "Angela Jolie", "Sister Jolie", null, "Tamara Hills Ward", LocalDate.of(2016, Month.JANUARY, 18), Arrays.asList("indexing"));
+        
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void testBuildReferralEmailBodyTwoInterests() {
+        String expected = "<html><head></head><body><img style=\"width:100%\" src=\"http://www.puyallupfamilyhistorycenter.org/uploads/4/8/2/9/4829765/1433113473.png\" alt=\"The Puyllup Family History Center\" /><h3>Dear Brother Snyder,</h3><p><strong>Angela Jolie</strong> from the Tamara Hills Ward visited the Discovery room at the Puyallup Stake Family History Center on January 18, 2016.</p><p>Sister Jolie expressed interest in learning more about <strong>indexing</strong> and <strong>research</strong>.</p><p>Please schedule a time for them to meet with a family history consultant so they can learn more about how they can be involved in family history work.</p><p>Thank you for your assistance; we appreciate it.</p><p>The staff at the Puyallup Stake Family History Center</p></body></html>";
+        String actual = EmailUtils.buildReferralEmailBody("Brother Snyder", "Angela Jolie", "Sister Jolie", null, "Tamara Hills Ward", LocalDate.of(2016, Month.JANUARY, 18), Arrays.asList("indexing", "research"));
+        
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void testBuildReferralEmailBodyThreeInterests() {
+        String expected = "<html><head></head><body><img style=\"width:100%\" src=\"http://www.puyallupfamilyhistorycenter.org/uploads/4/8/2/9/4829765/1433113473.png\" alt=\"The Puyllup Family History Center\" /><h3>Dear Brother Snyder,</h3><p><strong>Angela Jolie</strong> from the Tamara Hills Ward visited the Discovery room at the Puyallup Stake Family History Center on January 18, 2016.</p><p>Sister Jolie expressed interest in learning more about <strong>indexing</strong>, <strong>research</strong> and <strong>submitting names for temple ordinances</strong>.</p><p>Please schedule a time for them to meet with a family history consultant so they can learn more about how they can be involved in family history work.</p><p>Thank you for your assistance; we appreciate it.</p><p>The staff at the Puyallup Stake Family History Center</p></body></html>";
+        String actual = EmailUtils.buildReferralEmailBody("Brother Snyder", "Angela Jolie", "Sister Jolie", null, "Tamara Hills Ward", LocalDate.of(2016, Month.JANUARY, 18), Arrays.asList("indexing", "research", "submitting names for temple ordinances"));
         
         assertEquals(expected, actual);
     }

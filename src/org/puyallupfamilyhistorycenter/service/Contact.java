@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, tibbitts
+ * Copyright (c) 2016, tibbitts
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -23,26 +23,38 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package org.puyallupfamilyhistorycenter.service.utils;
-
-import org.junit.Test;
-import static org.junit.Assert.*;
+package org.puyallupfamilyhistorycenter.service;
 
 /**
  *
  * @author tibbitts
  */
-public class EmailUtilsIT {
-    
-    public EmailUtilsIT() {
+public class Contact {
+    private String fullName;
+    private String email;
+    private String ward;
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
     }
 
-    /**
-     * Test of sendFinalEmail method, of class EmailUtils.
-     */
-    @Test
-    public void testSendFinalEmailNoProspects() {
-        EmailUtils.sendFinalEmail("Graham Tibbitts", "graham.tibbitts@gmail.com", null);
+    public String getFullName() {
+        return fullName;
     }
-    
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setWard(String ward) {
+        this.ward = ward;
+    }
+
+    public String getWard() {
+        return ward;
+    }
 }

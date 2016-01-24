@@ -24,10 +24,10 @@
         <dependency org="org.springframework" name="spring-context" rev="4.1.0.RELEASE"/>
         <dependency org="org.springframework" name="spring-expression" rev="4.1.0.RELEASE"/>
         <dependency org="log4j" name="log4j" rev="1.2.16"/>
-        <dependency org="com.amazonaws" name="aws-java-sdk" rev="1.10.10"/>
         <dependency org="com.fasterxml.jackson.core" name="jackson-core" rev="2.6.0"/>
+	<dependency org="com.amazonaws" name="aws-java-sdk-ses" rev="1.10.49"/>        
+	<dependency org="com.amazonaws" name="aws-java-sdk-s3" rev="1.10.49"/>
 
-        
         <!--runtime-->
         
         <!--test-->

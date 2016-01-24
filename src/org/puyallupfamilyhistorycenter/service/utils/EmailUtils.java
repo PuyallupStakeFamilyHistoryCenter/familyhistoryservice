@@ -25,15 +25,23 @@
  */
 package org.puyallupfamilyhistorycenter.service.utils;
 
-import java.util.Date;
-import java.util.Properties;
-import javax.mail.Authenticator;
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.PasswordAuthentication;
-import javax.mail.Session;
-import javax.mail.Transport;
-import javax.mail.internet.MimeMessage;
+import com.amazonaws.ClientConfiguration;
+import com.amazonaws.auth.BasicAWSCredentials;
+import com.amazonaws.regions.Region;
+import com.amazonaws.regions.Regions;
+import com.amazonaws.services.simpleemail.AmazonSimpleEmailService;
+import com.amazonaws.services.simpleemail.AmazonSimpleEmailServiceClient;
+import com.amazonaws.services.simpleemail.model.Body;
+import com.amazonaws.services.simpleemail.model.Content;
+import com.amazonaws.services.simpleemail.model.Destination;
+import com.amazonaws.services.simpleemail.model.Message;
+import com.amazonaws.services.simpleemail.model.SendEmailRequest;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
+import java.util.Arrays;
+import java.util.List;
+import java.util.UUID;
 import org.apache.log4j.Logger;
 import org.puyallupfamilyhistorycenter.service.ApplicationProperties;
 import org.puyallupfamilyhistorycenter.service.models.PersonTemple;
@@ -43,41 +51,69 @@ import org.puyallupfamilyhistorycenter.service.models.PersonTemple;
  * @author tibbitts
  */
 public class EmailUtils {
-    private static final Logger logger = Logger.getLogger(EmailUtils.class);
-    private static final Properties props = new Properties();
-    private static final Session session;
+    private static final AmazonSimpleEmailService ses;
     static {
-//        props.put("mail.smtp.host", "smtp.zoho.com");
-        props.put("mail.smtp.host", "localhost");
-        props.put("mail.from", "admin@puyallupfamilyhistorycenter.org");
-        Authenticator auth = new Authenticator() {
-
-            @Override
-            protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication("admin@puyallupfamilyhistorycenter.org", "Brigham47");
-            }
-        };
-        session = Session.getInstance(props);
+        ClientConfiguration config = new ClientConfiguration();
+        //config.set
+        ses = new AmazonSimpleEmailServiceClient(new BasicAWSCredentials(ApplicationProperties.getEmailAWSAccessKey(), ApplicationProperties.getEmailAWSSecretKey()), config);
+        ses.setRegion(Region.getRegion(Regions.US_WEST_2));
+    }
+    
+    private static final Logger logger = Logger.getLogger(EmailUtils.class);
+    
+    public static void sendReferralEmail(String contactName, String contactEmail, String patronName, String patronEmail, String patronWard, List<String> interests) {
+        String emailBody = buildReferralEmailBody(contactName, patronName, patronName, patronEmail, patronWard, LocalDate.now(), interests);
+        String subject = "Family history consultant referral for " + patronName;
+        
+        sendEmail(contactName, contactEmail, subject, emailBody);
     }
 
-    
-    public static void sendFinalEmail(String personName, String emailAddress, Iterable<PersonTemple> prospects) {
+    protected static void sendEmail(String recipientName, String recipientEmail, String subjectString, String bodyString) {
+        Content subject = new Content(subjectString);
+        Body body = new Body();
         
-        try {
-            if (ApplicationProperties.enableEmail()) {
-                MimeMessage msg = new MimeMessage(session);
-                msg.setFrom();
-                msg.setRecipients(Message.RecipientType.TO,
-                                  emailAddress);
-                msg.setSubject("Thanks for visiting!");
-                msg.setSentDate(new Date());
-                msg.setContent(buildFinalEmailBody(personName, prospects), "text/html");
-                Transport.send(msg);
-                logger.info("Sent email to " + personName + " at " + emailAddress);
-            }
-        } catch (MessagingException mex) {
-            System.out.println("send failed, exception: " + mex);
+        Content bodyContent = new Content(bodyString);
+        body.setHtml(bodyContent);
+        Message message = new Message(subject, body);
+        
+        SendEmailRequest request = new SendEmailRequest();
+        request.setMessage(message);
+        request.setSource("admin@puyallupfamilyhistorycenter.org");
+        request.setDestination(new Destination(Arrays.asList("\"" + recipientName + "\" <" + recipientEmail + ">")));
+        ses.sendEmail(request);
+    }
+    
+    protected static final DateTimeFormatter dateFormat = DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG);
+    protected static final List<String> defaultInterest = Arrays.asList("family history");
+    
+    static String buildReferralEmailBody(String contactName, String patronFullName, String patronShortName, String patronEmail, String patronWard, LocalDate visitDate, List<String> interests) {
+        String uuid = UUID.nameUUIDFromBytes(patronEmail.getBytes()).toString();
+        StringBuilder builder = new StringBuilder("<html><head></head><body>");
+        builder.append("<img style=\"width:100%\" src=\"http://www.puyallupfamilyhistorycenter.org/uploads/4/8/2/9/4829765/1433113473.png?").append(uuid).append("\" alt=\"The Puyllup Family History Center\" />");
+        builder.append("<h3>Dear ").append(contactName).append(",</h3>");
+        builder.append("<p><strong>").append(patronFullName).append("</strong> from the ").append(patronWard)
+                .append(" visited the Discovery room at the Puyallup Stake Family History Center on ")
+                .append(dateFormat.format(visitDate)).append(".</p>");
+        if (interests == null || interests.isEmpty()) {
+            interests = defaultInterest;
         }
+        builder.append("<p>").append(patronShortName).append(" expressed interest in learning more about");
+        for (int i = 0; i < interests.size(); i++) {
+            if (i == interests.size() - 1 && interests.size() > 1) {
+                builder.append(" and");
+            } else if (i != 0 && interests.size() > 2) {
+                builder.append(",");
+            }
+            builder.append(" <strong>").append(interests.get(i)).append("</strong>");
+        }
+        builder.append(".</p>");
+        builder.append("<p>Please schedule a time for them to meet with a family history consultant ")
+                .append("so they can learn more about how they can be involved in family history work.</p>");
+        builder.append("<p>Thank you for your assistance; we appreciate it.</p>");
+        builder.append("<p>The staff at the Puyallup Stake Family History Center</p>");
+        builder.append("</body></html>");
+        
+        return builder.toString();
     }
     
     protected static String buildFinalEmailBody(String personName, Iterable<PersonTemple> prospects) {

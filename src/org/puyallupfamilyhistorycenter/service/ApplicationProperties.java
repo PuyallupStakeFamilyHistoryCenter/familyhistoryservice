@@ -25,8 +25,11 @@
  */
 package org.puyallupfamilyhistorycenter.service;
 
+import com.google.gson.Gson;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 /**
@@ -42,8 +45,12 @@ public class ApplicationProperties {
     private static final String GUEST_USER_ID = "guestUserId";
     private static final String AWS_ACCESS_KEY = "awsAccessKey";
     private static final String AWS_SECRET_KEY = "awsSecretKey";
+    private static final String EMAIL_AWS_ACCESS_KEY = "emailAwsAccessKey";
+    private static final String EMAIL_AWS_SECRET_KEY = "emailAwsSecretKey";
     private static final String VIDEO_S3_BUCKET = "videoS3Bucket";
     private static final String VIDEO_S3_KEY_PREFIX = "videoS3KeyPrefix";
+    private static final String INTEREST_PREFIX = "interest_";
+    private static final String WARD_CONTACT_PREFIX = "wardContact_";
 
     private static final Properties props;
     static {
@@ -74,6 +81,14 @@ public class ApplicationProperties {
     public static String getEmailSignature() {
         return props.getProperty(EMAIL_SIGNATURE);
     }
+    
+    public static String getEmailAWSAccessKey() {
+        return props.getProperty(EMAIL_AWS_ACCESS_KEY);
+    }
+    
+    public static String getEmailAWSSecretKey() {
+        return props.getProperty(EMAIL_AWS_SECRET_KEY);
+    }
 
     public static String getGuestPersonId() {
         return props.getProperty(GUEST_USER_ID);
@@ -93,5 +108,21 @@ public class ApplicationProperties {
     
     public static String getVideoS3KeyPrefix() {
         return props.getProperty(VIDEO_S3_KEY_PREFIX);
+    }
+    
+    public static Contact getWardContact(String stakeName, String wardName) {
+        return new Gson().fromJson(props.getProperty(WARD_CONTACT_PREFIX + stakeName + "_" + wardName), Contact.class);
+    }
+    
+    public static String getInterest(String interestId) {
+        return props.getProperty(INTEREST_PREFIX + interestId);
+    }
+
+    public static List<String> getInterests(String[] interestIds) {
+        List<String> interests = new ArrayList<>(interestIds.length);
+        for (String id : interestIds) {
+            interests.add(getInterest(id));
+        }
+        return interests;
     }
 }

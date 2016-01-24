@@ -43,6 +43,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -72,6 +73,7 @@ import org.familysearch.api.client.ft.FamilySearchFamilyTree;
 import org.gedcomx.rs.client.PersonState;
 import org.joda.time.DateTime;
 import org.puyallupfamilyhistorycenter.service.ApplicationProperties;
+import org.puyallupfamilyhistorycenter.service.Contact;
 import org.puyallupfamilyhistorycenter.service.SpringContextInitializer;
 import org.puyallupfamilyhistorycenter.service.cache.Precacher;
 import org.puyallupfamilyhistorycenter.service.models.Checklist;
@@ -747,6 +749,47 @@ public class FamilyHistoryCenterSocket {
                     
                     break;
                 }
+                
+                case "forceNavigateController": {
+                    String controllerId = scanner.next();
+                    String dest = scanner.next();
+                    
+                    //TODO: Verify controller has logged-in user
+                    
+                    sendToController(controllerId, "{\"responseType\":\"nav\",\"dest\":\"" + dest + "\"}");
+                    break;
+                }
+                
+                case "survey": {
+                    token = scanner.next();
+                    userId = tokenUserIdMap.get(token);
+                    
+                    if (userId == null) {
+                        throw new IllegalStateException("Token doesn't exist");
+                    }
+                    
+                    UserContext ctx = userContextMap.get(userId);
+                    
+                    if (ctx == null) {
+                        throw new IllegalStateException("User not found");
+                    }
+                    
+                    String stake = scanner.next();
+                    String ward = scanner.next();
+                    String interestsStr = scanner.next();
+                    boolean contactMe = scanner.nextBoolean();
+                    
+                    if (contactMe) {
+                        String[] interestIds = interestsStr.split(",");
+                        Contact contact = ApplicationProperties.getWardContact(stake, ward);
+                        
+                        EmailUtils.sendReferralEmail(contact.getFullName(), contact.getEmail(), ctx.userName, ctx.userEmail, contact.getWard(), ApplicationProperties.getInterests(interestIds));
+                    }
+                    
+                    response = "{\"responseType\":\"surveyFinished\"}";
+                    
+                    break;
+                }
 
                 default:
                     throw new IllegalStateException("unrecognized command '" + message + "'");
@@ -868,7 +911,7 @@ public class FamilyHistoryCenterSocket {
     private static void sendFinalEmail(String userId) {
         UserContext context = userContextMap.get(userId);
         if (context != null && context.precacher != null) {
-            EmailUtils.sendFinalEmail(context.userName, context.userEmail, context.precacher.getProspects());
+            //EmailUtils.sendEmail();
         }
     }
     
@@ -968,6 +1011,21 @@ public class FamilyHistoryCenterSocket {
             }
         } else {
             throw new IllegalStateException("display not found '" + id + "'");
+        }
+        return OK_RESPONSE;
+    }
+    
+    protected static String sendToController(String id, String message) {
+        RemoteEndpoint controllerEndpoint = remoteControllers.get(id);
+        if (controllerEndpoint != null) {
+            try {
+                logger.info("Sending '" + message + "' to controller " + id);
+                controllerEndpoint.sendString(message);
+            } catch (Exception e) {
+                throw new IllegalStateException("failed to communicate with controller " + id + ": " + e.getMessage(), e);
+            }
+        } else {
+            throw new IllegalStateException("controller not found '" + id + "'");
         }
         return OK_RESPONSE;
     }
