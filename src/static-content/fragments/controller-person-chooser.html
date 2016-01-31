@@ -140,9 +140,7 @@ POSSIBILITY OF SUCH DAMAGE.
                     console.info("Attempting to change root person");
                     var currentPage = peekHistory();
                     var id = $(this).attr("data-id");
-                    navigate(currentPage + "&rootPersonId=" + id).then(function() {
-                        popHistory(); //Attempt to remove page load from history
-                    });
+                    navigate(currentPage + "&rootPersonId=" + id);
                 });
                 
                 $("#loading-div").hide();

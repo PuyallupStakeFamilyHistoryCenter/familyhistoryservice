@@ -109,6 +109,7 @@ Add 'loading' animation                    DONE
 Remove 'descendants' filter                DONE
 Back button should go to the family tree   DONE
 Rethink design                             DONE
+Back button should go to previous view in tree DONE
 Don't show 'focus' button if a person has no parents on record
 Spacing between tabs and controls
 Allow choosing depth for ancestors/descendants
@@ -345,3 +346,8 @@ Go straight to controls form
 Fix logging in via iPad
 Auto-reconnect login screen
 
+Survey
+Add phone number
+Add scanner            DONE
+Add recording room     DONE
+Add counts of adults and children who attended
