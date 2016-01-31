@@ -37,7 +37,7 @@ POSSIBILITY OF SUCH DAMAGE.
                     name: "your-family",
                     label: "Your family",
                     image: "old-family.jpg",
-                    nav: "person-chooser?type=person&hidePersonDetail",
+                    nav: "person-chooser?type=person&target=main%3Fgroup%3Dperson%26personId%3D%24%7Bid%7D%26personName%3D%24%7Bname%7D&noPeople",
                     display: "person-detail"
                 },
                 {
@@ -45,20 +45,6 @@ POSSIBILITY OF SUCH DAMAGE.
                     label: "Statistics",
                     image: "statistics.jpg",
                     nav: "stats"
-                },
-                {
-                    name: "images",
-                    label: "Photos",
-                    image: "collage.jpg",
-                    nav: "image-chooser?hidePersonDetail",
-                    display: "person-detail"
-                },
-                {
-                    name: "maps",
-                    label: "Maps",
-                    image: "old-world-map.jpg",
-                    nav: "person-chooser?type=person&target=map&getPeople",
-                    display: "map"
                 },
                 {
                     name: "quiz",
@@ -171,7 +157,33 @@ POSSIBILITY OF SUCH DAMAGE.
                     nav: "stats"
                 },
             ]
-        }
+        },
+        person: {
+            parent: "main",
+            label: "${personName}",
+            buttons: [
+                {
+                    name: "maps",
+                    label: "Maps",
+                    image: "old-world-map.jpg",
+                    nav: "map?personId=${personId}",
+                    display: "map"
+                },
+                {
+                    name: "images",
+                    label: "Photos",
+                    image: "collage.jpg",
+                    nav: "image-chooser?personId=${personId}",
+                    display: "person-detail"
+                },
+                {
+                    name: "stories",
+                    label: "Stories",
+                    image: "old-book.jpg",
+                    nav: "stories?personId=${personId}",
+                },
+            ]
+        },
     };
     
     function setButtons(groupName) {
@@ -181,7 +193,7 @@ POSSIBILITY OF SUCH DAMAGE.
         var group = buttonGroups[groupName];
         
         if (group.label) {
-            setHeaderName(group.label);
+            setHeaderName(replaceVariables(fragmentVars, group.label));
         }
         
         if (!group || !group.buttons) {
@@ -193,20 +205,27 @@ POSSIBILITY OF SUCH DAMAGE.
         navButtons.html("");
         
         $.each(group.buttons, function(i, buttonInfo) {
-            navButtons.append('<button id="'+buttonInfo.name+'-button" class="btn btn-lg btn-default" style="margin: 5px;" '
+            var name = replaceVariables(fragmentVars, buttonInfo.name);
+            var image = replaceVariables(fragmentVars, buttonInfo.image);
+            var nav = replaceVariables(fragmentVars, buttonInfo.nav);
+            var display = replaceVariables(fragmentVars, buttonInfo.display);
+            var child = replaceVariables(fragmentVars, buttonInfo.child);
+            var label = replaceVariables(fragmentVars, buttonInfo.label);
+            
+            navButtons.append('<button id="'+name+'-button" class="btn btn-lg btn-default" style="margin: 5px;" '
                     +(buttonInfo.disabled?"disabled":"")+'>'+
-                    '<span class="btn-nav"><img src="../media/' + buttonInfo.image + '" /></span><br><strong>'+
-                    buttonInfo.label + '</strong></button>');
-            $("#" + buttonInfo.name + "-button").click(function(e) {
-                if (buttonInfo.nav) {
-                    if (buttonInfo.display) {
-                        navigateDisplay("display-" + buttonInfo.display);
+                    '<span class="btn-nav"><img src="../media/' + image + '" /></span><br><strong>'+
+                    label + '</strong></button>');
+            $("#" + name + "-button").click(function(e) {
+                if (nav) {
+                    if (display) {
+                        navigateDisplay("display-" + display);
                     } else {
-                        navigateDisplay("display-" + buttonInfo.nav);
+                        navigateDisplay("display-" + nav);
                     }
-                    navigate("controller-" + buttonInfo.nav);
+                    navigate("controller-" + nav);
                 } else if (buttonInfo.child) {
-                    navigate("controller-main?group="+buttonInfo.child);
+                    navigate("controller-main?group="+child);
                 }
                 
                 e.preventDefault();

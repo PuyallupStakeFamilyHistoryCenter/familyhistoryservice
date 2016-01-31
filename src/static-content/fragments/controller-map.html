@@ -94,4 +94,9 @@ POSSIBILITY OF SUCH DAMAGE.
     
     setHeaderName("Map");
     
+    var personId = getParameterByName("personId");
+    if (personId) {
+        ws.socketSend("get-person " + token + " " + personId);
+    }
+    
 </script>

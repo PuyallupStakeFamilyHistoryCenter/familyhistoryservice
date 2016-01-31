@@ -25,8 +25,16 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 -->
 
-<div id="data-div">
-    
+<div>
+    <button id="map-button" class="btn btn-lg btn-default" style="margin: 5px;" >
+        <span class="btn-nav"><img src="../media/old-world-map.jpg" /></span><br><strong>Map</strong>
+    </button>
+    <button id="images-button" class="btn btn-lg btn-default" style="margin: 5px;" >
+        <span class="btn-nav"><img src="../media/collage.jpg" /></span><br><strong>Photos</strong>
+    </button>
+    <button id="stories-button" class="btn btn-lg btn-default" style="margin: 5px;" >
+        <span class="btn-nav"><img src="../media/old-book.jpg" /></span><br><strong>Stories</strong>
+    </button>
 </div>
 
 <script>
@@ -36,18 +44,17 @@ POSSIBILITY OF SUCH DAMAGE.
 
     settings.local = {
         verbs: {
-            people: function(obj) {
-                var people = obj.people;
-                console.info("Got family '" + people + "'");
-                gotFamily(people);
+            person: function(obj) {
+                var person = obj.person;
+                console.info("Got person '" + person + "'");
+                gotPerson(person);
             }
         }
     }
 
-    console.info("Sending get-family request");
-    //ws.socketSend("get-ancestors " + token + " " + settings.userId);
-
-    function gotFamily(people) {
+    function gotPerson(person) {
+        setHeaderName(person.name);
+        
         $("#data-div").html("");
         $.each(people, function(index, person) {
             $("#data-div").append('<button class="btn btn-default btn-lg send-person" data-id="' + person.id + '">'+decodeURI(person.name)+'</button>')

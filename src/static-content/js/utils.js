@@ -39,9 +39,16 @@ function getUrlVars(hashes)
     {
         var hash = split[i].split('=');
         vars.push(hash[0]);
-        if (hash.length === 2) {
-            vars[hash[0]] = decodeURIComponent(hash[1].replace(/\+/g, " "));
+        if (hash.length >= 2) {
+            var value = decodeURIComponent(hash[1].replace(/\+/g, " "));
+            if (hash[0] === "target") {
+                console.warn("Query string: '" + hashes + "'; target=" + value)
+            }
+            vars[hash[0]] = value;
         } else {
+            if (hash[0] === "target") {
+                console.warn("Query string: '" + hashes)
+            }
             vars[hash[0]] = true;
         }
     }
@@ -249,4 +256,61 @@ function formatPlace(answer) {
 
 function validatePin(pin) {
     return "01234567890".indexOf(pin) === -1 && "09876543210".indexOf(pin) === -1 && pin.search(/([0-9])\1\1\1/) === -1;
+}
+    
+function replaceVariables(obj, original) {
+    if (original == null) {
+        return;
+    }
+    
+    var regex = /\$\{([^\}\{]+)\}/g;
+    var matches = original.match(regex);
+    if (!matches) {
+        return original;
+    }
+
+    var final = original;
+    do {
+        $.each(matches, function(index, found) {
+            var variable = found.substr(2, found.length - 3);
+            final = final.replace(found, resolveChildProperty(obj, variable)); 
+        });
+        matches = final.match(regex)
+    } while (matches);
+
+    return final;
+}
+    
+var resolvedConstants = {};
+    
+function resolveChildProperty(obj, path) {
+    var split = path.split(".");
+    var currentObject;
+    var currentTry = 0;
+    var maxTries = 10;
+
+    do {
+        currentObject = obj;
+        $.each(split, function(index, key) {
+            if (!currentObject) {
+                return;
+            }
+
+            if (key[0] === "*" && index === 0) {
+                currentObject = getRandomElement(filterArray(people, key.substr(1)));
+            } else if (key === "stats" && index === 0) {
+                currentObject = stats;
+            } else if (key[0] === "*") {
+                currentObject = getRandomElement(filterArray(currentObject, key.substr(1)));
+            } else if (resolvedConstants[key] && index === 0) {
+                currentObject = resolvedConstants[key];
+            } else if (currentObject && currentObject[key]) {
+                currentObject = currentObject[key];
+            } else {
+                currentObject = null;
+            }
+        });
+    } while (split[0] === "*" && currentObject === null && currentTry < maxTries);
+
+    return currentObject;
 }

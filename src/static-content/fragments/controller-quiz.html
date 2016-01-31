@@ -570,25 +570,6 @@ POSSIBILITY OF SUCH DAMAGE.
         return questionAndAnswers;
     }
     
-    function replaceVariables(person, original) {
-        var regex = /\$\{([^\}\{]+)\}/g;
-        var matches = original.match(regex);
-        if (!matches) {
-            return original;
-        }
-        
-        var final = original;
-        do {
-            $.each(matches, function(index, found) {
-                var variable = found.substr(2, found.length - 3);
-                final = final.replace(found, resolveChildProperty(person, variable)); 
-            });
-            matches = final.match(regex)
-        } while (matches);
-        
-        return final;
-    }
-    
     function satisfiesPrerequisites(person, prerequisites) {
         if (!person || person.living) {
             return false;
@@ -603,38 +584,6 @@ POSSIBILITY OF SUCH DAMAGE.
         });
         
         return hasPrerequisites;
-    }
-    
-    function resolveChildProperty(person, path) {
-        var split = path.split(".");
-        var currentObject;
-        var currentTry = 0;
-        var maxTries = 10;
-        
-        do {
-            currentObject = person;
-            $.each(split, function(index, key) {
-                if (!currentObject) {
-                    return;
-                }
-
-                if (key[0] === "*" && index === 0) {
-                    currentObject = getRandomElement(filterArray(people, key.substr(1)));
-                } else if (key === "stats" && index === 0) {
-                    currentObject = stats;
-                } else if (key[0] === "*") {
-                    currentObject = getRandomElement(filterArray(currentObject, key.substr(1)));
-                } else if (resolvedConstants[key] && index === 0) {
-                    currentObject = resolvedConstants[key];
-                } else if (currentObject && currentObject[key]) {
-                    currentObject = currentObject[key];
-                } else {
-                    currentObject = null;
-                }
-            });
-        } while (split[0] === "*" && currentObject === null && currentTry < maxTries);
-        
-        return currentObject;
     }
     
     function sendQuestion(questionAndAnswers) {

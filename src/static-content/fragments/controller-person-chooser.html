@@ -61,6 +61,7 @@ POSSIBILITY OF SUCH DAMAGE.
     var choiceType = getParameterByName("type");
     var target = getParameterByName("target");
     var sendPeople = !getParameterByName("getPeople");
+    var noPeople = getParameterByName("noPeople");
     var rootId = !getParameterByName("rootPersonId") ? settings.userId : getParameterByName("rootPersonId");
     var loggedInUser = !getParameterByName("loggedInUser") ? settings.userId : getParameterByName("loggedInUser");
 
@@ -123,14 +124,16 @@ POSSIBILITY OF SUCH DAMAGE.
                     logger.clear();
 
                     var id = $(this).attr("data-id");
-                    if (sendPeople) {
+                    if (sendPeople && !noPeople) {
                         ws.socketSend("send-" + choiceType + " " + token + " " + displayName + " " + id);
                     }
 
                     if (target) {
-                        navigate("controller-" + target).then(
+                        navigate("controller-" + replaceVariables(peopleIndex[id], target)).then(
                                 function() {
-                                    ws.socketSend("get-" + choiceType + " " + token + " " + id);
+                                    if (!noPeople) {
+                                        ws.socketSend("get-" + choiceType + " " + token + " " + id);
+                                    }
                                 });
                     }
                     
@@ -186,4 +189,6 @@ POSSIBILITY OF SUCH DAMAGE.
 
     buildTree();
     ws.socketSend("get-ancestors " + token + " " + rootId);
+    
+    asdf()
 </script>

@@ -65,41 +65,47 @@ POSSIBILITY OF SUCH DAMAGE.
 
     settings.local = {
         verbs: {
+            person: function (obj) {
+                loadPeopleImages([obj.person]);
+            },
             people: function (obj) {
-                people = obj.people;
-                if (!people || !people.length) {
-                    people = defaultPeople;
-                }
-                
-                images = [];
-                imageUseMap = {};
-                $.each(people, function(index, person) {
-                    var filteredIndex = 0;
-                    $.each(person.images, function(imageIndex, image) {
-                        if (!imageUseMap[image]) {
-                            images.push({responseType:"personImage", url: image, person: person, imageIndex: filteredIndex++});
-                            imageUseMap[image] = 1;
-                        }
-                    });
-                });
-                
-                $("#pagination").pagination({
-                    items: images.length,
-                    itemsOnPage: pageSize,
-                    displayedPages: 3,
-                    cssStyle: 'dark-theme',
-                    prevText: "<span class='glyphicon glyphicon-chevron-left'></span>",
-                    nextText: "<span class='glyphicon glyphicon-chevron-right'></span>",
-                    onPageClick: function(pageNumber, event) {
-                        showPage(pageNumber-1);
-                    }
-                });
-                
-                $("#loading-div").hide();
-                $("#loaded-div").show();
-                showPage(0);
+                loadPeopleImages(obj.people);
             }
         }
+    }
+    
+    function loadPeopleImages(people) {
+        if (!people || !people.length) {
+            people = defaultPeople;
+        }
+
+        images = [];
+        imageUseMap = {};
+        $.each(people, function(index, person) {
+            var filteredIndex = 0;
+            $.each(person.images, function(imageIndex, image) {
+                if (!imageUseMap[image]) {
+                    images.push({responseType:"personImage", url: image, person: person, imageIndex: filteredIndex++});
+                    imageUseMap[image] = 1;
+                }
+            });
+        });
+
+        $("#pagination").pagination({
+            items: images.length,
+            itemsOnPage: pageSize,
+            displayedPages: 3,
+            cssStyle: 'dark-theme',
+            prevText: "<span class='glyphicon glyphicon-chevron-left'></span>",
+            nextText: "<span class='glyphicon glyphicon-chevron-right'></span>",
+            onPageClick: function(pageNumber, event) {
+                showPage(pageNumber-1);
+            }
+        });
+
+        $("#loading-div").hide();
+        $("#loaded-div").show();
+        showPage(0);
     }
     
     function showPage(pageNum) {
@@ -129,5 +135,10 @@ POSSIBILITY OF SUCH DAMAGE.
     }
 
     settings.local.verbs.people(defaultPeople);
-    ws.socketSend("get-ancestor-images " + token + " " + settings.userId);
+    var personId = getParameterByName("personId");
+    if (personId) {
+        ws.socketSend("get-person " + token + " " + personId);
+    } else {
+        ws.socketSend("get-ancestor-images " + token + " " + settings.userId);
+    }
 </script>
