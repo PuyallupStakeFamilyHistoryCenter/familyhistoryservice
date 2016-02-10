@@ -41,6 +41,7 @@ public class PersonBuilder {
     private PersonReference[] spouses;
     private PersonReference[] children;
     private String[] images;
+    private String[] stories;
     
     public PersonBuilder withId(String id) {
         this.id = id;
@@ -87,7 +88,12 @@ public class PersonBuilder {
         return this;
     }
     
+    public PersonBuilder withStories(String[] stories) {
+        this.stories = stories;
+        return this;
+    }
+    
     public Person build() {
-        return new Person(id, name, gender, living, facts, parents, spouses, children, images);
+        return new Person(id, name, gender, living, facts, parents, spouses, children, images, stories);
     }
 }

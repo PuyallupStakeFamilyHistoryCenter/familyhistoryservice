@@ -26,8 +26,10 @@
 package org.puyallupfamilyhistorycenter.service.cache;
 
 import com.google.gson.Gson;
+import com.sun.jersey.api.client.ClientRequest;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 import org.apache.log4j.Logger;
@@ -39,6 +41,7 @@ import org.gedcomx.rs.client.PersonChildrenState;
 import org.gedcomx.rs.client.PersonParentsState;
 import org.gedcomx.rs.client.PersonSpousesState;
 import org.gedcomx.rs.client.SourceDescriptionsState;
+import org.gedcomx.rs.client.StateTransitionOption;
 import org.gedcomx.source.SourceDescription;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
@@ -120,13 +123,20 @@ public class FamilySearchPersonSource implements Source<Person> {
                     SourceDescriptionsState sourceState = state.readArtifacts();
                     List<SourceDescription> sources = sourceState.getSourceDescriptions();
                     if (sources != null) {
-                        String[] imageUrls = new String[sources.size()];
-                        int i = 0;
+                        List<String> imageUrls = new ArrayList<>();
+                        List<String> storyUrls = new ArrayList<>();
                         for (SourceDescription source : sources) {
+                            //TODO: Filter memories by type
                             //source.getAbout() is the url to the image
-                            imageUrls[i++] = "/image-cache?ref=" + URLEncoder.encode(source.getAbout().toString() + "&access_token=" + accessToken, StandardCharsets.UTF_8.name());
+                            String url = "/image-cache?ref=" + URLEncoder.encode(source.getAbout().toString() + "&access_token=" + accessToken, StandardCharsets.UTF_8.name());
+                            if (url.contains(".jpg") || url.contains(".png")) {
+                                imageUrls.add(url);
+                            } else {
+                                storyUrls.add(url);
+                            }
                         }
-                        builder.withImages(imageUrls);
+                        builder.withImages(imageUrls.toArray(new String[imageUrls.size()]))
+                                .withStories(storyUrls.toArray(new String[storyUrls.size()]));
                     }
                 }
             }

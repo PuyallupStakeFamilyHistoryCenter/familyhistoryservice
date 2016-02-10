@@ -47,9 +47,10 @@ public class Person {
     public final PersonReference[] spouses;
     public final PersonReference[] children;
     public final String[] images;
+    public final String[] stories;
     //TODO: Finish this (quickly!)
 
-    Person(String id, String name, String gender, Boolean living, Fact[] facts, PersonReference[] parents, PersonReference[] spouses, PersonReference[] children, String[] images) {
+    Person(String id, String name, String gender, Boolean living, Fact[] facts, PersonReference[] parents, PersonReference[] spouses, PersonReference[] children, String[] images, String[] stories) {
         this.id = id;
         this.name = name;
         this.gender = gender;
@@ -59,6 +60,7 @@ public class Person {
         this.spouses = spouses;
         this.children = children;
         this.images = images;
+        this.stories = stories;
     }
     
     public void setRelationship(String relationship) {
