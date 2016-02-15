@@ -403,7 +403,7 @@ function pushHistory(item) {
     if (navHistory.length > 1) {
         $("#back-btn").show();
     }
-    console.info("History: " + navHistory);
+    console.info("Pushing " + item + " to history: " + navHistory);
 }
 
 function popHistory() {
@@ -411,7 +411,7 @@ function popHistory() {
     if (navHistory.length <= 1) {
         $("#back-btn").hide();
     }
-    console.info("History: " + navHistory);
+    console.info("Popping "+ item + " from history: " + navHistory);
     return item;
 }
 
