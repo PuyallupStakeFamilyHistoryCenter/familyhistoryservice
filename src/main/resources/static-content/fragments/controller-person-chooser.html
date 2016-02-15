@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<!--
+Copyright (c) 2014, tibbitts
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+* Redistributions of source code must retain the above copyright notice, this
+  list of conditions and the following disclaimer.
+* Redistributions in binary form must reproduce the above copyright notice,
+  this list of conditions and the following disclaimer in the documentation
+  and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+POSSIBILITY OF SUCH DAMAGE.
+-->
+
+<div id='loaded-div' style='display: none;'>
+    <div id="choice-type-btns" class="btn-group btn-group-lg" style="display: none" data-toggle="buttons" >
+        <label class="btn btn-default type-btn">
+            <input type="radio" name="choice-type" value="person">Person
+        </label>
+        <label class="btn btn-default type-btn">
+            <input type="radio" name="choice-type" value="family">Family
+        </label>
+        <label class="btn btn-default type-btn">
+            <input type="radio" name="choice-type" value="ancestors">Ancestors
+        </label>
+    </div>
+    <div id="return-to-root" style="display: none;">
+        <button id="root-btn" class="btn btn-lg btn-default">Return to root</button>
+    </div>
+    <div>
+        <div id="gen-0" style="height: 640px; width: 20%; float: left;"></div>
+        <div id="gen-1" style="height: 640px; width: 20%; float: left;"></div>
+        <div id="gen-2" style="height: 640px; width: 20%; float: left;"></div>
+        <div id="gen-3" style="height: 640px; width: 20%; float: left;"></div>
+        <div id="gen-4" style="height: 640px; width: 20%; float: left;"></div>
+    </div>
+</div>
+
+<div id='loading-div' >
+    <div class="progress">
+        <div class="progress-bar progress-bar-default progress-bar-striped active cached-prg" style="width: 100%">
+            Loading...
+        </div>
+    </div>
+</div>
+
+<script>
+    var choiceType = getParameterByName("type");
+    var target = getParameterByName("target");
+    var sendPeople = !getParameterByName("getPeople");
+    var noPeople = getParameterByName("noPeople");
+    var rootId = !getParameterByName("rootPersonId") ? settings.userId : getParameterByName("rootPersonId");
+    var loggedInUser = !getParameterByName("loggedInUser") ? settings.userId : getParameterByName("loggedInUser");
+
+    function recursivelyAddButtons(person, personMap, index, depth) {
+        console.info("Adding person " + JSON.stringify(person) + " to #gen-" + depth + "-" + index)
+        $("#gen-" + depth + "-" + index).append("<div id='btns-"+ depth + "-" + index + "' style='position: absolute; left: 0; top: calc(50% - 19px); z-index: 100; display: inline-block; white-space: nowrap;' ><button class='btn btn-default person-btn' data-id='" + person.id + "'>" + person.name + "</button></div>");
+        if (person.id !== rootId) {
+            $("#btns-" + depth + "-" + index).append("<button class='btn btn-default target-btn' data-id='" + person.id + "'><span class='glyphicon glyphicon-tree-deciduous'></span></button>");
+        }
+        $("#connector-" + depth + "-" + index).removeClass("invisible");
+
+        if (person.parents) {
+            var fatherArray = filterArray(person.parents, "gender=Male");
+            if (fatherArray[0]) {
+                var father = personMap[fatherArray[0].id];
+                if (father) {
+                    recursivelyAddButtons(father, personMap, index * 2, depth + 1);
+                }
+            }
+
+            var motherArray = filterArray(person.parents, "gender=Female");
+            if (motherArray[0]) {
+                var mother = personMap[motherArray[0].id];
+                if (mother) {
+                    recursivelyAddButtons(mother, personMap, index * 2 + 1, depth + 1);
+                }
+            }
+        }
+    }
+    
+    function addRootSpouses(person) {
+        if (person.spouses) {
+            $("#btns-0-0").append("<h5>Spouse</h5>");
+            $.each(person.spouses, function(index, spouse) {
+                $("#btns-0-0").append("<div style='padding-top: 10px;'><button class='btn btn-default person-btn' data-id='" + spouse.id + "'>" + spouse.name + "</button><button class='btn btn-default target-btn' data-id='" + spouse.id + "'><span class='glyphicon glyphicon-tree-deciduous'></span></button></div>");
+            });
+        }
+        if (person.children) {
+            $("#btns-0-0").append("<h5>Children</h5>");
+            $.each(person.children, function(index, spouse) {
+                $("#btns-0-0").append("<div style='padding-top: 10px;'><button class='btn btn-default person-btn' data-id='" + spouse.id + "'>" + spouse.name + "</button><button class='btn btn-default target-btn' data-id='" + spouse.id + "'><span class='glyphicon glyphicon-tree-deciduous'></span></button></div>");
+            });
+        }
+    }
+
+    settings.local = {
+        verbs: {
+            people: function (obj) {
+                var people = obj.people;
+                var peopleIndex = {};
+
+                $.each(people, function (index, person) {
+                    peopleIndex[person.id] = person;
+                });
+
+                recursivelyAddButtons(people[0], peopleIndex, 0, 0);
+                addRootSpouses(people[0]);
+
+                $(".person-btn").click(function (e) {
+                    logger.clear();
+
+                    var id = $(this).attr("data-id");
+                    if (sendPeople && !noPeople) {
+                        ws.socketSend("send-" + choiceType + " " + token + " " + displayName + " " + id);
+                    }
+
+                    if (target) {
+                        navigate("controller-" + replaceVariables(peopleIndex[id], target)).then(
+                                function() {
+                                    if (!noPeople) {
+                                        ws.socketSend("get-" + choiceType + " " + token + " " + id);
+                                    }
+                                });
+                    }
+                    
+                });
+                
+                $(".target-btn").click(function() {
+                    console.info("Attempting to change root person");
+                    var currentPage = peekHistory();
+                    var id = $(this).attr("data-id");
+                    navigate(currentPage + "&rootPersonId=" + id);
+                });
+                
+                $("#loading-div").hide();
+                $("#loaded-div").show();
+            }
+        }
+    }
+
+    if (rootId !== loggedInUser) {
+        $("#return-to-root").show();
+    } else {
+        console.info("Root button hidden because " + rootId + " equals " + settings.userId);
+    }
+    $("#root-btn").click(function(e){
+        console.info("Attempting to change root person");
+        var currentPage = peekHistory();
+        navigate(currentPage + "&rootPersonId=" + loggedInUser).then(function() {
+            popHistory();
+        });
+    });
+
+    $(".type-btn").click(function (e) {
+        choiceType = $(this).children("input").val();
+    });
+    
+    if (!choiceType) {
+        choiceType = "ancestors";
+        $("#choice-type-btns").show();
+    }
+    
+    function buildTree() {
+        for (var i = 0; i < 5; i++) {
+            var pow = Math.pow(2, i);
+            var percentHeight = 100 / pow;
+            for (var j = 0; j < Math.pow(2, i); j++) {
+                $("#gen-" + i).append("<div id='gen-" + i + "-" + j + "' style='height: " + percentHeight + "%; border: none; position: relative;'>\n" +
+                        "<div id='connector-" + (i + 1) + "-" + (j * 2) + "' class='invisible' style='position: absolute; top: 25%; left: 50%; border-top-left-radius: 50px; border-left: 2px solid CornflowerBlue; border-top: 2px solid CornflowerBlue; width: 100%; height: 25%'></div>\n" +
+                        "<div id='connector-" + (i + 1) + "-" + (j * 2 + 1) + "' class='invisible' style='position: absolute; top: 50%; left: 50%; border-bottom-left-radius: 50px; border-left: 2px solid Crimson; border-bottom: 2px solid Crimson; width: 100%; height: 25%'></div>\n" +
+                        "</div>");
+            }
+        }
+    }
+
+    buildTree();
+    ws.socketSend("get-ancestors " + token + " " + rootId);
+    
+    asdf()
+</script>

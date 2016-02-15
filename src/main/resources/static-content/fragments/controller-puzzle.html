@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<!--
+Copyright (c) 2014, tibbitts
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+* Redistributions of source code must retain the above copyright notice, this
+  list of conditions and the following disclaimer.
+* Redistributions in binary form must reproduce the above copyright notice,
+  this list of conditions and the following disclaimer in the documentation
+  and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+POSSIBILITY OF SUCH DAMAGE.
+-->
+
+<button class="btn btn-danger btn-lg" id="resetButton" type="button">Reset</button>
+<div class="btn-group btn-group-lg" data-toggle="buttons">
+    <label class="btn btn-default">
+        <input type="radio" name="difficulty" value="easy">Easy
+    </label>
+    <label class="btn btn-default active">
+        <input type="radio" name="difficulty" value="medium" checked="">Medium
+    </label>
+    <label class="btn btn-default">
+        <input type="radio" name="difficulty" value="hard">Hard
+    </label>
+    <label class="btn btn-default">
+        <input type="radio" name="difficulty" value="insane">Insane
+    </label>
+    <label class="btn btn-warning">
+        <input type="radio" name="difficulty" value="custom">Custom
+    </label>
+</div>
+<div id="customControls" style="display: none;">
+    <dl class="dl-horizontal">
+        <dt>Piece size</dt>
+        <dd>
+            <div class="btn-group btn-group-lg" data-toggle="buttons">
+                <label class="btn btn-default">
+                    <input type="radio" name="depth" value="3">XL
+                </label>
+                <label class="btn btn-default active">
+                    <input type="radio" name="depth" value="4" checked="">L
+                </label>
+                <label class="btn btn-default">
+                    <input type="radio" name="depth" value="5">M
+                </label>
+                <label class="btn btn-default">
+                    <input type="radio" name="depth" value="6">S
+                </label>
+                <label class="btn btn-default">
+                    <input type="radio" name="depth" value="7">XS
+                </label>
+            </div>
+        </dd>
+
+        <dd>
+            <div class="btn-group btn-group-lg" data-toggle="buttons">
+                <label class="btn btn-default">
+                    <input type="checkbox" name="protrusions" id="protrusions">Show protrusions
+                </label>
+            </div>
+        </dd>
+
+        <dd>
+            <div class="btn-group btn-group-lg" data-toggle="buttons">
+                <label class="btn btn-default">
+                    <input type="checkbox" name="thumbnail">Show thumbnail
+                </label>
+            </div>
+        </dd>
+
+        <dd>
+            <div class="btn-group btn-group-lg" data-toggle="buttons">
+                <label class="btn btn-default">
+                    <input type="checkbox" name="presort" id="presort">Pre-sort pieces
+                </label>
+            </div>
+        </dd>
+
+        <dd>
+            <div class="btn-group btn-group-lg" data-toggle="buttons">
+                <label class="btn btn-default">
+                    <input type="checkbox" name="rotate" id="rotate">Rotate pieces
+                </label>
+            </div>
+        </dd>
+
+        <dd>
+            <div class="btn-group btn-group-lg" data-toggle="buttons">
+                <label class="btn btn-default">
+                    <input type="checkbox" name="snap" id="snap">Snap in place
+                </label>
+            </div>
+        </dd>
+
+        <dd>
+            <div class="btn-group btn-group-lg" data-toggle="buttons">
+                <label class="btn btn-default">
+                    <input type="checkbox" name="snapOnDrag" id="snapOnDrag">Snap on drag
+                </label>
+            </div>
+        </dd>
+
+        <dt>Snap radius</dt>
+        <dd>
+            <div class="btn-group btn-group-lg" data-toggle="buttons">
+                <label class="btn btn-default">
+                    <input type="radio" name="snapThreshold" value="5">S
+                </label>
+                <label class="btn btn-default">
+                    <input type="radio" name="snapThreshold" value="10">M
+                </label>
+                <label class="btn btn-default">
+                    <input type="radio" name="snapThreshold" value="15">L
+                </label>
+                <label class="btn btn-default">
+                    <input type="radio" name="snapThreshold" value="20">XL
+                </label>
+            </div>
+        </dd>
+
+        <dt>
+        Background
+        </dt>
+        <dd>
+            <div class="btn-group btn-group-lg" data-toggle="buttons">
+                <label class="btn btn-default">
+                    <input type="radio" name="backgroundTransparency" value="100">Invisible
+                </label>
+                <label class="btn btn-default active">
+                    <input type="radio" name="backgroundTransparency" value="75" checked="">..
+                </label>
+                <label class="btn btn-default">
+                    <input type="radio" name="backgroundTransparency" value="50">...
+                </label>
+                <label class="btn btn-default">
+                    <input type="radio" name="backgroundTransparency" value="25">Solid
+                </label>
+            </div>
+        </dd>
+    </dl>
+</div>
+
+<script>
+    var configurations = {
+        easy: {
+            depth: 3,
+            protrusions: true,
+            backgroundTransparency: 50,
+            thumbnail: false,
+            snap: true,
+            snapThreshold: 15,
+            snapOnDrag: true,
+            presort: false,
+            rotate: false
+        },
+        medium: {
+            depth: 5,
+            protrusions: true,
+            backgroundTransparency: 75,
+            thumbnail: false,
+            snap: true,
+            snapThreshold: 10,
+            snapOnDrag: false,
+            presort: true,
+            rotate: false
+        },
+        hard: {
+            depth: 6,
+            protrusions: true,
+            backgroundTransparency: 100,
+            thumbnail: true,
+            snap: true,
+            snapThreshold: 10,
+            snapOnDrag: false,
+            presort: true,
+            rotate: true
+        },
+        insane: {
+            depth: 7,
+            protrusions: false,
+            backgroundTransparency: 100,
+            thumbnail: true,
+            snap: false,
+            snapThreshold: 10,
+            snapOnDrag: false,
+            presort: false,
+            rotate: true
+        }
+    };
+
+    $('input[name=difficulty]:radio').change(function () {
+        $("#customControls").hide();
+
+        settings.config = configurations[$(this).val()];
+        sendFullConfiguration(settings.config);
+    });
+
+    $("input[name=difficulty][value='custom']:radio").unbind().change(function () {
+        if (!settings.config) {
+            settings.config = configurations.medium;
+        }
+        settings.config = cloneObject(settings.config);
+        initRadio("[name=depth]", settings.config.depth);
+        initCheckbox("[name=protrusions]", settings.config.protrusions);
+        initCheckbox("[name=rotate]", settings.config.rotate);
+        initCheckbox("[name=snap]", settings.config.snap);
+        initCheckbox("[name=snapOnDrag]", settings.config.snapOnDrag);
+        initRadio("[name=snapThreshold]", settings.config.snapThreshold);
+        initCheckbox("[name=presort]", settings.config.presort);
+        initRadio("[name=backgroundTransparency]", settings.config.backgroundTransparency);
+        initCheckbox("[name=thumbnail]", settings.config.thumbnail);
+        $("#customControls").show();
+        sendFullConfiguration(settings.config);
+    });
+
+    $("[name=depth]").change(function () {
+        //TODO: This isn't working
+        sendToDisplay("{\"responseType\":\"depth\",\"value\":" + $(this).val() + "}");
+    });
+
+    $("[name=protrusions]").change(function () {
+        sendToDisplay("{\"responseType\":\"protrusions\",\"value\":" + $(this).prop('checked') + "}");
+    });
+
+    $("[name=rotate]").change(function () {
+        sendToDisplay("{\"responseType\":\"rotate\",\"value\":" + $(this).prop('checked') + "}");
+    });
+
+    $("[name=snap]").change(function () {
+        sendToDisplay("{\"responseType\":\"snap\",\"value\":" + $(this).prop('checked') + "}");
+    });
+
+    $("[name=snapOnDrag]").change(function () {
+        sendToDisplay("{\"responseType\":\"snapOnDrag\",\"value\":" + $(this).prop('checked') + "}");
+    });
+
+    $("[name=snapThreshold]").change(function () {
+        sendToDisplay("{\"responseType\":\"snapThreshold\",\"value\":" + $(this).val() + "}");
+    });
+
+    $("[name=presort]").change(function () {
+        sendToDisplay("{\"responseType\":\"presort\",\"value\":" + $(this).prop('checked') + "}");
+    });
+
+    $("[name=backgroundTransparency]").change(function () {
+        sendToDisplay("{\"responseType\":\"backgroundTransparency\",\"value\":" + $(this).val() + "}");
+    });
+
+    $("[name=thumbnail]").change(function () {
+        sendToDisplay("{\"responseType\":\"thumbnail\",\"value\":" + $(this).prop('checked') + "}");
+    });
+
+    $("#resetButton").click(function () {
+        sendToDisplay("{\"responseType\":\"reset\"}");
+    });
+
+    sendFullConfiguration(configurations.medium);
+
+
+
+    function sendFullConfiguration(config) {
+        sendToDisplay("{\"responseType\":\"depth\",\"value\":" + config.depth + "}");
+        sendToDisplay("{\"responseType\":\"protrusions\",\"value\":" + config.protrusions + "}");
+        sendToDisplay("{\"responseType\":\"rotate\",\"value\":" + config.rotate + "}");
+        sendToDisplay("{\"responseType\":\"snap\",\"value\":" + config.snap + "}");
+        sendToDisplay("{\"responseType\":\"snapOnDrag\",\"value\":" + config.snapOnDrag + "}");
+        sendToDisplay("{\"responseType\":\"snapThreshold\",\"value\":" + config.snapThreshold + "}");
+        sendToDisplay("{\"responseType\":\"presort\",\"value\":" + config.presort + "}");
+        sendToDisplay("{\"responseType\":\"backgroundTransparency\",\"value\":" + config.backgroundTransparency + "}");
+        sendToDisplay("{\"responseType\":\"thumbnail\",\"value\":" + config.thumbnail + "}");
+    }
+
+    function cloneObject(obj) {
+        var serialized = window.JSON.stringify(obj);
+        var clone = window.JSON.parse(serialized);
+        return clone;
+    }
+    
+    function initCheckbox(selector, value) {
+        var checkbox = $(selector);
+        if (value) {
+            checkbox.prop('checked',"");
+            checkbox.parent().addClass("active");
+        } else {
+            checkbox.removeProp('checked');
+            checkbox.parent().removeClass("active");
+        }
+    }
+    
+    function initRadio(selector, value) {
+        $(selector).removeProp('checked').parent().removeClass("active");
+        $(selector + "[value="+value+"]").prop('checked','').parent().addClass("active");
+    }
+</script>

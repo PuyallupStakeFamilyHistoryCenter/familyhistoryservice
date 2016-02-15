@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<!--
+Copyright (c) 2014, tibbitts
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+* Redistributions of source code must retain the above copyright notice, this
+  list of conditions and the following disclaimer.
+* Redistributions in binary form must reproduce the above copyright notice,
+  this list of conditions and the following disclaimer in the documentation
+  and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+POSSIBILITY OF SUCH DAMAGE.
+-->
+
+<button class="stats-btn btn btn-lg btn-default" data-command="lifespan" data-type="chart" >Life span</button>
+<button class="stats-btn btn btn-lg btn-default" data-command="familySize" data-type="chart">Family size</button>
+<button class="stats-btn btn btn-lg btn-default" data-command="birthCountry" data-type="chart">Birth country</button>
+<button class="stats-btn btn btn-lg btn-default" data-command="deathCountry" data-type="chart">Death country</button>
+<button class="stats-btn btn btn-lg btn-default" data-command="emmigrantCountry" data-type="chart">Emmigrant birth country</button>
+<button class="stats-btn btn btn-lg btn-default" data-command="immigrantCountry" data-type="chart">Immigrant death country</button>
+<button class="stats-btn btn btn-lg btn-default" data-command="sourceDestCountry" data-type="chart">Source->destination frequency</button>
+<button class="stats-btn btn btn-lg btn-default" data-command="birthCountryMap" data-type="map">Birth country map</button>
+<button class="stats-btn btn btn-lg btn-default" data-command="emmigrantCountryMap" data-type="map">Emmigrant birth country map</button>
+
+<div id="scope-btn-div" class="panel panel-default" style="display: none">
+    <div class="panel-body">
+        <button class="scope-btn btn btn-default" data-command="scopeWorld">World</button>
+        <button class="scope-btn btn btn-default" data-command="scopeNorthAmerica">North America</button>
+        <button class="scope-btn btn btn-default" data-command="scopeSouthAmerica">South America</button>
+        <button class="scope-btn btn btn-default" data-command="scopeEurope">Europe</button>
+        <button class="scope-btn btn btn-default" data-command="scopeAfrica">Africa</button>
+        <button class="scope-btn btn btn-default" data-command="scopeAsia">Asia</button>
+        <button class="scope-btn btn btn-default" data-command="scopeOceania">Oceania</button>
+    </div>
+</div>
+
+<script>
+    ws.socketSend("send-ancestor-stats " + token + " " + displayName + " " + settings.userId);
+    
+    $(".stats-btn").click(function(e) {
+        var command = $(this).attr("data-command");
+        sendToDisplay(JSON.stringify({responseType: command}));
+        
+        if ($(this).attr("data-type") === "map") {
+            $("#scope-btn-div").show();
+        } else {
+            $("#scope-btn-div").hide();
+        }
+    });
+    
+    $(".scope-btn").click(function(e) {
+        var command = $(this).attr("data-command");
+        sendToDisplay(JSON.stringify({responseType: command}));
+    });
+</script>

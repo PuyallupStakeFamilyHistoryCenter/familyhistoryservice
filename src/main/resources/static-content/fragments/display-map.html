@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<!--
+Copyright (c) 2014, tibbitts
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+* Redistributions of source code must retain the above copyright notice, this
+  list of conditions and the following disclaimer.
+* Redistributions in binary form must reproduce the above copyright notice,
+  this list of conditions and the following disclaimer in the documentation
+  and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+POSSIBILITY OF SUCH DAMAGE.
+-->
+
+<div id="map-container" style="position: fixed; left: 0; top: 0;">
+    <div id="map-canvas" style="width:100%; height:100%; min-height: 500px;"/>
+</div>
+<script>
+    settings.local = {
+        verbs: {
+            person: function (obj) {
+                graphPerson(obj.person);
+            },
+            people: function (obj) {
+                graphPeople(obj.people);
+            },
+            selectFact: function (obj) {
+                stepTour(obj.factId);
+            },
+            zoom: function (obj) {
+                setZoom(Number(obj.zoom));
+            }
+        }
+    };
+
+    var map, geocoder;
+    function initialize() {                // Create an array of styles.
+        var styles = [
+            {
+                "featureType": "administrative",
+                "stylers": [
+                    {"visibility": "off"}
+                ]
+            }, {
+                "featureType": "administrative.country",
+                "stylers": [
+                    {"visibility": "on"}
+                ]
+            }, {
+                "featureType": "administrative.province",
+                "stylers": [
+                    {"visibility": "on"}
+                ]
+            }, {
+                "featureType": "administrative.locality",
+                "stylers": [
+                    {"visibility": "simplified"}
+                ]
+            }, {
+                "featureType": "landscape.man_made",
+                "stylers": [
+                    {"visibility": "off"}
+                ]
+            }, {
+                "featureType": "landscape",
+                "stylers": [
+                    {"visibility": "simplified"}
+                ]
+            }, {
+                "featureType": "poi",
+                "stylers": [
+                    {"visibility": "off"}
+                ]
+            }, {
+                "featureType": "road",
+                "stylers": [
+                    {"visibility": "simplified"}
+                ]
+            }, {
+                "featureType": "road",
+                "elementType": "labels",
+                "stylers": [
+                    {"visibility": "off"}
+                ]
+            }, {
+                "featureType": "road.highway",
+                "stylers": [
+                    {"visibility": "off"}
+                ]
+            }, {
+                "featureType": "transit",
+                "stylers": [
+                    {"visibility": "off"}
+                ]
+            }, {
+                "featureType": "water",
+                "elementType": "labels",
+                "stylers": [
+                    {"visibility": "simplified"}
+                ]
+            }, {
+                "featureType": "water",
+                "stylers": [
+                    {"hue": "#0011ff"}
+                ]
+            }
+        ];
+
+        // Create a new StyledMapType object, passing it the array of styles,
+        // as well as the name to be displayed on the map type control.
+        var styledMap = new google.maps.StyledMapType(styles,
+                {name: "Ancestor Map"});
+
+        var mapOptions = {
+            zoom: 3,
+            center: new google.maps.LatLng(-34.397, 150.644),
+            disableDefaultUI: true
+        };
+
+        map = new google.maps.Map(document.getElementById('map-canvas'),
+                mapOptions);
+
+        //Associate the styled map with the MapTypeId and set it to display.
+        map.mapTypes.set('ancestor_map', styledMap);
+        map.setMapTypeId('ancestor_map');
+
+        geocoder = new google.maps.Geocoder();
+        
+        google.maps.event.addListener(map, "idle", nextFrame);
+    }
+
+
+    function loadScript() {
+        var script = document.createElement('script');
+        script.type = 'text/javascript';
+        script.src = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyCZCAVOvmqimWWAdMAuCml5sqZ02GAfESw&&' +
+                'callback=initialize';
+        $("#content").append(script);
+    }
+
+    function resize() {
+        $("#map-container").height($(document).height());
+        $("#map-container").width($(document).width());
+    }
+
+    function graphPerson(person) {
+        graphPeople([person]);
+        asdf();
+    }
+
+    function graphPeople(people) {
+        var facts = people[0].facts;
+        attachNameToFacts(facts, people[0].name);
+
+        if (people[0].spouses) {
+            $.each(people[0].spouses, function (index, spouse) {
+                if (spouse.facts) {
+                    attachNameToFacts(spouse.facts, people[0].name + " and " + spouse.name)
+                    facts = facts.concat(spouse.facts);
+                }
+            });
+        }
+        ;
+
+        $.each(people, function (index, person) {
+            if (person.facts) {
+                attachNameToFacts(person.facts, person.name);
+                $.each(person.facts, function (index, fact) {
+                    if (fact.type === "Birth" || index === 0) {
+                        facts.push(fact);
+                    }
+                });
+            }
+        });
+
+        graphFacts(facts);
+    }
+    
+    function attachNameToFacts(facts, name) {
+        $.each(facts, function(index, fact) {
+            fact.name = name;
+        });
+    }
+
+    var flightPath;
+    var markers;
+    var infoWindows;
+    var tour;
+    var tourPosition;
+    function graphFacts(facts) {
+        facts = removeDuplicates(sortFacts(facts));
+
+        console.info("Graphing facts " + JSON.stringify(facts));
+        if (markers) {
+            $.each(markers, function (index, marker) {
+                marker.setMap(null);
+            });
+        }
+        markers = [];
+        if (flightPath) {
+            flightPath.setMap(null);
+        }
+        flightPath = new google.maps.Polyline({
+            geodesic: true,
+            strokeColor: '#FF0000',
+            strokeOpacity: 1.0,
+            strokeWeight: 2,
+        });
+        flightPath.setMap(map);
+        tourPosition = -1;
+        
+        var promises = [];
+        $.each(facts, function (index, fact) {
+            var promise = getLocationForAddress(fact.place);
+            promises.push(promise);
+        });
+
+        tour = {"fffffffffff": "all"};
+        Promise.all(promises).then(
+                function (results) {
+                    var infowindow = new google.maps.InfoWindow();
+                    $.each(results, function (index, result) {
+                        if (result) {
+                            flightPath.getPath().push(result);
+                            var fact = facts[index];
+                            var marker = new google.maps.Marker({
+                                position: result,
+                                map: map,
+                                title: fact.place + ": " + fact.type + " " + fact.date
+                            });
+                            markers.push(marker);
+                            var contentString = getFactBlurb(fact);
+
+                            tour[fact.id] = {
+                                fact: fact,
+                                position: result,
+                                marker: marker,
+                                infowindow: infowindow,
+                                blurb: contentString
+                            };
+                        }
+                    });
+                    stepTour("fffffffffff");
+                },
+                function (error) {
+                    console.log(error);
+                }
+        );
+    }
+    
+    var animationFrames = null;
+    var currentFrame;
+    function stepTour(nextPosition) {
+        var previousValue = tour[tourPosition];
+        if (previousValue && previousValue.infowindow) {
+            previousValue.infowindow.close();
+        }
+        var nextValue = tour[nextPosition];
+        if (nextValue === "all") {
+            var bounds = new google.maps.LatLngBounds();
+            $.each(tour, function(index, tourSegment) {
+                if (tourSegment !== "all") {
+                    bounds.extend(tourSegment.position);
+                }
+            });
+            map.fitBounds(bounds);
+            if (map.getZoom() > 5) {
+                map.setZoom(5);
+            }
+            tourPosition = null;
+        } else if (nextValue) {
+            if (previousValue && previousValue.position) {
+                animationFrames = createAnimationFrames(nextValue.position, previousValue.position);
+                currentFrame = -1;
+                nextFrame();
+            } else {
+                map.panTo(nextValue.position);
+                map.setZoom(10);
+                nextValue.infowindow.setContent("<div style='font-size: 3vmax;'>"+nextValue.blurb+"</div>");
+                nextValue.infowindow.open(map, nextValue.marker);
+                say(nextValue.blurb, true);
+            }
+            tourPosition = nextPosition;
+        }
+        
+    }
+    
+    function createAnimationFrames(p2, p1) {
+        var numFrames = 1; //TODO: make this dynamic based on the distance between
+        var path = [];
+        for (var i = 0; i < numFrames; i++) {
+            var lat = (p2.lat() - p1.lat()) / numFrames * i + p1.lat();
+            var lng = (p2.lng() - p1.lng()) / numFrames * i + p1.lng();
+            
+            path.push(new google.maps.LatLng(lat, lng));
+        }
+        path.push(p2);
+        
+        var animationFrames = [];
+        for (var i = 1; i < path.length; i++) {
+            animationFrames.push([p1, path[i]]);
+        }
+        for (var i = 1; i < path.length - 1; i++) {
+            animationFrames.push([path[i], p2]);
+        }
+        return animationFrames;
+    }
+    
+    function nextFrame() {
+        if (animationFrames && animationFrames[currentFrame+1]) {
+            currentFrame++;
+            var f = animationFrames[currentFrame];
+            var bounds = new google.maps.LatLngBounds();
+            bounds.extend(f[0]);
+            bounds.extend(f[1]);
+            map.fitBounds(bounds);
+            if (map.getZoom() > 10) {
+                map.setZoom(10);
+            } 
+        } else if (animationFrames) {
+            animationFrames = null;
+            var t = tour[tourPosition];
+            map.panTo(t.position);
+            map.setZoom(10);
+            t.infowindow.setContent("<div style='font-size: 3vmax;'>"+t.blurb+"</div>");
+            t.infowindow.open(map, t.marker);
+            say(t.blurb, true);
+        }
+    }
+
+    function clearOverlays() {
+        for (var i = 0; i < markersArray.length; i++) {
+            markersArray[i].setMap(null);
+        }
+        markersArray.length = 0;
+    }
+
+    /*
+     * Returns a promise that returns the location
+     */
+    function getLocationForAddress(address) {
+        return new Promise(function (resolve, reject) {
+            geocoder.geocode({address: address}, function (results, status) {
+                if (status == google.maps.GeocoderStatus.OK) {
+                    console.info("location " + address + " maps to " + JSON.stringify(results));
+                    resolve(results[0].geometry.location);
+                } else if (status == google.maps.GeocoderStatus.OVER_QUERY_LIMIT) {
+                    //Maybe do something
+                    resolve(null);
+                } else if (status == google.maps.GeocoderStatus.ZERO_RESULTS) {
+                    resolve(null);
+                } else {
+                    console.warn("Failed to get location with message " + status);
+                    resolve(null);
+                }
+            });
+        });
+    }
+    
+    var factTypeVerbMap = {
+        "Birth": {verb:"was born",connector:"on"},
+        "Christening": {verb:"was christened",connector:"on"},
+        "Residence": {verb:"lived",connector:"in"},
+        "Marriage": {verb:"were married",connector:"on"},
+        "Death": {verb:"died",connector:"on"},
+        "Burial": {verb:"was buried",connector:"on"},
+    };
+    function getFactBlurb(fact) {
+        var message = fact.type + ": " + fact.place + " " + fact.date;
+        if (factTypeVerbMap[fact.type]) {
+            var v = factTypeVerbMap[fact.type];
+            message = fact.name + " " + v.verb + " in " + formatPlace(fact.place) + " " + v.connector + " " + fact.date;
+        }
+        return message;
+    }
+    
+    function setZoom(zoom) {
+        map.setZoom(zoom);
+    }
+
+    resize();
+    loadScript();
+</script>

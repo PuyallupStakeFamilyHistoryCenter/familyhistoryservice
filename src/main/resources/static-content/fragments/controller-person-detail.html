@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<!--
+Copyright (c) 2014, tibbitts
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+* Redistributions of source code must retain the above copyright notice, this
+  list of conditions and the following disclaimer.
+* Redistributions in binary form must reproduce the above copyright notice,
+  this list of conditions and the following disclaimer in the documentation
+  and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+POSSIBILITY OF SUCH DAMAGE.
+-->
+
+<div>
+    <button id="map-button" class="btn btn-lg btn-default" style="margin: 5px;" >
+        <span class="btn-nav"><img src="../media/old-world-map.jpg" /></span><br><strong>Map</strong>
+    </button>
+    <button id="images-button" class="btn btn-lg btn-default" style="margin: 5px;" >
+        <span class="btn-nav"><img src="../media/collage.jpg" /></span><br><strong>Photos</strong>
+    </button>
+    <button id="stories-button" class="btn btn-lg btn-default" style="margin: 5px;" >
+        <span class="btn-nav"><img src="../media/old-book.jpg" /></span><br><strong>Stories</strong>
+    </button>
+</div>
+
+<script>
+    $("#back-button").click(function (e) {
+        navigate("controller-main");
+    });
+
+    settings.local = {
+        verbs: {
+            person: function(obj) {
+                var person = obj.person;
+                console.info("Got person '" + person + "'");
+                gotPerson(person);
+            }
+        }
+    }
+
+    function gotPerson(person) {
+        setHeaderName(person.name);
+        
+        $("#data-div").html("");
+        $.each(people, function(index, person) {
+            $("#data-div").append('<button class="btn btn-default btn-lg send-person" data-id="' + person.id + '">'+decodeURI(person.name)+'</button>')
+        });
+
+        $(".send-person").click(function(event) {
+            var personId = $(this).attr("data-id");
+            console.info("Got person id " + personId)
+            ws.socketSend("send-person " + token + " " + displayName + " " + personId);
+        });
+    }
+</script>
+

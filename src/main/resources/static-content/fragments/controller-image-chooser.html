@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<!--
+Copyright (c) 2014, tibbitts
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+* Redistributions of source code must retain the above copyright notice, this
+  list of conditions and the following disclaimer.
+* Redistributions in binary form must reproduce the above copyright notice,
+  this list of conditions and the following disclaimer in the documentation
+  and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+POSSIBILITY OF SUCH DAMAGE.
+-->
+
+<script src="/static-content/js/jquery.simplePagination.js" ></script>
+
+<div id='loaded-div' style='display: none;'>
+    <div id="images-wrapper">
+        <div id="images">
+
+        </div>
+        <div id="pagination">
+
+        </div>
+    </div>
+</div>
+
+
+<div id='loading-div' >
+    <div class="progress">
+        <div class="progress-bar progress-bar-default progress-bar-striped active cached-prg" style="width: 100%">
+            Loading...
+        </div>
+    </div>
+</div>
+
+<script>
+    console.info("Starting image chooser");
+    var target = getParameterByName("target");
+    var sendPeople = !getParameterByName("getPeople");
+    var people;
+    var images;
+    var pageSize = 10;
+    var defaultPeople = [
+        {
+            name: "Demo",
+            images: [
+                "/media/default.jpg"
+            ]
+        }
+    ]
+
+    settings.local = {
+        verbs: {
+            person: function (obj) {
+                loadPeopleImages([obj.person]);
+            },
+            people: function (obj) {
+                loadPeopleImages(obj.people);
+            }
+        }
+    }
+    
+    function loadPeopleImages(people) {
+        if (!people || !people.length) {
+            people = defaultPeople;
+        }
+
+        images = [];
+        imageUseMap = {};
+        $.each(people, function(index, person) {
+            var filteredIndex = 0;
+            $.each(person.images, function(imageIndex, image) {
+                if (!imageUseMap[image]) {
+                    images.push({responseType:"personImage", url: image, person: person, imageIndex: filteredIndex++});
+                    imageUseMap[image] = 1;
+                }
+            });
+        });
+
+        $("#pagination").pagination({
+            items: images.length,
+            itemsOnPage: pageSize,
+            displayedPages: 3,
+            cssStyle: 'dark-theme',
+            prevText: "<span class='glyphicon glyphicon-chevron-left'></span>",
+            nextText: "<span class='glyphicon glyphicon-chevron-right'></span>",
+            onPageClick: function(pageNumber, event) {
+                showPage(pageNumber-1);
+            }
+        });
+
+        $("#loading-div").hide();
+        $("#loaded-div").show();
+        showPage(0);
+    }
+    
+    function showPage(pageNum) {
+        $("#images").html("");
+        for (var i = pageSize * pageNum; i < Math.min(images.length, pageSize * (pageNum + 1)); i++) {
+            var image = images[i];
+            
+            if ($("#section-" + image.person.id).length === 0) {
+                $("#images").append("<div id='section-"+image.person.id+"' style='display: none;'><h4>" + image.person.name + 
+                        (image.imageIndex == 0 ? "" : " continued" )+ "</h4></div>");
+            }
+            var imageHtml = "<button class='btn btn-default img-btn' style='display: none;' data-image='" + JSON.stringify(image) + "'><img style='max-width:100px; max-height: 100px;' src='" + image.url + "' /></button>";
+            $("#section-" + image.person.id).append(imageHtml);
+        }
+        $(".img-btn img").load(function (e) {
+            $(this).parent().show().parent().show();
+        });
+        $(".img-btn").click(function (e) {
+            var data = $(this).attr("data-image");
+            var obj = JSON.parse(data);
+            sendToDisplay(data);
+
+            if (target) {
+                navigate("controller-" + target);
+            }
+        });
+    }
+
+    settings.local.verbs.people(defaultPeople);
+    var personId = getParameterByName("personId");
+    if (personId) {
+        ws.socketSend("get-person " + token + " " + personId);
+    } else {
+        ws.socketSend("get-ancestor-images " + token + " " + settings.userId);
+    }
+</script>

@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<!--
+Copyright (c) 2014, tibbitts
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+* Redistributions of source code must retain the above copyright notice, this
+  list of conditions and the following disclaimer.
+* Redistributions in binary form must reproduce the above copyright notice,
+  this list of conditions and the following disclaimer in the documentation
+  and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+POSSIBILITY OF SUCH DAMAGE.
+-->
+
+<ul class="nav nav-tabs" id="tabs" role="tablist">
+    <li class="active" id="media-tab" ><a href="#images" role="tab" data-toggle="tab">Media</a></li>
+    <li id="controls-tab" style="display: none" ><a href="#controls" role="tab" data-toggle="tab">Controls</a></li>
+</ul>
+<div id="media-buttons"></div>
+<div id="controls" style="display: none;">
+    <button id="skip-backward-btn" class="btn btn-lg btn-default auto-wire" data-action="skipBackward" ><span class="glyphicon glyphicon-step-backward" ></span></button>
+    <button id="play-btn" class="btn btn-lg btn-default" style="display: none"><span class="glyphicon glyphicon-play" ></span></button>
+    <button id="pause-btn" class="btn btn-lg btn-default"><span class="glyphicon glyphicon-pause" ></span></button>
+    <button id="skip-forward-btn" class="btn btn-lg btn-default auto-wire" data-action="skipForward" ><span class="glyphicon glyphicon-step-forward" ></span></button>
+    
+    <div style="padding-top: 30px">
+        <button id="mute-btn" class="btn btn-lg btn-default auto-wire" data-action="mute"><span class="glyphicon glyphicon-volume-off" ></span></button>
+        <button id="volume-down-btn" class="btn btn-lg btn-default auto-wire" data-action="volumeDown"><span class="glyphicon glyphicon-volume-down" ></span></button>
+        <button id="volume-up-btn" class="btn btn-lg btn-default auto-wire" data-action="volumeUp" ><span class="glyphicon glyphicon-volume-up" ></span></button>
+    </div>
+</div>
+
+<script>
+    var videos = [
+        {
+            id: "ivuO-0jfYiM",
+            title: "Opening Video",
+            responseType: "youtube"
+        },
+        {
+            id: "GCCIiFij7tg",
+            title: "Closing Video",
+            responseType: "youtube"
+        },
+        {
+            id: "QMcBiqc0gh4",
+            title: "Discovery Centers commercial",
+            responseType: "youtube"
+        },
+    ];
+    
+    console.info("Creating media buttons");
+    $.each(videos, function(index, video) {
+        $("#media-buttons").append("<button class='btn btn-lg btn-default media-btn' data-video='" + JSON.stringify(video) + "' ><span class='btn-nav' style='background-image: url(\"/image-cache?ref=https%3A%2F%2Fimg.youtube.com%2Fvi%2F"+ video.id +"%2Fsddefault.jpg\"); background-repeat: no-repeat; background-attachment: local; background-position: center; background-size:200px 150px '></span></button>")
+    });
+    
+    $(".media-btn").click(function() {
+        sendToDisplay($(this).attr("data-video"));
+        $("#controls-tab").show().click().addClass("active");
+        $("#media-tab").removeClass("active");
+        $("#pause-btn").show();
+        $("#play-btn").hide();
+    });
+    
+    $("#media-tab").click(function (e) {
+        $("#media-buttons").show();
+        $("#controls").hide();
+    });
+
+    $("#controls-tab").click(function (e) {
+        $("#media-buttons").hide();
+        $("#controls").show();
+    });
+    
+    $("#play-btn").click(function (e) {
+        sendToDisplay(JSON.stringify({responseType:"play"}));
+        $("#pause-btn").show();
+        $("#play-btn").hide();
+    });
+    
+    $("#pause-btn").click(function (e) {
+        sendToDisplay(JSON.stringify({responseType:"pause"}));
+        $("#pause-btn").hide();
+        $("#play-btn").show();
+    });
+    
+    $(".auto-wire").click(function (e) {
+        sendToDisplay(JSON.stringify({responseType:$(this).attr("data-action")}));
+    });
+</script>

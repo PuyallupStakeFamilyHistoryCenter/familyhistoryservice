@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<!--
+Copyright (c) 2015, tibbitts
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+* Redistributions of source code must retain the above copyright notice, this
+  list of conditions and the following disclaimer.
+* Redistributions in binary form must reproduce the above copyright notice,
+  this list of conditions and the following disclaimer in the documentation
+  and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+POSSIBILITY OF SUCH DAMAGE.
+-->
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">Displays</h3>
+            </div>
+            <div class="panel-body" id="display-btns"></div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">Users</h3>
+            </div>
+            <div class="panel-body" id="user-btns"></div>
+        </div>
+    </div>
+</div>
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title">Admin</h3>
+    </div>
+    <div class="panel-body" id="admin-btns">
+        <button class="btn btn-lg btn-danger" id="resetButton" >Restart server</button>
+        <button class="btn btn-lg btn-warning" id="reportBugButton" >Report bug</button>
+        <button class="btn btn-lg btn-success pull-right" id="checklistButton" >Checklist</button>
+    </div>
+</div>
+
+
+<div class="modal fade" id="confirmModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">Reset server...</h4>
+      </div>
+      <div class="modal-body">
+        Do you really want to restart the server? All users will have to log in again and all cached data will be lost
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+        <button id="confirmRestartButton" type="button" class="btn btn-primary">Restart server</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="modal fade" id="confirmForceLogoutModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">Force logout <span class="forceLogoutUserName"></span>...</h4>
+      </div>
+      <div class="modal-body">
+          Do you really want to force logout <span class="forceLogoutUserName"></span>?
+        <input type="hidden" id="forceLogoutUserId" />
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+        <button id="confirmForceLogoutButton" type="button" class="btn btn-primary">Force logout</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="bugReportModal" tabindex="-1" role="dialog" aria-labelledby="bugReportLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="bugReportLabel">Report bug...</h4>
+      </div>
+      <div class="modal-body">
+          <div id="bugReportInputDiv" >
+              <div class="col-md-8">
+                <div class="input-group">
+                  <span class="input-group-addon"><span class="glyphicon glyphicon-user"></span></span>
+                  <input id="bugReportReporterName" class="form-control" placeholder="Your name" />
+                  <span class="input-group-btn">
+                      <button class="btn btn-warning" id="clearReporterNameButton" tabindex="-1"><span class="glyphicon glyphicon-remove"></span></button>
+                  </span>
+                </div>
+              </div>
+              
+              <div style="padding-top: 20px" class="col-lg-12">
+                Enter a description of the bug and the steps 
+                required to reproduce it:
+                <textarea class="form-control" rows="5" id="bugReportBody" ></textarea>
+              </div>
+              
+              <div style="clear: both"></div>
+          </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+        <button id="confirmBugReportButton" type="button" class="btn btn-primary">Report bug</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+    settings.local = {
+        verbs: {
+            displays: function(obj) {
+                var displays = obj.displays;
+                setupDisplayButtons(displays);
+            },
+            "user-list": function(obj) {
+                var users = obj.users;
+                setupUserButtons(users);
+            },
+            precacheEvent: function(obj) {
+                var userId = obj.userId;
+                var cached = obj.totalCached;
+
+                var divSelector = "#" + userId + "-stats";
+
+                $(divSelector).html("Cached: " + cached);
+            }
+        }
+    };
+    
+    function setupDisplayButtons(displayIds) {
+        $("#display-btns").html("");
+        
+        $.each(displayIds, function(index, displayId) {
+            $("#display-btns").append("<div><button class='btn btn-lg btn-default display-btn' data-display='"+displayId+"'>"+displayId+"</button>" +
+                    "<button class='btn btn-lg btn-default survey-btn' data-display='"+displayId+"'><span class='glyphicon glyphicon-comment'></span></span></button>" + 
+                    "<button class='btn btn-lg btn-default ping-display-btn' data-display='"+displayId+"'><span class='glyphicon glyphicon-bell'></span></span></button>" + 
+                    "<button class='btn btn-lg btn-default reload-display-btn' data-display='"+displayId+"'><span class='glyphicon glyphicon-refresh' ></span></button></div>");
+        });
+        
+        $(".survey-btn").click(function() {
+            displayName = $(this).attr("data-display");
+            
+            ws.socketSend("forceNavigateController " + displayName + " controller-survey");
+        });
+        
+        $(".display-btn").click(function() {
+            displayName = $(this).attr("data-display");
+            
+            navigate("controller-main?group=presenter");
+        });
+        
+        $(".ping-display-btn").click(function() {
+            var displayId = $(this).attr("data-display");
+            ws.socketSend("pingDisplay " + displayId);
+        });
+        
+        $(".reload-display-btn").click(function() {
+            var displayId = $(this).attr("data-display");
+            ws.socketSend("reloadDisplay " + displayId);
+        });
+    }
+    
+    function setupUserButtons(users) {
+        $("#user-btns").html("");
+        
+        $.each(users, function(index, user) {
+            if (user.name !== "Guest account") {
+                $("#user-btns").append(
+                        "<div class='col-sm-12'>" +
+                        "    <div class='btn-group col-sm-8' role='group'>" +
+                        "        <button class='btn btn-default user-btn' data-user='"+user.id+"'>" + user.name + "</button>" +
+                        "        <button class='btn btn-danger remove-user-btn' data-user='"+user.id+"' data-user-name='"+user.name+"'>" +
+                        "            <span class='glyphicon glyphicon-remove'></span>" +
+                        "        </button>" +
+                        "    </div>" +
+                        "    <div class='col-sm-3' style='margin: 10px 10px; display: inline-block'>" +
+                        "        <div id='"+user.id+"-stats'></div>" +
+                        "    </div>" +
+                        "</div>");
+            }
+        });
+        
+        $(".user-btn").click(function() {
+            var userId = $(this).attr("data-user");
+            navigate("presenter-user-details?user-id=" + userId);
+        });
+        
+        $(".remove-user-btn").click(function() {
+            var userId = $(this).attr("data-user");
+            var userName = $(this).attr("data-user-name");
+            $("#forceLogoutUserId").val(userId);
+            $(".forceLogoutUserName").html(userName);
+            $("#confirmForceLogoutModal").modal();
+        });
+    }
+    
+    $("#resetButton").click(function() {
+        $("#confirmModal").modal();
+    });
+    
+    $("#confirmRestartButton").click(function() {
+        $("#confirmModal").modal("hide");
+        ws.socketSend("restart-server");
+    });
+    
+    $("#confirmForceLogoutButton").click(function() {
+        $("#confirmForceLogoutModal").modal("hide");
+        var userId = $("#forceLogoutUserId").val();
+        ws.socketSend("forceDestroyAccessToken " + userId);
+    });
+    
+    $("#reportBugButton").click(function() {
+        $("#bugReportBody").val("");
+        $("#bugReportModal").modal();
+    });
+    
+    $("#checklistButton").click(function() {
+        navigate("presenter-checklist");
+    });
+    
+    $("#confirmBugReportButton").click(function() {
+        var reporterName = $("#bugReportReporterName").val();
+        var reportBody = $("#bugReportBody").val();
+        
+        if (reporterName == null || reporterName.length === 0) {
+            logger.error("You must provide your name");
+            return;
+        }
+        
+        if (reportBody == null || reportBody.length === 0) {
+            logger.error("You must provide a report body");
+            return;
+        }
+        
+        ws.socketSend("reportBug " + reporterName.replace(/ /g, "%20") + " " + reportBody.replace(/ /g, "%20"));
+        
+        $("#bugReportModal").modal("hide");
+    });
+    
+    $("#clearReporterNameButton").click(function() {
+        $("#bugReportReporterName").val("").focus();
+    });
+    
+    
+    
+    setHeaderName("Presenter");
+    ws.socketSend("listDisplays");
+    ws.socketSend("list-current-users");
+</script>

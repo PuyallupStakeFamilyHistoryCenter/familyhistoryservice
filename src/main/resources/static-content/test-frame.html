@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<!--
+Copyright (c) 2014, tibbitts
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+* Redistributions of source code must retain the above copyright notice, this
+  list of conditions and the following disclaimer.
+* Redistributions in binary form must reproduce the above copyright notice,
+  this list of conditions and the following disclaimer in the documentation
+  and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+POSSIBILITY OF SUCH DAMAGE.
+-->
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Title placeholder</title>
+
+
+        <!-- Bootstrap --><!-- Latest compiled and minified CSS -->
+        <link rel="stylesheet" href="bootstrap.min.css">
+
+        <!-- Optional theme -->
+        <link rel="stylesheet" href="bootstrap-theme.min.css">
+        
+        <link rel="stylesheet" href="controller-display-base.css" >
+
+        <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+        <!--<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>-->
+        <script src="js/jquery-1.11.1.min.js"></script>
+        <script src="js/jquery.cookie.js"></script>
+        <!-- Latest compiled and minified JavaScript -->
+        <script src="js/bootstrap.min.js"></script>
+        <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+        <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+        <!--[if lt IE 9]>
+          <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+          <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+        <![endif]-->
+        <script src="js/utils.js"></script>
+        <script src="test/sockete.js"></script>
+        <script src="test/test-sockets.js"></script>
+        <script src="js/websockets.js"></script>
+        <script>
+            var willow="{\"id\":\"user-id\",\"name\":\"Willow%20Ufgood\",\"gender\":\"male\",\"facts\":[{\"type\":\"birth\",\"date\":\"24%20August%201980\",\"place\":\"The%20village\"},{\"type\":\"death\",\"date\":\"1%20March%202045\",\"place\":\"The%20village\"}],\"parents\":[],\"spouses\":[{\"id\":\"user-id2\",\"name\":\"Kaia%20Ufgood\",\"relationship\":\"wife\"}],\"children\":[],\"images\":[\"old-game.jpg\"]}";
+            var kaia="{\"id\":\"user-id2\",\"name\":\"Kaia%20Ufgood\",\"gender\":\"female\",\"facts\":[{\"type\":\"birth\",\"date\":\"24%20August%201980\",\"place\":\"The%20village\"},{\"type\":\"death\",\"date\":\"1%20March%202045\",\"place\":\"The%20village\"}]}";
+            
+            var verbResponses = [
+                { verb: "ping", response: "pong" },
+                { verb: "move-right asdfasdf", response: "ok" },
+                { verb: "move-left asdfasdf", response: "ok" },
+                { verb: "move-up asdfasdf", response: "ok" },
+                { verb: "move-down asdfasdf", response: "ok" },
+                { verb: "zoom-out asdfasdf", response: "ok" },
+                { verb: "zoom-in asdfasdf", response: "ok" },
+                { verb: "get-family qwerqwer user-id", response: "family ["+willow+","+kaia+"]" },
+                { verb: "send-person qwerqwer asdfasdf user-id", response: "ok" },
+                { verb: "send-person qwerqwer asdfasdf user-id2", response: "ok" },
+                //{ verb: "trigger", response: "person " + willow },
+                { verb: "list-current-users", response: "user-list Guest%20user KW79-H8X Willow%20Ufgood user-id Kaia%20Ufgood user-id2" },
+                { verb: "login user-id2 1234", response: "ok" },
+            ]
+            
+            var trigger = getParameterByName("trigger");
+            if (trigger) {
+                var response = eval(trigger);
+                verbResponses.push({ verb: "trigger", response: eval(trigger) });
+                ws.socketSend("trigger");
+            }
+            
+            configureSockete(verbResponses);
+        </script>
+        <script src="js/controller-display.js"></script>
+        <script>
+            defaultSettings.test = {
+                verbs:{},
+                begin: function() {
+                    var emulateMode = getParameterByName("emulate-mode");
+                    settings.page = defaultSettings[emulateMode];
+                    setup();
+
+                    var fragment = getParameterByName("fragment");
+                    navigate(emulateMode + "-" + fragment);
+                }
+            }
+            
+            displayName = "asdfasdf";
+            token = "qwerqwer";
+            settings.userId = "user-id";
+            $(window).ready(function() {
+                getReady();
+            });
+        </script>
+    </head>
+    <body>
+        <div class="container" >
+            <div id="page-header">
+                <h1>Header placeholder</h1>
+            </div>
+
+            <div id="messages">
+            </div>
+
+            <div id="content" style="min-height: 100px">
+            </div>
+        </div>
+    </body>
+</html>

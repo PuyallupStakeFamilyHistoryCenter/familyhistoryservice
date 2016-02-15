@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<!--
+Copyright (c) 2014, tibbitts
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+* Redistributions of source code must retain the above copyright notice, this
+  list of conditions and the following disclaimer.
+* Redistributions in binary form must reproduce the above copyright notice,
+  this list of conditions and the following disclaimer in the documentation
+  and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+POSSIBILITY OF SUCH DAMAGE.
+-->
+
+
+
+<div class="panel panel-default">
+    <!-- Default panel contents -->
+    <div class="panel-heading"><h3>Ancestry</h3></div>
+    <div class="container-fluid">
+
+        <table id="table-javascript"></table>
+    </div>
+</div>  
+
+<script>
+
+    $(function() {
+//        $('#table-javascript').bootstrapTable({
+//            data: [{first_name:"John", last_name: "Smith", birth: 1785, death: 1845},{first_name:"Maggie", last_name: "Smith", birth: 1785, death: 1845}],
+//            height: 400,
+//            striped: true,
+//            pagination: true,
+//            pageSize: 50,
+//            pageList: [10, 25, 50, 100, 200],
+//            search: true,
+//            showColumns: true,
+//            showToggle: true,
+//            showRefresh: true,
+//            minimumCountColumns: 0,
+//            toolbar: "#table-toolbar",
+//            clickToSelect: true,
+//            onCheck: selectionChanged,
+//            onUncheck: selectionChanged,
+//            onCheckAll: selectionChanged,
+//            onUncheckAll: selectionChanged,
+//            columns: [{
+//                    field: 'state',
+//                    checkbox: true
+//                }, {
+//                    field: 'name',
+//                    title: 'Name',
+//                    align: 'center',
+//                    valign: 'middle',
+//                    sortable: true,
+//                    switchable: false,
+//                    formatter: nameFormatter
+//                }, {
+//                    field: 'birth',
+//                    title: 'Birth',
+//                    align: 'center',
+//                    valign: 'middle',
+//                    sortable: true,
+//                    visible: false
+//                }, {
+//                    field: 'death',
+//                    title: 'Death',
+//                    align: 'center',
+//                    valign: 'middle',
+//                    sortable: true,
+//                    visible: false
+//                }, {
+//                    field: 'lifespan',
+//                    title: 'Lifespan',
+//                    align: 'center',
+//                    valign: 'middle',
+//                    sortable: true,
+//                    formatter: lifespanFormatter
+//                }]
+//        });
+//    });
+        $('#table-javascript').dataTable({
+            data: [],
+            columns: [
+                { data: "last_name" },
+                { data: "first_name" }
+            ],
+            dom: '<"toolbar">frtip'
+        });
+        
+        $("div.toolbar").html([
+        '<div id="table-toolbar">',
+        '    <div class="btn-group btn-group-sm">',
+        '        <button class="btn btn-default life-map" title="Show life events on a map for up to five ancestors" disabled ><span class="glyphicon glyphicon-map-marker"></span> Life map</button>',
+        '        <button class="btn btn-default family-map" disabled ><span class="glyphicon glyphicon-heart"></span> Family map</button>',
+        '        <button class="btn btn-default life-sketch" disabled ><span class="glyphicon glyphicon-pencil"></span> Life sketch</button>',
+        '        <button class="btn btn-default timeline" disabled ><span class="glyphicon glyphicon-time"></span> Timeline</button>',
+        '        <button class="btn btn-default images" disabled><span class="glyphicon glyphicon-picture"></span> Images</button>',
+        '        <button class="btn btn-default quiz" disabled><span class="glyphicon glyphicon-question-sign"></span> Quiz</button>',
+        '    </div>',
+        '</div>'
+        ].join(''));
+    });
+    
+    function nameFormatter(value, row, index) {
+        return row.last_name + ", " + row.first_name;
+    }
+
+    function lifespanFormatter(value, row, index) {
+        return row.birth + '-' + row.death;
+    }
+
+    settings.page.gotAncestor = function(ancestor) {
+        var table = $('#table-javascript').DataTable();
+        table.row.add(ancestor);
+    };
+    
+    function selectionChanged() {
+        var selections = $('#table-javascript').bootstrapTable('getSelections');
+        $(".life-map, .images").prop("disabled", selections.length > 5 || selections.length === 0);
+        $(".family-map, .life-sketch, .timeline").prop("disabled", selections.length !== 1);
+        $(".quiz").prop("disabled", selections.length === 0);
+    }
+</script>

@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<!--
+Copyright (c) 2014, tibbitts
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+* Redistributions of source code must retain the above copyright notice, this
+  list of conditions and the following disclaimer.
+* Redistributions in binary form must reproduce the above copyright notice,
+  this list of conditions and the following disclaimer in the documentation
+  and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+POSSIBILITY OF SUCH DAMAGE.
+-->
+<div id="nav-buttons">
+</div>
+
+<script>
+    var buttonGroups = {
+        main: {
+            parent: null,
+            label: "Main",
+            buttons: [
+                {
+                    name: "your-family",
+                    label: "Your family",
+                    image: "old-family.jpg",
+                    nav: "person-chooser?type=person&target=main%3Fgroup%3Dperson%26personId%3D%24%7Bid%7D%26personName%3D%24%7Bname%7D&noPeople",
+                    display: "person-detail"
+                },
+                {
+                    name: "stats",
+                    label: "Statistics",
+                    image: "statistics.jpg",
+                    nav: "stats"
+                },
+                {
+                    name: "quiz",
+                    label: "Quiz",
+                    image: "quiz.jpg",
+                    nav: "quiz"
+                }
+            ]
+        },
+        presenter: {
+            parent: null,
+            label: "Presenter",
+            buttons: [
+                {
+                    name: "media",
+                    label: "Media",
+                    image: "tutorials.jpg",
+                    nav: "media-youtube"
+                },
+            ]
+        },
+        yourfamily: {
+            parent: "main",
+            label: "Your family",
+            buttons: [
+                {
+                    name: "stats",
+                    label: "Statistics",
+                    image: "statistics.jpg",
+                    nav: "stats"
+                },
+                {
+                    name: "stories",
+                    label: "Stories",
+                    image: "old-book.jpg",
+                    nav: "person-stories",
+                    disabled: true
+                },
+                {
+                    name: "collage",
+                    label: "Collage",
+                    image: "collage.jpg",
+                    nav: "collage",
+                    disabled: true
+                },
+                {
+                    name: "individual",
+                    label: "Individual",
+                    image: "children.png",
+                    nav: "person-chooser?type=person&hidePersonDetail",
+                    display: "person-detail"
+                }
+            ]
+        },
+        tutorials: {
+            parent: "main",
+            label: "Tutorials",
+            buttons: [
+                {
+                    name: "research",
+                    label: "Research",
+                    image: "research.png",
+                    nav: "research",
+                    disabled: true
+                },
+                {
+                    name: "indexing",
+                    label: "Indexing",
+                    image: "indexing.gif",
+                    nav: "indexing",
+                    disabled: true
+                }
+            ]
+        },
+        games: {
+            parent: "main",
+            label: "Games",
+            buttons: [
+                {
+                    name: "puzzle",
+                    label: "Puzzle",
+                    image: "puzzle.jpg",
+                    nav: "image-chooser?target=puzzle",
+                    display: "puzzle"
+                },
+                {
+                    name: "color",
+                    label: "Color",
+                    image: "crayon.jpg",
+                    nav: "image-chooser?target=color",
+                    display: "color"
+                },
+                {
+                    name: "tiles",
+                    label: "Tiles",
+                    image: "tiles.png",
+                    nav: "image-chooser?target=tiles",
+                    display: "tiles"
+                },
+                {
+                    name: "quiz",
+                    label: "Quiz",
+                    image: "quiz.jpg",
+                    nav: "quiz"
+                },
+                {
+                    name: "stats",
+                    label: "Statistics",
+                    image: "statistics.jpg",
+                    nav: "stats"
+                },
+            ]
+        },
+        person: {
+            parent: "main",
+            label: "${personName}",
+            send: "send-person " + token + " " + displayName + " ${personId}",
+            buttons: [
+                {
+                    name: "maps",
+                    label: "Maps",
+                    image: "old-world-map.jpg",
+                    nav: "map?personId=${personId}",
+                    display: "map"
+                },
+                {
+                    name: "images",
+                    label: "Photos",
+                    image: "collage.jpg",
+                    nav: "image-chooser?personId=${personId}",
+                    display: "person-detail"
+                },
+                {
+                    name: "stories",
+                    label: "Stories",
+                    image: "old-book.jpg",
+                    nav: "person-stories?personId=${personId}",
+                },
+            ]
+        },
+    };
+    
+    function setButtons(groupName) {
+        //Clear messages
+        logger.clear();
+        
+        var group = buttonGroups[groupName];
+        
+        if (group.label) {
+            setHeaderName(replaceVariables(fragmentVars, group.label));
+        }
+        
+        if (group.send) {
+            ws.socketSend(replaceVariables(fragmentVars, group.send));
+        }
+        
+        if (!group || !group.buttons) {
+            logger.error("Button group " + groupName + " not found");
+            return;
+        }
+        
+        var navButtons = $("#nav-buttons");
+        navButtons.html("");
+        
+        $.each(group.buttons, function(i, buttonInfo) {
+            var name = replaceVariables(fragmentVars, buttonInfo.name);
+            var image = replaceVariables(fragmentVars, buttonInfo.image);
+            var nav = replaceVariables(fragmentVars, buttonInfo.nav);
+            var display = replaceVariables(fragmentVars, buttonInfo.display);
+            var child = replaceVariables(fragmentVars, buttonInfo.child);
+            var label = replaceVariables(fragmentVars, buttonInfo.label);
+            
+            navButtons.append('<button id="'+name+'-button" class="btn btn-lg btn-default" style="margin: 5px;" '
+                    +(buttonInfo.disabled?"disabled":"")+'>'+
+                    '<span class="btn-nav"><img src="../media/' + image + '" /></span><br><strong>'+
+                    label + '</strong></button>');
+            $("#" + name + "-button").click(function(e) {
+                if (nav) {
+                    if (display) {
+                        navigateDisplay("display-" + display);
+                    } else {
+                        navigateDisplay("display-" + nav);
+                    }
+                    navigate("controller-" + nav);
+                } else if (buttonInfo.child) {
+                    navigate("controller-main?group="+child);
+                }
+                
+                e.preventDefault();
+            });
+        });
+        
+    }
+    
+    var groupName = getParameterByName("group");
+    console.info("Got group name " + groupName);
+    if (!groupName) {
+        groupName = "main";
+    }
+    setButtons(groupName);
+</script>
+
+<div style="display: none;">
+    <form id="nav-form">
+        <input type="text" id="address-text" /><button type="submit">Navigate</button>
+    </form>
+</div>
+
+<script>
+    $(function() {
+        $("#nav-form").submit(function(e) {
+            var address = $("#address-text").val();
+            navigateDisplay(address);
+            e.preventDefault();
+        });
+    });
+</script>

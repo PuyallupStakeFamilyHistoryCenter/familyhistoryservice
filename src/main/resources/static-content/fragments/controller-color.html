@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<!--
+Copyright (c) 2014, tibbitts
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+* Redistributions of source code must retain the above copyright notice, this
+  list of conditions and the following disclaimer.
+* Redistributions in binary form must reproduce the above copyright notice,
+  this list of conditions and the following disclaimer in the documentation
+  and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+POSSIBILITY OF SUCH DAMAGE.
+-->
+
+<dl class="dl-horizontal">
+    <dt>Brush color</dt>
+    <dd>
+        <div id="palate"></div>
+    </dd>
+        
+    <dt>Brush size</dt>
+    <dd>
+        <div id="brush-size" class="btn-group"></div>
+    </dd>
+</dl>
+
+<button id="print-btn" class="btn btn-lg btn-default">Print</button>
+<button id="email-btn" class="btn btn-lg btn-default">Email</button>
+
+<script>
+    var swatches = [
+        {responseType: "swatch", color: "#FFDCB2"},
+        {responseType: "swatch", color: "#FF0066"},
+        {responseType: "swatch", color: "#00CC00"},
+        {responseType: "swatch", color: "#FF0000"},
+        {responseType: "swatch", color: "#00FF00"},
+        {responseType: "swatch", color: "#0000FF"},
+        {responseType: "swatch", color: "SkyBlue"},
+        {responseType: "swatch", color: "LightGreen"},
+        {responseType: "swatch", color: "SaddleBrown"},
+        {responseType: "swatch", color: "Tomato"},
+        {responseType: "swatch", color: "OrangeRed"},
+        {responseType: "swatch", color: "White"}
+    ];
+
+    var brushSizes = [
+        {responseType: "brushSize", size: 3, title: "Small"},
+        {responseType: "brushSize", size: 7, title: "."},
+        {responseType: "brushSize", size: 11, title: ".."},
+        {responseType: "brushSize", size: 15, title: "..."},
+        {responseType: "brushSize", size: 19, title: "Large"}
+    ]
+
+    $.each(swatches, function (index, swatch) {
+        $("#palate").append("<button class='btn btn-lg btn-default swatch-btn' data-swatch='" + JSON.stringify(swatch) + "' style='background-color: " + swatch.color + "'>&nbsp;</button>");
+    });
+
+    $(".swatch-btn").click(function () {
+        sendToDisplay($(this).attr("data-swatch"));
+    });
+
+    $.each(brushSizes, function (index, brushSize) {
+        $("#brush-size").append("<button class='btn btn-lg btn-default brush-size-btn' data-size='" + JSON.stringify(brushSize) + "'>" + brushSize.title + "</button>")
+    })
+
+    $(".brush-size-btn").click(function () {
+        sendToDisplay($(this).attr("data-size"));
+    });
+    
+    $("#print-btn").click(function() {
+        sendToDisplay("{\"responseType\":\"print\"}")
+    });
+    
+    $("#print-btn").click(function() {
+        sendToDisplay("{\"responseType\":\"email\",\"email\":\"anonymous@gmail.com\"}")
+    });
+</script>

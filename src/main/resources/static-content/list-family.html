@@ -1,0 +1,85 @@
+
+<!-- saved from url=(0058)file:///home/local/ANT/tibbitts/Downloads/list-family.html -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+    <script src="file:///home/local/ANT/tibbitts/Downloads/jquery-1.11.1.js"></script>
+    <script src="./list-family_files/familysearch-javascript-sdk.js"></script>
+    <script>
+        $(window).load(function() {
+            FamilySearch.init({
+              app_key: 'WCQY-7J1Q-GKVV-7DNM-SQ5M-9Q5H-JX3H-CMJK',
+              environment: 'sandbox',
+              auth_callback: 'http://localhost:8000/auth-redirect.html',
+              http_function: $.ajax,
+              deferred_function: $.Deferred,
+              auto_expire: true,
+              auto_signin: true,
+              save_access_token: true
+            });
+            FamilySearch.getAccessToken().then(function (response) {
+                var person = getParameterByName("person");
+                
+                if (person == null) {
+                    FamilySearch.getCurrentUser().then(function (response) {
+                        var user = response.getUser();
+                        displayPersonFamily(user.personId);
+                    });
+                } else {
+                    displayPersonFamily(person);
+                }
+            });
+        })
+        
+        
+<!--        function displayPersonFamily(personId) {-->
+<!--            FamilySearch.getAncestry(personId, {-->
+<!--                        generations: 1,-->
+<!--                        personDetails: true,-->
+<!--                        marriageDetails: true-->
+<!--                        }).then(function(getAncestryResponse) {-->
+<!--                var persons = getAncestryResponse.getPersons();-->
+<!--                for (var i = 0; i < persons.length; i++) {-->
+<!--                    var person = persons[i];-->
+<!--                    $("#results").append("<b>"+person.$getDisplayName()+"</b>");-->
+<!--                    var p = {-->
+<!--                        'Position': ahnentafel[i],-->
+<!--                        'Id': person.id,-->
+<!--                        'Name': person.$getDisplayName(),-->
+<!--                        'Life Span': person.$getDisplayLifeSpan(),-->
+<!--                        'Living': person.living,-->
+<!--                        'Display': person.display-->
+<!--                    }-->
+<!--                }-->
+<!--            }-->
+<!--        }-->
+        
+        function displayPersonFamily(personId) {
+            FamilySearch.getAncestry(personId, {
+                        generations: 5,
+                        personDetails: true,
+                        marriageDetails: true,
+                        }).then(function(getAncestryResponse) {
+                    var persons = getAncestryResponse.getPersons();
+                    
+                    $.each(persons, function(index, person) {
+                        $("#results").append('<dl><dt>'+person.$getDisplayName()+' ('+person.$getDisplayLifeSpan()+')</dt><dd><a href="list-family.html?person='+person.id+'">list</a> <a href="maps-test.html?person='+person.id+'">map</a></dd></dl>');
+                    });
+                });
+        }
+        
+        var ahnentafel = ['',
+            'primary',
+            'father',
+            'mother',
+            'paternal grandfather',
+            'paternal grandmother',
+            'maternal grandfather',
+            'maternal grandmother'];
+    </script>
+</head>
+
+<body>
+    <div id="results">
+    </div>
+
+
+</body></html>

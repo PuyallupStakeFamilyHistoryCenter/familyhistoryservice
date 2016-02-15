@@ -1,0 +1,292 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Copyright (c) 2014, tibbitts
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+* Redistributions of source code must retain the above copyright notice, this
+  list of conditions and the following disclaimer.
+* Redistributions in binary form must reproduce the above copyright notice,
+  this list of conditions and the following disclaimer in the documentation
+  and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+POSSIBILITY OF SUCH DAMAGE.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+        xmlns:util="http://www.springframework.org/schema/util"
+        xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+ 	http://www.springframework.org/schema/beans/spring-beans-4.1.xsd  
+   	http://www.springframework.org/schema/context
+   	http://www.springframework.org/schema/context/spring-context-4.1.xsd
+        http://www.springframework.org/schema/util
+        http://www.springframework.org/schema/util/spring-util.xsd">
+
+    <context:annotation-config />
+    <!--<context:property-placeholder location="classpath:org/puyallupfamilyhistorycenter/config/sandbox.properties" />-->
+    <!--<context:property-placeholder location="classpath:org/puyallupfamilyhistorycenter/config/beta.properties" />-->
+    <context:property-placeholder location="classpath:org/puyallupfamilyhistorycenter/config/prod.properties" />
+    
+    <bean id="app-key-config" class="org.puyallupfamilyhistorycenter.service.websocket.AppKeyConfig" />
+    
+    <bean id="family-search-person-source" class="org.puyallupfamilyhistorycenter.service.cache.FamilySearchPersonSource" />
+    <bean id="person-class" class="java.lang.Class" factory-method="forName">
+        <constructor-arg value="org.puyallupfamilyhistorycenter.service.models.Person" />
+    </bean>
+    <bean id="allow-all-decider" class="org.puyallupfamilyhistorycenter.service.cache.AllowAllDecider" />
+    <bean id="file-cache" class="org.puyallupfamilyhistorycenter.service.cache.FileCache" >
+        <constructor-arg ref="person-class" />
+        <constructor-arg value="${person-cache-dir}" />
+        <constructor-arg value="${person-cache-ttl}" />
+    </bean>
+    <bean id="file-source" class="org.puyallupfamilyhistorycenter.service.cache.CachingSource">
+        <constructor-arg ref="family-search-person-source" />
+        <constructor-arg ref="file-cache" />
+        <property name="decider" ref="allow-all-decider" />
+    </bean>
+    <bean id="in-memory-cache" class="org.puyallupfamilyhistorycenter.service.cache.InMemoryCache" />
+    <bean id="in-memory-source" class="org.puyallupfamilyhistorycenter.service.cache.CachingSource">
+        <constructor-arg ref="file-source" />
+        <constructor-arg ref="in-memory-cache" />
+        <property name="decider" ref="allow-all-decider" />
+    </bean>
+    <bean id="person-dao" class="org.puyallupfamilyhistorycenter.service.cache.PersonDao" >
+        <constructor-arg ref="in-memory-source" />
+    </bean>
+    
+    <bean id="temple-source" class="org.puyallupfamilyhistorycenter.service.cache.FamilySearchPersonTempleSource" />
+    
+    <!--Web socket-->
+    <bean id="web-socket-handler" class="org.puyallupfamilyhistorycenter.service.websocket.FamilyHistoryCenterWebSocketHandler" />
+    <bean id="web-socket-resource" class="org.eclipse.jetty.util.resource.Resource" factory-method="newResource" >
+        <constructor-arg value="" />
+    </bean>
+    <bean id="web-socket-context" class="org.eclipse.jetty.server.handler.ContextHandler">
+        <property name="handler" ref="web-socket-handler" />
+        <property name="baseResource" ref="web-socket-resource" />
+    </bean>
+    
+    <!--Static content-->
+    <bean id="static-resource" class="org.eclipse.jetty.util.resource.Resource" factory-method="newClassPathResource">
+        <constructor-arg value="/static-content" />
+    </bean>
+    <bean id="static-handler" class="org.eclipse.jetty.server.handler.ResourceHandler" >
+        <property name="directoriesListed" value="true" />
+        <property name="baseResource" ref="static-resource" />
+        <property name="cacheControl" value="private, max-age=0, no-cache" />
+    </bean>
+    <bean id="static-handler-gzip" class="org.eclipse.jetty.servlets.gzip.GzipHandler">
+        <property name="handler" ref="static-handler" />
+        <property name="mimeTypes" >
+            <set>
+                <value>text/html</value>
+                <value>text/css</value>
+                <value>application/javascript</value>
+            </set>
+        </property>
+    </bean>
+    <bean id="static-context" class="org.eclipse.jetty.server.handler.ContextHandler" >
+        <constructor-arg value="/static-content" />
+        <property name="handler" ref="static-handler-gzip" />
+    </bean>
+    
+    <!--Media-->
+    <bean id="media-resource" class="org.eclipse.jetty.util.resource.Resource" factory-method="newClassPathResource">
+        <constructor-arg value="/media" />
+    </bean>
+    <bean id="media-handler" class="org.eclipse.jetty.server.handler.ResourceHandler" >
+        <property name="directoriesListed" value="true" />
+        <property name="baseResource" ref="media-resource" />
+        <property name="cacheControl" value="public, max-age=86400" />
+    </bean>
+    <bean id="media-handler-gzip" class="org.eclipse.jetty.servlets.gzip.GzipHandler">
+        <property name="handler" ref="media-handler" />
+        <property name="mimeTypes" >
+            <set>
+                <value>image/png</value>
+                <value>image/jpg</value>
+                <value>image/gif</value>
+            </set>
+        </property>
+    </bean>
+    <bean id="media-context" class="org.eclipse.jetty.server.handler.ContextHandler" >
+        <constructor-arg value="/media" />
+        <property name="handler" ref="media-handler-gzip" />
+    </bean>
+    
+    <!--Video-->
+    <util:map id="mime-map">
+        <entry key="mp4" value="video/mp4" />
+    </util:map>
+    <bean id="video-resource" class="org.eclipse.jetty.util.resource.Resource" factory-method="newResource">
+        <constructor-arg value="${user.home}/Dropbox/Videos" />
+    </bean>
+    <bean id="video-handler" class="org.eclipse.jetty.server.handler.StreamingResourceHandler" >
+        <property name="directoriesListed" value="true" />
+        <property name="baseResource" ref="video-resource" />
+        <property name="cacheControl" value="public, max-age=86400" />
+        <property name="minMemoryMappedContentLength" value="1024" />
+        <property name="mimeMapping" ref="mime-map" />
+    </bean>
+    <bean id="video-context" class="org.eclipse.jetty.server.handler.ContextHandler" >
+        <constructor-arg value="/videos" />
+        <property name="handler" ref="video-handler" />
+    </bean>
+    
+    <!--Image cache-->
+    <bean id="image-cache-handler" class="org.puyallupfamilyhistorycenter.service.cache.FamilySearchImageCacheHandler" />
+    <bean id="image-cache-context" class="org.eclipse.jetty.server.handler.ContextHandler" >
+        <constructor-arg value="/image-cache" />
+        <property name="handler" ref="image-cache-handler" />
+    </bean>
+    
+    <!--Handler collection-->
+    <bean id="context-handlers" class="org.eclipse.jetty.server.handler.ContextHandlerCollection">
+        <property name="handlers">
+            <array>
+                <ref bean="web-socket-context" />
+                <ref bean="media-context" />
+                <ref bean="video-context" />
+                <ref bean="static-context" />
+                <ref bean="image-cache-context" />
+            </array>
+        </property>
+    </bean>
+    
+    <bean id="rewrite-handler" class="org.eclipse.jetty.rewrite.handler.RewriteHandler">
+        <property name="rewriteRequestURI" value="true" />
+        <property name="rewritePathInfo" value="true" />
+        <property name="originalPathAttribute" value="requestedPath" />
+        
+        <property name="rules">
+            <array>
+                <bean class="org.eclipse.jetty.rewrite.handler.RewritePatternRule">
+                    <property name="pattern" value="/display" />
+                    <property name="replacement" value="/static-content/controller-display-base.html" />
+                </bean>
+                <bean class="org.eclipse.jetty.rewrite.handler.RewritePatternRule">
+                    <property name="pattern" value="/controller" />
+                    <property name="replacement" value="/static-content/controller-display-base.html" />
+                </bean>
+                <bean class="org.eclipse.jetty.rewrite.handler.RewritePatternRule">
+                    <property name="pattern" value="/games" />
+                    <property name="replacement" value="/static-content/controller-display-base.html" />
+                </bean>
+                <bean class="org.eclipse.jetty.rewrite.handler.RewritePatternRule">
+                    <property name="pattern" value="/presenter" />
+                    <property name="replacement" value="/static-content/controller-display-base.html" />
+                </bean>
+                <bean class="org.eclipse.jetty.rewrite.handler.RewritePatternRule">
+                    <property name="pattern" value="/kiosk" />
+                    <property name="replacement" value="/static-content/controller-display-base.html" />
+                </bean>
+                <bean class="org.eclipse.jetty.rewrite.handler.RewritePatternRule">
+                    <property name="pattern" value="/clear-display-name" />
+                    <property name="replacement" value="/static-content/controller-display-base.html" />
+                </bean>
+                <bean class="org.eclipse.jetty.rewrite.handler.RewritePatternRule">
+                    <property name="pattern" value="/change-display-name" />
+                    <property name="replacement" value="/static-content/controller-display-base.html" />
+                </bean>
+                <bean class="org.eclipse.jetty.rewrite.handler.RewritePatternRule">
+                    <property name="pattern" value="/split" />
+                    <property name="replacement" value="/static-content/split.html" />
+                </bean>
+                <bean class="org.eclipse.jetty.rewrite.handler.RewritePatternRule">
+                    <property name="pattern" value="/auth-redirect.html" />
+                    <property name="replacement" value="/static-content/auth-redirect.html" />
+                </bean>
+                <bean class="org.eclipse.jetty.rewrite.handler.RewritePatternRule">
+                    <property name="pattern" value="/account-verification" />
+                    <property name="replacement" value="/static-content/account-verification.html" />
+                </bean>
+            </array>
+        </property>
+        
+        <property name="handler" ref="context-handlers" />
+    </bean>
+    
+    <bean id="server" class="org.eclipse.jetty.server.Server" init-method="start">
+        <property name="handler" ref="rewrite-handler" />
+        <!-- I didn't think this would work, but it seems to -->
+        <property name="connectors">
+            <list>
+                <ref bean="ssl-connector" /> 
+                <ref bean="plain-connector" /> 
+            </list>
+        </property>
+    </bean>
+    
+    <bean id="serverLifecycleManager" class="org.puyallupfamilyhistorycenter.service.ServletLifecycleManager" init-method="start">
+        <property name="server" ref="server" />
+    </bean>
+    
+    <!--SSL context factory-->
+    <bean id="ssl-context-factory" class="org.eclipse.jetty.util.ssl.SslContextFactory" >
+        <property name="keyStorePath" value="keystore" />
+        <property name="keyStorePassword" value="${key-store-password}" />
+        <property name="keyManagerPassword" value="${key-manager-password}" />
+        <property name="trustStorePath" value="keystore" />
+        <property name="trustStorePassword" value="${trust-store-password}" />
+        <property name="excludeCipherSuites" value="SSL_RSA_WITH_DES_CBC_SHA,SSL_DHE_RSA_WITH_DES_CBC_SHA,SSL_DHE_DSS_WITH_DES_CBC_SHA,SSL_RSA_EXPORT_WITH_RC4_40_MD5,SSL_RSA_EXPORT_WITH_DES40_CBC_SHA,SSL_DHE_RSA_EXPORT_WITH_DES40_CBC_SHA,SSL_DHE_DSS_EXPORT_WITH_DES40_CBC_SHA" />
+    </bean>
+    
+    <!--HTTP config-->
+    <bean id="https-config" class="org.eclipse.jetty.server.HttpConfiguration" >
+        <property name="secureScheme" value="https" />
+        <property name="securePort" value="8443" />
+        <property name="outputBufferSize" value="${http-output=buffer-size:32768}" />
+        <property name="requestHeaderSize" value="${http-request-header-size:8192}" />
+        <property name="responseHeaderSize" value="${http-response-header-size:8192}" />
+        <property name="sendServerVersion" value="${http-send-server-version:true}" />
+        <property name="sendDateHeader" value="${http-send-date-header:false}" />
+        <property name="customizers">
+            <list>
+                <bean class="org.eclipse.jetty.server.SecureRequestCustomizer" />
+            </list>
+        </property>
+    </bean>
+    
+    <!--SSL connector-->
+    <bean id="ssl-connection-factory" class="org.eclipse.jetty.server.SslConnectionFactory">
+        <constructor-arg ref="ssl-context-factory" />
+        <constructor-arg value="HTTP/1.1" />
+    </bean>
+    <bean id="http-connection-factory" class="org.eclipse.jetty.server.HttpConnectionFactory">
+        <constructor-arg ref="https-config" />
+    </bean>
+    <bean id="ssl-connector" class="org.eclipse.jetty.server.ServerConnector">
+        <constructor-arg name="server" ref="server" />
+        <constructor-arg name="factories">
+            <array>
+                <ref bean="ssl-connection-factory" />
+                <ref bean="http-connection-factory" />
+            </array>
+        </constructor-arg>
+        <property name="port" value="8443" />
+        <property name="stopTimeout" value="600000" />
+        <property name="idleTimeout" value="600000" />
+    </bean>
+    
+    <bean id="plain-connector" class="org.eclipse.jetty.server.ServerConnector" >
+        <constructor-arg name="server" ref="server" />
+        <constructor-arg name="factories" ref="http-connection-factory" />
+        <property name="port" value="8080" />
+        <property name="stopTimeout" value="600000" />
+        <property name="idleTimeout" value="600000" />
+    </bean>
+
+</beans>
