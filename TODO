@@ -17,7 +17,7 @@ Delete access token on log out             DONE
 
 Socket:
 Move display name check to function        DONE
-*Apps should auto-reconnect to websockets
+Apps should auto-reconnect to websockets   DONE
 
 
 Caching:
@@ -179,7 +179,7 @@ Set max-height on image
 *Ensure all of data fits on the screen
 
 Statistics:
-Implement basic family statistics
+Implement basic family statistics          DONE
 
 Quiz:
 Implement basic quiz                       DONE
@@ -313,7 +313,7 @@ Fix ivy classpath
 Allow tagging people for future follow-up
 
 Email:
-Test email with real server
+Test email with real server                DONE
 Get email address at login                 DONE
 Comb tree for waiting ancestors
 Send email at log-off                      DONE
