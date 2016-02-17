@@ -778,13 +778,15 @@ public class FamilyHistoryCenterSocket {
                     String ward = scanner.next();
                     String interestsStr = scanner.next();
                     boolean contactMe = scanner.nextBoolean();
+                    String numAdults = scanner.next();
+                    String numChildren = scanner.next();
                     String phone = scanner.next();
                     
                     if (contactMe) {
                         String[] interestIds = interestsStr.split(",");
                         Contact contact = ApplicationProperties.getWardContact(stake, ward);
                         
-                        EmailUtils.sendReferralEmail(contact.getFullName(), contact.getEmail(), ctx.userName, ctx.userEmail, phone, contact.getWard(), ApplicationProperties.getInterests(interestIds));
+                        EmailUtils.sendReferralEmail(contact.getFullName(), contact.getEmail(), ctx.userName, ctx.userEmail, phone, contact.getWard(), ApplicationProperties.getInterests(interestIds), numAdults, numChildren);
                     }
                     
                     response = "{\"responseType\":\"surveyFinished\"}";

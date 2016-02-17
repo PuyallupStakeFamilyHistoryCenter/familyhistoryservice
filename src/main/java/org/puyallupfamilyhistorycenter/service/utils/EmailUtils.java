@@ -61,8 +61,8 @@ public class EmailUtils {
     
     private static final Logger logger = Logger.getLogger(EmailUtils.class);
     
-    public static void sendReferralEmail(String contactName, String contactEmail, String patronName, String patronEmail, String patronPhone, String patronWard, List<String> interests) {
-        String emailBody = buildReferralEmailBody(contactName, patronName, patronName, patronEmail, patronPhone, patronWard, LocalDate.now(), interests);
+    public static void sendReferralEmail(String contactName, String contactEmail, String patronName, String patronEmail, String patronPhone, String patronWard, List<String> interests, String numAdults, String numChildren) {
+        String emailBody = buildReferralEmailBody(contactName, patronName, patronName, patronEmail, patronPhone, patronWard, LocalDate.now(), interests, numAdults, numChildren);
         String subject = "Family history consultant referral for " + patronName;
         
         sendEmail(contactName, contactEmail, new String[] { "normanse@gmail.com" }, subject, emailBody);
@@ -86,14 +86,16 @@ public class EmailUtils {
     protected static final DateTimeFormatter dateFormat = DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG);
     protected static final List<String> defaultInterest = Arrays.asList("family history");
     
-    static String buildReferralEmailBody(String contactName, String patronFullName, String patronShortName, String patronEmail, String patronPhone, String patronWard, LocalDate visitDate, List<String> interests) {
+    static String buildReferralEmailBody(String contactName, String patronFullName, String patronShortName, String patronEmail, String patronPhone, String patronWard, LocalDate visitDate, List<String> interests, String numAdults, String numChildren) {
         String uuid = UUID.nameUUIDFromBytes(patronEmail.getBytes()).toString();
         StringBuilder builder = new StringBuilder("<html><head></head><body>");
         builder.append("<img style=\"width:100%\" src=\"http://www.puyallupfamilyhistorycenter.org/uploads/4/8/2/9/4829765/1433113473.png?").append(uuid).append("\" alt=\"The Puyllup Family History Center\" />");
         builder.append("<h3>Dear ").append(contactName).append(",</h3>");
         builder.append("<p><strong>").append(patronFullName).append("</strong> from the ").append(patronWard)
                 .append(" visited the Discovery room at the Puyallup Stake Family History Center on ")
-                .append(dateFormat.format(visitDate)).append(".</p>");
+                .append(dateFormat.format(visitDate)).append(" with a party of ")
+                .append(numAdults).append(" adults and ")
+                .append(numChildren).append(" children.</p>");
         if (interests == null || interests.isEmpty()) {
             interests = defaultInterest;
         }
@@ -109,8 +111,8 @@ public class EmailUtils {
         builder.append(".</p>");
         builder.append("<p>Please schedule a time for them to meet with a family history consultant ")
                 .append("so they can learn more about how they can be involved in family history work.</p>");
-        builder.append("<dl><dt>Phone:</dt><dd>").append(patronPhone).append("</dd>");
-        builder.append("<dt>Email:</dt><dd>").append(patronEmail).append("</dd></dl>");
+        builder.append("<dt>Email:</dt><dd><a href=\"mailto:").append(patronEmail).append("\">").append(patronEmail).append("</a></dd></dl>");
+        builder.append("<dt>Phone:</dt><dd><a href=\"tel:").append(patronPhone).append("\">").append(patronPhone).append("</a></dd></dl>");
         builder.append("<p>Thank you for your assistance; we appreciate it.</p>");
         builder.append("<p>The staff at the Puyallup Stake Family History Center</p>");
         builder.append("</body></html>");

@@ -330,24 +330,11 @@ Allow requesting signed PUT urls
 Allow requesting signed GET urls
 Send email after log out
 
-
-DEMO NOTES
-
-No feedback when something appears on display
-
-Logging in is hard
-Display doesn't work well on a wide screen
-Display text is too small
-Children in person-details aren't sorted
-Give some context for the person
-Give worksheet with scavenger hunt questions
-Go straight to controls form
-
-Fix logging in via iPad
-Auto-reconnect login screen
-
-Survey
+Survey:
 Add phone number
 Add scanner            DONE
 Add recording room     DONE
 Add counts of adults and children who attended
+
+Story:
+Refine sentence-end logic
