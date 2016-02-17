@@ -148,6 +148,10 @@ POSSIBILITY OF SUCH DAMAGE.
                 
                 $("#loading-div").hide();
                 $("#loaded-div").show();
+                
+                var rootName = peopleIndex[rootId].name;
+                var possessiveName = rootId === loggedInUser ? "Your" : rootName + "'s";
+                setHeaderName(possessiveName + " Family");
             }
         }
     }
