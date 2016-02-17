@@ -30,6 +30,15 @@ POSSIBILITY OF SUCH DAMAGE.
 <style type="text/css">
     .cover {
         background-color: firebrick;
+        color: gold;
+    }
+    
+    .cover-florish {
+        width: 86%;
+        height: 86%;
+        margin: 7%;
+        border-style: solid;
+        border-width: 1px;
     }
     
     .story-title {
@@ -37,16 +46,24 @@ POSSIBILITY OF SUCH DAMAGE.
         font: italic small-caps bolder 28px serif;
         text-align: center;
         margin-top: 40%;
+    }
+    
+    .story-title-lg {
+        width: 100%;
+        font: italic small-caps bolder 36px serif;
+        text-align: center;
         color: gold;
     }
     
     .story-page {
+        border-color: lightgray;
+        color: darkslategray;
         background-color:white;
+        border-style:solid;
+        border-width:.5px;
     }
     
     .story-page,.cover {
-        border-style:solid;
-        border-width:.5px;
         min-height:600px;
         position:relative;
     }
@@ -82,7 +99,7 @@ POSSIBILITY OF SUCH DAMAGE.
     settings.local = {
         verbs: {
             story: function(obj) {
-                loadStory(obj.storyTitle, obj.storyUrl, obj.images);
+                loadStory(obj.storyHero, obj.storyUrl, obj.images);
             },
             previousPage: function(obj) {
                 $('.flipbook').turn("previous");
@@ -93,9 +110,9 @@ POSSIBILITY OF SUCH DAMAGE.
         }
     }
     
-    function loadStory(storyTitle, storyUrl, images) {
+    function loadStory(storyHero, storyUrl, images) {
         $.get(storyUrl, function(data) {
-            $("#flipbook-holder").html("<div class='flipbook'><div class='cover'><h2 class='story-title'>"+storyTitle+"</h2></div></div>");
+            $("#flipbook-holder").html("<div class='flipbook'><div class='cover'><div class='cover-florish'><div class='story-title'>A story about</div><div class='story-title-lg'>"+storyHero+"</div><div></div></div>");
             $('.flipbook').turn({
 
                 // Elevation
@@ -122,7 +139,15 @@ POSSIBILITY OF SUCH DAMAGE.
             
             $(".flipbook").turn("addPage", "<div class='story-page'>"+
                     (images[imgIndex] ? "<img src='" + images[imgIndex] + "' class='story-img' />" : "")+
-                    "<div class='caption'>The end</div></div>")
+                    "<div class='caption'>The end</div></div>");
+            imgIndex = (imgIndex + 1) % (images.length + 1);
+            
+            if (sentences.length % 2 === 0) {
+                $(".flipbook").turn("addPage", "<div class='story-page'>"+
+                        (images[imgIndex] ? "<img src='" + images[imgIndex] + "' class='story-img' />" : ""));
+            }
+            
+            $(".flipbook").turn("addPage", "<div class='cover'><div class='cover-florish'></div></div>")
         });
     }
 </script>

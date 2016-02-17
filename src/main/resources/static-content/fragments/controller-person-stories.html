@@ -69,7 +69,7 @@ POSSIBILITY OF SUCH DAMAGE.
             sendToDisplay(JSON.stringify(
                     {
                         responseType:"story",
-                        storyTitle:"A Story About<br/>" + person.name,
+                        storyHero:person.name,
                         storyUrl:person.stories[storyId],
                         images:person.images
                     }));
