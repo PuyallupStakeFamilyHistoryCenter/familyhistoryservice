@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<!--
+Copyright (c) 2014, tibbitts
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+* Redistributions of source code must retain the above copyright notice, this
+  list of conditions and the following disclaimer.
+* Redistributions in binary form must reproduce the above copyright notice,
+  this list of conditions and the following disclaimer in the documentation
+  and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+POSSIBILITY OF SUCH DAMAGE.
+-->
+
+<button id="start-btn" class="btn btn-lg btn-primary">New game</button>
+
+<hr>
+
+<div id="letter-btns"></div>
+
+<script>
+    $("#start-btn").click(function() {
+        sendRandomWord();
+    });
+    
+    $.each("ABCDEFGHIJKLMNOPQRSTUVWXYZ".split(""), function(index, value) {
+        $("#letter-btns").append("<button class='letter-btn btn btn-lg btn-default' style='margin: 3px' data-value='"+value+"'>" + value + "</button>");
+    });
+    
+    $(".letter-btn").click(function() {
+        var value = $(this).attr("data-value");
+        sendToDisplay(JSON.stringify({
+            responseType: "guess",
+            letter: value
+        }));
+        $(this).prop("disabled", "disabled");
+    });
+    
+    var words = [];
+    settings.local = {
+        verbs: {
+            people: function(obj) {
+                $.each(obj.people, function(index, person) {
+                    var names = splitWords(person.name);
+                    $.each(names, function(i2, name) {
+                        if (name.length > 3 && name.length <= 8 && !words[name]) {
+                            words[name] = name;
+                            words.push(name);
+                        }
+                    });
+//                    if (person.facts) {
+//                        $.each(person.facts, function(index, fact) {
+//                            var names = splitWords(fact.place);
+//                            $.each(names, function(i2, name) {
+//                                if (name.length > 3 && name.length <= 8 && !words[name]) {
+//                                    words[name] = name;
+//                                    words.push(name);
+//                                }
+//                            });
+//                        });
+//                    }
+                });
+                console.info("Words: " + JSON.stringify(words));
+                sendRandomWord();
+            }
+        }
+    }
+    
+    function sendRandomWord() {
+        var word = getRandomElement(words);
+        sendToDisplay(JSON.stringify({
+            responseType: "start",
+            word: word
+        }));
+        $(".letter-btn").removeProp("disabled");
+    }
+    
+    ws.socketSend("get-ancestors " + token + " " + settings.userId);
+</script>

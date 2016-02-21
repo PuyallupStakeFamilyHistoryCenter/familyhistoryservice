@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<!--
+Copyright (c) 2016, tibbitts
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+* Redistributions of source code must retain the above copyright notice, this
+  list of conditions and the following disclaimer.
+* Redistributions in binary form must reproduce the above copyright notice,
+  this list of conditions and the following disclaimer in the documentation
+  and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+POSSIBILITY OF SUCH DAMAGE.
+-->
+
+<style>
+    text.word {
+        font-family: monospace
+    }
+</style>
+
+<svg id="board" viewBox="0 0 120 110" version="1.1"
+     xmlns="http://www.w3.org/2000/svg">
+<line class="game-part game-part-base hidden"
+      x1="0" y1="100" 
+      x2="110" y2="100" 
+      stroke="brown" 
+      stroke-width="5"/>
+<line class="game-part game-part-frame-1 hidden"
+      x1="10" y1="100" 
+      x2="10" y2="7.5" 
+      stroke="brown" 
+      stroke-width="5"/>
+<line class="game-part game-part-frame-1 hidden"
+      x1="0" y1="100" 
+      x2="10" y2="90" 
+      stroke="brown" 
+      stroke-width="2"/>
+<circle class="game-part game-part-frame-1 hidden" 
+        cx="1.5" cy="98.5" r=".5"
+        fill="grey" />
+<circle class="game-part game-part-frame-1 hidden" 
+        cx="8.5" cy="91.5" r=".5"
+        fill="grey" />
+<line class="game-part game-part-frame-2 hidden"
+      x1="10" y1="10" 
+      x2="60" y2="10"
+      stroke="brown" 
+      stroke-width="5"/>
+<line class="game-part game-part-frame-2 hidden"
+      x1="10" y1="30" 
+      x2="30" y2="10" 
+      stroke="brown" 
+      stroke-width="2"/>
+<circle class="game-part game-part-frame-2 hidden" 
+        cx="11.5" cy="28.5" r=".5"
+        fill="grey" />
+<circle class="game-part game-part-frame-2 hidden" 
+        cx="28.5" cy="11.5" r=".5"
+        fill="grey" />
+<line class="game-part game-part-rope hidden"
+      x1="60" y1="10" 
+      x2="60" y2="28" 
+      stroke="tan" 
+      stroke-linecap="round"
+      stroke-width="1"/>
+<line class="game-part game-part-body hidden"
+      x1="60" y1="35" 
+      x2="60" y2="60" 
+      stroke="black" 
+      stroke-linecap="round"
+      stroke-width="1"/>
+<ellipse class="game-part game-part-rope hidden"
+         cx="60" cy="32" 
+         rx="2" ry="4" 
+         stroke="tan" 
+         fill="none"/>
+<ellipse class="game-part game-part-head hidden"
+         cx="60" cy="30" 
+         rx="4" ry="5" 
+         stroke="black" 
+         fill="white"/>
+<line class="game-part game-part-left-arm hidden"
+      x1="60" y1="40" 
+      x2="45" y2="45" 
+      stroke="black" 
+      stroke-linecap="round"
+      stroke-width="1"/>
+<line class="game-part game-part-right-arm hidden"
+      x1="60" y1="40" 
+      x2="75" y2="45" 
+      stroke="black" 
+      stroke-linecap="round"
+      stroke-width="1"/>
+<line class="game-part game-part-left-leg hidden"
+      x1="60" y1="60" 
+      x2="50" y2="85" 
+      stroke="black" 
+      stroke-linecap="round"
+      stroke-width="1"/>
+<line class="game-part game-part-right-leg hidden"
+      x1="60" y1="60" 
+      x2="70" y2="85" 
+      stroke="black" 
+      stroke-linecap="round"
+      stroke-width="1"/>
+<text class="word letter letter-0 letter-W hidden" x="10" y="100">W</text>
+<line class="word underline underline-0" x1="10" y1="102" x2="19" y2="102" stroke="black" stroke-width="1"></line>
+<text class="word letter letter-1 letter-O hidden" x="21" y="100">O</text>
+<line class="word underline underline-1" x1="21" y1="102" x2="30" y2="102" stroke="black" stroke-width="1"></line>
+<text class="word letter letter-2 letter-R hidden" x="32" y="100">R</text>
+<line class="word underline underline-2" x1="32" y1="102" x2="41" y2="102" stroke="black" stroke-width="1"></line>
+<text class="word letter letter-3 letter-D hidden" x="43" y="100">D</text>
+<line class="word underline underline-3" x1="43" y1="102" x2="52" y2="102" stroke="black" stroke-width="1"></line>
+<text class="word letter letter-4 letter-W hidden" x="54" y="100">W</text>
+<line class="word underline underline-4" x1="54" y1="102" x2="63" y2="102" stroke="black" stroke-width="1"></line>
+<text class="word letter letter-5 letter-O hidden" x="65" y="100">O</text>
+<line class="word underline underline-5" x1="65" y1="102" x2="74" y2="102" stroke="black" stroke-width="1"></line>
+<text class="word letter letter-6 letter-R hidden" x="76" y="100">R</text>
+<line class="word underline underline-6" x1="76" y1="102" x2="85" y2="102" stroke="black" stroke-width="1"></line>
+<text class="word letter letter-7 letter-D hidden" x="87" y="100">D</text>
+<line class="word underline underline-7" x1="87" y1="102" x2="96" y2="102" stroke="black" stroke-width="1"></line>
+</svg>
+
+<script>
+    var cIndex = 0;
+    var finished = false;
+    
+    var gameParts = [
+        "base", "frame-1", "frame-2", "rope", "head", "body", "left-arm", 
+        "right-arm", "left-leg", "right-leg"
+    ];
+    
+    settings.local = {
+        verbs: {
+            guess: function(obj) {
+                if (finished) {
+                    return;
+                }
+                if ($(".letter-" + obj.letter).length > 0) {
+                    removeClass(".letter-" + obj.letter,"hidden");
+                    addClass(".underline-" + obj.letter,"hidden");
+                    
+                    if ($(".letter.used.hidden").length === 0) {
+                        finished = true;
+                        
+                        $(".letter").attr("fill", "green");
+                    }
+                } else {
+                    removeClass(".game-part-" + gameParts[cIndex++],"hidden");
+                    
+                    if ($(".game-part.hidden").length === 0) {
+                        finished = true;
+                        
+                        $(".letter.hidden").attr("fill", "red");
+                        removeClass(".letter.used.hidden", "hidden");
+                        addClass(".underline", "hidden");
+                    }
+                }
+            },
+            start: function(obj) {
+                cIndex = 0;
+                finished = false;
+                addClass(".game-part","hidden");
+//                removeClass(".game-part","hidden");
+                setupWord(obj.word);
+            }
+        }
+    };
+    
+    function setupWord(word) {
+        addClass(".word", "hidden");
+        removeClass(".letter", "letter-[A-Z]");
+        removeClass(".underline", "underline-[A-Z]");
+        removeClass(".letter","used");
+        $(".letter.hidden").attr("fill", "black");
+        var currentX = 60-((9*word.length)+(2*word.length-1))/2;
+        
+        $.each(word.split(""), function(index, letter) {
+            letter = letter.toUpperCase();
+            $(".letter-"+index).html(letter);
+            $(".letter-"+index).attr("x", currentX);
+            $(".underline-"+index).attr("x1", currentX);
+            $(".underline-"+index).attr("x2", currentX+9);
+            currentX+=11;
+            addClass(".letter-"+index,"letter-"+letter+" used");
+            addClass(".underline-"+index,"underline-"+letter);
+            removeClass(".underline-"+index,"hidden");
+        });
+    }
+    
+    function addClass(selector, c) {
+        $(selector).each(function() {
+            var classes = $(this).attr('class');
+            $(this).attr('class', classes + " " + c);
+        });
+    }
+    
+    function removeClass(selector, c) {
+        $(selector).each(function() {
+            var classes = $(this).attr('class');
+            var regex = new RegExp("^"+c+"$|^"+c+"(?= )| "+c+"$| "+c+"(?= )","g");
+            $(this).attr('class', classes.replace(regex,""));
+        });
+    }
+    
+    $("#board").height($(window).height() - $("#page-header").height() - 10);
+    $("#board").width($("#content").width() - "10");
+</script>

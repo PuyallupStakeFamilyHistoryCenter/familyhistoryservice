@@ -314,3 +314,10 @@ function resolveChildProperty(obj, path) {
 
     return currentObject;
 }
+
+function splitWords(s) {
+    if (!s) {
+        return [];
+    }
+    return s.split(/[ .!?,-;:"'0-]/g);
+}
