@@ -76,6 +76,48 @@ POSSIBILITY OF SUCH DAMAGE.
       stroke="tan" 
       stroke-linecap="round"
       stroke-width="1"/>
+<line class="game-part game-part-rope hidden"
+      x1="59.5" y1="27.2" 
+      x2="60.5" y2="27.2" 
+      stroke="tan" 
+      stroke-linecap="round"
+      stroke-width="1"/>
+<line class="game-part game-part-rope hidden"
+      x1="59.5" y1="26.4" 
+      x2="60.5" y2="26.4" 
+      stroke="tan" 
+      stroke-linecap="round"
+      stroke-width="1"/>
+<line class="game-part game-part-rope hidden"
+      x1="59.5" y1="25.6" 
+      x2="60.5" y2="25.6" 
+      stroke="tan" 
+      stroke-linecap="round"
+      stroke-width="1"/>
+<line class="game-part game-part-rope hidden"
+      x1="59.5" y1="24.8" 
+      x2="60.5" y2="24.8" 
+      stroke="tan" 
+      stroke-linecap="round"
+      stroke-width="1"/>
+<line class="game-part game-part-rope hidden"
+      x1="59.5" y1="24.0" 
+      x2="60.5" y2="24.0" 
+      stroke="tan" 
+      stroke-linecap="round"
+      stroke-width="1"/>
+<line class="game-part game-part-rope hidden"
+      x1="59.5" y1="23.2" 
+      x2="60.5" y2="23.2" 
+      stroke="tan" 
+      stroke-linecap="round"
+      stroke-width="1"/>
+<line class="game-part game-part-rope hidden"
+      x1="59.5" y1="22.4" 
+      x2="60.5" y2="22.4" 
+      stroke="tan" 
+      stroke-linecap="round"
+      stroke-width="1"/>
 <line class="game-part game-part-body hidden"
       x1="60" y1="35" 
       x2="60" y2="60" 
@@ -211,7 +253,7 @@ POSSIBILITY OF SUCH DAMAGE.
     function removeClass(selector, c) {
         $(selector).each(function() {
             var classes = $(this).attr('class');
-            var regex = new RegExp("^"+c+"$|^"+c+"(?= )| "+c+"$| "+c+"(?= )","g");
+            var regex = new RegExp("^"+c+"$|^"+c+" | "+c+"$| "+c+"(?= )","g");
             $(this).attr('class', classes.replace(regex,""));
         });
     }

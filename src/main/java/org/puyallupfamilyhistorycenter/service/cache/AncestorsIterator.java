@@ -105,6 +105,10 @@ public class AncestorsIterator implements Iterator<Person> {
     }
 
     protected static void addRelationshipToPerson(Person person, int depth) {
+        if (person.gender == null) {
+            return;
+        }
+        
         String baseRelationship = person.gender.equals("Female") ? "mother" : "father";
         String relationship;
         switch (depth) { 
