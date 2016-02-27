@@ -87,7 +87,7 @@ POSSIBILITY OF SUCH DAMAGE.
     }
 </style>
 
-<div id="flipbook-holder" class="jumbotron">
+<div id="flipbook-holder">
     <div class="flipbook">
         <div>
 
@@ -122,6 +122,8 @@ POSSIBILITY OF SUCH DAMAGE.
                 // Enable gradients
 
                 gradients: true,
+                
+                height: $(window).height() - $("#page-header").height() - 10
             });
             
             var sentences = data.split(/[\.?!][ \n]/);
