@@ -37,7 +37,7 @@ POSSIBILITY OF SUCH DAMAGE.
     });
     
     $.each("ABCDEFGHIJKLMNOPQRSTUVWXYZ".split(""), function(index, value) {
-        $("#letter-btns").append("<button class='letter-btn btn btn-lg btn-default' style='margin: 3px' data-value='"+value+"'>" + value + "</button>");
+        $("#letter-btns").append("<button class='letter-btn btn btn-lg btn-default' style='margin: 3px' data-value='"+value+"' disabled='disabled'>" + value + "</button>");
     });
     
     $(".letter-btn").click(function() {
@@ -49,41 +49,34 @@ POSSIBILITY OF SUCH DAMAGE.
         $(this).prop("disabled", "disabled");
     });
     
-    var words = [];
+    var people;
     settings.local = {
         verbs: {
             people: function(obj) {
-                $.each(obj.people, function(index, person) {
-                    var names = splitWords(person.name);
-                    $.each(names, function(i2, name) {
-                        if (name.length > 3 && name.length <= 8 && !words[name]) {
-                            words[name] = name;
-                            words.push(name);
-                        }
-                    });
-//                    if (person.facts) {
-//                        $.each(person.facts, function(index, fact) {
-//                            var names = splitWords(fact.place);
-//                            $.each(names, function(i2, name) {
-//                                if (name.length > 3 && name.length <= 8 && !words[name]) {
-//                                    words[name] = name;
-//                                    words.push(name);
-//                                }
-//                            });
-//                        });
-//                    }
-                });
-                console.info("Words: " + JSON.stringify(words));
+                people = obj.people;
                 sendRandomWord();
             }
         }
     }
     
     function sendRandomWord() {
-        var word = getRandomElement(words);
+        var person, word;
+        do {
+            person = getRandomElement(people);
+            var names = splitWords(person.name);
+            if (names && names.length > 0) {
+                word = getRandomElement(names);
+            }
+        } while (word.length > 11 || word.length < 3 || word.toLowerCase() === "living");
+        var imgUrl;
+        if (person.images) {
+            imgUrl = getRandomElement(person.images);
+        }
         sendToDisplay(JSON.stringify({
             responseType: "start",
-            word: word
+            word: word,
+            name: person.name,
+            imgUrl: imgUrl
         }));
         $(".letter-btn").removeProp("disabled");
     }

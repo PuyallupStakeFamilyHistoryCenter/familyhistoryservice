@@ -31,150 +31,161 @@ POSSIBILITY OF SUCH DAMAGE.
     }
 </style>
 
-<svg id="board" viewBox="0 0 120 110" version="1.1"
-     xmlns="http://www.w3.org/2000/svg">
-<line class="game-part game-part-base hidden"
-      x1="0" y1="100" 
-      x2="110" y2="100" 
-      stroke="brown" 
-      stroke-width="5"/>
-<line class="game-part game-part-frame-1 hidden"
-      x1="10" y1="100" 
-      x2="10" y2="7.5" 
-      stroke="brown" 
-      stroke-width="5"/>
-<line class="game-part game-part-frame-1 hidden"
-      x1="0" y1="100" 
-      x2="10" y2="90" 
-      stroke="brown" 
-      stroke-width="2"/>
-<circle class="game-part game-part-frame-1 hidden" 
-        cx="1.5" cy="98.5" r=".5"
-        fill="grey" />
-<circle class="game-part game-part-frame-1 hidden" 
-        cx="8.5" cy="91.5" r=".5"
-        fill="grey" />
-<line class="game-part game-part-frame-2 hidden"
-      x1="10" y1="10" 
-      x2="60" y2="10"
-      stroke="brown" 
-      stroke-width="5"/>
-<line class="game-part game-part-frame-2 hidden"
-      x1="10" y1="30" 
-      x2="30" y2="10" 
-      stroke="brown" 
-      stroke-width="2"/>
-<circle class="game-part game-part-frame-2 hidden" 
-        cx="11.5" cy="28.5" r=".5"
-        fill="grey" />
-<circle class="game-part game-part-frame-2 hidden" 
-        cx="28.5" cy="11.5" r=".5"
-        fill="grey" />
-<line class="game-part game-part-rope hidden"
-      x1="60" y1="10" 
-      x2="60" y2="28" 
-      stroke="tan" 
-      stroke-linecap="round"
-      stroke-width="1"/>
-<line class="game-part game-part-rope hidden"
-      x1="59.5" y1="27.2" 
-      x2="60.5" y2="27.2" 
-      stroke="tan" 
-      stroke-linecap="round"
-      stroke-width="1"/>
-<line class="game-part game-part-rope hidden"
-      x1="59.5" y1="26.4" 
-      x2="60.5" y2="26.4" 
-      stroke="tan" 
-      stroke-linecap="round"
-      stroke-width="1"/>
-<line class="game-part game-part-rope hidden"
-      x1="59.5" y1="25.6" 
-      x2="60.5" y2="25.6" 
-      stroke="tan" 
-      stroke-linecap="round"
-      stroke-width="1"/>
-<line class="game-part game-part-rope hidden"
-      x1="59.5" y1="24.8" 
-      x2="60.5" y2="24.8" 
-      stroke="tan" 
-      stroke-linecap="round"
-      stroke-width="1"/>
-<line class="game-part game-part-rope hidden"
-      x1="59.5" y1="24.0" 
-      x2="60.5" y2="24.0" 
-      stroke="tan" 
-      stroke-linecap="round"
-      stroke-width="1"/>
-<line class="game-part game-part-rope hidden"
-      x1="59.5" y1="23.2" 
-      x2="60.5" y2="23.2" 
-      stroke="tan" 
-      stroke-linecap="round"
-      stroke-width="1"/>
-<line class="game-part game-part-rope hidden"
-      x1="59.5" y1="22.4" 
-      x2="60.5" y2="22.4" 
-      stroke="tan" 
-      stroke-linecap="round"
-      stroke-width="1"/>
-<line class="game-part game-part-body hidden"
-      x1="60" y1="35" 
-      x2="60" y2="60" 
-      stroke="black" 
-      stroke-linecap="round"
-      stroke-width="1"/>
-<ellipse class="game-part game-part-rope hidden"
-         cx="60" cy="32" 
-         rx="2" ry="4" 
-         stroke="tan" 
-         fill="none"/>
-<ellipse class="game-part game-part-head hidden"
-         cx="60" cy="30" 
-         rx="4" ry="5" 
-         stroke="black" 
-         fill="white"/>
-<line class="game-part game-part-left-arm hidden"
-      x1="60" y1="40" 
-      x2="45" y2="45" 
-      stroke="black" 
-      stroke-linecap="round"
-      stroke-width="1"/>
-<line class="game-part game-part-right-arm hidden"
-      x1="60" y1="40" 
-      x2="75" y2="45" 
-      stroke="black" 
-      stroke-linecap="round"
-      stroke-width="1"/>
-<line class="game-part game-part-left-leg hidden"
-      x1="60" y1="60" 
-      x2="50" y2="85" 
-      stroke="black" 
-      stroke-linecap="round"
-      stroke-width="1"/>
-<line class="game-part game-part-right-leg hidden"
-      x1="60" y1="60" 
-      x2="70" y2="85" 
-      stroke="black" 
-      stroke-linecap="round"
-      stroke-width="1"/>
-<text class="word letter letter-0 letter-W hidden" x="10" y="100">W</text>
-<line class="word underline underline-0" x1="10" y1="102" x2="19" y2="102" stroke="black" stroke-width="1"></line>
-<text class="word letter letter-1 letter-O hidden" x="21" y="100">O</text>
-<line class="word underline underline-1" x1="21" y1="102" x2="30" y2="102" stroke="black" stroke-width="1"></line>
-<text class="word letter letter-2 letter-R hidden" x="32" y="100">R</text>
-<line class="word underline underline-2" x1="32" y1="102" x2="41" y2="102" stroke="black" stroke-width="1"></line>
-<text class="word letter letter-3 letter-D hidden" x="43" y="100">D</text>
-<line class="word underline underline-3" x1="43" y1="102" x2="52" y2="102" stroke="black" stroke-width="1"></line>
-<text class="word letter letter-4 letter-W hidden" x="54" y="100">W</text>
-<line class="word underline underline-4" x1="54" y1="102" x2="63" y2="102" stroke="black" stroke-width="1"></line>
-<text class="word letter letter-5 letter-O hidden" x="65" y="100">O</text>
-<line class="word underline underline-5" x1="65" y1="102" x2="74" y2="102" stroke="black" stroke-width="1"></line>
-<text class="word letter letter-6 letter-R hidden" x="76" y="100">R</text>
-<line class="word underline underline-6" x1="76" y1="102" x2="85" y2="102" stroke="black" stroke-width="1"></line>
-<text class="word letter letter-7 letter-D hidden" x="87" y="100">D</text>
-<line class="word underline underline-7" x1="87" y1="102" x2="96" y2="102" stroke="black" stroke-width="1"></line>
-</svg>
+<div style="position: relative">
+    <svg id="board" viewBox="0 0 120 110" version="1.1"
+         xmlns="http://www.w3.org/2000/svg">
+    <line class="game-part game-part-base hidden"
+          x1="0" y1="100" 
+          x2="110" y2="100" 
+          stroke="brown" 
+          stroke-width="5"/>
+    <line class="game-part game-part-frame-1 hidden"
+          x1="10" y1="100" 
+          x2="10" y2="7.5" 
+          stroke="brown" 
+          stroke-width="5"/>
+    <line class="game-part game-part-frame-1 hidden"
+          x1="0" y1="100" 
+          x2="10" y2="90" 
+          stroke="brown" 
+          stroke-width="2"/>
+    <circle class="game-part game-part-frame-1 hidden" 
+            cx="1.5" cy="98.5" r=".5"
+            fill="grey" />
+    <circle class="game-part game-part-frame-1 hidden" 
+            cx="8.5" cy="91.5" r=".5"
+            fill="grey" />
+    <line class="game-part game-part-frame-2 hidden"
+          x1="10" y1="10" 
+          x2="60" y2="10"
+          stroke="brown" 
+          stroke-width="5"/>
+    <line class="game-part game-part-frame-2 hidden"
+          x1="10" y1="30" 
+          x2="30" y2="10" 
+          stroke="brown" 
+          stroke-width="2"/>
+    <circle class="game-part game-part-frame-2 hidden" 
+            cx="11.5" cy="28.5" r=".5"
+            fill="grey" />
+    <circle class="game-part game-part-frame-2 hidden" 
+            cx="28.5" cy="11.5" r=".5"
+            fill="grey" />
+    <line class="game-part game-part-rope hidden"
+          x1="60" y1="10" 
+          x2="60" y2="28" 
+          stroke="tan" 
+          stroke-linecap="round"
+          stroke-width="1"/>
+    <line class="game-part game-part-rope hidden"
+          x1="59.5" y1="27.2" 
+          x2="60.5" y2="27.2" 
+          stroke="tan" 
+          stroke-linecap="round"
+          stroke-width="1"/>
+    <line class="game-part game-part-rope hidden"
+          x1="59.5" y1="26.4" 
+          x2="60.5" y2="26.4" 
+          stroke="tan" 
+          stroke-linecap="round"
+          stroke-width="1"/>
+    <line class="game-part game-part-rope hidden"
+          x1="59.5" y1="25.6" 
+          x2="60.5" y2="25.6" 
+          stroke="tan" 
+          stroke-linecap="round"
+          stroke-width="1"/>
+    <line class="game-part game-part-rope hidden"
+          x1="59.5" y1="24.8" 
+          x2="60.5" y2="24.8" 
+          stroke="tan" 
+          stroke-linecap="round"
+          stroke-width="1"/>
+    <line class="game-part game-part-rope hidden"
+          x1="59.5" y1="24.0" 
+          x2="60.5" y2="24.0" 
+          stroke="tan" 
+          stroke-linecap="round"
+          stroke-width="1"/>
+    <line class="game-part game-part-rope hidden"
+          x1="59.5" y1="23.2" 
+          x2="60.5" y2="23.2" 
+          stroke="tan" 
+          stroke-linecap="round"
+          stroke-width="1"/>
+    <line class="game-part game-part-rope hidden"
+          x1="59.5" y1="22.4" 
+          x2="60.5" y2="22.4" 
+          stroke="tan" 
+          stroke-linecap="round"
+          stroke-width="1"/>
+    <line class="game-part game-part-body hidden"
+          x1="60" y1="35" 
+          x2="60" y2="60" 
+          stroke="black" 
+          stroke-linecap="round"
+          stroke-width="1"/>
+    <ellipse class="game-part game-part-rope hidden"
+             cx="60" cy="32" 
+             rx="2" ry="4" 
+             stroke="tan" 
+             fill="none"/>
+    <ellipse class="game-part game-part-head hidden"
+             cx="60" cy="30" 
+             rx="4" ry="5" 
+             stroke="black" 
+             fill="white"/>
+    <line class="game-part game-part-left-arm hidden"
+          x1="60" y1="40" 
+          x2="45" y2="45" 
+          stroke="black" 
+          stroke-linecap="round"
+          stroke-width="1"/>
+    <line class="game-part game-part-right-arm hidden"
+          x1="60" y1="40" 
+          x2="75" y2="45" 
+          stroke="black" 
+          stroke-linecap="round"
+          stroke-width="1"/>
+    <line class="game-part game-part-left-leg hidden"
+          x1="60" y1="60" 
+          x2="50" y2="85" 
+          stroke="black" 
+          stroke-linecap="round"
+          stroke-width="1"/>
+    <line class="game-part game-part-right-leg hidden"
+          x1="60" y1="60" 
+          x2="70" y2="85" 
+          stroke="black" 
+          stroke-linecap="round"
+          stroke-width="1"/>
+    <text class="word letter letter-0 letter-W hidden" x="10" y="100">W</text>
+    <line class="word underline underline-0" x1="10" y1="102" x2="19" y2="102" stroke="black" stroke-width="1"></line>
+    <text class="word letter letter-1 letter-O hidden" x="21" y="100">O</text>
+    <line class="word underline underline-1" x1="21" y1="102" x2="30" y2="102" stroke="black" stroke-width="1"></line>
+    <text class="word letter letter-2 letter-R hidden" x="32" y="100">R</text>
+    <line class="word underline underline-2" x1="32" y1="102" x2="41" y2="102" stroke="black" stroke-width="1"></line>
+    <text class="word letter letter-3 letter-D hidden" x="43" y="100">D</text>
+    <line class="word underline underline-3" x1="43" y1="102" x2="52" y2="102" stroke="black" stroke-width="1"></line>
+    <text class="word letter letter-4 letter-W hidden" x="54" y="100">W</text>
+    <line class="word underline underline-4" x1="54" y1="102" x2="63" y2="102" stroke="black" stroke-width="1"></line>
+    <text class="word letter letter-5 letter-O hidden" x="65" y="100">O</text>
+    <line class="word underline underline-5" x1="65" y1="102" x2="74" y2="102" stroke="black" stroke-width="1"></line>
+    <text class="word letter letter-6 letter-R hidden" x="76" y="100">R</text>
+    <line class="word underline underline-6" x1="76" y1="102" x2="85" y2="102" stroke="black" stroke-width="1"></line>
+    <text class="word letter letter-7 letter-D hidden" x="87" y="100">D</text>
+    <line class="word underline underline-7" x1="87" y1="102" x2="96" y2="102" stroke="black" stroke-width="1"></line>
+    <text class="word letter letter-8 letter-D hidden" x="87" y="100">D</text>
+    <line class="word underline underline-8" x1="87" y1="102" x2="96" y2="102" stroke="black" stroke-width="1"></line>
+    <text class="word letter letter-9 letter-D hidden" x="87" y="100">D</text>
+    <line class="word underline underline-9" x1="87" y1="102" x2="96" y2="102" stroke="black" stroke-width="1"></line>
+    <text class="word letter letter-10 letter-D hidden" x="87" y="100">D</text>
+    <line class="word underline underline-10" x1="87" y1="102" x2="96" y2="102" stroke="black" stroke-width="1"></line>
+    </svg>
+
+    <div id="reveal-div" style="position: absolute; border: solid 2px; background-color: white; margin: 0px; top: 10%; left:10%; display: none">
+    </div>
+</div>
 
 <script>
     var cIndex = 0;
@@ -199,6 +210,7 @@ POSSIBILITY OF SUCH DAMAGE.
                         finished = true;
                         
                         $(".letter").attr("fill", "green");
+                        $("#reveal-div").show();
                     }
                 } else {
                     removeClass(".game-part-" + gameParts[cIndex++],"hidden");
@@ -209,6 +221,7 @@ POSSIBILITY OF SUCH DAMAGE.
                         $(".letter.hidden").attr("fill", "red");
                         removeClass(".letter.used.hidden", "hidden");
                         addClass(".underline", "hidden");
+                        $("#reveal-div").show();
                     }
                 }
             },
@@ -216,11 +229,29 @@ POSSIBILITY OF SUCH DAMAGE.
                 cIndex = 0;
                 finished = false;
                 addClass(".game-part","hidden");
-//                removeClass(".game-part","hidden");
+                $("#reveal-div").hide();
+                setupReveal(obj.imgUrl, obj.name);
                 setupWord(obj.word);
             }
         }
     };
+    
+    function setupReveal(imgUrl, name) {
+        var html = "";
+        if (imgUrl) {
+            html += "<img id='reveal-img' style='display: none' src='"+imgUrl+"'/>";
+        }
+        html += "<h3 id='reveal-name' style='width: 100%; text-align: center'>"+name+"</h3>";
+        $("#reveal-div").html(html);
+        $("#reveal-img").css("max-height", $("#board").height() * .60);
+        $("#reveal-div").css("left", (($("#board").width() - $("#reveal-div").width())/2) + "px");
+        
+        $("#reveal-img").load(function() {
+            $("#reveal-img").show()
+                    .css("max-height", $("#reveal-div").height()*.70 + "px");
+            $("#reveal-div").css("left", (($("#board").width() - $("#reveal-div").width())/2) + "px");
+        });
+    }
     
     function setupWord(word) {
         addClass(".word", "hidden");
@@ -259,5 +290,6 @@ POSSIBILITY OF SUCH DAMAGE.
     }
     
     $("#board").height($(window).height() - $("#page-header").height() - 10);
-    $("#board").width($("#content").width() - "10");
+    $("#board").width($("#content").width() - 10);
+    
 </script>
