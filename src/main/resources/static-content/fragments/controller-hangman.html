@@ -59,15 +59,25 @@ POSSIBILITY OF SUCH DAMAGE.
         }
     }
     
+    var usedWords = [];
     function sendRandomWord() {
         var person, word;
+        var tries = 0, maxTries = 50;
         do {
             person = getRandomElement(people);
             var names = splitWords(person.name);
             if (names && names.length > 0) {
                 word = getRandomElement(names);
             }
-        } while (word.length > 12 || word.length < 3 || word.toLowerCase() === "living" || !person.images);
+        } while ((word.length > 12 || 
+                word.length < 3 || 
+                word.toLowerCase() === "living" || 
+                usedWords[word]) && tries++ < maxTries);
+        if (tries >= maxTries) {
+            usedWords = [];
+        }
+        
+        usedWords[word] = word;
         var imgUrl;
         if (person.images) {
             imgUrl = getRandomElement(person.images);

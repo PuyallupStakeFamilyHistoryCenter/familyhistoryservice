@@ -246,7 +246,10 @@ POSSIBILITY OF SUCH DAMAGE.
         html += "<h3 id='reveal-name' style='width: 100%; text-align: center'>"+name+"</h3>";
         $("#reveal-div").html(html);
         $("#reveal-img").css("max-height", $("#board").height() * .60);
-        
+        $("#reveal-div").show();
+        $("#reveal-div").css("left", (($("#board").width() - $("#reveal-div").width())/2) + "px");
+        $("#reveal-div").hide();
+            
         $("#reveal-img").load(function() {
             $("#reveal-div").show();
             $("#reveal-img").show()
