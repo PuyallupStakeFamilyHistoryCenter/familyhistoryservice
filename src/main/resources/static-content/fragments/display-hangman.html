@@ -181,6 +181,8 @@ POSSIBILITY OF SUCH DAMAGE.
     <line class="word underline underline-9" x1="87" y1="102" x2="96" y2="102" stroke="black" stroke-width="1"></line>
     <text class="word letter letter-10 letter-D hidden" x="87" y="100">D</text>
     <line class="word underline underline-10" x1="87" y1="102" x2="96" y2="102" stroke="black" stroke-width="1"></line>
+    <text class="word letter letter-11 letter-D hidden" x="87" y="100">D</text>
+    <line class="word underline underline-12" x1="87" y1="102" x2="96" y2="102" stroke="black" stroke-width="1"></line>
     </svg>
 
     <div id="reveal-div" style="position: absolute; border: solid 2px; background-color: white; margin: 0px; top: 10%; left:10%; display: none">
@@ -244,12 +246,17 @@ POSSIBILITY OF SUCH DAMAGE.
         html += "<h3 id='reveal-name' style='width: 100%; text-align: center'>"+name+"</h3>";
         $("#reveal-div").html(html);
         $("#reveal-img").css("max-height", $("#board").height() * .60);
-        $("#reveal-div").css("left", (($("#board").width() - $("#reveal-div").width())/2) + "px");
         
         $("#reveal-img").load(function() {
+            $("#reveal-div").show();
             $("#reveal-img").show()
                     .css("max-height", $("#reveal-div").height()*.70 + "px");
+            $("#reveal-name").css("max-width", $("#reveal-img").width() + "px");
             $("#reveal-div").css("left", (($("#board").width() - $("#reveal-div").width())/2) + "px");
+            $("#reveal-div").hide();
+            
+            setTimeout(function() {
+            },10);
         });
     }
     

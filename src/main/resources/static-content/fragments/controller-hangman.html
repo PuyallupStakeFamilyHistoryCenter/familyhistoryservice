@@ -67,7 +67,7 @@ POSSIBILITY OF SUCH DAMAGE.
             if (names && names.length > 0) {
                 word = getRandomElement(names);
             }
-        } while (word.length > 11 || word.length < 3 || word.toLowerCase() === "living");
+        } while (word.length > 12 || word.length < 3 || word.toLowerCase() === "living" || !person.images);
         var imgUrl;
         if (person.images) {
             imgUrl = getRandomElement(person.images);
