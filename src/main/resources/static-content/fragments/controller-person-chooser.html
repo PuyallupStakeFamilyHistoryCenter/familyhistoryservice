@@ -67,7 +67,14 @@ POSSIBILITY OF SUCH DAMAGE.
 
     function recursivelyAddButtons(person, personMap, index, depth) {
         console.info("Adding person " + JSON.stringify(person) + " to #gen-" + depth + "-" + index)
-        $("#gen-" + depth + "-" + index).append("<div id='btns-"+ depth + "-" + index + "' style='position: absolute; left: 0; top: calc(50% - 19px); z-index: 100; display: inline-block; white-space: nowrap;' ><button class='btn btn-default person-btn' data-id='" + person.id + "'>" + person.name + "</button></div>");
+        var badges = "";
+        if (person.images && person.images.length) {
+            badges += "<span class='glyphicon glyphicon-picture' style='margin-left: 3px; text-shadow: none'></span>"
+        }
+        if (person.stories && person.stories.length) {
+            badges += "<span class='glyphicon glyphicon-book' style='margin-left: 3px; text-shadow: none'></span>"
+        }
+        $("#gen-" + depth + "-" + index).append("<div id='btns-"+ depth + "-" + index + "' style='position: absolute; left: 0; top: calc(50% - 19px); z-index: 100; display: inline-block; white-space: nowrap;' ><button class='btn btn-default person-btn' data-id='" + person.id + "'>" + person.name + badges + "</button></div>");
         if (person.id !== rootId) {
             $("#btns-" + depth + "-" + index).append("<button class='btn btn-default target-btn' data-id='" + person.id + "'><span class='glyphicon glyphicon-tree-deciduous'></span></button>");
         }
