@@ -51,7 +51,8 @@ POSSIBILITY OF SUCH DAMAGE.
 
     var map, geocoder;
     var initialized = false, person;
-    function initialize() {                // Create an array of styles.
+    function initialize() {
+        // Create an array of styles.
         var styles = [
             {
                 "featureType": "administrative",
@@ -148,6 +149,7 @@ POSSIBILITY OF SUCH DAMAGE.
         if (person) {
             graphPerson(person);
         }
+        initialized = true;
     }
 
 
