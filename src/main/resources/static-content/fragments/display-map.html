@@ -32,7 +32,10 @@ POSSIBILITY OF SUCH DAMAGE.
     settings.local = {
         verbs: {
             person: function (obj) {
-                graphPerson(obj.person);
+                person = obj.person;
+                if (initialized) {
+                    graphPerson(obj.person);
+                }
             },
             people: function (obj) {
                 graphPeople(obj.people);
@@ -47,6 +50,7 @@ POSSIBILITY OF SUCH DAMAGE.
     };
 
     var map, geocoder;
+    var initialized = false, person;
     function initialize() {                // Create an array of styles.
         var styles = [
             {
@@ -140,6 +144,10 @@ POSSIBILITY OF SUCH DAMAGE.
         geocoder = new google.maps.Geocoder();
         
         google.maps.event.addListener(map, "idle", nextFrame);
+        
+        if (person) {
+            graphPerson(person);
+        }
     }
 
 
