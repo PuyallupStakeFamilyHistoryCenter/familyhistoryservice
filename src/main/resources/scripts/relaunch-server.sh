@@ -1,5 +1,5 @@
 #!/bin/sh
 
-pkill -9 -f "FamilyHistoryCacheService.ja[r]"
+lsof -i :8080 | grep java | awk '{print $2}' | uniq | xargs kill -9
 sleep 1s
-nohup java -jar FamilyHistoryCacheService.jar&
+./run-server.sh
