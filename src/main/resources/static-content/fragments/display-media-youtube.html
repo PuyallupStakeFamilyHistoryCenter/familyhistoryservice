@@ -31,7 +31,7 @@ POSSIBILITY OF SUCH DAMAGE.
 
 <script>
     var player, ready;
-    var playlist;
+    var playlist = JSON.parse(getParameterByName("playlist"));
     
     settings.local = {
         verbs: {
@@ -112,6 +112,7 @@ POSSIBILITY OF SUCH DAMAGE.
     
     function onPlayerReady(event) {
         ready = true;
+        playNext();
     }
     
     function onPlayerStateChange(event) {
@@ -124,6 +125,7 @@ POSSIBILITY OF SUCH DAMAGE.
     
     function playNext() {
         if (playlist && playlist.length > 0) {
+            console.info(playlist);
             play(playlist.shift());
         }
     }

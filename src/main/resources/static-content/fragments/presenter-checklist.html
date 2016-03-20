@@ -37,41 +37,138 @@ POSSIBILITY OF SUCH DAMAGE.
             font-size: 9px;
         }
     </style>
-    <div id="checkboxes">
+    <div id="checkboxes" style="position: relative">
         
     </div>
 </div>
 
 <script>
+    
+    var type = getParameterByName("type");
+    var displayId = displayName = getParameterByName("displayId");
+    
     settings.local.verbs = {
+        displays: function() {},
         checklist: function(obj) {
-            $("#checkboxes").append("<h5>Open</h5>")
-            $.each(obj.openItems, function(index, item) {
-                $("#checkboxes").append(
-                        "<div class='checkbox checkbox-circle checkbox-success h5'>\n" +
-                        "  <input type='checkbox' class='bound-chk' id='"+ item.id +"' data-id='"+ item.id +"' "+(item.checked?"checked=''":"")+" >\n" +
-                        "  <label for='"+ item.id +"'>\n" +
-                        "    " + item.text + "\n" +
-                        "  </label>\n" +
-                        "</div>\n")
-            });
-            $("#checkboxes").append("<h5>Close</h5>")
-            $.each(obj.closeItems, function(index, item) {
-                $("#checkboxes").append(
-                        "<div class='checkbox checkbox-circle checkbox-success h5'>\n" +
-                        "  <input type='checkbox' class='bound-chk' id='"+ item.id +"' data-id='"+ item.id +"' "+(item.checked?"checked=''":"")+" >\n" +
-                        "  <label for='"+ item.id +"'>\n" +
-                        "    " + item.text + "\n" +
-                        "  </label>\n" +
-                        "</div>\n")
+            var extraContent = "";
+            $("#checkboxes").html("");
+            var index = 0;
+            $.each(obj.items, function(categoryName, category) {
+                $("#checkboxes").append("<h5>"+toFirstCaps(categoryName)+"</h5>")
+                $.each(category, function(i2, item) {
+                    $("#checkboxes").append(
+                            "<div class='checkbox checkbox-circle checkbox-success h5' style='width:50%'>\n" +
+                            "  <input type='checkbox' class='bound-chk' id='"+ item.id +"' data-index='"+ index +"' data-id='"+ item.id +"' "+(item.checked?"checked=''":"")+" >\n" +
+                            "  <label for='"+ item.id +"'>\n" +
+                            "    " + item.text + "\n" +
+                            "  </label>\n" +
+                            "</div>\n" +
+                            "<div id='extra-div-"+index++ + "' class='extra-div panel panel-default' style='position: absolute; top: 0px; left: 50%; width: 50%; height: 100%'><div class='panel-body'>" + resolveExtraContent(item) + "</div></div>")
+                });
+                
+                setupHandlers();
             });
             
             $(".bound-chk").click(function() {
-                ws.socketSend("check " + $(this).attr("data-id") + " " + $(this).prop("checked"));
+                if (type) {
+                    ws.socketSend("check " + $(this).attr("data-id") + " " + $(this).prop("checked") + " " + type + " " + displayId);
+                } else {
+                    ws.socketSend("check " + $(this).attr("data-id") + " " + $(this).prop("checked"));
+                }
+                
+                showActiveStep();
+                console.log("Check clicked");
             });
+            
+            function showActiveStep() {
+                var first = true;
+                $(".extra-div").hide().each(function() {
+                    if (first && !($(this).prev().children("input").prop("checked"))) {
+                        first = false;
+                        $(this).show();
+                        location.href = "#";
+                        location.href = "#" + $(this).next().next().attr("id");
+                    }
+                });
+            }
+            
+            function resolveExtraContent(item) {
+                var content = "<h3>Next up: "+item.text+"</h3>" +
+                        (item.description ? "<h5>"+item.description+"</h5>" : "");
+                if (item.action) {
+                    switch (item.action.type) {
+                        case "YOUTUBE":
+                            var data = JSON.parse(item.action.data);
+                            content += "<button class='btn btn-lg btn-default youtube-btn' data-video='" + item.action.data + "' ><span class='btn-nav' style='background-image: url(\"/image-cache?ref=https%3A%2F%2Fimg.youtube.com%2Fvi%2F"+ data.id +"%2Fsddefault.jpg\"); background-repeat: no-repeat; background-attachment: local; background-position: center; background-size:200px 150px '></span></button>\n"+
+                                        "<div id='controls' style='display: none'>\n"+
+                                        "    <button id='skip-backward-btn' class='btn btn-lg btn-default auto-wire' data-action='skipBackward' ><span class='glyphicon glyphicon-step-backward' ></span></button>\n"+
+                                        "    <button id='play-btn' class='btn btn-lg btn-default play-btn' style='display: none'><span class='glyphicon glyphicon-play' ></span></button>\n"+
+                                        "    <button id='pause-btn' class='btn btn-lg btn-default pause-btn'><span class='glyphicon glyphicon-pause' ></span></button>\n"+
+                                        "    <button id='skip-forward-btn' class='btn btn-lg btn-default auto-wire' data-action='skipForward' ><span class='glyphicon glyphicon-step-forward' ></span></button>\n"+
+                                        "    <div style='padding-top: 30px'>\n"+
+                                        "        <button id='mute-btn' class='btn btn-lg btn-default auto-wire' data-action='mute'><span class='glyphicon glyphicon-volume-off' ></span></button>\n"+
+                                        "        <button id='volume-down-btn' class='btn btn-lg btn-default auto-wire' data-action='volumeDown'><span class='glyphicon glyphicon-volume-down' ></span></button>\n"+
+                                        "        <button id='volume-up-btn' class='btn btn-lg btn-default auto-wire' data-action='volumeUp' ><span class='glyphicon glyphicon-volume-up' ></span></button>\n"+
+                                        "    </div>\n"+
+                                        "</div>";
+                            break;
+                            
+                        case "RESET":
+                            content += "<button class='btn btn-lg btn-default reload-btn'><span class='glyphicon glyphicon-refresh' ></span></button>";
+                            break;
+                            
+                        case "SURVEY":
+                            content += "<button class='btn btn-lg btn-default survey-btn'><span class='glyphicon glyphicon-comment'></span></button>";
+                            break;
+                        default:
+                    }
+                }
+                return content;
+            }
+            
+            function setupHandlers() {
+                $(".youtube-btn").click(function() {
+                    navigateDisplay("display-media-youtube?playlist=["+$(this).attr("data-video")+"]");
+                    $(".youtube-btn").show().next().hide();
+                    $(this).hide().next().show();
+                    $(".pause-btn").show();
+                    $(".play-btn").hide();
+                });
+                
+                $(".reload-btn").click(function() {
+                    ws.socketSend("reloadDisplay " + displayId);
+                });
+                
+                $(".survey-btn").click(function() {
+                    ws.socketSend("forceNavigateController " + displayName + " controller-survey");
+                })
+    
+                $(".play-btn").click(function (e) {
+                    sendToDisplay(JSON.stringify({responseType:"play"}));
+                    $(this).hide().next().show();
+                });
+
+                $(".pause-btn").click(function (e) {
+                    sendToDisplay(JSON.stringify({responseType:"pause"}));
+                    $(this).hide().prev().show();
+                });
+
+                $(".auto-wire").click(function (e) {
+                    sendToDisplay(JSON.stringify({responseType:$(this).attr("data-action")}));
+                });
+            }
+            
+            showActiveStep();
         }
     }
     
-    ws.socketSend("getChecklist");
-    abcd();
+    function load() {
+        if (type) {
+            ws.socketSend("getChecklist " + type + " " + displayId);
+        } else {
+            ws.socketSend("getChecklist");
+        }
+    }
+    
+    load();
 </script>

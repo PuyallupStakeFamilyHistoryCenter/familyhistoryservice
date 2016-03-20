@@ -25,6 +25,8 @@
  */
 package org.puyallupfamilyhistorycenter.service.models;
 
+import com.google.common.collect.Table;
+import com.google.common.collect.Tables;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -33,30 +35,42 @@ import java.util.Map;
  * @author tibbitts
  */
 public class Checklist {
+    private final String OPEN_KEY = "open";
+    private final String CLOSE_KEY = "close";
+    private final String SESSION_KEY = "session";
+    
     public final String responseType = "checklist";
-    public final Map<String, ChecklistItem> openItems;
-    public final Map<String, ChecklistItem> closeItems;
+    public final Table<String, String, ChecklistItem> items;
 
     public Checklist() {
-        this.openItems = new LinkedHashMap<>();
-        this.closeItems = new LinkedHashMap<>();
+        this.items = Tables.newCustomTable(new LinkedHashMap<String, Map<String, ChecklistItem>>(), () -> {
+            return new LinkedHashMap<String, ChecklistItem>();
+        });
     }
     
     public void addOpenItem(ChecklistItem item) {
-        openItems.put(item.id,item);
+        items.put(OPEN_KEY, item.id, item);
     }
     
     public void addCloseItem(ChecklistItem item) {
-        closeItems.put(item.id,item);
+        items.put(CLOSE_KEY, item.id, item);
+    }
+    
+    public void addSessionItem(ChecklistItem item) {
+        items.put(SESSION_KEY, item.id, item);
     }
     
     public void setChecked(String id, boolean checked) {
-        if (openItems.containsKey(id)) {
-            openItems.get(id).setChecked(checked);
+        if (items.contains(OPEN_KEY, id)) {
+            items.get(OPEN_KEY, id).setChecked(checked);
         }
             
-        if (closeItems.containsKey(id)) {
-            closeItems.get(id).setChecked(checked);
+        if (items.contains(CLOSE_KEY, id)) {
+            items.get(CLOSE_KEY, id).setChecked(checked);
+        }
+            
+        if (items.contains(SESSION_KEY, id)) {
+            items.get(SESSION_KEY, id).setChecked(checked);
         }
     }
 }

@@ -26,8 +26,18 @@
 
 package org.puyallupfamilyhistorycenter.service.websocket;
 
+import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.Table;
 import org.puyallupfamilyhistorycenter.service.ServletLifecycleManager;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -35,6 +45,7 @@ import org.puyallupfamilyhistorycenter.service.cache.PersonDao;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.lang.reflect.Type;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLDecoder;
@@ -77,6 +88,7 @@ import org.puyallupfamilyhistorycenter.service.Contact;
 import org.puyallupfamilyhistorycenter.service.SpringContextInitializer;
 import org.puyallupfamilyhistorycenter.service.cache.Precacher;
 import org.puyallupfamilyhistorycenter.service.models.Checklist;
+import org.puyallupfamilyhistorycenter.service.models.ChecklistAction;
 import org.puyallupfamilyhistorycenter.service.models.ChecklistItem;
 import org.puyallupfamilyhistorycenter.service.models.Statistics;
 import org.puyallupfamilyhistorycenter.service.models.Person;
@@ -92,7 +104,29 @@ import org.puyallupfamilyhistorycenter.service.utils.S3Utils;
 @WebSocket(maxTextMessageSize = 64 * 1024)
 public class FamilyHistoryCenterSocket {
     private static final Logger logger = Logger.getLogger(FamilyHistoryCenterSocket.class);
-    private static final Gson GSON = new Gson();
+    private static final Gson GSON = new GsonBuilder().registerTypeAdapter(Table.class, (JsonDeserializer<Table>) (JsonElement json, Type type, JsonDeserializationContext context) -> {
+                                    Table table = HashBasedTable.create();
+                                    JsonObject object = (JsonObject) json;
+                                    JsonElement element = object.get("backingMap");
+                                    for (Map.Entry<String, JsonElement> entry : ((JsonObject) element).entrySet()) {
+                                        String row = entry.getKey();
+                                        for (Map.Entry<String, JsonElement> column : ((JsonObject) entry.getValue()).entrySet()) {
+                                            table.put(row, column.getKey(), column.getValue());
+                                        }
+                                    }
+                                    return table;
+                                }).registerTypeAdapter(Table.class, (JsonSerializer<Table<String, String, ChecklistItem>>) (Table<String, String, ChecklistItem> t, Type type, JsonSerializationContext jsc) -> {
+                                    JsonObject tableElement = new JsonObject();
+                                    for (String rowKey : t.rowKeySet()) {
+                                        JsonObject rowElement = new JsonObject();
+                                        tableElement.add(rowKey, rowElement);
+                                        
+                                        for (String columnKey : t.row(rowKey).keySet()) {
+                                            rowElement.add(columnKey, jsc.serialize(t.get(rowKey, columnKey)));
+                                        }
+                                    }
+                                    return tableElement;
+                                }).create();
     private static final PersonDao personDao;
     private static final AppKeyConfig appKeyConfig;
     
@@ -140,7 +174,8 @@ public class FamilyHistoryCenterSocket {
     private static final Map<String, Long> tokenLastUse = new HashMap<>();
     private static final Map<String, UserContext> userContextMap = new LinkedHashMap<>();
     private static final Set<String> stackTraces = new HashSet<>();
-    private static final Checklist checklist = newChecklist();
+    private static Checklist checklist = newChecklist();
+    private static final Map<String, Checklist> displayChecklists = new HashMap<>();
     private static final SecureRandom rand;
     static {
         try {
@@ -224,7 +259,7 @@ public class FamilyHistoryCenterSocket {
                     response = "{\"responseType\":\"pong\"}";
                     break;
                     
-                case "reconnect":
+                case "reconnect": {
                     String type = scanner.next();
                     switch (type) {
                         case "display":
@@ -235,6 +270,7 @@ public class FamilyHistoryCenterSocket {
                             break;
                     }
                     break;
+                }
                     
                 case "restart-server": {
                     Iterator<UserContext> it = userContextMap.values().iterator();
@@ -296,6 +332,7 @@ public class FamilyHistoryCenterSocket {
                     String id = scanner.next();
                     if (!isDisplayActive(id)) {
                         remoteDisplays.put(id, session.getRemote());
+                        displayChecklists.put(id, newSessionChecklist());
                         response = "{\"responseType\":\"standby\"}";
                         resendDisplayList();
                     } else {
@@ -718,7 +755,9 @@ public class FamilyHistoryCenterSocket {
                 }
                 
                 case "getChecklist": {
-                    response = GSON.toJson(checklist);
+                    String type = scanner.hasNext() ? scanner.next() : null;
+                    String displayId = scanner.hasNext() ? scanner.next() : null;
+                    response = GSON.toJson(getChecklist(displayId));
                     
                     break;
                 }
@@ -726,7 +765,9 @@ public class FamilyHistoryCenterSocket {
                 case "check": {
                     String id = scanner.next();
                     boolean value = scanner.nextBoolean();
-                    checklist.setChecked(id, value);
+                    String type = scanner.hasNext() ? scanner.next() : null;
+                    String displayId = scanner.hasNext() ? scanner.next() : null;
+                    getChecklist(displayId).setChecked(id, value);
                     break;
                 }
                 
@@ -1045,6 +1086,40 @@ public class FamilyHistoryCenterSocket {
         checklist.addCloseItem(new ChecklistItem("lock-cabinet", "Lock cabinet"));
         checklist.addCloseItem(new ChecklistItem("empty-trash", "Empty trash"));
         
+        return checklist;
+    }
+    
+    protected static Checklist newSessionChecklist() {
+        Checklist checklist = new Checklist();
+        checklist.addSessionItem(new ChecklistItem("welcome", "Welcome"));
+        checklist.addSessionItem(new ChecklistItem("log-in", "Log in", "Have the users log into their FamilySearch accounts"));
+        checklist.addSessionItem(new ChecklistItem("tree", "Tree", "Explain the significance of the tree and place the birds on it"));
+        checklist.addSessionItem(new ChecklistItem("tree-photo", "Tree photo", "Take a photo of the family in front of the tree"));
+        checklist.addSessionItem(new ChecklistItem("opening-video", "Opening video", "Play the opening video", 
+                new ChecklistAction(ChecklistAction.ActionType.YOUTUBE, null, null, "{\"id\":\"ivuO-0jfYiM\",\"title\":\"Opening Video\",\"responseType\":\"youtube\"}")));
+        checklist.addSessionItem(new ChecklistItem("controller-tutorial", "Controller tutorial", "Explain how to use the controllers",
+                new ChecklistAction(ChecklistAction.ActionType.RESET, null, null, null)));
+        checklist.addSessionItem(new ChecklistItem("kids-ipads", "Distribute kids' iPads"));
+        checklist.addSessionItem(new ChecklistItem("green-screen-photo", "Green screen photo", "Take a photo of the family with the green screen app"));
+        checklist.addSessionItem(new ChecklistItem("closing-video", "Closing video", "Play the closing video", 
+                new ChecklistAction(ChecklistAction.ActionType.YOUTUBE, null, null, "{\"id\":\"GCCIiFij7tg\",\"title\":\"Closing Video\",\"responseType\":\"youtube\"}")));
+        checklist.addSessionItem(new ChecklistItem("survey", "Survey", "Ask family to fill out the survey",
+                new ChecklistAction(ChecklistAction.ActionType.SURVEY, null, null, null)));
+        checklist.addSessionItem(new ChecklistItem("give-photos", "Give photos", "Give the family their photos"));
+        
+        return checklist;
+    }
+    
+    protected Checklist getChecklist(String displayId) {
+        if (displayId == null) {
+            return checklist;
+        }
+        
+        Checklist checklist = displayChecklists.get(displayId);
+        if (checklist == null) {
+            throw new IllegalStateException("Checklist for display '" + displayId + "' not found");
+        }
+
         return checklist;
     }
     

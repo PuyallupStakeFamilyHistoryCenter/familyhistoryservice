@@ -158,7 +158,8 @@ POSSIBILITY OF SUCH DAMAGE.
             $("#display-btns").append("<div><button class='btn btn-lg btn-default display-btn' data-display='"+displayId+"'>"+displayId+"</button>" +
                     "<button class='btn btn-lg btn-default survey-btn' data-display='"+displayId+"'><span class='glyphicon glyphicon-comment'></span></span></button>" + 
                     "<button class='btn btn-lg btn-default ping-display-btn' data-display='"+displayId+"'><span class='glyphicon glyphicon-bell'></span></span></button>" + 
-                    "<button class='btn btn-lg btn-default reload-display-btn' data-display='"+displayId+"'><span class='glyphicon glyphicon-refresh' ></span></button></div>");
+                    "<button class='btn btn-lg btn-default reload-display-btn' data-display='"+displayId+"'><span class='glyphicon glyphicon-refresh' ></span></button>" +
+                    "<button class='btn btn-lg btn-default session-checklist-btn' data-display='"+displayId+"'><span class='glyphicon glyphicon-check'></span></button></div>");
         });
         
         $(".survey-btn").click(function() {
@@ -181,6 +182,11 @@ POSSIBILITY OF SUCH DAMAGE.
         $(".reload-display-btn").click(function() {
             var displayId = $(this).attr("data-display");
             ws.socketSend("reloadDisplay " + displayId);
+        });
+        
+        $(".session-checklist-btn").click(function() {
+            var displayId = $(this).attr("data-display");
+            navigate("presenter-checklist?type=session&displayId=" + displayId);
         });
     }
     
@@ -240,6 +246,10 @@ POSSIBILITY OF SUCH DAMAGE.
     
     $("#checklistButton").click(function() {
         navigate("presenter-checklist");
+    });
+    
+    $("#sessionChecklistButton").click(function() {
+        navigate("presenter-checklist?type=session");
     });
     
     $("#confirmBugReportButton").click(function() {

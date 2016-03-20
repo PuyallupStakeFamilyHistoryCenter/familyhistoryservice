@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, tibbitts
+ * Copyright (c) 2016, tibbitts
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -29,40 +29,22 @@ package org.puyallupfamilyhistorycenter.service.models;
  *
  * @author tibbitts
  */
-public class ChecklistItem {
-    public final String id;
-    public final String text;
-    public final String description;
-    public final ChecklistAction action;
-    
-    private boolean checked;
-    
-    public ChecklistItem(String id, String text) {
-        this.id = id;
-        this.text = text;
-        this.description = null;
-        this.action = null;
-    }
-    
-    public ChecklistItem(String id, String text, String description) {
-        this.id = id;
-        this.text = text;
-        this.description = description;
-        this.action = null;
-    }
-    
-    public ChecklistItem(String id, String text, String description, ChecklistAction action) {
-        this.id = id;
-        this.text = text;
-        this.description = description;
-        this.action = action;
-    }
+public class ChecklistAction {
+    public final ActionType type;
+    public final String displayDest;
+    public final String controllerDest;
+    public final String data;
 
-    public boolean isChecked() {
-        return checked;
+    public ChecklistAction(ActionType type, String displayDest, String controllerDest, String data) {
+        this.type = type;
+        this.displayDest = displayDest;
+        this.controllerDest = controllerDest;
+        this.data = data;
     }
-
-    public void setChecked(boolean checked) {
-        this.checked = checked;
+    
+    public static enum ActionType {
+        YOUTUBE,
+        RESET,
+        SURVEY
     }
 }
