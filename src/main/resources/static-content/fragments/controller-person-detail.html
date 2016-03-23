@@ -29,10 +29,10 @@ POSSIBILITY OF SUCH DAMAGE.
     <button id="map-button" class="btn btn-lg btn-default" style="margin: 5px;" >
         <span class="btn-nav"><img src="../media/old-world-map.jpg" /></span><br><strong>Map</strong>
     </button>
-    <button id="images-button" class="btn btn-lg btn-default" style="margin: 5px;" >
+    <button id="images-button" class="btn btn-lg btn-default" style="margin: 5px; display: none" >
         <span class="btn-nav"><img src="../media/collage.jpg" /></span><br><strong>Photos</strong>
     </button>
-    <button id="stories-button" class="btn btn-lg btn-default" style="margin: 5px;" >
+    <button id="stories-button" class="btn btn-lg btn-default" style="margin: 5px; display: none" >
         <span class="btn-nav"><img src="../media/old-book.jpg" /></span><br><strong>Stories</strong>
     </button>
 </div>
@@ -65,6 +65,15 @@ POSSIBILITY OF SUCH DAMAGE.
             console.info("Got person id " + personId)
             ws.socketSend("send-person " + token + " " + displayName + " " + personId);
         });
+        
+        if (person.images && person.images.length > 0) {
+            $("#images-button").show();
+            asdf();
+        }
+        
+        if (person.stories && person.stories.length > 0) {
+            $("#stories-button").show();
+        }
     }
 </script>
 

@@ -66,7 +66,7 @@ POSSIBILITY OF SUCH DAMAGE.
     var loggedInUser = !getParameterByName("loggedInUser") ? settings.userId : getParameterByName("loggedInUser");
 
     function recursivelyAddButtons(person, personMap, index, depth) {
-        console.info("Adding person " + JSON.stringify(person) + " to #gen-" + depth + "-" + index)
+        console.log("Adding person " + JSON.stringify(person) + " to #gen-" + depth + "-" + index)
         var badges = "";
         if (person.images && person.images.length) {
             badges += "<span class='glyphicon glyphicon-picture' style='margin-left: 3px; text-shadow: none'></span>"
@@ -136,7 +136,9 @@ POSSIBILITY OF SUCH DAMAGE.
                     }
 
                     if (target) {
-                        navigate("controller-" + replaceVariables(peopleIndex[id], target)).then(
+                        resolvedTarget = replaceVariables(peopleIndex[id], target);
+                        console.info("Target: " + resolvedTarget);
+                        navigate("controller-" + resolvedTarget).then(
                                 function() {
                                     if (!noPeople) {
                                         ws.socketSend("get-" + choiceType + " " + token + " " + id);
