@@ -547,6 +547,16 @@ public class FamilyHistoryCenterSocket {
                     break;
                 }
                 
+                case "get-ancestor-stories": {
+                    token = scanner.next();
+                    String personId = scanner.next();
+                    List<Person> people = personDao.listAncestorsWithStories(personId, 5, token);
+                    
+                    response = getPeopleResponse(people);
+                    
+                    break;
+                }
+                
                 case "get-ancestor-stats": {
                     token = scanner.next();
                     String personId = scanner.next();

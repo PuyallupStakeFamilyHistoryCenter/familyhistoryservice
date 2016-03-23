@@ -81,6 +81,10 @@ public class PersonDao {
         return extractPeopleWithImages(new AncestorsIterator(personId, maxDepth, source, accessToken, true));
     }
     
+    public List<Person> listAncestorsWithStories(String personId, int maxDepth, String accessToken) {
+        return extractPeopleWithStories(new AncestorsIterator(personId, maxDepth, source, accessToken, true));
+    }
+    
     /**
      * Get an iterator over descendant records for the given person
      * @param personId The person whose descendants to get
@@ -101,6 +105,17 @@ public class PersonDao {
         while (it.hasNext()) {
             Person p = it.next();
             if (p.images != null && p.images.length > 0) {
+                people.add(p);
+            }
+        }
+        return people;
+    } 
+    
+    private List<Person> extractPeopleWithStories(final Iterator<Person> it) {
+        List<Person> people = new ArrayList<>();
+        while (it.hasNext()) {
+            Person p = it.next();
+            if (p.stories != null && p.stories.length > 0) {
                 people.add(p);
             }
         }

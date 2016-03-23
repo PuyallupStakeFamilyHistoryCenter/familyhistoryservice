@@ -26,7 +26,6 @@
 package org.puyallupfamilyhistorycenter.service.cache;
 
 import com.google.gson.Gson;
-import com.sun.jersey.api.client.ClientRequest;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -41,7 +40,6 @@ import org.gedcomx.rs.client.PersonChildrenState;
 import org.gedcomx.rs.client.PersonParentsState;
 import org.gedcomx.rs.client.PersonSpousesState;
 import org.gedcomx.rs.client.SourceDescriptionsState;
-import org.gedcomx.rs.client.StateTransitionOption;
 import org.gedcomx.source.SourceDescription;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
@@ -129,7 +127,7 @@ public class FamilySearchPersonSource implements Source<Person> {
                             //TODO: Filter memories by type
                             //source.getAbout() is the url to the image
                             String url = "/image-cache?ref=" + URLEncoder.encode(source.getAbout().toString() + "&access_token=" + accessToken, StandardCharsets.UTF_8.name());
-                            if (url.contains(".jpg") || url.contains(".png")) {
+                            if (url.contains(".jpg") || url.contains(".png") || url.contains(".tif")) {
                                 imageUrls.add(url);
                             } else {
                                 storyUrls.add(url);

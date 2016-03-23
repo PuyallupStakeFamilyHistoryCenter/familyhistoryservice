@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<!--
+Copyright (c) 2016, tibbitts
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+* Redistributions of source code must retain the above copyright notice, this
+  list of conditions and the following disclaimer.
+* Redistributions in binary form must reproduce the above copyright notice,
+  this list of conditions and the following disclaimer in the documentation
+  and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+POSSIBILITY OF SUCH DAMAGE.
+-->
+
+<script src="/static-content/js/jquery.simplePagination.js" ></script>
+
+<div id='loaded-div' style='display: none;'>
+    <div id="stories-wrapper">
+        <div id="stories">
+
+        </div>
+        <div id="pagination">
+
+        </div>
+    </div>
+</div>
+
+
+<div id='loading-div' >
+    <div class="progress">
+        <div class="progress-bar progress-bar-default progress-bar-striped active cached-prg" style="width: 100%">
+            Loading...
+        </div>
+    </div>
+</div>
+
+<script>
+    console.info("Starting story chooser");
+    var target = getParameterByName("target");
+    var sendPeople = !getParameterByName("getPeople");
+    var people;
+    var stories;
+    var pageSize = 10;
+    var defaultPeople = [
+        {
+            name:"Demo",
+            stories:["/media/default-story.txt"],
+            images:["/media/default.jpg"]
+        }
+    ]
+
+    settings.local = {
+        verbs: {
+            person: function (obj) {
+                loadPeopleStories([obj.person]);
+            },
+            people: function (obj) {
+                loadPeopleStories(obj.people);
+            }
+        }
+    }
+    
+    function loadPeopleStories(people) {
+        if (!people || !people.length) {
+            console.info("Using default people: " + JSON.stringify(defaultPeople));
+            people = defaultPeople;
+        }
+
+        stories = [];
+        storyUseMap = {};
+        $.each(people, function(index, person) {
+            var filteredIndex = 0;
+            if (person.stories) {
+                $.each(person.stories, function(storyIndex, story) {
+                    if (!storyUseMap[story]) {
+                        stories.push({
+                            responseType:"story",
+                            person:{id:person.id},
+                            storyHero:person.name,
+                            storyUrl:story,
+                            images:person.images,
+                            storyIndex:storyIndex
+                        });
+                        storyUseMap[story] = 1;
+                    }
+                });
+            }
+        });
+
+        $("#pagination").pagination({
+            items: stories.length,
+            itemsOnPage: pageSize,
+            displayedPages: 3,
+            cssStyle: 'dark-theme',
+            prevText: "<span class='glyphicon glyphicon-chevron-left'></span>",
+            nextText: "<span class='glyphicon glyphicon-chevron-right'></span>",
+            onPageClick: function(pageNumber, event) {
+                showPage(pageNumber-1);
+            }
+        });
+
+        $("#loading-div").hide();
+        $("#loaded-div").show();
+        showPage(0);
+    }
+    
+    function showPage(pageNum) {
+        $("#stories").html("");
+        for (var i = pageSize * pageNum; i < Math.min(stories.length, pageSize * (pageNum + 1)); i++) {
+            var story = stories[i];
+            
+            if ($("#section-" + story.person.id).length === 0) {
+                $("#stories").append("<div id='section-"+story.person.id+"'><h4>" + story.storyHero + 
+                        (story.storyIndex == 0 ? "" : " continued" )+ "</h4></div>");
+            }
+            var storyHtml = "<button class='btn btn-default img-btn' data-story='" + JSON.stringify(story) + "'><span style='width:70px; height:100px; background-color:red; display: block'><span style='color:black; font'>Story</span></span></button>";
+            $("#section-" + story.person.id).append(storyHtml);
+        }
+        $(".img-btn img").load(function (e) {
+            $(this).parent().show().parent().show();
+        });
+        $(".img-btn").click(function (e) {
+            var data = $(this).attr("data-story");
+            var obj = JSON.parse(data);
+            sendToDisplay(data);
+
+            if (target) {
+                navigate("controller-" + target);
+            }
+        });
+    }
+
+    settings.local.verbs.people(defaultPeople);
+    var personId = getParameterByName("personId");
+    if (personId) {
+        ws.socketSend("get-person " + token + " " + personId);
+    } else {
+        ws.socketSend("get-ancestor-stories " + token + " " + settings.userId);
+    }
+</script>

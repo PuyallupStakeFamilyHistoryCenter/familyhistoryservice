@@ -134,7 +134,14 @@ POSSIBILITY OF SUCH DAMAGE.
                     label: "Hangman",
                     image: "hangman.png",
                     nav: "hangman"
-                }
+                },
+                {
+                    name: "stories",
+                    label: "Stories",
+                    image: "old-book.jpg",
+                    nav: "story-chooser",
+                    display: "person-stories"
+                },
             ]
         },
         person: {
@@ -161,8 +168,7 @@ POSSIBILITY OF SUCH DAMAGE.
                     name: "stories",
                     label: "Stories",
                     image: "old-book.jpg",
-                    nav: "person-stories?personId=${personId}",
-                    visible: "${hasStories}"
+                    nav: "person-stories?personId=${personId}"
                 },
             ]
         },
