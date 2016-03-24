@@ -82,22 +82,21 @@ POSSIBILITY OF SUCH DAMAGE.
         stories = [];
         storyUseMap = {};
         $.each(people, function(index, person) {
-            var filteredIndex = 0;
-            if (person.stories) {
-                $.each(person.stories, function(storyIndex, story) {
-                    if (!storyUseMap[story]) {
-                        stories.push({
-                            responseType:"story",
-                            person:{id:person.id},
-                            storyHero:person.name,
-                            storyUrl:story,
-                            images:person.images,
-                            storyIndex:storyIndex
-                        });
-                        storyUseMap[story] = 1;
-                    }
-                });
-            }
+            var storyIndex = 0;
+            $.each(person.stories, function(i, story) {
+                if (!storyUseMap[story]) {
+                    stories.push({
+                        responseType:"story",
+                        person:{id:person.id},
+                        storyHero:person.name,
+                        storyUrl:story,
+                        images:person.images,
+                        storyIndex:storyIndex
+                    });
+                    storyUseMap[story] = 1;
+                    storyIndex++;
+                }
+            });
         });
 
         $("#pagination").pagination({
@@ -126,7 +125,13 @@ POSSIBILITY OF SUCH DAMAGE.
                 $("#stories").append("<div id='section-"+story.person.id+"'><h4>" + story.storyHero + 
                         (story.storyIndex == 0 ? "" : " continued" )+ "</h4></div>");
             }
-            var storyHtml = "<button class='btn btn-default img-btn' data-story='" + JSON.stringify(story) + "'><span style='width:70px; height:100px; background-color:red; display: block'><span style='color:black; font'>Story</span></span></button>";
+            var storyHtml = "<button class='btn btn-default img-btn' style='margin:3px' data-story='" + JSON.stringify(story) + "'>\n\
+                                <span style='width:70px; height:100px; margin-left: 15px; margin-right: 15px; padding-top: 4%; background-color:firebrick; color:gold; display: block; text-shadow: none; font: italic small-caps bolder 60% serif;'>\n\
+                                    <span style='width: 86%; height:86%; margin: 7%; border-style: solid; border-width: .1px; padding-top: 30%; display: block'>\n\
+                                        <span style='width:100%; display: block'>Story "+(story.storyIndex+1)+"</span>\n\
+                                    </span>\n\
+                                </span>\n\
+                             </button>";
             $("#section-" + story.person.id).append(storyHtml);
         }
         $(".img-btn img").load(function (e) {

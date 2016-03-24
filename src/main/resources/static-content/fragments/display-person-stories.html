@@ -135,7 +135,7 @@ POSSIBILITY OF SUCH DAMAGE.
                 $(".flipbook").turn("addPage", "<div class='story-page'>"+
                         (images[imgIndex] ? "<img src='" + images[imgIndex] + "' class='story-img' />" : "")+
                         "<div class='caption'>"+ sentence +".</div></div>")
-                imgIndex = (imgIndex + 1) % (images.length + 1);
+                imgIndex = (imgIndex + 1) % images.length;
             });
             
             
