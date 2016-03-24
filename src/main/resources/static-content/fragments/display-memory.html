@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<!--
+Copyright (c) 2016, tibbitts
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+* Redistributions of source code must retain the above copyright notice, this
+  list of conditions and the following disclaimer.
+* Redistributions in binary form must reproduce the above copyright notice,
+  this list of conditions and the following disclaimer in the documentation
+  and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+POSSIBILITY OF SUCH DAMAGE.
+-->
+
+<div id="cache" style="display:none"></div>
+
+<div class="col-lg-6" id="first-guess-div">
+    <h2>Choose a card on the controller</h2>
+</div>
+
+<div class="col-lg-6" id="second-guess-div">
+    
+</div>
+
+<script>
+    var firstGuess = null;
+    var secondGuess = null;
+    
+    settings.local = {
+        verbs: {
+            guess: function(obj) {
+                reveal(obj.guess);
+            },
+            cache: function(obj) {
+                cache(obj.cache);
+            }
+        }
+    }
+    
+    function reveal(guess) {
+        var guessDiv;
+        if (firstGuess) {
+            secondGuess = guess;
+            guessDiv = $("#second-guess-div");
+        } else {
+            firstGuess = guess;
+            guessDiv = $("#first-guess-div");
+        }
+        
+        switch (guess.type) {
+            case "img": {
+                guessDiv.html("<img src='"+guess.img+"' style='max-width:100%;' />");
+                
+                break;
+            }
+        }
+        
+        if (secondGuess) {
+            guessDiv.children("img").load(function() {
+                setTimeout(function() {
+                    firstGuess = null;
+                    secondGuess = null;
+                    $("#first-guess-div").html("<h2>Choose a card on the controller</h2>");
+                    $("#second-guess-div").html("");
+                }, 3000);
+            });
+        }
+    }
+    
+    function cache(imgs) {
+        $("#cache").html("");
+        $.each(imgs, function(index, img) {
+            $("#cache").append("<img src='"+img+"' style='width:1px; height:1px' />")
+        });
+    }
+</script>

@@ -151,6 +151,20 @@ function shuffle(array) {
     return array;
 }
 
+function dedupe(array) {
+    var varUseMap = {};
+    var newArray = [];
+    
+    $.each(array, function(index, value) {
+        if (!varUseMap[value]) {
+            varUseMap[value] = 1;
+            newArray.push(value);
+        }
+    });
+    
+    return newArray;
+}
+
 function filterArray(array, rawFilters) {
     var split = rawFilters.split(',');
 

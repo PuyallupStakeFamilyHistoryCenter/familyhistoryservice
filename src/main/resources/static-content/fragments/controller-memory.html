@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<!--
+Copyright (c) 2016, tibbitts
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+* Redistributions of source code must retain the above copyright notice, this
+  list of conditions and the following disclaimer.
+* Redistributions in binary form must reproduce the above copyright notice,
+  this list of conditions and the following disclaimer in the documentation
+  and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+POSSIBILITY OF SUCH DAMAGE.
+-->
+
+<div id="board">
+    
+</div>
+
+<button id="reset-btn" class="btn btn-lg btn-primary">Reset</button>
+
+<script>
+    settings.local = {
+        verbs: {
+            people: function(obj) {
+                setupBoard(obj.people);
+            }
+        }
+    }
+    
+    function setupBoard(people) {
+        var rows=4;
+        var cols=5;
+        
+        var allImgs = [];
+        $.each(people, function(index, person) {
+            if (person.images) {
+                Array.prototype.push.apply(allImgs, person.images);
+            }
+        });
+        
+        allImgs = shuffle(dedupe(allImgs));
+
+        var imgs = allImgs.slice(0, rows*cols/2);
+        sendToDisplay(JSON.stringify(
+                    {
+                        responseType:"cache",
+                        cache:imgs
+                    }
+                ));
+        
+        var doubleImgs = [];
+        Array.prototype.push.apply(doubleImgs, imgs);
+        Array.prototype.push.apply(doubleImgs, imgs);
+        doubleImgs = shuffle(doubleImgs);
+        
+        var index = 0;
+        $("#board").html("");
+        for (var i = 0; i < rows; i++) {
+            $("#board").append("<div id='row-"+i+"'></div>");
+            for (var j = 0; j < cols; j++) {
+                $("#row-"+i).append("<button id='btn-"+i+"-"+j+"' class='btn btn-lg btn-default game-btn' data-guess='{\"img\":\""+doubleImgs[index++]+"\",\"type\":\"img\"}' style='width:100px;height:100px'></button>");
+            }
+        }
+
+        var firstBtn = null;
+        $(".game-btn").click(function() {
+            var guess = $(this).attr("data-guess");
+            if (firstBtn) {
+                var firstGuess = firstBtn.attr("data-guess");
+                if (firstGuess === guess) {
+                    firstBtn.prop("disabled", "disabled");
+                    $(this).prop("disabled", "disabled");
+                }
+                firstBtn = null;
+            } else {
+                firstBtn = $(this);
+            }
+            sendToDisplay(JSON.stringify(
+                    {
+                        responseType:"guess",
+                        guess:JSON.parse(guess)
+                    }
+                ));
+        });
+    }
+    
+    function reset() {
+        ws.socketSend("get-ancestors " + token + " " + settings.userId);
+    }
+    
+    $("#reset-btn").click(reset);
+    reset();
+</script>
