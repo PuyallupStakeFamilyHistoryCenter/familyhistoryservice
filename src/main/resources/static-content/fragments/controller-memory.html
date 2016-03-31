@@ -71,7 +71,10 @@ POSSIBILITY OF SUCH DAMAGE.
         for (var i = 0; i < rows; i++) {
             $("#board").append("<div id='row-"+i+"'></div>");
             for (var j = 0; j < cols; j++) {
-                $("#row-"+i).append("<button id='btn-"+i+"-"+j+"' class='btn btn-lg btn-default game-btn' data-guess='{\"img\":\""+doubleImgs[index++]+"\",\"type\":\"img\"}' style='width:100px;height:100px'></button>");
+                if (doubleImgs[index]) {
+                    $("#row-"+i).append("<button id='btn-"+i+"-"+j+"' class='btn btn-lg btn-default game-btn' data-guess='{\"img\":\""+doubleImgs[index]+"\",\"type\":\"img\"}' style='width:100px;height:100px'></button>");
+                }
+                index++;
             }
         }
 
