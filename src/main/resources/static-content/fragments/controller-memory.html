@@ -78,22 +78,30 @@ POSSIBILITY OF SUCH DAMAGE.
         var firstBtn = null;
         $(".game-btn").click(function() {
             var guess = $(this).attr("data-guess");
-            if (firstBtn) {
-                var firstGuess = firstBtn.attr("data-guess");
-                if (firstGuess === guess) {
-                    firstBtn.prop("disabled", "disabled");
-                    $(this).prop("disabled", "disabled");
-                }
-                firstBtn = null;
-            } else {
-                firstBtn = $(this);
-            }
             sendToDisplay(JSON.stringify(
                     {
                         responseType:"guess",
                         guess:JSON.parse(guess)
                     }
                 ));
+            if (firstBtn) {
+                var firstGuess = firstBtn.attr("data-guess");
+                if (firstGuess === guess) {
+                    $(this).prop("disabled", "disabled");
+                    
+                    var disabledCount = $(".game-btn:disabled").length;
+                    var allCount = $(".game-btn").length;
+                    console.info(disabledCount + "/" + allCount + " cards matched");
+                    if (disabledCount === allCount) {
+                        sendToDisplay(JSON.stringify({responseType:"won"}));
+                    }
+                } else {
+                    firstBtn.removeProp("disabled");
+                }
+                firstBtn = null;
+            } else {
+                firstBtn = $(this).prop("disabled", "disabled");
+            }
         });
     }
     
@@ -103,4 +111,6 @@ POSSIBILITY OF SUCH DAMAGE.
     
     $("#reset-btn").click(reset);
     reset();
+    
+    console.info("Loaded controller-memory");
 </script>
