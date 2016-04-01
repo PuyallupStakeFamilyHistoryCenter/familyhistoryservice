@@ -30,8 +30,87 @@ POSSIBILITY OF SUCH DAMAGE.
 </div>
 
 <button id="reset-btn" class="btn btn-lg btn-primary">Reset</button>
+<div class="btn-group btn-group-lg" data-toggle="buttons">
+    <label class="btn btn-default">
+        <input type="radio" name="difficulty" value="easy">Easy
+    </label>
+    <label class="btn btn-default active">
+        <input type="radio" name="difficulty" value="medium" checked="">Medium
+    </label>
+    <label class="btn btn-default">
+        <input type="radio" name="difficulty" value="hard">Hard
+    </label>
+    <label class="btn btn-default">
+        <input type="radio" name="difficulty" value="insane">Insane
+    </label>
+    <label class="btn btn-warning">
+        <input type="radio" name="difficulty" value="custom">Custom
+    </label>
+</div>
+<div id="customControls" style="display: none;">
+    <dl class="dl-horizontal">
+        <dt>Piece size</dt>
+        <dd>
+            <div class="btn-group btn-group-lg" data-toggle="buttons">
+                <label class="btn btn-default">
+                    <input type="radio" name="pairs" value="4">4
+                </label>
+                <label class="btn btn-default active">
+                    <input type="radio" name="pairs" value="5" checked="">5
+                </label>
+                <label class="btn btn-default">
+                    <input type="radio" name="pairs" value="6">6
+                </label>
+                <label class="btn btn-default">
+                    <input type="radio" name="pairs" value="7">7
+                </label>
+                <label class="btn btn-default">
+                    <input type="radio" name="pairs" value="8">8
+                </label>
+            </div>
+        </dd>
+    </dl>
+</div>
 
 <script>
+    console.info("Loading controller-memory");
+    var configurations = {
+        easy: {
+            pairs: 4,
+        },
+        medium: {
+            pairs: 5,
+        },
+        hard: {
+            pairs: 7,
+        },
+        insane: {
+            pairs: 8,
+        }
+    };
+    
+    $('input[name=difficulty]:radio').change(function () {
+        $("#customControls").hide();
+
+        settings.config = cloneObject(configurations[$(this).val()]);
+        reset();
+    });
+
+    $("input[name=difficulty][value='custom']:radio").unbind().change(function () {
+        if (!settings.config) {
+            settings.config = cloneObject(configurations.medium);
+        }
+        initRadio("[name=pairs]", settings.config.pairs);
+        $("#customControls").show();
+    });
+    
+    $("[name=pairs]").change(function () {
+        settings.config.pairs = $(this).val();
+        reset();
+    });
+
+
+
     settings.local = {
         verbs: {
             people: function(obj) {
@@ -41,7 +120,7 @@ POSSIBILITY OF SUCH DAMAGE.
     }
     
     function setupBoard(people) {
-        var rows=4;
+        console.info("Setting up board");
         var cols=3;
         
         var allImgs = [];
@@ -53,7 +132,7 @@ POSSIBILITY OF SUCH DAMAGE.
         
         allImgs = shuffle(dedupe(allImgs));
 
-        var imgs = allImgs.slice(0, rows*cols/2);
+        var imgs = allImgs.slice(0, settings.config.pairs);
         sendToDisplay(JSON.stringify(
                     {
                         responseType:"cache",
@@ -66,9 +145,10 @@ POSSIBILITY OF SUCH DAMAGE.
         Array.prototype.push.apply(doubleImgs, imgs);
         doubleImgs = shuffle(doubleImgs);
         
+        var i = 0;
         var index = 0;
         $("#board").html("");
-        for (var i = 0; i < rows; i++) {
+        while (index < doubleImgs.length) {
             $("#board").append("<div id='row-"+i+"'></div>");
             for (var j = 0; j < cols; j++) {
                 if (doubleImgs[index]) {
@@ -76,6 +156,7 @@ POSSIBILITY OF SUCH DAMAGE.
                 }
                 index++;
             }
+            i++;
         }
 
         var firstBtn = null;
@@ -112,8 +193,30 @@ POSSIBILITY OF SUCH DAMAGE.
         ws.socketSend("get-ancestors " + token + " " + settings.userId);
     }
     
-    $("#reset-btn").click(reset);
-    reset();
+    function cloneObject(obj) {
+        var serialized = window.JSON.stringify(obj);
+        var clone = window.JSON.parse(serialized);
+        return clone;
+    }
     
-    console.info("Loaded controller-memory");
+    function initCheckbox(selector, value) {
+        var checkbox = $(selector);
+        if (value) {
+            checkbox.prop('checked',"");
+            checkbox.parent().addClass("active");
+        } else {
+            checkbox.removeProp('checked');
+            checkbox.parent().removeClass("active");
+        }
+    }
+    
+    function initRadio(selector, value) {
+        $(selector).removeProp('checked').parent().removeClass("active");
+        $(selector + "[value="+value+"]").prop('checked','').parent().addClass("active");
+    }
+    
+    $("#reset-btn").click(reset);
+    
+    settings.config = cloneObject(configurations.medium);
+    reset();
 </script>
