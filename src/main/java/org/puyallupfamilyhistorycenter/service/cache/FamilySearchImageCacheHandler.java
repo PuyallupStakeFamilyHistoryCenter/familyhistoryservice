@@ -39,6 +39,7 @@ import java.io.Writer;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Enumeration;
 import java.util.HashSet;
@@ -79,7 +80,7 @@ public class FamilySearchImageCacheHandler extends AbstractHandler {
             return;
         }
         
-        String filename = ref.replaceAll("access_token.*", "");
+        String filename = URLEncoder.encode(ref.replaceAll("access_token.*", ""), StandardCharsets.UTF_8.name());
         File cachedFile = new File(cacheDir, filename + ".gz");
         File metadataFile = new File(cacheDir, filename + ".meta");
         

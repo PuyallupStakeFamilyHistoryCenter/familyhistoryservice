@@ -25,51 +25,113 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 -->
 
-<div id="board">
+<style>
+    .memory {
+        max-width: 100%;
+        max-height: 100%;
+    }
     
-</div>
+    .memory-text {
+        white-space: normal;
+        word-break: normal;
+        word-wrap: normal;
+    }
+    
+    button {
+        overflow: hidden
+    }
+    
+    button .memory {
+        display: none;
+    }
+    
+    button.flipped .memory,
+    button.flipped-permanant .memory {
+        display: inherit;
+    }
+</style>
 
-<button id="reset-btn" class="btn btn-lg btn-primary">Reset</button>
-<div class="btn-group btn-group-lg" data-toggle="buttons">
-    <label class="btn btn-default">
-        <input type="radio" name="difficulty" value="easy">Easy
-    </label>
-    <label class="btn btn-default active">
-        <input type="radio" name="difficulty" value="medium" checked="">Medium
-    </label>
-    <label class="btn btn-default">
-        <input type="radio" name="difficulty" value="hard">Hard
-    </label>
-    <label class="btn btn-default">
-        <input type="radio" name="difficulty" value="insane">Insane
-    </label>
-    <label class="btn btn-warning">
-        <input type="radio" name="difficulty" value="custom">Custom
-    </label>
+<ul class="nav nav-tabs" id="tabs" role="tablist">
+    <li class="active" id="game-tab" ><a href="#game-tab" role="tab" data-toggle="tab">Game</a></li>
+    <li id="settings-tab" ><a href="#settings-tab" role="tab" data-toggle="tab">Settings</a></li>
+</ul>
+
+<div id="game">
+    <div id="board">
+
+    </div>
+
+    <button id="reset-btn" class="btn btn-lg btn-primary">Reset</button>
 </div>
-<div id="customControls" style="display: none;">
-    <dl class="dl-horizontal">
-        <dt>Piece size</dt>
-        <dd>
-            <div class="btn-group btn-group-lg" data-toggle="buttons">
-                <label class="btn btn-default">
-                    <input type="radio" name="pairs" value="4">4
-                </label>
-                <label class="btn btn-default active">
-                    <input type="radio" name="pairs" value="5" checked="">5
-                </label>
-                <label class="btn btn-default">
-                    <input type="radio" name="pairs" value="6">6
-                </label>
-                <label class="btn btn-default">
-                    <input type="radio" name="pairs" value="7">7
-                </label>
-                <label class="btn btn-default">
-                    <input type="radio" name="pairs" value="8">8
-                </label>
-            </div>
-        </dd>
-    </dl>
+<div id="settings" style="display: none">
+    <div class="btn-group btn-group-lg" data-toggle="buttons">
+        <label class="btn btn-default">
+            <input type="radio" name="difficulty" value="easy">Easy
+        </label>
+        <label class="btn btn-default active">
+            <input type="radio" name="difficulty" value="medium" checked="">Medium
+        </label>
+        <label class="btn btn-default">
+            <input type="radio" name="difficulty" value="hard">Hard
+        </label>
+        <label class="btn btn-default">
+            <input type="radio" name="difficulty" value="insane">Insane
+        </label>
+        <label class="btn btn-warning">
+            <input type="radio" name="difficulty" value="custom">Custom
+        </label>
+    </div>
+    <div id="customControls" style="display: none;">
+        <dl class="dl-horizontal">
+            <dt>Number of pairs</dt>
+            <dd>
+                <div class="btn-group btn-group-lg" data-toggle="buttons">
+                    <label class="btn btn-default">
+                        <input type="radio" name="pairs" value="4">4
+                    </label>
+                    <label class="btn btn-default active">
+                        <input type="radio" name="pairs" value="5" checked="">5
+                    </label>
+                    <label class="btn btn-default">
+                        <input type="radio" name="pairs" value="6">6
+                    </label>
+                    <label class="btn btn-default">
+                        <input type="radio" name="pairs" value="7">7
+                    </label>
+                    <label class="btn btn-default">
+                        <input type="radio" name="pairs" value="8">8
+                    </label>
+                </div>
+            </dd>
+
+            <dt></dt>
+            <dd>
+                <div class="btn-group btn-group-lg" data-toggle="buttons">
+                    <label class="btn btn-default active">
+                        <input type="checkbox" name="type" value="image" checked>Image
+                    </label>
+                    <label class="btn btn-default">
+                        <input type="checkbox" name="type" value="name">Name
+                    </label>
+                    <label class="btn btn-default">
+                        <input type="checkbox" name="type" value="relationship" disabled>Relationship
+                    </label>
+                    <label class="btn btn-default">
+                        <input type="checkbox" name="type" value="birthplace" disabled>Birth place
+                    </label>
+                    <label class="btn btn-default">
+                        <input type="checkbox" name="type" value="birthdate" disabled>Birth date
+                    </label>
+                    <label class="btn btn-default disabled">
+                        <input type="checkbox" name="type" value="spouseimage" disabled>Spouse image
+                    </label>
+                    <label class="btn btn-default">
+                        <input type="checkbox" name="type" value="spouse" disabled>Spouse name
+                    </label>
+                </div>
+            </dd>
+        </dl>
+    </div>
 </div>
 
 <script>
@@ -77,17 +139,88 @@ POSSIBILITY OF SUCH DAMAGE.
     var configurations = {
         easy: {
             pairs: 4,
+            types: [
+                "image"
+            ]
         },
         medium: {
             pairs: 5,
+            types: [
+                "image",
+                "name"
+            ]
         },
         hard: {
             pairs: 7,
+            types: [
+                "image",
+                "name",
+                "relationship"
+            ]
         },
         insane: {
             pairs: 8,
+            types: [
+                "image",
+                "name",
+                "relationship",
+                "birthplace",
+                "birthdate"
+            ]
         }
     };
+    
+    var templates = {
+        image:{
+            prerequisites: [
+                "images.0"
+            ],
+            constants: {
+                image: "images.*"
+            },
+            card: "{\"id\":\"${id}\",\"html\":\"%3Cimg%20class%3D%27memory-img%20memory%27%20src%3D%27${image}%27%20%2F%3E\",\"value\":\"${image}\"}"
+        },
+        name: {
+            prerequisites: [
+                "name"
+            ],
+            card: "{\"id\":\"${id}\",\"html\":\"%3Cdiv%20class%3D%27memory-text%20memory%27%3E${name}%3C%2Fdiv%3E\",\"value\":\"${name}\"}"
+        },
+        relationship: {
+            prerequisites: [
+                "relationship"
+            ],
+            card: "{\"id\":\"${id}\",\"html\":\"%3Cdiv%20class%3D%27memory-text%20memory%27%3E${relationship}%3C%2Fdiv%3E\",\"value\":\"${relationship}\"}"
+        },
+        birthplace: {
+            prerequisites: [
+                "facts.*type=Birth.place"
+            ],
+            constants: {
+                birthplace: "facts.*type=Birth.place"
+            },
+            card: "{\"id\":\"${id}\",\"html\":\"%3Cdiv%20class%3D%27memory-text%20memory%27%3EBirth: ${birthplace}%3C%2Fdiv%3E\",\"value\":\"${birthplace}\"}"
+        },
+        birthdate: {
+            prerequisites: [
+                "facts.*type=Birth.date"
+            ],
+            constants: {
+                birthdate: "facts.*type=Birth.date"
+            },
+            card: "{\"id\":\"${id}\",\"html\":\"%3Cdiv%20class%3D%27memory-text%20memory%27%3EBirth: ${birthdate}%3C%2Fdiv%3E\",\"value\":\"${birthdate}\"}"
+        },
+        spouse: {
+            prerequisites: [
+                "spouses",
+                "spouses.0"
+            ],
+            constants: {
+                spouse: "spouses.*.name"
+            },
+            card: "{\"id\":\"${id}\",\"html\":\"%3Cdiv%20class%3D%27memory-text%20memory%27%3ESpouse: ${spouse}%3C%2Fdiv%3E\",\"value\":\"${spouse}\"}"
+        }
+    }
     
     $('input[name=difficulty]:radio').change(function () {
         $("#customControls").hide();
@@ -101,6 +234,7 @@ POSSIBILITY OF SUCH DAMAGE.
             settings.config = cloneObject(configurations.medium);
         }
         initRadio("[name=pairs]", settings.config.pairs);
+        initCheckboxes("[name=type]", settings.config.types);
         $("#customControls").show();
     });
     
@@ -108,8 +242,21 @@ POSSIBILITY OF SUCH DAMAGE.
         settings.config.pairs = $(this).val();
         reset();
     });
+    
+    $("[name=type]").change(function () {
+        settings.config.types = getCheckboxValues("[name=type]");
+        reset();
+    });
 
+    $("#game-tab").click(function() {
+        $("#game").show();
+        $("#settings").hide();
+    });
 
+    $("#settings-tab").click(function() {
+        $("#game").hide();
+        $("#settings").show();
+    });
 
     settings.local = {
         verbs: {
@@ -120,58 +267,65 @@ POSSIBILITY OF SUCH DAMAGE.
     }
     
     function setupBoard(people) {
+        if (!settings.config.types || settings.config.types.length === 0) {
+            console.warn("At least one type must be selected. Setting types to [\"image\"] by default");
+            settings.config.types = ["image"];
+        }
+        
+        if (settings.config.pairs < 2) {
+            settings.config.pairs = 2;
+        } else if (settings.config.pairs > 10) {
+            settings.config.pairs = 10;
+        }
+        
         console.info("Setting up board");
-        var cols=3;
-        
-        var allImgs = [];
-        $.each(people, function(index, person) {
-            if (person.images) {
-                Array.prototype.push.apply(allImgs, person.images);
+        var cards = [];
+        var valueMap = {};
+        var idMap = {};
+        var tries = 0;
+        while (cards.length < settings.config.pairs * 2 && tries < 100) {
+            var newCards = generateMatch(people, idMap, valueMap);
+            if (newCards && newCards.length === 2) {
+                Array.prototype.push.apply(cards, newCards);
             }
-        });
+            tries++;
+        }
         
-        allImgs = shuffle(dedupe(allImgs));
-
-        var imgs = allImgs.slice(0, settings.config.pairs);
         sendToDisplay(JSON.stringify(
-                    {
-                        responseType:"cache",
-                        cache:imgs
-                    }
-                ));
+                {
+                    responseType: "cache",
+                    cache: cards
+                }));
         
-        var doubleImgs = [];
-        Array.prototype.push.apply(doubleImgs, imgs);
-        Array.prototype.push.apply(doubleImgs, imgs);
-        doubleImgs = shuffle(doubleImgs);
+        console.info("Generated " + cards.length + " cards out of " + settings.config.pairs);
+        shuffle(cards);
         
-        var i = 0;
+        var tries = 0;
         var index = 0;
         $("#board").html("");
-        while (index < doubleImgs.length) {
-            $("#board").append("<div id='row-"+i+"'></div>");
-            for (var j = 0; j < cols; j++) {
-                if (doubleImgs[index]) {
-                    $("#row-"+i).append("<button id='btn-"+i+"-"+j+"' class='btn btn-lg btn-default game-btn' data-guess='{\"img\":\""+doubleImgs[index]+"\",\"type\":\"img\"}' style='width:100px;height:100px'></button>");
-                }
-                index++;
+        while (index < cards.length) {
+            if (cards[index]) {
+                $("#board").append("<button id='game-btn-"+index+"' class='btn btn-lg btn-default game-btn' data-guess='"+ JSON.stringify(cards[index])+"' style='width:120px;height:120px'><span id='game-btn-contents-"+index+"'>"+decodeURIComponent(cards[index].html)+"</span></button>");
+                adjustHeights("game-btn-contents-"+index)
             }
-            i++;
+            index++;
         }
 
         var firstBtn = null;
         $(".game-btn").click(function() {
-            var guess = $(this).attr("data-guess");
+            var guess = JSON.parse($(this).attr("data-guess"));
             sendToDisplay(JSON.stringify(
                     {
                         responseType:"guess",
-                        guess:JSON.parse(guess)
+                        guess:guess
                     }
                 ));
             if (firstBtn) {
-                var firstGuess = firstBtn.attr("data-guess");
-                if (firstGuess === guess) {
-                    $(this).prop("disabled", "disabled");
+                var firstGuess = JSON.parse(firstBtn.attr("data-guess"));
+                $(this).addClass("flipped");
+                if (firstGuess.id === guess.id) {
+                    firstBtn.addClass("flipped-permanant");
+                    $(this).prop("disabled", "disabled").addClass("flipped-permanant");
                     
                     var disabledCount = $(".game-btn:disabled").length;
                     var allCount = $(".game-btn").length;
@@ -181,16 +335,109 @@ POSSIBILITY OF SUCH DAMAGE.
                     }
                 } else {
                     firstBtn.removeProp("disabled");
+                    setUnflipTimeout(firstBtn);
+                    setUnflipTimeout($(this));
                 }
                 firstBtn = null;
             } else {
-                firstBtn = $(this).prop("disabled", "disabled");
+                $(".game-btn").removeClass("flipped");
+                firstBtn = $(this).prop("disabled", "disabled").addClass("flipped");
             }
         });
     }
     
+    var timeouts = {};
+    function setUnflipTimeout(obj, timeMs) {
+        if (timeMs == null) {
+            timeMs = 3000;
+        }
+        
+        var key = obj.attr("id");
+        if (timeouts[key]) {
+            clearTimeout(timeouts[key]);
+        }
+        timeouts[key] = setTimeout(function() {
+            obj.removeClass("flipped");
+        }, timeMs);
+    }
+    
     function reset() {
         ws.socketSend("get-ancestors " + token + " " + settings.userId);
+    }
+    
+    function generateMatch(people, idMap, valueMap) {
+        for (var i = 0; i < 100; i++) {
+            var person = getRandomElement(filterArray(people, "living=false"));
+            var type1 = getRandomElement(settings.config.types);
+            var type2 = getRandomElement(settings.config.types);
+            
+            var template1 = templates[type1];
+            var template2 = templates[type2];
+            
+            try {
+                if (!idMap[person.id] &&
+                        satisfiesPrerequisites(person, template1.prerequisites) && 
+                        resolveConstants(template1, person)) {
+                    var card1 = JSON.parse(replaceVariables(person, template1.card));
+
+                    if (valueMap[card1.value]) {
+                        continue;
+                    }
+                    
+                    if (settings.config.types.length > 1) {
+                        valueMap[card1.value] = 1;
+                    }
+
+                    if (satisfiesPrerequisites(person, template2.prerequisites) &&
+                            resolveConstants(template2, person)) {
+                        var card2 = JSON.parse(replaceVariables(person, template2.card));
+
+                        if (valueMap[card2.value]) {
+                            continue;
+                        }
+
+                        idMap[person.id] = 1;
+                        valueMap[card1.value] = 1;
+                        valueMap[card2.value] = 1;
+
+                        return [card1, card2];
+                    }
+                }
+            } catch (e) {
+                console.warn("Failed to generate card pair: " + JSON.stringify(e));
+            }
+        }
+        
+        console.warn("Failed to generate match");
+        return null;
+    }
+    
+    function resolveConstants(template, person) {
+        var allResolved = true;
+        resolvedConstants = [];
+        if (template.constants) {
+            Object.keys(template.constants).forEach(function(key) {
+                resolvedConstants[key] = resolveChildProperty(person, replaceVariables(person, template.constants[key]));
+                allResolved = allResolved && (resolvedConstants[key]?true:false);
+            });
+        }
+        return allResolved;
+    }
+    
+    function satisfiesPrerequisites(person, prerequisites) {
+        if (!person || person.living) {
+            return false;
+        }
+        
+        var hasPrerequisites = true;
+        $.each(prerequisites, function(index, prerequisite) {
+            if (!resolveChildProperty(person, prerequisite)) {
+                console.info("Could not resolve prerequisite " + prerequisite + " in person " + JSON.stringify(person));
+                hasPrerequisites = false;
+            }
+        });
+        
+        return hasPrerequisites;
     }
     
     function cloneObject(obj) {
@@ -199,20 +446,34 @@ POSSIBILITY OF SUCH DAMAGE.
         return clone;
     }
     
-    function initCheckbox(selector, value) {
-        var checkbox = $(selector);
-        if (value) {
-            checkbox.prop('checked',"");
-            checkbox.parent().addClass("active");
-        } else {
-            checkbox.removeProp('checked');
-            checkbox.parent().removeClass("active");
+    function initCheckboxes(selector, values) {
+        $(selector).removeProp('checked').parent().removeClass("active");
+        if (values) {
+            $.each(values, function(index, value) {
+                $(selector + "[value="+value+"]").prop('checked','').parent().addClass("active");
+            });
         }
     }
     
     function initRadio(selector, value) {
         $(selector).removeProp('checked').parent().removeClass("active");
         $(selector + "[value="+value+"]").prop('checked','').parent().addClass("active");
+    }
+    
+    function getCheckboxValues(selector) {
+        var values = [];
+        $(selector + ":checked").each(function() {
+            values.push($(this).val());
+        });
+        return values;
+    }
+
+    function adjustHeights(elem) {
+      var fontstep = 1;
+      if ($(elem).height()>$(elem).parent().height() || $(elem).width()>$(elem).parent().width()) {
+        $(elem).css('font-size',(($(elem).css('font-size').substr(0,2)-fontstep)) + 'px').css('line-height',(($(elem).css('font-size').substr(0,2))) + 'px');
+        adjustHeights(elem);
+      }
     }
     
     $("#reset-btn").click(reset);

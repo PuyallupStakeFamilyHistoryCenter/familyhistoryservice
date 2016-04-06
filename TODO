@@ -340,9 +340,9 @@ Story:
 Refine sentence-end logic
 
 Memory:
-Add image/name pairs option
-Add board size option
-Show images on controller buttons (when clicked)
+Add board size option                      DONE
+Add image/name pairs option                DONE
+Show images on controller buttons (when clicked) DONE
 Configure number of generations to search for images
-Match person with facts like birth place and date
-Add separate tab for settings
+Match person with facts like birth place and date DONE
+Add separate tab for settings              DONE

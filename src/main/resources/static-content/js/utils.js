@@ -298,6 +298,7 @@ function replaceVariables(obj, original) {
 var resolvedConstants = {};
     
 function resolveChildProperty(obj, path) {
+    console.info("Resolving " + path + " on " + JSON.stringify(obj));
     var split = path.split(".");
     var currentObject;
     var currentTry = 0;
