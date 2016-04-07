@@ -82,7 +82,7 @@ public class FamilySearchPersonSource implements Source<Person> {
             PersonSpousesState spousesState = state.readSpouses();
             List<org.gedcomx.conclusion.Person> spousePersons = spousesState.getPersons();
             if (spousePersons != null) {
-                builder.withSpouses(fsPersonsToPersonRefs(spousePersons.subList(1, spousePersons.size()), spousesState.getRelationships()));
+                builder.withSpouses(fsPersonsToPersonRefs(spousePersons, spousesState.getRelationships()));
             }
 
             {

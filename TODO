@@ -3,6 +3,7 @@ TODO:
 Maybe wrap FamilySearch JS library for use in Java
 
 Switch anonymous classes for lambdas
+Use Lombok for builders and boilerplate
 
 Server:
 Set up SSL for web socket and image cache  DONE
