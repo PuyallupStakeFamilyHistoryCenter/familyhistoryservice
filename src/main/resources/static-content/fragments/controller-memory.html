@@ -114,19 +114,19 @@ POSSIBILITY OF SUCH DAMAGE.
                         <input type="checkbox" name="type" value="name">Name
                     </label>
                     <label class="btn btn-default">
-                        <input type="checkbox" name="type" value="relationship" disabled>Relationship
+                        <input type="checkbox" name="type" value="relationship">Relationship
                     </label>
                     <label class="btn btn-default">
-                        <input type="checkbox" name="type" value="birthplace" disabled>Birth place
+                        <input type="checkbox" name="type" value="birthplace">Birth place
                     </label>
                     <label class="btn btn-default">
-                        <input type="checkbox" name="type" value="birthdate" disabled>Birth date
+                        <input type="checkbox" name="type" value="birthdate">Birth date
                     </label>
                     <label class="btn btn-default disabled">
                         <input type="checkbox" name="type" value="spouseimage" disabled>Spouse image
                     </label>
                     <label class="btn btn-default">
-                        <input type="checkbox" name="type" value="spouse" disabled>Spouse name
+                        <input type="checkbox" name="type" value="spouse">Spouse name
                     </label>
                 </div>
             </dd>
@@ -342,6 +342,7 @@ POSSIBILITY OF SUCH DAMAGE.
             } else {
                 $(".game-btn").removeClass("flipped");
                 firstBtn = $(this).prop("disabled", "disabled").addClass("flipped");
+                clearUnflipTimeout(firstBtn);
             }
         });
     }
@@ -352,13 +353,18 @@ POSSIBILITY OF SUCH DAMAGE.
             timeMs = 3000;
         }
         
+        clearUnflipTimeout(obj);
+        var key = obj.attr("id");
+        timeouts[key] = setTimeout(function() {
+            obj.removeClass("flipped");
+        }, timeMs);
+    }
+    
+    function clearUnflipTimeout(obj) {
         var key = obj.attr("id");
         if (timeouts[key]) {
             clearTimeout(timeouts[key]);
         }
-        timeouts[key] = setTimeout(function() {
-            obj.removeClass("flipped");
-        }, timeMs);
     }
     
     function reset() {
@@ -450,6 +456,7 @@ POSSIBILITY OF SUCH DAMAGE.
         $(selector).removeProp('checked').parent().removeClass("active");
         if (values) {
             $.each(values, function(index, value) {
+                console.info("Checking checkbox " + value);
                 $(selector + "[value="+value+"]").prop('checked','').parent().addClass("active");
             });
         }

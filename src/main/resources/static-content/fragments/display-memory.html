@@ -26,46 +26,6 @@ POSSIBILITY OF SUCH DAMAGE.
 -->
 
 <style>
-/*    .memory {
-        max-width: 100%;
-        max-height: 100%;
-    }
-    
-    .memory-text {
-        white-space: normal;
-        word-break: normal;
-        word-wrap: normal;
-        font-size: 200%;
-        text-align: center;
-        padding-top: 45%;
-        padding-bottom: 45%;
-    }
-    
-    div .memory {
-        margin-left: 3%;
-        margin-right: 3%;
-        width: 94%;
-        height: 100%;
-        border: black solid 1px;
-        border-radius: 5px;
-    }*/
-/*    .box{
-	position: relative;
-	width: 50%;		 desired width 
-    }
-    .box:before{
-	content: "";
-	display: block;
-	margin-top: 100%; 	 initial ratio of 1:1
-    }
-    .content {
-        position: absolute;
-        top: 0;
-        left: 0;
-        bottom: 0;
-        right: 0;
-    } */
-
     .box{
             position:  relative;
             width: 45%;
@@ -137,15 +97,14 @@ POSSIBILITY OF SUCH DAMAGE.
 </div>
 
 <div id="game" style="display:none">
+    <div id="game-message">
+        <h2>Choose a card on the controller</h2>
+    </div>
+    
     <div class="box" id="first-guess-div">
     </div>
 
     <div class="box" id="second-guess-div">
-
-    </div>
-
-    <div id="game-message">
-        <h2>Choose a card on the controller</h2>
     </div>
 </div>
 
@@ -180,11 +139,11 @@ POSSIBILITY OF SUCH DAMAGE.
                 clearTimeout(memoryTimeout);
                 memoryTimeout = null;
             }
-            $("#second-guess-div").html("");
             guessDiv = $("#first-guess-div");
+            $("#second-guess-div").html("");
         }
         
-        $("#game-message").html("");
+        $("#game-message").html("<h2>&nbsp;</h2>");
         guessDiv.html("<div class='content'>"+decodeURIComponent(guess.html)+"</div>");
         
         if (secondGuess) {
