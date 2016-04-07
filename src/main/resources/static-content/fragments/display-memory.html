@@ -120,8 +120,11 @@ POSSIBILITY OF SUCH DAMAGE.
             cache: function(obj) {
                 cache(obj.cache);
             },
-            won: function(obj) {
+            won: function() {
                 showWin();
+            },
+            reset: function() {
+                showLoading();
             }
         }
     }
@@ -170,6 +173,11 @@ POSSIBILITY OF SUCH DAMAGE.
         $("#game-message").html("<h2>You won!</h2>");
         clearTimeout(memoryTimeout);
         console.info("Memory game won");
+    }
+    
+    function showLoading() {
+        $("#loading-div").show();
+        $("#game").hide();
     }
     
     function cache(toCache) {

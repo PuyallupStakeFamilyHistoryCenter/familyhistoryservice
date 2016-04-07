@@ -2,6 +2,8 @@ TODO:
 
 Maybe wrap FamilySearch JS library for use in Java
 
+Switch anonymous classes for lambdas
+
 Server:
 Set up SSL for web socket and image cache  DONE
 Delete access token on log out             DONE

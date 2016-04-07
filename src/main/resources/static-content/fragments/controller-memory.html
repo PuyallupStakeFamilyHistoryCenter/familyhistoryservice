@@ -283,7 +283,7 @@ POSSIBILITY OF SUCH DAMAGE.
         var valueMap = {};
         var idMap = {};
         var tries = 0;
-        while (cards.length < settings.config.pairs * 2 && tries < 100) {
+        while (cards.length < settings.config.pairs * 2 && tries < 10) {
             var newCards = generateMatch(people, idMap, valueMap);
             if (newCards && newCards.length === 2) {
                 Array.prototype.push.apply(cards, newCards);
@@ -368,6 +368,9 @@ POSSIBILITY OF SUCH DAMAGE.
     }
     
     function reset() {
+        sendToDisplay(JSON.stringify({
+                    responseType: "reset"
+                }));
         ws.socketSend("get-ancestors " + token + " " + settings.userId);
     }
     
@@ -384,7 +387,7 @@ POSSIBILITY OF SUCH DAMAGE.
                 if (!idMap[person.id] &&
                         satisfiesPrerequisites(person, template1.prerequisites) && 
                         resolveConstants(template1, person)) {
-                    var card1 = JSON.parse(replaceVariables(person, template1.card));
+                    var card1 = JSON.parse(replaceVariables(person, template1.card, true));
 
                     if (valueMap[card1.value]) {
                         continue;
@@ -396,7 +399,7 @@ POSSIBILITY OF SUCH DAMAGE.
 
                     if (satisfiesPrerequisites(person, template2.prerequisites) &&
                             resolveConstants(template2, person)) {
-                        var card2 = JSON.parse(replaceVariables(person, template2.card));
+                        var card2 = JSON.parse(replaceVariables(person, template2.card, true));
 
                         if (valueMap[card2.value]) {
                             continue;

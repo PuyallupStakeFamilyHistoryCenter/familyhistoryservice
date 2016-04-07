@@ -272,7 +272,7 @@ function validatePin(pin) {
     return "01234567890".indexOf(pin) === -1 && "09876543210".indexOf(pin) === -1 && pin.search(/([0-9])\1\1\1/) === -1;
 }
     
-function replaceVariables(obj, original) {
+function replaceVariables(obj, original, encode) {
     if (original == null) {
         return;
     }
@@ -287,7 +287,12 @@ function replaceVariables(obj, original) {
     do {
         $.each(matches, function(index, found) {
             var variable = found.substr(2, found.length - 3);
-            final = final.replace(found, resolveChildProperty(obj, variable)); 
+            var value = resolveChildProperty(obj, variable);
+            if (encode) {
+                value = encodeURIComponent(value).replace(/'/,"%27");
+            }
+            
+            final = final.replace(found, value); 
         });
         matches = final.match(regex)
     } while (matches);
