@@ -35,13 +35,30 @@ import com.amazonaws.services.simpleemail.model.Body;
 import com.amazonaws.services.simpleemail.model.Content;
 import com.amazonaws.services.simpleemail.model.Destination;
 import com.amazonaws.services.simpleemail.model.Message;
+import com.amazonaws.services.simpleemail.model.RawMessage;
 import com.amazonaws.services.simpleemail.model.SendEmailRequest;
+import com.amazonaws.services.simpleemail.model.SendRawEmailRequest;
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+import java.nio.ByteBuffer;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.Properties;
+import java.util.Set;
 import java.util.UUID;
+import javax.activation.DataHandler;
+import javax.activation.DataSource;
+import javax.activation.FileDataSource;
+import javax.mail.Address;
+import javax.mail.Session;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
+import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
 import org.apache.log4j.Logger;
 import org.puyallupfamilyhistorycenter.service.ApplicationProperties;
 import org.puyallupfamilyhistorycenter.service.models.PersonTemple;
@@ -51,21 +68,37 @@ import org.puyallupfamilyhistorycenter.service.models.PersonTemple;
  * @author tibbitts
  */
 public class EmailUtils {
+    private static final Logger logger = Logger.getLogger(EmailUtils.class);
     private static final AmazonSimpleEmailService ses;
+    private static final Set<String> emailWhitelist;
     static {
         ClientConfiguration config = new ClientConfiguration();
         //config.set
         ses = new AmazonSimpleEmailServiceClient(new BasicAWSCredentials(ApplicationProperties.getEmailAWSAccessKey(), ApplicationProperties.getEmailAWSSecretKey()), config);
         ses.setRegion(Region.getRegion(Regions.US_WEST_2));
+        
+        emailWhitelist = ApplicationProperties.getEmailWhitelist();
     }
-    
-    private static final Logger logger = Logger.getLogger(EmailUtils.class);
     
     public static void sendReferralEmail(String contactName, String contactEmail, String patronName, String patronEmail, String patronPhone, String patronWard, List<String> interests, String numAdults, String numChildren) {
         String emailBody = buildReferralEmailBody(contactName, patronName, patronName, patronEmail, patronPhone, patronWard, LocalDate.now(), interests, numAdults, numChildren);
         String subject = "Family history consultant referral for " + patronName;
         
         sendEmail(contactName, contactEmail, new String[] { "normanse@gmail.com" }, subject, emailBody);
+    }
+    
+    public static void sendFinalEmail(String userName, String userEmail) {
+        if (!emailWhitelist.contains(userEmail)) {
+            logger.info("Skipping sending email because '" + userEmail + "' is not whitelisted");
+            return;
+        }
+        
+        String emailBody = buildFinalEmailBody(userName, null);
+        String subject = ApplicationProperties.getEmailSubject();
+        
+        sendEmailWithAttachments(userName, userEmail, new String[] {}, subject, emailBody, Collections.EMPTY_LIST);
+
+        logger.info("Sent final email to " + userEmail);
     }
 
     protected static void sendEmail(String recipientName, String recipientEmail, String[] ccList, String subjectString, String bodyString) {
@@ -81,6 +114,64 @@ public class EmailUtils {
         request.setSource("admin@puyallupfamilyhistorycenter.org");
         request.setDestination(new Destination(Arrays.asList("\"" + recipientName + "\" <" + recipientEmail + ">")).withCcAddresses(Arrays.asList(ccList)));
         ses.sendEmail(request);
+    }
+    
+    protected static void sendEmailWithAttachments(String recipientName, String recipientEmail, String[] ccList, String subjectString, String bodyString, List<String> attachments) {
+        try {
+            Session session = Session.getDefaultInstance(new Properties());
+            MimeMessage message = new MimeMessage(session);
+            message.setSubject(subjectString, "UTF-8");
+
+            message.setFrom(new InternetAddress("admin@puyallupfamilyhistorycenter.org"));
+            message.setReplyTo(new Address[]{new InternetAddress("admin@puyallupfamilyhistorycenter.org")});
+            message.setRecipients(javax.mail.Message.RecipientType.TO, InternetAddress.parse(recipientEmail));
+            //TODO: Handle CC?
+
+            // Cover wrap
+            MimeBodyPart wrap = new MimeBodyPart();
+
+            // Alternative TEXT/HTML content
+            MimeMultipart cover = new MimeMultipart("alternative");
+            MimeBodyPart html = new MimeBodyPart();
+            cover.addBodyPart(html);
+
+            wrap.setContent(cover);
+
+            MimeMultipart content = new MimeMultipart("related");
+            message.setContent(content);
+            content.addBodyPart(wrap);
+
+            // This is just for testing HTML embedding of different type of attachments.
+            StringBuilder sb = new StringBuilder();
+
+            for (String attachmentFileName : attachments) {
+                String id = UUID.randomUUID().toString();
+                sb.append("<img src=\"cid:");
+                sb.append(id);
+                sb.append("\" alt=\"ATTACHMENT\"/>\n");
+
+                MimeBodyPart attachment = new MimeBodyPart();
+
+                DataSource fds = new FileDataSource(attachmentFileName);
+                attachment.setDataHandler(new DataHandler(fds));
+                attachment.setHeader("Content-ID", "<" + id + ">");
+                attachment.setFileName(fds.getName());
+
+                content.addBodyPart(attachment);
+            }
+
+            html.setContent("<html><body><img style=\"width:100%\" src=\"http://www.puyallupfamilyhistorycenter.org/uploads/4/8/2/9/4829765/1433113473.png?\" alt=\"The Puyllup Family History Center\" />" + bodyString + "</body></html>", "text/html");
+
+            // Send the email.
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            message.writeTo(outputStream);
+            RawMessage rawMessage = new RawMessage(ByteBuffer.wrap(outputStream.toByteArray()));
+
+            SendRawEmailRequest rawEmailRequest = new SendRawEmailRequest(rawMessage);
+            ses.sendRawEmail(rawEmailRequest);
+        } catch (Exception ex) {
+            throw new IllegalStateException("Failed to send email to " + recipientEmail, ex);
+        }
     }
     
     protected static final DateTimeFormatter dateFormat = DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG);

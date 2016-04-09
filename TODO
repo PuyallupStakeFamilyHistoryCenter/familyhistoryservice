@@ -6,131 +6,41 @@ Switch anonymous classes for lambdas
 Use Lombok for builders and boilerplate
 
 Server:
-Set up SSL for web socket and image cache  DONE
-Delete access token on log out             DONE
 *Speed up hosting
-    zip/minify resources (static-resources) DONE
-    zip/minify resources (image-cache)      DONE
-    allow client-side caching (static-resources images) DONE
-    allow client-side caching (image-cache) DONE
     add server threads
-*Send summary email on logout
 ?Add method for authenticating with devices
 
 
-Socket:
-Move display name check to function        DONE
-Apps should auto-reconnect to websockets   DONE
-
-
 Caching:
-Get facts into person                      DONE
-Set up pre-caching                         DONE
-Limit precaching to a configurable depth   DONE
-File cacher should fall back to cached file even if expired DONE
-Add progress bar for caching               DONE
-Progress bar should never regress          DONE
-Throttle precaching messages               DONE
-Ensure security of living person data      DONE
-    Filter living children out of person   DONE
-    Show only placeholder for living people DONE
-Retire websocket instance if precache event fails to send DONE
-Progress bar should reset when switch user DONE
-Progress bar should change color when past 4 generations DONE
-Implement listDescendants DONE
 *Mine for ordinances
 *Speed up caching
-    Add thread(s)                          DONE
     Use getAncestory function to get several generations at once
     Rethink get person logic to reduce wasted downloads
 *Create clean-up script to clear cache occasionally
+*Restart caching when root person changes
 Stop sending precache status after caching complete
 Allow force-refresh of people
 Allow timeouts on requests
 Location cache
 Offline: "Failed to get person KWC6-X7D; attempting to recover" doesn't recover
-Limit total number of caching threads      DONE
-Use fairer sub-thread-pool assignment strategy
 
 Puzzle:
-Wire puzzle settings into display          DONE
-Dynamically resize puzzle                  DONE
-Make puzzle canvas opaque or remove header DONE
-Remove "you win" dialog                    DONE
-Look up parseBoolean equivalent in JS (for puzzle settings) DONE
-Remove configurations from display side, send every setting from controller to reduce redundancy DONE
-Remove extra space from 'send' command     DONE
-Fix styling of controls                    DONE
-Fix puzzle initial config                  DONE
-Rotate pieces without restarting           DONE
-Presort pieces without restarting          DONE
-Thumbnail should fit in remaining space    DONE
-Snap radius setting shouldn't be disabled by snap-on-drag DONE
-Don't reset game on size change if the size doesn't actually change DONE
-Figure out why puzzle scrolls in split mode DONE
-Set up image chooser                       DONE
-Keep puzzle pieces from starting off the screen DONE
-Test on iPad in split mode                 DONE
-Fix piece rotation in split mode           DONE
-Fix z-order in split mode                  DONE
-Add person info on controller-puzzle       DONE
-Fix image loading                          DONE
-Landscape puzzles are much harder          DONE
-Back button in puzzle goes back to main screen instead of games screen DONE
 Make piece shapes more interesting
-Allow display to signal to controller when puzzle is finished
-
-Image cacher:
-Filter out stories
 
 Image chooser:
-Add get people with images call            DONE
-Make app controls a tab                    DONE
-Style tabs correctly                       DONE
-Image choice persists from puzzle to color DONE
-Split mode on iPad: images don't load      DONE
-Load controls first, then person-details (to prevent "unrecognized command" issues) DONE
-Paginate to prevent scrolling issues on iPad DONE
-Group images by person                     DONE
-Add 'loading' animation                    DONE
-Provide default images                     DONE
-Back button should go back to image choice screen DONE
+Remove duplicate images                  DONE
 Spacing between tabs and controls
-Remove duplicate images
 
 Person chooser:
-Move person-chooser from controller-person-detail
-Load the tree instead of just the family   DONE
-Make app controls a tab                    DONE
-Arrange like family tree                   DONE
-Use person chooser for the person-details page DONE
-Allow choosing person/family/ancestors/descendants DONE
-Load controls first, then person-details (to prevent "unrecognized command" issues) DONE
-'Person' granularity doesn't work (in quiz) DONE
-Allow navigating in tree                   DONE
-Add 'loading' animation                    DONE
-Remove 'descendants' filter                DONE
-Back button should go to the family tree   DONE
-Rethink design                             DONE
-Back button should go to previous view in tree DONE
+Allow switching to spouse                DONE
 Don't show 'focus' button if a person has no parents on record
 Spacing between tabs and controls
-Allow choosing depth for ancestors/descendants
 Show loading spinner while waiting for server
 Add path from ancestor to root
-Allow switching to spouse
+?Allow choosing depth for ancestors/descendants
 ?Horizontal scrolling on ipad
 
 Color:
-Add coloring game to menu                  DONE
-Use image chooser                          DONE
-Move image to opposite side from menu      DONE
-Fix brush                                  DONE
-Limit coloring to inside image             DONE
-Allow brush resizing                       DONE
-Move palate and brushes to controller      DONE
-Fix image loading                          DONE
-*Set up print function
 *Set up email function
 Rearrange colors more logically
 Add more color options
@@ -138,27 +48,9 @@ Change mouse pointer
 Transparent images show logo in background
 ?Add different brush types
 ?Undo feature
+?Set up print function
 
 Life map:
-Test map movement (changed to 'send' commands; removed native 'move' commands) DONE
-Show life events on map for single person  DONE
-Show life events for family                DONE
-Add timestamp to facts and sort            DONE
-Add person chooser                         DONE
-Add person info                            DONE
-Fix mouse zoom (pinch) in split mode       DONE
-Add blurb to map markers                   DONE
-Add outline of states                      DONE
-Directed/narrated tour                     DONE
-Tags attached to wrong markers             DONE
-Map doesn't display locations in split mode DONE
-Fix buttons in split mode                  DONE
-Make map popups larger                     DONE
-Zoom for context                           DONE
-Zoom and pan between locations             DONE
-Show buttons for per life event, not forward and backward buttons DONE
-Show controls immediately after clicking on person DONE
-Show events on controller (map) and click on them DONE
 Map should begin on world map
 *Show only three life events (birth, marriage, and death)
 Lerah Ellis (LZJ8-4KJ) doesn't show death and burial events in tour
@@ -172,36 +64,12 @@ Narrated tour doesn't work on iPad
 ?Set max zoom in map
 
 Person detail:
-Fix birth and death dates                  DONE
-Add parents                                DONE
-Add marriage date/place to spouse          DONE
-Display more/all facts                     DONE
-Add space between marriage event and date  DONE
-Filter marriage details                    DONE
 Set max-height on image
 *Ensure all of data fits on the screen
 
 Statistics:
-Implement basic family statistics          DONE
 
 Quiz:
-Implement basic quiz                       DONE
-Allow answers to be pulled from random people DONE
-Basic duplicate answer detection           DONE
-Allow star operator to filter on gender, etc DONE
-Allow filter based on main person's attributes DONE
-Show stats on display                      DONE
-Allow assigning variables names for reuse  DONE
-Shuffle answers                            DONE
-Allow more complex filters (e.g. >, >=)    DONE
-React on display to correct and incorrect answers DONE
-Require at least 2 answers                 DONE
-BUG: How are null and null related? Mother and daughter DONE
-Allow selection of people                  DONE
-More advanced duplicate answer detection   DONE
-Add loading animation                      DONE
-Read questions and answers separately      DONE
-Give relationship to current person        DONE
 *Add more questions
 *Image questions no longer appear (image URL contains '.', which is reserved)
 Difficulty levels
@@ -223,15 +91,8 @@ Allow conditionals (e.g. "gender=Female?her:his")
 Conditionalize relationship questions
 
 Sliding tiles:
-Basic implementation                       DONE
-Tiles can become stuck in desktop mode     DONE
-Landscape puzzles are much harder          DONE
-Fix image loading                          DONE
-Check for win and display last piece       DONE
 
 Media:
-Add video selection screen                 DONE
-Add video controls to controller           DONE
 Add support for videos from lds.org
 Allow displaying discussion points after videos
 
@@ -240,23 +101,6 @@ Put sample content into carousel           DONE
 *Make carousel content configurable
 
 Controller:
-Consistent frame between screens without redundancy DONE
-Collapse menu when log out pressed         DONE
-Add back button to standard header         DONE
-Set logged-in name when logged in          DONE
-Add back button to standard header         DONE
-Make header opaque so scrolling doesn't look weird DONE
-Add picture to the individual page         DONE
-Header jumps down after login              DONE
-Clear logged-in name when logged out       DONE
-Turn off log-out button when logged out    DONE
-Time out (auto-dismiss) error messages     DONE
-Fix log-out button in split mode           DONE
-Allow switching the root person            DONE
-Hide menu button on log in screen          DONE
-Simplify menu                              DONE
-Disable navigation when logged out         DONE
-Return/done should submit login form       DONE
 *Menu clicks should renew controller lease
 *Incorrect PIN should focus PIN input
 Add 'report a problem' button for bug reports
@@ -268,36 +112,17 @@ Display:
 Fade out mouse pointer
 
 Kiosk:
-Show FS permissions dialog                 DONE
-Show permissions dialog while loading user DONE
-Kiosk should reload page to clear all fields DONE
-Remove permissions dialog (it's now native) DONE
-PIN shouldn't be easy (e.g. 1234)          DONE
 *Remove hard-coded guest user
 
 Presenter:
-Allow resetting controller and display     DONE
-Show precaching stats per person           DONE
 *Authenticate presenter!
 Add controller to display list
 Allow sending bug reports
 
 Library:
-Separate query params for page and fragment DONE
 Rewire sockete.js to accept a response callback
 
 Project:
-Set up screen with both display and controller in iframes for independent use   DONE
-Reload display causes "display * is already connected" DONE
-Unit tests should use JSON responses       DONE
-Finish wiring dependencies via Spring      DONE
-Move developer id into config file (not in Git) DONE
-Delay loading of controller in split mode  DONE
-Split mode controller shouldn't cover display DONE
-Support approximate dates and date ranges  DONE
-Set up CA and certificates (http://blog.httpwatch.com/2013/12/12/five-tips-for-using-self-signed-ssl-certificates-with-ios/) DONE
-Figure out deployment strategy             DONE
-Turn features on/off for split/normal mode DONE
 *Add third-party website links
 *Figure out deployment strategy
 *Turn features on/off for split/normal mode
@@ -316,22 +141,16 @@ Fix ivy classpath
 Allow tagging people for future follow-up
 
 Email:
-Test email with real server                DONE
-Get email address at login                 DONE
+Send email at log-off                   DONE
+Make email text configurable            DONE
 Comb tree for waiting ancestors
-Send email at log-off                      DONE
-Fix prospect URL
-Make email text configurable
 ?Allow saving and sending attachments
 ?Save and send quiz scores (and perhaps suggest areas of study)
 
 Video app:
-Set up AWS account                         DONE
-Set up IAM user                            DONE
 Configure IAM credentials (not checked in)
 Allow requesting signed PUT urls
 Allow requesting signed GET urls
-Send email after log out
 
 Survey:
 Add phone number
@@ -346,8 +165,17 @@ Memory:
 Add board size option                      DONE
 Add image/name pairs option                DONE
 Show images on controller buttons (when clicked) DONE
-Configure number of generations to search for images
 Match person with facts like birth place and date DONE
 Add separate tab for settings              DONE
-Spouse name option isn't working
+Spouse name option isn't working           DONE
+Configure number of generations to search for images
 Custom setting doesn't select type options
+
+Hangman:
+Add options tab
+Select words from 
+
+New feature ideas:
+Word search (maybe printable version in email?)
+Todo feature (for data quality issues?)
+Create image collage

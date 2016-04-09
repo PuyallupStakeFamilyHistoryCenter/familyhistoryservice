@@ -964,8 +964,8 @@ public class FamilyHistoryCenterSocket {
 
     private static void sendFinalEmail(String userId) {
         UserContext context = userContextMap.get(userId);
-        if (context != null && context.precacher != null) {
-            //EmailUtils.sendEmail();
+        if (context != null && ApplicationProperties.enableEmail()) {
+            EmailUtils.sendFinalEmail(context.userName, context.userEmail);
         }
     }
     

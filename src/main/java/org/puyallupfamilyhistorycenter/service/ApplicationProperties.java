@@ -25,12 +25,14 @@
  */
 package org.puyallupfamilyhistorycenter.service;
 
+import com.google.common.collect.ImmutableSet;
 import com.google.gson.Gson;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+import java.util.Set;
 
 /**
  *
@@ -38,8 +40,10 @@ import java.util.Properties;
  */
 public class ApplicationProperties {
     private static final String ENABLE_EMAIL = "enableEmail";
+    private static final String EMAIL_WHITELIST = "emailWhitelist";
     private static final String EMAIL_SALUTATION = "emailSalutation";
     private static final String EMAIL_BODY = "emailBody";
+    private static final String EMAIL_SUBJECT = "emailSubject";
     private static final String EMAIL_PROSPECTS_EXPL = "emailProspectsExpl";
     private static final String EMAIL_SIGNATURE = "emailSignature";
     private static final String GUEST_USER_ID = "guestUserId";
@@ -66,12 +70,23 @@ public class ApplicationProperties {
         return Boolean.parseBoolean(props.getProperty(ENABLE_EMAIL));
     }
     
+    public static Set<String> getEmailWhitelist() {
+        return ImmutableSet
+                .<String>builder()
+                .add(props.getProperty(EMAIL_WHITELIST).split(";"))
+                .build();
+    }
+    
     public static String getEmailSalutation() {
         return props.getProperty(EMAIL_SALUTATION);
     }
     
     public static String getEmailBody() {
         return props.getProperty(EMAIL_BODY);
+    }
+    
+    public static String getEmailSubject() {
+        return props.getProperty(EMAIL_SUBJECT);
     }
     
     public static String getEmailProspectsExplanation() {
