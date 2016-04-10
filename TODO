@@ -89,6 +89,7 @@ Allow reporting problems with question/answers
 Figure out why some answers are 'undefined'
 Allow conditionals (e.g. "gender=Female?her:his")
 Conditionalize relationship questions
+Add competitive mode (with multiple controllers?)
 
 Sliding tiles:
 
