@@ -289,7 +289,7 @@ function replaceVariables(obj, original, encode) {
             var variable = found.substr(2, found.length - 3);
             var value = resolveChildProperty(obj, variable);
             if (encode) {
-                value = encodeURIComponent(value).replace(/'/,"%27");
+                value = encodeURIComponent(value).replace(/'/,"%27").replace(/\./,"%2E");
             }
             
             final = final.replace(found, value); 

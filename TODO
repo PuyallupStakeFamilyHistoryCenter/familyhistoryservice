@@ -102,9 +102,9 @@ Put sample content into carousel           DONE
 *Make carousel content configurable
 
 Controller:
+Add 'report a problem' button for bug reports    DONE
 *Menu clicks should renew controller lease
 *Incorrect PIN should focus PIN input
-Add 'report a problem' button for bug reports
 ?Use custom number pad for PIN
 ?Set up accordian for groups of controls
 
@@ -154,10 +154,11 @@ Allow requesting signed PUT urls
 Allow requesting signed GET urls
 
 Survey:
-Add phone number
+Add phone number       DONE
 Add scanner            DONE
 Add recording room     DONE
-Add counts of adults and children who attended
+Add counts of adults and children who attended DONE
+Verify user is logged in before sending survey
 
 Story:
 Refine sentence-end logic
@@ -174,7 +175,8 @@ Custom setting doesn't select type options
 
 Hangman:
 Add options tab
-Select words from 
+Select words from other facts
+Add hints option
 
 New feature ideas:
 Word search (maybe printable version in email?)

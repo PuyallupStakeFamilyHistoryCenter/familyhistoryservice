@@ -25,25 +25,65 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 -->
 
-<div id='loaded-div' style='display:none;' >
-    <h3>Answers</h3>
-    <div id="score"></div>
-    <div id="answers" class="btn-group-vertical">
+<ul class="nav nav-tabs" id="tabs" role="tablist">
+    <li class="active" id="game-tab" ><a href="#game-tab" role="tab" data-toggle="tab">Game</a></li>
+    <li id="settings-tab" ><a href="#settings-tab" role="tab" data-toggle="tab">Settings</a></li>
+</ul>
+
+<div id="game">
+    <div id='loaded-div' style='display:none;' >
+        <h3>Answers</h3>
+        <div id="score"></div>
+        <div id="answers" class="btn-group-vertical">
+        </div>
+
+        <div id="hint" >
+        </div>
+
+        <button id="new-question" style="display: none;" class="btn btn-lg btn-primary">New question</button>
+        <button id="read-question" style="display: none;" class="btn btn-sm btn-default"><span class="glyphicon glyphicon-volume-up"></span> Read question again</button> 
     </div>
 
-    <div id="hint" >
-    </div>
 
-    <button id="new-question" style="display: none;" class="btn btn-lg btn-primary">New question</button>
-    <button id="read-question" style="display: none;" class="btn btn-sm btn-default"><span class="glyphicon glyphicon-volume-up"></span> Read question again</button> 
+    <div id='loading-div' >
+        <div class="progress">
+            <div class="progress-bar progress-bar-default progress-bar-striped active cached-prg" style="width: 100%">
+                Loading...
+            </div>
+        </div>
+    </div>
 </div>
 
-
-<div id='loading-div' >
-    <div class="progress">
-        <div class="progress-bar progress-bar-default progress-bar-striped active cached-prg" style="width: 100%">
-            Loading...
-        </div>
+<div id="settings" style="display:none">
+    <div id="customControls">
+        <dl class="dl-horizontal">
+            <dt>Types</dt>
+            <dd>
+                <div id="types-div" class="btn-group btn-group-lg" data-toggle="buttons">
+                    <label class="btn btn-default active">
+                        <input type="checkbox" name="type" value="image" checked>Image
+                    </label>
+                    <label class="btn btn-default">
+                        <input type="checkbox" name="type" value="name">Name
+                    </label>
+                    <label class="btn btn-default">
+                        <input type="checkbox" name="type" value="relationship">Relationship
+                    </label>
+                    <label class="btn btn-default">
+                        <input type="checkbox" name="type" value="birthplace">Birth place
+                    </label>
+                    <label class="btn btn-default">
+                        <input type="checkbox" name="type" value="birthdate">Birth date
+                    </label>
+                    <label class="btn btn-default disabled">
+                        <input type="checkbox" name="type" value="spouseimage" disabled>Spouse image
+                    </label>
+                    <label class="btn btn-default">
+                        <input type="checkbox" name="type" value="spouse">Spouse name
+                    </label>
+                </div>
+            </dd>
+            </dl>
     </div>
 </div>
 
@@ -81,293 +121,352 @@ POSSIBILITY OF SUCH DAMAGE.
 	}
     });
     
-    var personQuestionTemplates = [
-//        {
-//            prerequisites: [
-//                'name',
-//                'facts.*type=Birth.date',
-//                'facts.*type=Death.date'
-//            ],
-//            question: "When was your ${relationship} ${name} born?",
-//            answers: [
-//                { 
-//                    text: '${facts.*type=Birth.date}', 
-//                    hint: "Correct! ${name} was born on ${facts.*type=Birth.date} in ${facts.*type=Birth.place} to ${parents.0.name} and ${parents.1.name}" 
-//                },
-//                { 
-//                    text: '${facts.*type=Death.date}', 
-//                    hint: "No, but ${name} died on ${facts.*type=Death.date} in ${facts.*type=Death.place}" 
-//                },
-//                { 
-//                    text: '${*.facts.*.date}'
-//                },
-//                { 
-//                    text: '${*.facts.*.date}'
-//                },
-//            ],
-//        },
-//        {
-//            prerequisites: [
-//                'name',
-//                'facts.*type=Birth.place'
-//            ],
-//            question: "Where was your ${relationship} ${name} born?",
-//            answers: [
-//                { 
-//                    text: '${facts.*type=Birth.place}', 
-//                    hint: "Correct! ${name} was born on ${facts.*type=Birth.date} in ${facts.*type=Birth.place} to ${parents.0.name} and ${parents.1.name}" 
-//                },
-//                { 
-//                    text: '${*.facts.*.place}'
-//                },
-//                { 
-//                    text: '${*.facts.*.place}'
-//                },
-//                { 
-//                    text: '${*.facts.*.place}'
-//                },
-//            ],
-//        },
-//        {
-//            prerequisites: [
-//                'name',
-//                'parents.0.name',
-//                'parents.1.name',
-//                'children.*gender=Male.name',
-//                'children.*gender=Female.name',
-//            ],
-//            question: "Who were ${name}'s parents?",
-//            answers: [
-//                { 
-//                    text: '${parents.*gender=Male.name} and ${parents.*gender=Female.name}', 
-//                    hint: "Correct! ${name} was born on ${facts.*type=Birth.date} in ${facts.*type=Birth.place} to ${parents.*gender=Male.name} and ${parents.*gender=Female.name}" 
-//                },
-//                { 
-//                    text: '${children.*gender=Male.name} and ${children.*gender=Female.name}', 
-//                    hint: "No, those are his/her children!" 
-//                },
-//                { 
-//                    text: '${*gender=Male,living=false.name} and ${children.*gender=Female.name}', 
-//                },
-//                { 
-//                    text: '${parents.*gender=Male.name} and ${*gender=Female,living=false.name}'
-//                },
-//            ],
-//        },
-//        {
-//            prerequisites: [
-//            ],
-//            constants: {
-//                spouse: 'spouses.*',
-//                spouseName: 'spouse.name',
-//                marriage: 'spouse.facts.*type=Marriage',
-//                marriageDate: 'marriage.date',
-//                birth: 'facts.*type=Birth',
-//                death: 'facts.*type=Death',
-//                birthDate: 'birth.date',
-//                deathDate: 'death.date'
-//            },
-//            question: "When were ${name} and ${spouseName} married?",
-//            answers: [
-//                { 
-//                    text: '${marriageDate}', 
-//                    hint: "Correct! ${name} and ${spouseName} married on ${marriageDate} in ${marriage.place}" 
-//                },
-//                { 
-//                    text: '${birthDate}', 
-//                    hint: "No, but ${name} was born on ${birthDate} in ${birth.place}" 
-//                },
-//                { 
-//                    text: '${deathDate}', 
-//                    hint: "No, but ${name} died on ${deathDate} in ${death.place}" 
-//                },
-//                { 
-//                    text: '${*.spouses.*.facts.*type=Marriage.date}'
-//                },
-//            ],
-//        },
-//        {
-//            prerequisites: [
-//                'name',
-//                'spouses.0.name',
-//                'spouses.0.facts.*type=Marriage.place'
-//            ], //TODO: use a constant for spouse so any spouse may be selected not just the first
-//            constants: {
-//                birth: 'facts.*type=Birth',
-//                death: 'facts.*type=Death',
-//                birthPlace: 'birth.place',
-//                deathPlace: 'death.place'
-//            },
-//            question: "Where were ${name} and ${spouses.0.name} married?",
-//            answers: [
-//                { 
-//                    text: '${spouses.0.facts.*type=Marriage.place}', 
-//                    hint: "Correct! ${name} and ${spouses.0.name} married on ${spouses.0.facts.*type=Marriage.date} in ${spouses.0.facts.*type=Marriage.place}" 
-//                },
-//                { 
-//                    text: '${birthPlace}', 
-//                    hint: "No, but ${name} was born on ${birth.date} in ${birthPlace}" 
-//                },
-//                { 
-//                    text: '${deathPlace}', 
-//                    hint: "No, but ${name} died on ${death.date} in ${deathPlace}" 
-//                },
-//                { 
-//                    text: '${*.spouses.*.facts.*type=Marriage.place}'
-//                },
-//            ],
-//        },
-//        {
-//            prerequisites: [
-//                'name',
-//                'images.0'
-//            ],
-//            constants: {
-//                image: "images.*",
-//                otherPerson1: '*gender=${gender},images !contains ${image}',
-//                otherPerson2: '*gender=${gender},images !contains ${image},id!=${otherPerson1.id}',
-//                otherPerson3: '*images !contains ${image},id!=${otherPerson1.id},id!=${otherPerson2.id}'
-//            },
-//            question: "Who is this?<br><img src='${image}' style='max-width:600px; max-height:600px' />",
-//            answers: [
-//                { 
-//                    text: '${name}', 
-//                    hint: "Correct!" 
-//                },
-//                { 
-//                    text: '${otherPerson1.name}'
-//                },
-//                { 
-//                    text: '${otherPerson2.name}'
-//                },
-//                { 
-//                    text: '${otherPerson3.name}'
-//                },
-//            ],
-//        },
-//        {
-//            prerequisites: [
-//                'name',
-//                'children'
-//            ],
-//            question: "How many children did ${name} have?",
-//            answers: [
-//                { 
-//                    text: '${children.length}', 
-//                    hint: "Correct!" 
-//                },
-//                { 
-//                    text: '${*.children.length}'
-//                },
-//                { 
-//                    text: '${*.children.length}'
-//                },
-//            ],
-//        },
-//        {
-//            prerequisites: [
-//                'name',
-//                'parents.0.name',
-//            ],
-//            constants: {
-//                parent: "parents.*"
-//            },
-//            question: "How are ${parent.name} and ${name} related?",
-//            answers: [
-//                { 
-//                    text: 'Parent and child',
-//                    hint: "Correct!"
-//                },
-//                { 
-//                    text: 'Siblings',
-//                },
-//                { 
-//                    text: 'Grandparent and grandchild',
-//                },
-//                { 
-//                    text: 'Spouses',
-//                },
-//            ],
-//        },
-//        {
-//            prerequisites: [
-//                'children.0.name',
-//                'parents.0.name',
-//            ],
-//            constants: {
-//                child: "children.*",
-//                parent: "parents.*"
-//            },
-//            question: "How are ${parent.name} and ${child.name} related?",
-//            answers: [
-//                { 
-//                    text: 'Grandparent and grandchild',
-//                    hint: "Correct!"
-//                },
-//                { 
-//                    text: 'Parent and child',
-//                },
-//                { 
-//                    text: 'Siblings',
-//                },
-//                { 
-//                    text: 'Spouses',
-//                },
-//            ],
-//        },
-//        {
-//            prerequisites: [
-//                'children.0.name',
-//                'children.1.name',
-//            ],
-//            constants: {
-//                child1: "children.*",
-//                child2: "children.*id!=${child1.id}"
-//            },
-//            question: "How are ${child1.name} and ${child2.name} related?",
-//            answers: [
-//                { 
-//                    text: 'Siblings',
-//                    hint: "Correct!"
-//                },
-//                { 
-//                    text: 'Parent and child',
-//                },
-//                { 
-//                    text: 'Grandparent and grandchild',
-//                },
-//                { 
-//                    text: 'Spouses',
-//                },
-//            ],
-//        },
-//        {
-//            prerequisites: [
-//                'parents.0.name',
-//                'parents.1.name',
-//            ],
-//            constants: {
-//                parent1: "parents.*",
-//                parent2: "parents.*id!=${parent1.id}"
-//            },
-//            question: "How are ${parent1.name} and ${parent2.name} related?",
-//            answers: [
-//                { 
-//                    text: 'Spouses',
-//                    hint: "Correct!"
-//                },
-//                { 
-//                    text: 'Parent and child',
-//                },
-//                { 
-//                    text: 'Grandparent and grandchild',
-//                },
-//                { 
-//                    text: 'Siblings',
-//                },
-//            ],
-//        },
-        {
+    var personQuestionTemplates = {
+        birth1: {
+            prerequisites: [
+                'name',
+                'facts.*type=Birth.date',
+                'facts.*type=Death.date'
+            ],
+            constants: {
+                mother: "parents.*gender=Female.name",
+                father: "parents.*gender=Male.name"
+            },
+            question: "When was your ${relationship} ${name} born?",
+            answers: [
+                { 
+                    text: '${facts.*type=Birth.date}', 
+                    hint: "Correct! ${name} was born on ${facts.*type=Birth.date} in ${facts.*type=Birth.place} to ${father} and ${mother}" 
+                },
+                { 
+                    text: '${facts.*type=Death.date}', 
+                    hint: "No, but ${name} died on ${facts.*type=Death.date} in ${facts.*type=Death.place}" 
+                },
+                { 
+                    text: '${*.facts.*.date}'
+                },
+                { 
+                    text: '${*.facts.*.date}'
+                },
+            ],
+        },
+        birth2: {
+            prerequisites: [
+                'name',
+                'facts.*type=Birth.place'
+            ],
+            constants: {
+                mother: "parents.*gender=Female.name",
+                father: "parents.*gender=Male.name"
+            },
+            question: "Where was your ${relationship} ${name} born?",
+            answers: [
+                { 
+                    text: '${facts.*type=Birth.place}', 
+                    hint: "Correct! ${name} was born on ${facts.*type=Birth.date} in ${facts.*type=Birth.place} to ${father} and ${mother}" 
+                },
+                { 
+                    text: '${*.facts.*.place}'
+                },
+                { 
+                    text: '${*.facts.*.place}'
+                },
+                { 
+                    text: '${*.facts.*.place}'
+                },
+            ],
+        },
+        parents1: {
+            prerequisites: [
+                'name',
+                'children.*gender=Male,name!=${name},living=false.name',
+                'children.*gender=Female,name!=${name},living=false.name',
+            ],
+            constants: {
+                mother: "parents.*gender=Female.name",
+                father: "parents.*gender=Male.name"
+            },
+            question: "Who were ${name}'s parents?",
+            answers: [
+                { 
+                    text: '${father} and<br> ${mother}', 
+                    hint: "Correct! ${name} was born on ${facts.*type=Birth.date} in ${facts.*type=Birth.place} to ${father} and ${mother}" 
+                },
+                { 
+                    text: '${children.*gender=Male,name!=${name},living=false.name} and<br> ${children.*gender=Female,name!=${name},living=false.name}', 
+                    hint: "No, those are his/her children!" 
+                },
+                { 
+                    text: '${*gender=Male,living=false,name!=${name}.name} and<br> ${children.*gender=Female,name!=${name}.name}', 
+                },
+                { 
+                    text: '${father} and<br> ${*gender=Female,living=false,name!=${name}.name}'
+                },
+            ],
+        },
+        marriage1: {
+            prerequisites: [
+            ],
+            constants: {
+                spouse: 'spouses.*',
+                marriage: 'spouse.facts.*type=Marriage',
+                birth: 'facts.*type=Birth',
+                death: 'facts.*type=Death'
+            },
+            question: "When were ${name} and ${spouse.name} married?",
+            answers: [
+                { 
+                    text: '${marriageDate}', 
+                    hint: "Correct! ${name} and ${spouse.name} married on ${marriage.date} in ${marriage.place}" 
+                },
+                { 
+                    text: '${birth.date}', 
+                    hint: "No, but ${name} was born on ${birth.date} in ${birth.place}" 
+                },
+                { 
+                    text: '${deathDate}', 
+                    hint: "No, but ${name} died on ${death.date} in ${death.place}" 
+                },
+                { 
+                    text: '${*.spouses.*.facts.*type=Marriage.date}'
+                },
+            ],
+        },
+        marriage2: {
+            prerequisites: [
+                'name',
+                'spouses.0.name',
+                'spouses.0.facts.*type=Marriage.place'
+            ], //TODO: use a constant for spouse so any spouse may be selected not just the first
+            constants: {
+                spouse: 'spouses.*',
+                marriage: 'spouse.facts.*type=Marriage',
+                birth: 'facts.*type=Birth',
+                death: 'facts.*type=Death'
+            },
+            question: "Where were ${name} and ${spouse} married?",
+            answers: [
+                { 
+                    text: '${spouses.0.facts.*type=Marriage.place}', 
+                    hint: "Correct! ${name} and ${spouse} married on ${marriage.date} in ${marriage.place}" 
+                },
+                { 
+                    text: '${birth.place}', 
+                    hint: "No, but ${name} was born on ${birth.date} in ${birth.place}" 
+                },
+                { 
+                    text: '${death.place}', 
+                    hint: "No, but ${name} died on ${death.date} in ${death.place}" 
+                },
+                { 
+                    text: '${*.spouses.*.facts.*type=Marriage.place}'
+                },
+            ],
+        },
+        image:{
+            prerequisites: [
+                'images.0',
+                'name'
+            ],
+            constants: {
+                image: "images.*",
+                otherPerson1: '*gender=${gender},images !contains ${image}',
+                otherPerson2: '*gender=${gender},images !contains ${image},id!=${otherPerson1.id}',
+                otherPerson3: '*images !contains ${image},id!=${otherPerson1.id},id!=${otherPerson2.id}'
+            },
+            question: "Who is this?<br><img src='${image}' style='max-width:600px; max-height:600px' />",
+            answers: [
+                { 
+                    text: '${name}', 
+                    hint: "Correct!" 
+                },
+                { 
+                    text: '${otherPerson1.name}'
+                },
+                { 
+                    text: '${otherPerson2.name}'
+                },
+                { 
+                    text: '${otherPerson3.name}'
+                },
+            ],
+        },
+        children1: {
+            prerequisites: [
+                'name',
+                'children'
+            ],
+            question: "How many children did ${name} have?",
+            answers: [
+                { 
+                    text: '${children.length}', 
+                    hint: "Correct!" 
+                },
+                { 
+                    text: '${*.children.length}'
+                },
+                { 
+                    text: '${*.children.length}'
+                },
+                { 
+                    text: '${*.children.length}'
+                },
+            ],
+        },
+        how_are_they_related_1:{
+            prerequisites: [
+                'name',
+                'parents.0.name',
+            ],
+            constants: {
+                parent: "parents.*"
+            },
+            question: "How are ${parent.name} and ${name} related?",
+            answers: [
+                { 
+                    text: 'Parent and child',
+                    hint: "Correct!"
+                },
+                { 
+                    text: 'Siblings',
+                },
+                { 
+                    text: 'Grandparent and grandchild',
+                },
+                { 
+                    text: 'Spouses',
+                },
+            ],
+        },
+        how_are_they_related_6:{
+            prerequisites: [
+                'name',
+                'children.0.name',
+            ],
+            constants: {
+                child: "children.*living=false"
+            },
+            question: "How are ${name} and ${child.name} related?",
+            answers: [
+                { 
+                    text: 'Parent and child',
+                    hint: "Correct!"
+                },
+                { 
+                    text: 'Siblings',
+                },
+                { 
+                    text: 'Grandparent and grandchild',
+                },
+                { 
+                    text: 'Spouses',
+                },
+            ],
+        },
+        how_are_they_related_2:{
+            prerequisites: [
+                'children.0.name',
+                'parents.0.name',
+            ],
+            constants: {
+                child: "children.*living=false",
+                parent: "parents.*"
+            },
+            question: "How are ${parent.name} and ${child.name} related?",
+            answers: [
+                { 
+                    text: 'Grandparent and grandchild',
+                    hint: "Correct!"
+                },
+                { 
+                    text: 'Parent and child',
+                },
+                { 
+                    text: 'Siblings',
+                },
+                { 
+                    text: 'Spouses',
+                },
+            ],
+        },
+        how_are_they_related_3:{
+            prerequisites: [
+                'children.0.name',
+                'children.1.name',
+            ],
+            constants: {
+                child1: "children.*living=false",
+                child2: "children.*id!=${child1.id} living=false"
+            },
+            question: "How are ${child1.name} and ${child2.name} related?",
+            answers: [
+                { 
+                    text: 'Siblings',
+                    hint: "Correct!"
+                },
+                { 
+                    text: 'Parent and child',
+                },
+                { 
+                    text: 'Grandparent and grandchild',
+                },
+                { 
+                    text: 'Spouses',
+                },
+            ],
+        },
+        how_are_they_related_4:{
+            prerequisites: [
+                'parents.0.name',
+                'parents.1.name',
+            ],
+            constants: {
+                parent1: "parents.*",
+                parent2: "parents.*id!=${parent1.id}"
+            },
+            question: "How are ${parent1.name} and ${parent2.name} related?",
+            answers: [
+                { 
+                    text: 'Spouses',
+                    hint: "Correct!"
+                },
+                { 
+                    text: 'Parent and child',
+                },
+                { 
+                    text: 'Grandparent and grandchild',
+                },
+                { 
+                    text: 'Siblings',
+                },
+            ],
+        },
+        how_are_they_related_5:{
+            prerequisites: [
+                'name',
+                'spouses.0.name',
+            ],
+            constants: {
+                spouse: "spouses.*"
+            },
+            question: "How are ${name} and ${spouse.name} related?",
+            answers: [
+                { 
+                    text: 'Spouses',
+                    hint: "Correct!"
+                },
+                { 
+                    text: 'Parent and child',
+                },
+                { 
+                    text: 'Grandparent and grandchild',
+                },
+                { 
+                    text: 'Siblings',
+                },
+            ],
+        },
+        relationship1:{
             prerequisites: [
                 'relationship'
             ],
@@ -394,7 +493,7 @@ POSSIBILITY OF SUCH DAMAGE.
                 }
             ]
         },
-        {
+        relationship2:{
             prerequisites: [
                 'relationship',
             ],
@@ -423,7 +522,7 @@ POSSIBILITY OF SUCH DAMAGE.
                 },
             ],
         },
-        {
+        statistic:{
             prerequisites: [
                 'relationship',
             ],
@@ -452,7 +551,106 @@ POSSIBILITY OF SUCH DAMAGE.
         
         //Question ideas
         // How many siblings did your (father|mother|grandfather|grandmother) have?
-    ];
+    };
+    
+    var questionTemplateSets = {
+        statistic: {
+            description: "Statistics",
+            values: ["statistic"]
+        },
+        relationship: {
+            description: "Relationship to you",
+            values: ["relationship1","relationship2"]
+        },
+        how_are_they_related: {
+            description: "Relationship to each other",
+            values: [
+                "how_are_they_related_1",
+                "how_are_they_related_2",
+                "how_are_they_related_3",
+                "how_are_they_related_4",
+                "how_are_they_related_5",
+                "how_are_they_related_6",
+            ]
+        },
+        birth: {
+            description: "Birth",
+            values: [
+                "birth1",
+                "birth2"
+            ]
+        },
+        marriage: {
+            description: "Marriage",
+            values: [
+                "marriage1",
+                "marriage2"
+            ]
+        },
+        parents: {
+            description: "Parents",
+            values: [
+                "parents1"
+            ]
+        },
+        children: {
+            description: "Children",
+            values: [
+                "children1"
+            ]
+        },
+        image: {
+            description: "Image",
+            values: [
+                "image"
+            ]
+        }
+    }
+    
+    var selectedQuestionSets = [
+        "relationship",
+        "statistic",
+        "how_are_they_related"
+    ]
+    
+    $("#settings").ready(function() {
+        $("#types-div").html("");
+        $.each(questionTemplateSets, function(key, value) {
+            var selected = selectedQuestionSets.includes(key);
+            
+            $("#types-div").append(
+                    "<label class='btn btn-default "+(selected?"active":"")+"'>" +
+                    "    <input type='checkbox' name='type' value='"+key+"' "+(selected?"checked":"")+">"+value.description+
+                    "</label>");
+        });
+        
+        $("input[name=type]").change(function() {
+            selectedQuestionSets = [];
+            $("input[name=type]").each(function() {
+                if ($(this).prop("checked")) {
+                    selectedQuestionSets.push($(this).val());
+                }
+            });
+            if (selectedQuestionSets.length === 0) {
+                selectedQuestionSets = [
+                    "relationship",
+                    "statistic",
+                    "how_are_they_related"
+                ];
+            }
+            console.info("Selected question sets: " + JSON.stringify(selectedQuestionSets));
+        });
+    });
+
+    $("#game-tab").click(function() {
+        $("#game").show();
+        $("#settings").hide();
+    });
+
+    $("#settings-tab").click(function() {
+        $("#game").hide();
+        $("#settings").show();
+    });
     
     var questionLastUse = {};
     function askQuestion() {
@@ -470,11 +668,14 @@ POSSIBILITY OF SUCH DAMAGE.
         
         var questionKey = "";
         for (var i = 0; !questionAndAnswers && i < 5; i++) {
-            var template = getRandomElement(personQuestionTemplates);
+            var templateSetName = getRandomElement(selectedQuestionSets);
+            var templateSet = questionTemplateSets[templateSetName];
+            var templateName = getRandomElement(templateSet.values)
+            var template = personQuestionTemplates[templateName];
+            
+            console.info("Selected question set '"+templateSetName+"', template '"+templateName+"'");
 
             var questionAndAnswers;
-            var maxTries = 100;
-            var currentTry = 0;
             for (var j = 0; !questionAndAnswers && j < 100; j++) {
                 var person = getRandomElement(filterArray(people, "living=false"));
 
@@ -513,7 +714,7 @@ POSSIBILITY OF SUCH DAMAGE.
         resolvedConstants = [];
         if (template.constants) {
             Object.keys(template.constants).forEach(function(key) {
-                resolvedConstants[key] = resolveChildProperty(person, replaceVariables(person, template.constants[key]));
+                resolvedConstants[key] = resolveChildProperty(person, replaceVariables(person, template.constants[key], true));
                 allResolved = allResolved && (resolvedConstants[key]?true:false);
             });
         }
