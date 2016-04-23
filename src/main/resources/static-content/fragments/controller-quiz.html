@@ -366,19 +366,20 @@ POSSIBILITY OF SUCH DAMAGE.
             ],
             constants: {
                 personGender: "gender",
-                child: "children.*gender=personGender,name!=Living"
+                child: "children.*gender=personGender,name!=Living",
+                childGender: "child.gender"
             },
             question: "How are ${name} and ${child.name} related?",
             answers: [
                 { 
-                    text: '${gender=Male?Father:Mother} and ${gender=Male?son:daughter}',
+                    text: '${personGender=Male?Father:Mother} and ${childGender=Male?son:daughter}',
                     hint: "Correct!"
                 },
                 { 
-                    text: '${gender=Male?Brothers:Sisters}',
+                    text: '${personGender=Male?Brothers:Sisters}',
                 },
                 { 
-                    text: 'Grand${gender=Male?father:mother} and grand${gender=Male?son:daughter}',
+                    text: 'Grand${personGender=Male?father:mother} and grand${childGender=Male?son:daughter}',
                 }
             ],
         },
@@ -388,22 +389,23 @@ POSSIBILITY OF SUCH DAMAGE.
             ],
             constants: {
                 personGender: "gender",
-                child: "children.*gender!=personGender,name!=Living"
+                child: "children.*gender!=personGender,name!=Living",
+                childGender: "child.gender"
             },
             question: "How are ${name} and ${child.name} related?",
             answers: [
                 { 
-                    text: '${gender=Female?Father:Mother} and ${gender=Male?son:daughter}',
+                    text: '${personGender=Male?Father:Mother} and ${childGender=Male?son:daughter}',
                     hint: "Correct!"
                 },
                 { 
-                    text: '${gender=Female?Brother:Sister} and ${gender=Male?brother:sister}',
+                    text: '${personGender=Male?Brother:Sister} and ${childGender=Male?brother:sister}',
                 },
                 { 
-                    text: 'Grand${gender=Female?father:mother} and grand${gender=Male?son:daughter}',
+                    text: 'Grand${personGender=Male?father:mother} and grand${childGender=Male?son:daughter}',
                 },
                 { 
-                    text: '${gender=Female?Husband:Wife} and ${gender=Male?husband:wife}',
+                    text: '${personGender=Male?Husband:Wife} and ${childGender=Male?husband:wife}',
                 }
             ],
         },
