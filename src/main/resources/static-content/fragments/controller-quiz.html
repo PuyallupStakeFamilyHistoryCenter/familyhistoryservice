@@ -603,8 +603,11 @@ POSSIBILITY OF SUCH DAMAGE.
             ],
             constants: {
                 person1: '*relationship!=${relationship},gender=${gender}',
+                person1Gender: "person1.gender",
                 person2: '*relationship!=${relationship},gender=${gender}',
-                person3: '*relationship!=${relationship},gender!=${gender}'
+                person2Gender: "person2.gender",
+                person3: '*relationship!=${relationship},gender!=${gender}',
+                person3Gender: "person3.gender"
             },
             question: "Which of the following is your ${relationship}",
             answers: [
@@ -614,15 +617,15 @@ POSSIBILITY OF SUCH DAMAGE.
                 },
                 { 
                     text: '${person1.name}',
-                    hint: "No ${person1.gender=Male:he:she} is your ${person1.relationship}!"
+                    hint: "No, ${person1Gender=Male?he:she} is your ${person1.relationship}!"
                 },
                 { 
                     text: '${person2.name}',
-                    hint: "No ${person2.gender=Male:he:she} is your ${person2.relationship}!"
+                    hint: "No, ${person2Gender=Male?he:she} is your ${person2.relationship}!"
                 },
                 { 
                     text: '${person3.name}',
-                    hint: "'Wrong gender! ${person3.gender=Male:he:she} is your ${person3.relationship}"
+                    hint: "'Wrong gender! ${person3Gender=Male?He:She} is your ${person3.relationship}"
                 },
             ],
         },
