@@ -100,8 +100,8 @@ POSSIBILITY OF SUCH DAMAGE.
                 askQuestion();
             },
             people: function(obj) {
-                people = obj.people;
-                if (filterArray(people, "living=false").length > 0) {
+                people = filterArray(obj.people, "name!=Living");
+                if (people.length > 0) {
                     currentStreak = 0;
                     askQuestion();
                 } else if (nextDepth <= 10) {
@@ -179,8 +179,8 @@ POSSIBILITY OF SUCH DAMAGE.
         parents1: {
             prerequisites: [
                 'name',
-                'children.*gender=Male,name!=${name},living=false.name',
-                'children.*gender=Female,name!=${name},living=false.name',
+                'children.*gender=Male,name!=Living.name',
+                'children.*gender=Female,name!=living.name',
             ],
             constants: {
                 mother: "parents.*gender=Female.name",
@@ -189,18 +189,18 @@ POSSIBILITY OF SUCH DAMAGE.
             question: "Who were ${name}'s parents?",
             answers: [
                 { 
-                    text: '${father} and<br> ${mother}', 
+                    text: '${father} and<br>${mother}', 
                     hint: "Correct! ${name} was born on ${facts.*type=Birth.date} in ${facts.*type=Birth.place} to ${father} and ${mother}" 
                 },
                 { 
-                    text: '${children.*gender=Male,name!=${name},living=false.name} and<br> ${children.*gender=Female,name!=${name},living=false.name}', 
-                    hint: "No, those are his/her children!" 
+                    text: '${children.*gender=Male,name!=Living.name} and<br>${children.*gender=Female,name!=Living.name}', 
+                    hint: "No, those are ${gender=Male?his:her} children!" 
                 },
                 { 
-                    text: '${*gender=Male,living=false,name!=${name}.name} and<br> ${children.*gender=Female,name!=${name}.name}', 
+                    text: '${*gender=Male.name} and<br>${children.*gender=Female,name!=Living.name}', 
                 },
                 { 
-                    text: '${father} and<br> ${*gender=Female,living=false,name!=${name}.name}'
+                    text: '${father} and<br>${*gender=Female.name}'
                 },
             ],
         },
@@ -208,7 +208,7 @@ POSSIBILITY OF SUCH DAMAGE.
             prerequisites: [
             ],
             constants: {
-                spouse: 'spouses.*',
+                spouse: 'spouses.*name!=Living',
                 marriage: 'spouse.facts.*type=Marriage',
                 birth: 'facts.*type=Birth',
                 death: 'facts.*type=Death'
@@ -221,11 +221,11 @@ POSSIBILITY OF SUCH DAMAGE.
                 },
                 { 
                     text: '${birth.date}', 
-                    hint: "No, but ${name} was born on ${birth.date} in ${birth.place}" 
+                    hint: "No, but ${gender=Male?he:she} was born on ${birth.date} in ${birth.place}" 
                 },
                 { 
                     text: '${deathDate}', 
-                    hint: "No, but ${name} died on ${death.date} in ${death.place}" 
+                    hint: "No, but ${gender=Male?he:she} died on ${death.date} in ${death.place}" 
                 },
                 { 
                     text: '${*.spouses.*.facts.*type=Marriage.date}'
@@ -235,28 +235,27 @@ POSSIBILITY OF SUCH DAMAGE.
         marriage2: {
             prerequisites: [
                 'name',
-                'spouses.0.name',
-                'spouses.0.facts.*type=Marriage.place'
+                'spouses.0.name'
             ], //TODO: use a constant for spouse so any spouse may be selected not just the first
             constants: {
                 spouse: 'spouses.*',
-                marriage: 'spouse.facts.*type=Marriage',
-                birth: 'facts.*type=Birth',
-                death: 'facts.*type=Death'
+                marriage: 'spouse.facts.*type=Marriage,place!=null',
+                birth: 'facts.*type=Birth,place!=null',
+                death: 'facts.*type=Death,place!=null'
             },
-            question: "Where were ${name} and ${spouse} married?",
+            question: "Where were ${name} and ${spouse.name} married?",
             answers: [
                 { 
-                    text: '${spouses.0.facts.*type=Marriage.place}', 
-                    hint: "Correct! ${name} and ${spouse} married on ${marriage.date} in ${marriage.place}" 
+                    text: '${marriage.place}', 
+                    hint: "Correct! ${name} and ${spouse.name} married on ${marriage.date} in ${marriage.place}" 
                 },
                 { 
                     text: '${birth.place}', 
-                    hint: "No, but ${name} was born on ${birth.date} in ${birth.place}" 
+                    hint: "No, but ${gender=Male?he:she} was born on ${birth.date} in ${birth.place}" 
                 },
                 { 
                     text: '${death.place}', 
-                    hint: "No, but ${name} died on ${death.date} in ${death.place}" 
+                    hint: "No, but ${gender=Male?he:she} died on ${death.date} in ${death.place}" 
                 },
                 { 
                     text: '${*.spouses.*.facts.*type=Marriage.place}'
@@ -313,156 +312,259 @@ POSSIBILITY OF SUCH DAMAGE.
                 },
             ],
         },
-        how_are_they_related_1:{
+        
+        how_are_they_related_parent_same_gender:{
             prerequisites: [
                 'name',
-                'parents.0.name',
             ],
             constants: {
-                parent: "parents.*"
+                personGender: "person.gender",
+                parent: "parents.*gender=personGender"
             },
             question: "How are ${parent.name} and ${name} related?",
             answers: [
                 { 
-                    text: 'Parent and child',
+                    text: '${gender=Male?Father:Mother} and ${gender=Male?son:daughter}',
                     hint: "Correct!"
                 },
                 { 
-                    text: 'Siblings',
+                    text: '${gender=Male?Brothers:Sisters}',
                 },
                 { 
-                    text: 'Grandparent and grandchild',
-                },
-                { 
-                    text: 'Spouses',
-                },
+                    text: 'Grand${gender=Male?father:mother} and grand${gender=Male?son:daughter}',
+                }
             ],
         },
-        how_are_they_related_6:{
+        how_are_they_related_parent_different_gender:{
             prerequisites: [
                 'name',
-                'children.0.name',
             ],
             constants: {
-                child: "children.*living=false"
+                personGender: "gender",
+                parent: "parents.*gender!=personGender"
+            },
+            question: "How are ${parent.name} and ${name} related?",
+            answers: [
+                { 
+                    text: '${gender=Female?Father:Mother} and ${gender=Male?son:daughter}',
+                    hint: "Correct!"
+                },
+                { 
+                    text: '${gender=Female?Brother:Sister} and ${gender=Male?brother:sister}',
+                },
+                { 
+                    text: 'Grand${gender=Female?father:mother} and grand${gender=Male?son:daughter}',
+                },
+                { 
+                    text: '${gender=Female?Husband:Wife} and ${gender=Male?husband:wife}',
+                }
+            ],
+        },
+        how_are_they_related_child_same_gender:{
+            prerequisites: [
+                'name',
+            ],
+            constants: {
+                personGender: "gender",
+                child: "children.*gender=personGender,name!=Living"
             },
             question: "How are ${name} and ${child.name} related?",
             answers: [
                 { 
-                    text: 'Parent and child',
+                    text: '${gender=Male?Father:Mother} and ${gender=Male?son:daughter}',
                     hint: "Correct!"
                 },
                 { 
-                    text: 'Siblings',
+                    text: '${gender=Male?Brothers:Sisters}',
                 },
                 { 
-                    text: 'Grandparent and grandchild',
-                },
-                { 
-                    text: 'Spouses',
-                },
+                    text: 'Grand${gender=Male?father:mother} and grand${gender=Male?son:daughter}',
+                }
             ],
         },
-        how_are_they_related_2:{
+        how_are_they_related_child_different_gender:{
+            prerequisites: [
+                'name',
+            ],
+            constants: {
+                personGender: "gender",
+                child: "children.*gender!=personGender,name!=Living"
+            },
+            question: "How are ${name} and ${child.name} related?",
+            answers: [
+                { 
+                    text: '${gender=Female?Father:Mother} and ${gender=Male?son:daughter}',
+                    hint: "Correct!"
+                },
+                { 
+                    text: '${gender=Female?Brother:Sister} and ${gender=Male?brother:sister}',
+                },
+                { 
+                    text: 'Grand${gender=Female?father:mother} and grand${gender=Male?son:daughter}',
+                },
+                { 
+                    text: '${gender=Female?Husband:Wife} and ${gender=Male?husband:wife}',
+                }
+            ],
+        },
+        how_are_they_related_grandparent_same_gender:{
             prerequisites: [
                 'children.0.name',
                 'parents.0.name',
             ],
             constants: {
-                child: "children.*living=false",
-                parent: "parents.*"
+                child: "children.*",
+                childGender: "child.gender",
+                parent: "parents.*gender=childGender",
+                parentGender: "parent.gender"
             },
             question: "How are ${parent.name} and ${child.name} related?",
             answers: [
                 { 
-                    text: 'Grandparent and grandchild',
+                    text: 'Grand${parentGender=Male?father:mother} and grand${childGender=Male?son:daughter}',
                     hint: "Correct!"
                 },
                 { 
-                    text: 'Parent and child',
+                    text: '${parentGender=Male?Father:Mother} and ${childGender=Male?son:daughter}',
                 },
                 { 
-                    text: 'Siblings',
-                },
-                { 
-                    text: 'Spouses',
+                    text: '${parentGender=Male?Brothers:Sisters}',
                 },
             ],
         },
-        how_are_they_related_3:{
+        how_are_they_related_grandparent_different_gender:{
+            prerequisites: [
+                'children.0.name',
+                'parents.0.name',
+            ],
+            constants: {
+                child: "children.*name!=Living",
+                childGender: "child.gender",
+                parent: "parents.*gender!=childGender,name!=Living",
+                parentGender: "parent.gender"
+            },
+            question: "How are ${parent.name} and ${child.name} related?",
+            answers: [
+                { 
+                    text: 'Grand${parentGender=Male?father:mother} and grand${childGender=Male?son:daughter}',
+                    hint: "Correct!"
+                },
+                { 
+                    text: '${parentGender=Male?Father:Mother} and ${childGender=Male?son:daughter}',
+                },
+                { 
+                    text: '${parentGender=Male?Brother:Sister} and ${childGender=Male?brother:sister}',
+                },
+                { 
+                    text: '${parentGender=Male?Husband:Wife} and ${childGender=Male?husband:wife}',
+                }
+            ],
+        },
+        how_are_they_related_siblings_same_gender:{
             prerequisites: [
                 'children.0.name',
                 'children.1.name',
             ],
             constants: {
-                child1: "children.*living=false",
-                child2: "children.*id!=${child1.id} living=false"
+                child1: "children.*name!=Living",
+                child1Gender: "child1.gender",
+                child2: "children.*id!=${child1.id},gender=child1Gender,name!=Living",
+                child2Gender: "child2.gender",
             },
             question: "How are ${child1.name} and ${child2.name} related?",
             answers: [
                 { 
-                    text: 'Siblings',
+                    text: '${child1Gender=Male?Brothers:Sisters}',
                     hint: "Correct!"
                 },
                 { 
-                    text: 'Parent and child',
+                    text: 'Grand${child1Gender=Male?father:mother} and grand${child2Gender=Male?son:daughter}',
                 },
                 { 
-                    text: 'Grandparent and grandchild',
-                },
-                { 
-                    text: 'Spouses',
+                    text: '${child1Gender=Male?Father:Mother} and ${child2Gender=Male?son:daughter}',
                 },
             ],
         },
-        how_are_they_related_4:{
+        how_are_they_related_siblings_different_gender:{
+            prerequisites: [
+                'children.0.name',
+                'children.1.name',
+            ],
+            constants: {
+                child1: "children.*name!=Living",
+                child1Gender: "child1.gender",
+                child2: "children.*id!=${child1.id},gender!=child1Gender,name!=Living",
+                child2Gender: "child2.gender",
+            },
+            question: "How are ${child1.name} and ${child2.name} related?",
+            answers: [
+                { 
+                    text: '${child1Gender=Male?Brother:Sister} and ${child2Gender=Male?brother:sister}',
+                    hint: "Correct!"
+                },
+                { 
+                    text: 'Grand${child1Gender=Male?father:mother} and grand${child2Gender=Male?son:daughter}',
+                },
+                { 
+                    text: '${child1Gender=Male?Father:Mother} and ${child2Gender=Male?son:daughter}',
+                },
+                { 
+                    text: '${child1Gender=Male?Husband:Wife} and ${child2Gender=Male?husband:wife}',
+                }
+            ],
+        },
+        how_are_they_related_spouses1:{
             prerequisites: [
                 'parents.0.name',
                 'parents.1.name',
             ],
             constants: {
                 parent1: "parents.*",
-                parent2: "parents.*id!=${parent1.id}"
+                parent1Gender: "parent1.gender",
+                parent2: "parents.*id!=${parent1.id}",
+                parent2Gender: "parent2.gender"
             },
             question: "How are ${parent1.name} and ${parent2.name} related?",
             answers: [
                 { 
-                    text: 'Spouses',
+                    text: '${parent1Gender=Male?Husband:Wife} and ${parent2Gender=Male?husband:wife}',
                     hint: "Correct!"
                 },
                 { 
-                    text: 'Parent and child',
+                    text: '${parent1Gender=Male?Brother:Sister} and ${parent2Gender=Male?brother:sister}',
                 },
                 { 
-                    text: 'Grandparent and grandchild',
+                    text: 'Grand${parent1Gender=Male?father:mother} and grand${parent2Gender=Male?son:daughter}',
                 },
                 { 
-                    text: 'Siblings',
+                    text: '${parent1Gender=Male?Father:Mother} and ${parent2Gender=Male?son:daughter}',
                 },
             ],
         },
-        how_are_they_related_5:{
+        how_are_they_related_spouses2:{
             prerequisites: [
                 'name',
                 'spouses.0.name',
             ],
             constants: {
-                spouse: "spouses.*"
+                personGender: "gender",
+                spouse: "spouses.*",
+                spouseGender: "spouse.gender"
             },
             question: "How are ${name} and ${spouse.name} related?",
             answers: [
                 { 
-                    text: 'Spouses',
+                    text: '${personGender=Male?Husband:Wife} and ${spouseGender=Male?husband:wife}',
                     hint: "Correct!"
                 },
                 { 
-                    text: 'Parent and child',
+                    text: '${personGender=Male?Brother:Sister} and ${spouseGender=Male?brother:sister}',
                 },
                 { 
-                    text: 'Grandparent and grandchild',
+                    text: 'Grand${personGender=Male?father:mother} and grand${spouseGender=Male?son:daughter}',
                 },
                 { 
-                    text: 'Siblings',
+                    text: '${personGender=Male?Father:Mother} and ${spouseGender=Male?son:daughter}',
                 },
             ],
         },
@@ -471,9 +573,9 @@ POSSIBILITY OF SUCH DAMAGE.
                 'relationship'
             ],
             constants: {
-                person1: '*relationship!=${relationship},gender=${gender},living=false',
-                person2: '*relationship!=${relationship},gender=${gender},living=false',
-                person3: '*relationship!=${relationship},gender!=${gender},living=false'
+                person1: '*relationship!=${relationship},gender=${gender}',
+                person2: '*relationship!=${relationship},gender=${gender}',
+                person3: '*relationship!=${relationship},gender!=${gender}'
             },
             question: "How is ${name} related to you?",
             answers: [
@@ -498,9 +600,9 @@ POSSIBILITY OF SUCH DAMAGE.
                 'relationship',
             ],
             constants: {
-                person1: '*relationship!=${relationship},gender=${gender},living=false',
-                person2: '*relationship!=${relationship},gender=${gender},living=false',
-                person3: '*relationship!=${relationship},gender!=${gender},living=false'
+                person1: '*relationship!=${relationship},gender=${gender}',
+                person2: '*relationship!=${relationship},gender=${gender}',
+                person3: '*relationship!=${relationship},gender!=${gender}'
             },
             question: "Which of the following is your ${relationship}",
             answers: [
@@ -510,15 +612,15 @@ POSSIBILITY OF SUCH DAMAGE.
                 },
                 { 
                     text: '${person1.name}',
-                    hint: "No ${person1.name} is your ${person1.relationship}!"
+                    hint: "No ${person1.gender=Male:he:she} is your ${person1.relationship}!"
                 },
                 { 
                     text: '${person2.name}',
-                    hint: "No ${person2.name} is your ${person2.relationship}!"
+                    hint: "No ${person2.gender=Male:he:she} is your ${person2.relationship}!"
                 },
                 { 
                     text: '${person3.name}',
-                    hint: "'Wrong gender! ${person3.name} is your ${person3.relationship}"
+                    hint: "'Wrong gender! ${person3.gender=Male:he:she} is your ${person3.relationship}"
                 },
             ],
         },
@@ -565,12 +667,16 @@ POSSIBILITY OF SUCH DAMAGE.
         how_are_they_related: {
             description: "Relationship to each other",
             values: [
-                "how_are_they_related_1",
-                "how_are_they_related_2",
-                "how_are_they_related_3",
-                "how_are_they_related_4",
-                "how_are_they_related_5",
-                "how_are_they_related_6",
+                "how_are_they_related_parent_same_gender",
+                "how_are_they_related_parent_different_gender",
+                "how_are_they_related_child_same_gender",
+                "how_are_they_related_child_different_gender",
+                "how_are_they_related_grandparent_same_gender",
+                "how_are_they_related_grandparent_different_gender",
+                "how_are_they_related_siblings_same_gender",
+                "how_are_they_related_siblings_different_gender",
+                "how_are_they_related_spouses1",
+                "how_are_they_related_spouses2"
             ]
         },
         birth: {
@@ -625,6 +731,7 @@ POSSIBILITY OF SUCH DAMAGE.
         });
         
         $("input[name=type]").change(function() {
+            nextDepth = 1;
             selectedQuestionSets = [];
             $("input[name=type]").each(function() {
                 if ($(this).prop("checked")) {
@@ -677,9 +784,9 @@ POSSIBILITY OF SUCH DAMAGE.
 
             var questionAndAnswers;
             for (var j = 0; !questionAndAnswers && j < 100; j++) {
-                var person = getRandomElement(filterArray(people, "living=false"));
+                var person = getRandomElement(people);
 
-                console.info("Trying to create question " + JSON.stringify(template) + " for person " + JSON.stringify(person));
+                console.info("Trying to create question " + JSON.stringify(template) + " for person " + JSON.stringify(person.id));
                 if (satisfiesPrerequisites(person, template.prerequisites) && resolveConstants(template, person)) {
                     questionAndAnswers = createQuestion(person, template);
                     
@@ -711,7 +818,7 @@ POSSIBILITY OF SUCH DAMAGE.
     
     function resolveConstants(template, person) {
         var allResolved = true;
-        resolvedConstants = [];
+        resolvedConstants = {"person":person};
         if (template.constants) {
             Object.keys(template.constants).forEach(function(key) {
                 resolvedConstants[key] = resolveChildProperty(person, replaceVariables(person, template.constants[key], true));
@@ -844,6 +951,9 @@ POSSIBILITY OF SUCH DAMAGE.
     }
     
     function getMoreAncestors() {
+        if (nextDepth > 5) {
+            throw "Max depth reached";
+        }
         ws.socketSend("get-ancestors " + token + " " + settings.userId + " " + nextDepth);
         nextDepth++;
     }

@@ -176,70 +176,15 @@ function filterArray(array, rawFilters) {
         if (!filterMatches || filterMatches.length < 4) {
             return [];
         }
-        var filterKey = filterMatches[1];
+        var rawKey1 = filterMatches[1] === "null" ? null : filterMatches[1];
         var operator = filterMatches[2];
-        var filterValue = filterMatches[3];
+        var rawKey2 = filterMatches[3] === "null" ? null : filterMatches[3];
 
         $.each(currentArray, function (index2, arrayValue) {
-            var value = filterKey != null && filterKey.length > 0 ? arrayValue[filterKey] : arrayValue;
-            
-            switch (operator) {
-                case "=":
-                    if (value != null && value.toString && value.toString() === filterValue) {
-                        newArray.push(arrayValue);
-                    } else if (value == filterValue) {
-                        newArray.push(arrayValue);
-                    }
-                    break;
-                case "!=":
-                    if (value != null && value.toString && value.toString() !== filterValue) {
-                        newArray.push(arrayValue);
-                    } else if (value != filterValue) {
-                        newArray.push(arrayValue);
-                    }
-                    break;
-                case ">":
-                    if (value != null && value.toString && value.toString() > filterValue) {
-                        newArray.push(arrayValue);
-                    } else if (value > filterValue) {
-                        newArray.push(arrayValue);
-                    }
-                    break;
-                case ">=":
-                    if (value != null && value.toString && value.toString() >= filterValue) {
-                        newArray.push(arrayValue);
-                    } else if (value >= filterValue) {
-                        newArray.push(arrayValue);
-                    }
-                    break;
-                case "<":
-                    if (value != null && value.toString && value.toString() < filterValue) {
-                        newArray.push(arrayValue);
-                    } else if (value < filterValue) {
-                        newArray.push(arrayValue);
-                    }
-                    break;
-                case "<=":
-                    if (value != null && value.toString && value.toString() <= filterValue) {
-                        newArray.push(arrayValue);
-                    } else if (value <= filterValue) {
-                        newArray.push(arrayValue);
-                    }
-                    break;
-                case "∋":
-                case " contains ":
-                    if (Array.isArray(value) && value.indexOf(filterValue) >= 0) {
-                        newArray.push(arrayValue);
-                    }
-                    break;
-                case "∌":
-                case " !contains ":
-                    if (Array.isArray(value) && value.indexOf(filterValue) == -1) {
-                        newArray.push(arrayValue);
-                    }
-                    break;
-                default:
-                    throw new Error("Filter " + rawFilter + " contains invalid operator " + operator + "; context: " + rawFilters);
+            var value1 = resolveChildProperty(arrayValue,rawKey1,rawKey1);//filterKey != null && filterKey.length > 0 ? arrayValue[filterKey] : arrayValue;
+            var value2 = resolveChildProperty(arrayValue,rawKey2,rawKey2);
+            if (evaluateBinaryExpression(value1, operator, value2)) {
+                newArray.push(arrayValue);
             }
         });
 
@@ -247,6 +192,86 @@ function filterArray(array, rawFilters) {
     });
 
     return currentArray;
+}
+
+function evaluateBooleanExpression(expression, obj) {
+    var filterRegex = /([a-z0-9]*)(=|<=|<|>=|>|!=|∋|∌| contains | !contains )(.+)/i;
+    var filterMatches = expression.match(filterRegex);
+    if (!filterMatches || filterMatches.length < 4) {
+        return [];
+    }
+    var rawKey1 = filterMatches[1] === "null" ? null : filterMatches[1];
+    var operator = filterMatches[2];
+    var rawKey2 = filterMatches[3] === "null" ? null : filterMatches[3];
+    
+    var value1 = resolveChildProperty(obj,rawKey1,rawKey1);//filterKey != null && filterKey.length > 0 ? arrayValue[filterKey] : arrayValue;
+    var value2 = resolveChildProperty(obj,rawKey2,rawKey2);
+    if (evaluateBinaryExpression(value1, operator, value2)) {
+        return true;
+    }
+}
+
+function evaluateBinaryExpression(leftOperand, operator, rightOperand) {
+    switch (operator) {
+        case "=":
+            if (leftOperand != null && leftOperand.toString && leftOperand.toString() === rightOperand) {
+                return true;
+            } else if (leftOperand == rightOperand) {
+                return true;
+            }
+            break;
+        case "!=":
+            if (leftOperand != null && leftOperand.toString && leftOperand.toString() !== rightOperand) {
+                return true;
+            } else if (leftOperand != rightOperand) {
+                return true;
+            }
+            break;
+        case ">":
+            if (leftOperand != null && leftOperand.toString && leftOperand.toString() > rightOperand) {
+                return true;
+            } else if (leftOperand > rightOperand) {
+                return true;
+            }
+            break;
+        case ">=":
+            if (leftOperand != null && leftOperand.toString && leftOperand.toString() >= rightOperand) {
+                return true;
+            } else if (leftOperand >= rightOperand) {
+                return true;
+            }
+            break;
+        case "<":
+            if (leftOperand != null && leftOperand.toString && leftOperand.toString() < rightOperand) {
+                return true;
+            } else if (leftOperand < rightOperand) {
+                return true;
+            }
+            break;
+        case "<=":
+            if (leftOperand != null && leftOperand.toString && leftOperand.toString() <= rightOperand) {
+                return true;
+            } else if (leftOperand <= rightOperand) {
+                return true;
+            }
+            break;
+        case "∋":
+        case " contains ":
+            if (Array.isArray(leftOperand) && leftOperand.indexOf(rightOperand) >= 0) {
+                return true;
+            }
+            break;
+        case "∌":
+        case " !contains ":
+            if (Array.isArray(leftOperand) && leftOperand.indexOf(rightOperand) == -1) {
+                return true;
+            }
+            break;
+        default:
+            throw new Error("Invalid operator " + operator + "; context: " + leftOperand + " " + operator + " " + rightOperand);
+    }
+ 
+    return false;
 }
 
 function say(message, cancel) {
@@ -291,7 +316,7 @@ function replaceVariables(obj, original, encode) {
             if (encode) {
                 value = encodeURIComponent(value).replace(/'/,"%27").replace(/\./,"%2E");
             }
-            
+
             final = final.replace(found, value); 
         });
         matches = final.match(regex)
@@ -302,36 +327,55 @@ function replaceVariables(obj, original, encode) {
     
 var resolvedConstants = {};
     
-function resolveChildProperty(obj, path) {
+function resolveChildProperty(obj, path, defaultValue) {
     console.info("Resolving " + path + " on " + JSON.stringify(obj));
-    var split = path.split(".");
     var currentObject;
-    var currentTry = 0;
-    var maxTries = 10;
+    var triRegex = /^([^?]+)\?([^:]+)\:(.+)$/
+    var trimatch = path.match(triRegex);
+    if (trimatch) {
+        var booleanExpr = trimatch[1];
+        var trueValue = trimatch[2];
+        var falseValue = trimatch[3];
 
-    do {
-        currentObject = obj;
-        $.each(split, function(index, key) {
-            if (!currentObject) {
-                return;
-            }
+        if (evaluateBooleanExpression(booleanExpr, obj)) {
+            currentObject = trueValue;
+        } else {
+            currentObject = falseValue;
+        }
 
-            if (key[0] === "*" && index === 0) {
-                currentObject = getRandomElement(filterArray(people, key.substr(1)));
-            } else if (key === "stats" && index === 0) {
-                currentObject = stats;
-            } else if (key[0] === "*") {
-                currentObject = getRandomElement(filterArray(currentObject, key.substr(1)));
-            } else if (resolvedConstants[key] && index === 0) {
-                currentObject = resolvedConstants[key];
-            } else if (currentObject && currentObject[key]) {
-                currentObject = currentObject[key];
-            } else {
-                currentObject = null;
-            }
-        });
-    } while (split[0] === "*" && currentObject === null && currentTry < maxTries);
+    } else {
 
+        var split = path.split(".");
+        var currentTry = 0;
+        var maxTries = 10;
+
+        do {
+            currentObject = obj;
+            $.each(split, function(index, key) {
+                if (!currentObject) {
+                    return;
+                }
+
+                if (key[0] === "*" && index === 0) {
+                    currentObject = getRandomElement(filterArray(people, key.substr(1)));
+                } else if (key === "stats" && index === 0) {
+                    currentObject = stats;
+                } else if (key[0] === "*") {
+                    currentObject = getRandomElement(filterArray(currentObject, key.substr(1)));
+                } else if (resolvedConstants[key] && index === 0) {
+                    currentObject = resolvedConstants[key];
+                } else if (currentObject && currentObject[key]) {
+                    currentObject = currentObject[key];
+                } else {
+                    currentObject = null;
+                }
+            });
+        } while (split[0] === "*" && currentObject === null && currentTry < maxTries);
+    }
+
+    if (currentObject == null) {
+        currentObject = defaultValue;
+    }
     return currentObject;
 }
 

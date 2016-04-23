@@ -87,8 +87,8 @@ Fix image questions
 Rethink layout
 Allow reporting problems with question/answers
 Figure out why some answers are 'undefined'
-Allow conditionals (e.g. "gender=Female?her:his")
-Conditionalize relationship questions
+Allow conditionals (e.g. "gender=Female?her:his") DONE
+Conditionalize relationship questions             DONE
 Add competitive mode (with multiple controllers?)
 
 Sliding tiles:
