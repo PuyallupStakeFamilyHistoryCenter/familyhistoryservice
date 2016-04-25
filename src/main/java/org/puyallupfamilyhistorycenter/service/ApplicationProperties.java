@@ -86,7 +86,7 @@ public class ApplicationProperties {
     }
     
     public static String getEmailSubject() {
-        return props.getProperty(EMAIL_SUBJECT);
+        return props.getProperty(EMAIL_SUBJECT, "Thanks for visiting!");
     }
     
     public static String getEmailProspectsExplanation() {

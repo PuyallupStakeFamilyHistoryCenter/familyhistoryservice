@@ -96,6 +96,7 @@ import org.puyallupfamilyhistorycenter.service.models.PersonImage;
 import org.puyallupfamilyhistorycenter.service.models.Video;
 import org.puyallupfamilyhistorycenter.service.utils.EmailUtils;
 import org.puyallupfamilyhistorycenter.service.utils.S3Utils;
+import org.puyallupfamilyhistorycenter.service.utils.UserImageRegistry;
 
 /**
  *
@@ -129,12 +130,14 @@ public class FamilyHistoryCenterSocket {
                                 }).create();
     private static final PersonDao personDao;
     private static final AppKeyConfig appKeyConfig;
+    private static final UserImageRegistry imageRegistry;
     
     private static final String OK_RESPONSE = "{\"responseType\":\"ok\"}";
     
     static {
         personDao = (PersonDao) SpringContextInitializer.getContext().getBean("person-dao");
         appKeyConfig = (AppKeyConfig) SpringContextInitializer.getContext().getBean("app-key-config");
+        imageRegistry = (UserImageRegistry) SpringContextInitializer.getContext().getBean("user-image-registry");
     }
     
 
@@ -965,7 +968,7 @@ public class FamilyHistoryCenterSocket {
     private static void sendFinalEmail(String userId) {
         UserContext context = userContextMap.get(userId);
         if (context != null && ApplicationProperties.enableEmail()) {
-            EmailUtils.sendFinalEmail(context.userName, context.userEmail);
+            EmailUtils.sendFinalEmail(context.userName, context.userEmail, imageRegistry.getImages(context.userId));
         }
     }
     

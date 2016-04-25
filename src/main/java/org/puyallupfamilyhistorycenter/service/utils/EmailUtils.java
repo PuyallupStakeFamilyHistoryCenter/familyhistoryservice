@@ -39,13 +39,13 @@ import com.amazonaws.services.simpleemail.model.RawMessage;
 import com.amazonaws.services.simpleemail.model.SendEmailRequest;
 import com.amazonaws.services.simpleemail.model.SendRawEmailRequest;
 import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
 import java.nio.ByteBuffer;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
+import java.util.Collection;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
@@ -87,7 +87,7 @@ public class EmailUtils {
         sendEmail(contactName, contactEmail, new String[] { "normanse@gmail.com" }, subject, emailBody);
     }
     
-    public static void sendFinalEmail(String userName, String userEmail) {
+    public static void sendFinalEmail(String userName, String userEmail, Collection<String> imageFiles) {
         if (!emailWhitelist.contains(userEmail)) {
             logger.info("Skipping sending email because '" + userEmail + "' is not whitelisted");
             return;
@@ -96,7 +96,7 @@ public class EmailUtils {
         String emailBody = buildFinalEmailBody(userName, null);
         String subject = ApplicationProperties.getEmailSubject();
         
-        sendEmailWithAttachments(userName, userEmail, new String[] {}, subject, emailBody, Collections.EMPTY_LIST);
+        sendEmailWithAttachments(userName, userEmail, new String[] {}, subject, emailBody, imageFiles);
 
         logger.info("Sent final email to " + userEmail);
     }
@@ -116,7 +116,7 @@ public class EmailUtils {
         ses.sendEmail(request);
     }
     
-    protected static void sendEmailWithAttachments(String recipientName, String recipientEmail, String[] ccList, String subjectString, String bodyString, List<String> attachments) {
+    protected static void sendEmailWithAttachments(String recipientName, String recipientEmail, String[] ccList, String subjectString, String bodyString, Collection<String> attachments) {
         try {
             Session session = Session.getDefaultInstance(new Properties());
             MimeMessage message = new MimeMessage(session);

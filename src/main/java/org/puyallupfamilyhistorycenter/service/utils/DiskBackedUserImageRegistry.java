@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, tibbitts
+ * Copyright (c) 2016, tibbitts
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -23,19 +23,28 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
+package org.puyallupfamilyhistorycenter.service.utils;
 
-package org.puyallupfamilyhistorycenter.service;
-
-
+import com.google.common.collect.LinkedListMultimap;
+import com.google.common.collect.Multimap;
+import java.util.Collection;
 
 /**
  *
  * @author tibbitts
  */
-public class FamilyHistoryCacheServlet {
-    public static void main(String[] args) throws ClassNotFoundException, InstantiationException, IllegalAccessException, Exception {
-        SpringContextInitializer.getContext().getBean(ServletLifecycleManager.class);
-        ServletLifecycleManager.join();
-        
+public class DiskBackedUserImageRegistry implements UserImageRegistry {
+    
+    private Multimap<String, String> userFiles = LinkedListMultimap.create();
+
+    @Override
+    public void registerImage(String userId, String filename) {
+        userFiles.put(userId, filename);
     }
+
+    @Override
+    public Collection<String> getImages(String userId) {
+        return userFiles.get(userId);
+    }
+    
 }

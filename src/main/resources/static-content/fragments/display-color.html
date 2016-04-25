@@ -19,11 +19,8 @@
                 console.info("Setting brush size");
                 brushSize = obj.size;
             },
-            print: function(obj) {
-//                $("canvas").printElement();
-            },
-            email: function(obj) {
-                var email = obj.email;
+            save: function(obj) {
+                saveImage(obj.userId);
             }
         }
     }
@@ -236,6 +233,25 @@
         canvas2.height = window.innerHeight - 16;
             
         scale = Math.min(canvas.width/image.width, canvas.height/image.height);
+    }
+    
+    function saveImage(userId) {
+        canvas.toBlob(function(blob) {
+            var formData = new FormData();
+            
+            formData.append("coloring-page", blob);
+            
+            $.ajax({
+                url: '/image-save/?user-id='+userId,
+                data: formData,
+                processData: false,
+                contentType: false,
+                type: 'POST',
+                success: function(data){
+                    logger.info("Successfully saved image");
+                }
+            });
+        });
     }
 
     init();

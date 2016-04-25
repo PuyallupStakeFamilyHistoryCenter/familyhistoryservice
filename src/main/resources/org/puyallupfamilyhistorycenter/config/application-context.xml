@@ -153,6 +153,13 @@ POSSIBILITY OF SUCH DAMAGE.
         <property name="handler" ref="image-cache-handler" />
     </bean>
     
+    <!--Image save handler-->
+    <bean id="image-save-handler" class="org.puyallupfamilyhistorycenter.service.SaveImageHandler" />
+    <bean id="image-save-context" class="org.eclipse.jetty.server.handler.ContextHandler" >
+        <constructor-arg value="/image-save" />
+        <property name="handler" ref="image-save-handler" />
+    </bean>
+    
     <!--Handler collection-->
     <bean id="context-handlers" class="org.eclipse.jetty.server.handler.ContextHandlerCollection">
         <property name="handlers">
@@ -162,6 +169,7 @@ POSSIBILITY OF SUCH DAMAGE.
                 <ref bean="video-context" />
                 <ref bean="static-context" />
                 <ref bean="image-cache-context" />
+                <ref bean="image-save-context" />
             </array>
         </property>
     </bean>
@@ -289,5 +297,7 @@ POSSIBILITY OF SUCH DAMAGE.
         <property name="stopTimeout" value="600000" />
         <property name="idleTimeout" value="600000" />
     </bean>
+    
+    <bean id="user-image-registry" class="org.puyallupfamilyhistorycenter.service.utils.DiskBackedUserImageRegistry" />
 
 </beans>

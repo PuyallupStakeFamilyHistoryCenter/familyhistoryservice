@@ -37,8 +37,7 @@ POSSIBILITY OF SUCH DAMAGE.
     </dd>
 </dl>
 
-<button id="print-btn" class="btn btn-lg btn-default">Print</button>
-<button id="email-btn" class="btn btn-lg btn-default">Email</button>
+<button id="save-btn" class="btn btn-lg btn-default">Save</button>
 
 <script>
     var swatches = [
@@ -80,11 +79,7 @@ POSSIBILITY OF SUCH DAMAGE.
         sendToDisplay($(this).attr("data-size"));
     });
     
-    $("#print-btn").click(function() {
-        sendToDisplay("{\"responseType\":\"print\"}")
-    });
-    
-    $("#print-btn").click(function() {
-        sendToDisplay("{\"responseType\":\"email\",\"email\":\"anonymous@gmail.com\"}")
+    $("#save-btn").click(function() {
+        sendToDisplay("{\"responseType\":\"save\",\"userId\":\""+settings.userId+"\"}")
     });
 </script>
