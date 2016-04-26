@@ -314,7 +314,7 @@ function replaceVariables(obj, original, encode) {
             var variable = found.substr(2, found.length - 3);
             var value = resolveChildProperty(obj, variable);
             if (encode) {
-                value = encodeURIComponent(value).replace(/'/,"%27").replace(/\./,"%2E");
+                value = encodeURIComponent(value).replace(/'/g,"%27").replace(/\./g,"%2E");
             }
 
             final = final.replace(found, value); 
@@ -328,6 +328,10 @@ function replaceVariables(obj, original, encode) {
 var resolvedConstants = {};
     
 function resolveChildProperty(obj, path, defaultValue) {
+    if (path == null) {
+        return null;
+    }
+    
     console.info("Resolving " + path + " on " + JSON.stringify(obj));
     var currentObject;
     var triRegex = /^([^?]+)\?([^:]+)\:(.+)$/

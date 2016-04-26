@@ -61,6 +61,7 @@ Add multi-generation map mode
 Remove parents from family mode
 Narrated tour should be less repetitive
 Narrated tour doesn't work on iPad
+Investigate throttling issue
 ?Add spiral effect from RootsMapper
 ?Color-code markers
 ?Set max zoom in map
@@ -83,9 +84,7 @@ Automatically grade questions based on answer frequency
 Automatically grade answers based on answer frequency
 Automatically progress difficulty based on performance
 Fix image questions
-    Image questions should use persona info from FS
-    OR
-    Allow searching for people with same image DONE
+    Allow searching for people with same image
 Rethink layout
 Allow reporting problems with question/answers
 Figure out why some answers are 'undefined'

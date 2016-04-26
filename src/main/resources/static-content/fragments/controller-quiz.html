@@ -211,12 +211,12 @@ POSSIBILITY OF SUCH DAMAGE.
                 spouse: 'spouses.*name!=Living',
                 marriage: 'spouse.facts.*type=Marriage',
                 birth: 'facts.*type=Birth',
-                death: 'facts.*type=Death'
+                death: 'facts.*type=Death',
             },
             question: "When were ${name} and ${spouse.name} married?",
             answers: [
                 { 
-                    text: '${marriageDate}', 
+                    text: '${marriage.date}', 
                     hint: "Correct! ${name} and ${spouse.name} married on ${marriage.date} in ${marriage.place}" 
                 },
                 { 
@@ -224,7 +224,7 @@ POSSIBILITY OF SUCH DAMAGE.
                     hint: "No, but ${gender=Male?he:she} was born on ${birth.date} in ${birth.place}" 
                 },
                 { 
-                    text: '${deathDate}', 
+                    text: '${death.date}', 
                     hint: "No, but ${gender=Male?he:she} died on ${death.date} in ${death.place}" 
                 },
                 { 
@@ -271,7 +271,7 @@ POSSIBILITY OF SUCH DAMAGE.
                 image: "images.*",
                 otherPerson1: '*gender=${gender},images !contains ${image}',
                 otherPerson2: '*gender=${gender},images !contains ${image},id!=${otherPerson1.id}',
-                otherPerson3: '*images !contains ${image},id!=${otherPerson1.id},id!=${otherPerson2.id}'
+                otherPerson3: '*gender!=${gender},images !contains ${image},id!=${otherPerson1.id},id!=${otherPerson2.id}'
             },
             question: "Who is this?<br><img src='${image}' style='max-width:600px; max-height:600px' />",
             answers: [
@@ -957,7 +957,7 @@ POSSIBILITY OF SUCH DAMAGE.
     
     function getMoreAncestors() {
         if (nextDepth > 5) {
-            throw "Max depth reached";
+            nextDepth = 5;
         }
         ws.socketSend("get-ancestors " + token + " " + settings.userId + " " + nextDepth);
         nextDepth++;
