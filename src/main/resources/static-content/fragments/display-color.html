@@ -32,6 +32,7 @@
     var scale;
     var pressed = false;
     var firstSegment = false;
+    var imageId;
 
     function init() {
         r = g = b = 0;
@@ -69,6 +70,8 @@
             }
 
             context.putImageData(imageData, 0, 0);
+            
+            imageId = rand(0, 1000000000);
         }
 
         canvas.onmousedown = function (e) {
@@ -249,7 +252,7 @@
             formData.append("coloring-page", blob);
             
             $.ajax({
-                url: '/image-save/?user-id='+userId,
+                url: '/image-save/?user-id='+userId+'&image-id='+imageId,
                 data: formData,
                 processData: false,
                 contentType: false,

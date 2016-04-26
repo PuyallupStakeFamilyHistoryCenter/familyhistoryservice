@@ -25,9 +25,11 @@
  */
 package org.puyallupfamilyhistorycenter.service.utils;
 
-import com.google.common.collect.LinkedListMultimap;
-import com.google.common.collect.Multimap;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 /**
  *
@@ -35,11 +37,16 @@ import java.util.Collection;
  */
 public class DiskBackedUserImageRegistry implements UserImageRegistry {
     
-    private Multimap<String, String> userFiles = LinkedListMultimap.create();
+    private final Map<String, Set<String>> userFiles = new HashMap<>();
 
     @Override
-    public void registerImage(String userId, String filename) {
-        userFiles.put(userId, filename);
+    public synchronized void registerImage(String userId, String filename) {
+        Set<String> files = userFiles.get(userId);
+        if (files == null) {
+            files = new HashSet<>();
+            userFiles.put(userId, files);
+        }
+        files.add(filename);
     }
 
     @Override

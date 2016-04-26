@@ -73,8 +73,11 @@ public class SaveImageHandler extends AbstractHandler {
         
         rqst.setAttribute(Request.__MULTIPART_CONFIG_ELEMENT, mpce);
         
+        
+        String imageId = rqst.getParameter("image-id");
+        
         Part part = hsr.getPart("coloring-page");
-        File file = File.createTempFile("saved-image-", ".png", saveImageDir);
+        File file = new File(saveImageDir, "saved-image-" + imageId + ".png");
         file.deleteOnExit();
         
         try (InputStream in = part.getInputStream();
