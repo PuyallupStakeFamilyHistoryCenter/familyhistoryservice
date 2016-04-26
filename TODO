@@ -41,15 +41,16 @@ Add path from ancestor to root
 ?Horizontal scrolling on ipad
 
 Color:
-*Set up email function
+Fix canvas ratio             DONE
+Set up email function        DONE
+*Set up print function
 Rearrange colors more logically
 Add more color options
-Change mouse pointer
 Transparent images show logo in background
-Fix canvas ratio
+Save to deterministic location
 ?Add different brush types
 ?Undo feature
-?Set up print function
+?Change mouse pointer
 
 Life map:
 Map should begin on world map

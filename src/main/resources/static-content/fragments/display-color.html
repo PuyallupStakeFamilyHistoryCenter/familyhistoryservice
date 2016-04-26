@@ -233,6 +233,13 @@
         canvas2.height = window.innerHeight - 16;
             
         scale = Math.min(canvas.width/image.width, canvas.height/image.height);
+        if (canvas.width/image.width > canvas.height/image.height) {
+            canvas.width = image.width/image.height*canvas.height;
+            canvas2.width = image.width/image.height*canvas.height;
+        } else {
+            canvas.height = image.height/image.width*canvas.width;
+            canvas2.height = image.height/image.width*canvas.width;
+        }
     }
     
     function saveImage(userId) {
