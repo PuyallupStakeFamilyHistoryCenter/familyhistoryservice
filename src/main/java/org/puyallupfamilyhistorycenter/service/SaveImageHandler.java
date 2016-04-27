@@ -76,7 +76,7 @@ public class SaveImageHandler extends AbstractHandler {
         
         String imageId = rqst.getParameter("image-id");
         
-        Part part = hsr.getPart("coloring-page");
+        Part part = hsr.getPart("image");
         File file = new File(saveImageDir, "saved-image-" + imageId + ".png");
         file.deleteOnExit();
         

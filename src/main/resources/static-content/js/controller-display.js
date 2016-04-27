@@ -66,6 +66,9 @@ var settings = {
                 };
                 
                 countdownFunction();
+            },
+            screenshot: function() {
+                takeScreenshot(settings.userId);
             }
         }
     },

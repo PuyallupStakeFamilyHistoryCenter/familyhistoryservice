@@ -262,7 +262,7 @@ POSSIBILITY OF SUCH DAMAGE.
                 },
             ],
         },
-        image:{
+        who_is_this_image:{
             prerequisites: [
                 'images.0',
                 'name'
@@ -288,6 +288,45 @@ POSSIBILITY OF SUCH DAMAGE.
                 { 
                     text: '${otherPerson3.name}'
                 },
+            ],
+        },
+        is_this_an_image_of_1:{
+            prerequisites: [
+                'images.0',
+                'name'
+            ],
+            constants: {
+                image: "images.*",
+            },
+            question: "True or false, this is an image of ${name}?<br><img src='${image}' style='max-width:600px; max-height:600px' />",
+            answers: [
+                { 
+                    text: 'True', 
+                    hint: "Correct!" 
+                },
+                { 
+                    text: 'False'
+                }
+            ],
+        },
+        is_this_an_image_of_2:{
+            prerequisites: [
+                'images.0',
+                'name'
+            ],
+            constants: {
+                image: "images.*",
+                person: "*gender=${gender},name!=${name}"
+            },
+            question: "True or false, this is an image of ${person.name}?<br><img src='${image}' style='max-width:600px; max-height:600px' />",
+            answers: [
+                { 
+                    text: 'False', 
+                    hint: "Correct! This is an image of ${name}" 
+                },
+                { 
+                    text: 'True'
+                }
             ],
         },
         children1: {
@@ -713,7 +752,9 @@ POSSIBILITY OF SUCH DAMAGE.
         image: {
             description: "Image",
             values: [
-                "image"
+                "who_is_this_image",
+                "is_this_an_image_of_1",
+                "is_this_an_image_of_2"
             ]
         }
     }

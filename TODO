@@ -146,6 +146,7 @@ Email:
 Send email at log-off                   DONE
 Make email text configurable            DONE
 Comb tree for waiting ancestors
+Not all attachments are sent
 ?Allow saving and sending attachments
 ?Save and send quiz scores (and perhaps suggest areas of study)
 
@@ -163,6 +164,7 @@ Verify user is logged in before sending survey
 
 Story:
 Refine sentence-end logic
+Getting 'Synchronous XMLHttpRequest' warning
 
 Memory:
 Add board size option                      DONE
@@ -178,6 +180,14 @@ Hangman:
 Add options tab
 Select words from other facts
 Add hints option
+
+Screenshot:
+Doesn't hide svg elements correctly
+Doesn't work on stats map view
+Stats graph view shows two headings and two x-axis labels
+Family tree is truncated sometimes
+Doesn't work on maps
+Truncates tiles game
 
 New feature ideas:
 Word search (maybe printable version in email?)

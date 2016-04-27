@@ -332,7 +332,6 @@ function resolveChildProperty(obj, path, defaultValue) {
         return null;
     }
     
-    console.info("Resolving " + path + " on " + JSON.stringify(obj));
     var currentObject;
     var triRegex = /^([^?]+)\?([^:]+)\:(.+)$/
     var trimatch = path.match(triRegex);
@@ -392,4 +391,32 @@ function splitWords(s) {
 
 function toFirstCaps(string) {
     return string.substring(0,1).toUpperCase() + string.substring(1);
+}
+
+function saveCanvas(canvas, userId, imageId) {
+    canvas.toBlob(function(blob) {
+        var formData = new FormData();
+
+        formData.append("image", blob);
+
+        $.ajax({
+            url: '/image-save/?user-id='+userId+'&image-id='+imageId,
+            data: formData,
+            processData: false,
+            contentType: false,
+            type: 'POST',
+            success: function(data){
+                logger.info("Successfully saved image");
+            }
+        });
+    });
+}
+
+function takeScreenshot(userId) { 
+    html2canvas(document.getElementById("content"), {
+        onrendered: function(canvas) {
+            saveCanvas(canvas, userId, rand(0, 1000000000));
+        },
+        background: "white"
+    });
 }
