@@ -143,20 +143,22 @@ public class EmailUtils {
             // This is just for testing HTML embedding of different type of attachments.
             StringBuilder sb = new StringBuilder();
 
-            for (String attachmentFileName : attachments) {
-                String id = UUID.randomUUID().toString();
-                sb.append("<img src=\"cid:");
-                sb.append(id);
-                sb.append("\" alt=\"ATTACHMENT\"/>\n");
+            if (attachments != null) {
+                for (String attachmentFileName : attachments) {
+                    String id = UUID.randomUUID().toString();
+                    sb.append("<img src=\"cid:");
+                    sb.append(id);
+                    sb.append("\" alt=\"ATTACHMENT\"/>\n");
 
-                MimeBodyPart attachment = new MimeBodyPart();
+                    MimeBodyPart attachment = new MimeBodyPart();
 
-                DataSource fds = new FileDataSource(attachmentFileName);
-                attachment.setDataHandler(new DataHandler(fds));
-                attachment.setHeader("Content-ID", "<" + id + ">");
-                attachment.setFileName(fds.getName());
+                    DataSource fds = new FileDataSource(attachmentFileName);
+                    attachment.setDataHandler(new DataHandler(fds));
+                    attachment.setHeader("Content-ID", "<" + id + ">");
+                    attachment.setFileName(fds.getName());
 
-                content.addBodyPart(attachment);
+                    content.addBodyPart(attachment);
+                }
             }
 
             html.setContent("<html><body><img style=\"width:100%\" src=\"http://www.puyallupfamilyhistorycenter.org/uploads/4/8/2/9/4829765/1433113473.png?\" alt=\"The Puyllup Family History Center\" />" + bodyString + "</body></html>", "text/html");

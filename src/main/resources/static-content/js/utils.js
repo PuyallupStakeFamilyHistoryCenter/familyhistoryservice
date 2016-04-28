@@ -412,8 +412,12 @@ function saveCanvas(canvas, userId, imageId) {
     });
 }
 
-function takeScreenshot(userId) { 
-    html2canvas(document.getElementById("content"), {
+function takeScreenshot(userId) {
+    var element = document.getElementById("canvas");
+    if (!element) {
+        element = document.getElementById("content");
+    }
+    html2canvas(element, {
         onrendered: function(canvas) {
             saveCanvas(canvas, userId, rand(0, 1000000000));
         },

@@ -182,12 +182,12 @@ Select words from other facts
 Add hints option
 
 Screenshot:
+Truncates tiles game                       DONE
 Doesn't hide svg elements correctly
 Doesn't work on stats map view
 Stats graph view shows two headings and two x-axis labels
 Family tree is truncated sometimes
 Doesn't work on maps
-Truncates tiles game
 
 New feature ideas:
 Word search (maybe printable version in email?)
