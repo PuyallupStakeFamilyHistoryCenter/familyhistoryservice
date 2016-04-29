@@ -38,6 +38,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
 import org.apache.commons.io.IOUtils;
+import org.apache.log4j.Logger;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.AbstractHandler;
 import org.puyallupfamilyhistorycenter.service.utils.UserImageRegistry;
@@ -48,6 +49,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author tibbitts
  */
 public class SaveImageHandler extends AbstractHandler {
+    private static final Logger logger = Logger.getLogger(SaveImageHandler.class);
     
     @Autowired
     UserImageRegistry imageRegistry;
@@ -87,6 +89,8 @@ public class SaveImageHandler extends AbstractHandler {
         
         String userId = rqst.getParameter("user-id");
         imageRegistry.registerImage(userId, file.getPath());
+        
+        logger.info("Saved image " + file.getName() + " for user " + userId);
         
         rqst.setHandled(true);
     }

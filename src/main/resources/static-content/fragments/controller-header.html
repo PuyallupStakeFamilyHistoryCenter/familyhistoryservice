@@ -107,7 +107,8 @@ POSSIBILITY OF SUCH DAMAGE.
     $("#display-screenshot").click(function() {
         $("#bs-example-navbar-collapse-1").removeClass("in");
         sendToDisplay(JSON.stringify({
-            responseType:"screenshot"
+            responseType:"screenshot",
+            userId: settings.userId
         }))
     });
     

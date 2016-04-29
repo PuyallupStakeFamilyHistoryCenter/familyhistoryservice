@@ -67,8 +67,8 @@ var settings = {
                 
                 countdownFunction();
             },
-            screenshot: function() {
-                takeScreenshot(settings.userId);
+            screenshot: function(obj) {
+                takeScreenshot(obj.userId);
             }
         }
     },
