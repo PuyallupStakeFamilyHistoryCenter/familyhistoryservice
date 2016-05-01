@@ -43,8 +43,7 @@ POSSIBILITY OF SUCH DAMAGE.
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                 <ul class="nav navbar-nav navbar-right" >
                     <li id="logged-in-user-name" style="display:none"><span class="navbar-text">You are logged in as <span class="username"></span></span></li>
-                    <li><a href="#" id="controller-screenshot" style="display:none">Controller screenshot</a></li>
-                    <li><a href="#" id="display-screenshot" style="display:none">Display screenshot</a></li>
+                    <li><a href="#" id="screenshot" style="display:none">Screenshot</a></li>
                     <li><a href="#" id="change-root-link" style="display:none">Change root user</a></li>
                     <li><a href="#" id="logout-link" style="display:none">Switch user</a></li>
                 </ul>
@@ -104,16 +103,11 @@ POSSIBILITY OF SUCH DAMAGE.
         navigate(navHistory[navHistory.length - 1]);
     });
     
-    $("#display-screenshot").click(function() {
+    $("#screenshot").click(function() {
         $("#bs-example-navbar-collapse-1").removeClass("in");
         sendToDisplay(JSON.stringify({
             responseType:"screenshot",
             userId: settings.userId
         }))
     });
-    
-    $("#controller-screenshot").click(function() {
-        $("#bs-example-navbar-collapse-1").removeClass("in");
-        takeScreenshot(settings.userId);
-    })
 </script>  

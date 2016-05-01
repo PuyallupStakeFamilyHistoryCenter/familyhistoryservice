@@ -37,8 +37,6 @@ POSSIBILITY OF SUCH DAMAGE.
     </dd>
 </dl>
 
-<button id="save-btn" class="btn btn-lg btn-default">Save</button>
-
 <script>
     var swatches = [
         {responseType: "swatch", color: "#FFDCB2"},
@@ -77,9 +75,5 @@ POSSIBILITY OF SUCH DAMAGE.
 
     $(".brush-size-btn").click(function () {
         sendToDisplay($(this).attr("data-size"));
-    });
-    
-    $("#save-btn").click(function() {
-        sendToDisplay("{\"responseType\":\"save\",\"userId\":\""+settings.userId+"\"}")
     });
 </script>
