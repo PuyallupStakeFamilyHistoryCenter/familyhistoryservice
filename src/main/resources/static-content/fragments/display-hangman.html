@@ -234,6 +234,9 @@ POSSIBILITY OF SUCH DAMAGE.
                 $("#reveal-div").hide();
                 setupReveal(obj.imgUrl, obj.name);
                 setupWord(obj.word);
+            },
+            screenshot: function() {
+                logger.warn("Screenshot is disabled in hangman");
             }
         }
     };

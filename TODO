@@ -183,12 +183,13 @@ Add hints option
 
 Screenshot:
 Truncates tiles game                       DONE
-Doesn't hide svg elements correctly
-Doesn't work on stats map view
+Doesn't work on stats map view             DONE
+Family tree is truncated sometimes         DONE
+Remove dedicated 'Save' button in the coloring app DONE
+Disable screenshot in apps where it doesn't work DONE
+Doesn't hide svg elements correctly in hangman
 Stats graph view shows two headings and two x-axis labels
-Family tree is truncated sometimes
 Doesn't work on maps
-Remove dedicated 'Save' button in the coloring app
 
 New feature ideas:
 Word search (maybe printable version in email?)

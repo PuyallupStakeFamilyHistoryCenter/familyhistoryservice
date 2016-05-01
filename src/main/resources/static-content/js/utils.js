@@ -406,7 +406,9 @@ function saveCanvas(canvas, userId, imageId) {
             contentType: false,
             type: 'POST',
             success: function(data){
-                logger.info("Successfully saved image");
+                if (logger) {
+                    logger.info("Successfully saved image");
+                }
             }
         });
     });
@@ -416,6 +418,12 @@ function takeScreenshot(userId) {
     var element = document.getElementById("canvas");
     if (!element) {
         element = document.getElementById("content");
+    }
+    if (!element) {
+        element = document.getElementById("container");
+    }
+    if (!element) {
+        console.error("Failed to take screenshot of page " + window.location.href);
     }
     html2canvas(element, {
         onrendered: function(canvas) {

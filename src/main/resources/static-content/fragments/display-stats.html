@@ -132,6 +132,14 @@ POSSIBILITY OF SUCH DAMAGE.
             scopeOceania: function() {
                 scope = "oceania";
                 showMap();
+            },
+            screenshot: function(obj) {
+                var iframe = document.getElementById("stats-map-frame");
+                if (iframe) {
+                    iframe.contentWindow.takeScreenshot(obj.userId);
+                } else {
+                    settings.global.verbs.screenshot(obj);
+                }
             }
         }
     };
