@@ -87,11 +87,6 @@ public class EmailUtils {
     }
     
     public static void sendFinalEmail(String userName, String userEmail, Collection<String> imageFiles) {
-        if (!emailWhitelist.contains(userEmail)) {
-            logger.info("Skipping sending email because '" + userEmail + "' is not whitelisted");
-            return;
-        }
-        
         String emailBody = buildFinalEmailBody(userName, null);
         String subject = ApplicationProperties.getEmailSubject();
         
