@@ -4,6 +4,7 @@ Maybe wrap FamilySearch JS library for use in Java
 
 Switch anonymous classes for lambdas
 Use Lombok for builders and boilerplate
+Use JSON for requests to server
 
 Server:
 *Speed up hosting

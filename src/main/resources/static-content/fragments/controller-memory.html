@@ -376,7 +376,7 @@ POSSIBILITY OF SUCH DAMAGE.
     
     function generateMatch(people, idMap, valueMap) {
         for (var i = 0; i < 100; i++) {
-            var person = getRandomElement(filterArray(people, "living=false"));
+            var person = getRandomElement(filterArray(people, "living!=true"));
             var type1 = getRandomElement(settings.config.types);
             var type2 = getRandomElement(settings.config.types);
             
