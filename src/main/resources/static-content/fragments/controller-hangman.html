@@ -25,13 +25,140 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 -->
 
-<button id="start-btn" class="btn btn-lg btn-primary">New game</button>
+<ul class="nav nav-tabs" id="tabs" role="tablist">
+    <li class="active" id="game-tab" ><a href="#game-tab" role="tab" data-toggle="tab">Game</a></li>
+    <li id="settings-tab" ><a href="#settings-tab" role="tab" data-toggle="tab">Settings</a></li>
+</ul>
 
-<hr>
 
-<div id="letter-btns"></div>
+<div id="game">
+    <button id="start-btn" class="btn btn-lg btn-primary">New game</button>
+
+    <hr>
+
+    <div id="letter-btns"></div>
+</div>
+
+<div id="settings" style="display: none">
+    <div class="btn-group btn-group-lg" data-toggle="buttons">
+        <label class="btn btn-default">
+            <input type="radio" name="difficulty" value="easy">Easy
+        </label>
+        <label class="btn btn-default active">
+            <input type="radio" name="difficulty" value="medium" checked="">Medium
+        </label>
+        <label class="btn btn-default">
+            <input type="radio" name="difficulty" value="hard">Hard
+        </label>
+        <label class="btn btn-default">
+            <input type="radio" name="difficulty" value="insane">Insane
+        </label>
+        <label class="btn btn-warning">
+            <input type="radio" name="difficulty" value="custom">Custom
+        </label>
+    </div>
+    <div id="customControls" style="display: none;">
+        <dl class="dl-horizontal">
+            <dt></dt>
+            <dd>
+                <div class="btn-group btn-group-lg" data-toggle="buttons">
+                    <label class="btn btn-default active">
+                        <input type="checkbox" name="type" value="name">Name
+                    </label>
+                    <label class="btn btn-default active">
+                        <input type="checkbox" name="type" value="relationship">Relationship
+                    </label>
+                    <label class="btn btn-default">
+                        <input type="checkbox" name="type" value="birthPlace">Birth place
+                    </label>
+                    <label class="btn btn-default">
+                        <input type="checkbox" name="type" value="deathPlace">Death place
+                    </label>
+                </div>
+            </dd>
+        </dl>
+    </div>
+</div>
+
 
 <script>
+    console.info("Loading controller-hangman");
+    var configurations = {
+        easy: {
+            types: [
+                "name"
+            ]
+        },
+        medium: {
+            types: [
+                "name",
+                "relationship"
+            ]
+        },
+        hard: {
+            types: [
+                "name",
+                "relationship",
+                "birthPlace"
+            ]
+        },
+        insane: {
+            types: [
+                "name",
+                "relationship",
+                "birthPlace",
+                "deathPlace"
+            ]
+        }
+    };
+    
+    var templates = {
+        name: {
+            path: "name"
+        },
+        relationship: {
+            path: "relationship",
+            contextPrefix: " "
+        },
+        birthPlace: {
+            path: "facts.*type=Birth.place",
+            contextPrefix: "Birth: "
+        },
+        deathPlace: {
+            path: "facts.*type=Death.place",
+            contextPrefix: "Death: "
+        }
+    }
+    
+    $('input[name=difficulty]:radio').change(function () {
+        $("#customControls").hide();
+
+        settings.config = cloneObject(configurations[$(this).val()]);
+    });
+
+    $("input[name=difficulty][value='custom']:radio").unbind().change(function () {
+        if (!settings.config) {
+            settings.config = cloneObject(configurations.medium);
+        }
+        initCheckboxes("[name=type]", settings.config.types);
+        $("#customControls").show();
+    });
+    
+    $("[name=type]").change(function () {
+        settings.config.types = getCheckboxValues("[name=type]");
+    });
+
+    $("#game-tab").click(function() {
+        $("#game").show();
+        $("#settings").hide();
+    });
+
+    $("#settings-tab").click(function() {
+        $("#game").hide();
+        $("#settings").show();
+    });
+
+    
     $("#start-btn").click(function() {
         sendRandomWord();
     });
@@ -53,7 +180,7 @@ POSSIBILITY OF SUCH DAMAGE.
     settings.local = {
         verbs: {
             people: function(obj) {
-                people = obj.people;
+                people = filterArray(obj.people, "living!=true");
                 sendRandomWord();
             }
         }
@@ -63,15 +190,20 @@ POSSIBILITY OF SUCH DAMAGE.
     function sendRandomWord() {
         var person, word;
         var tries = 0, maxTries = 50;
+        var context;
         do {
+            //TODO: place selectors not working
             person = getRandomElement(people);
-            var names = splitWords(person.name);
-            if (names && names.length > 0) {
-                word = getRandomElement(names);
+            var type = getRandomElement(settings.config.types);
+            var template = templates[type];
+            var element = resolveChildProperty(person, template.path);
+            var words = splitWords(element);
+            if (words && words.length > 0) {
+                word = getRandomElement(words).replace(/[^a-zA-Z]/g, "");
             }
-        } while ((word.length > 12 || 
+            context = (template.contextPrefix ? "<hr>"+ template.contextPrefix + element : "");
+        } while ((!word || word.length > 12 || 
                 word.length < 3 || 
-                word.toLowerCase() === "living" || 
                 usedWords[word]) && tries++ < maxTries);
         if (tries >= maxTries) {
             usedWords = [];
@@ -85,11 +217,41 @@ POSSIBILITY OF SUCH DAMAGE.
         sendToDisplay(JSON.stringify({
             responseType: "start",
             word: word,
-            name: person.name,
+            name: person.name + context,
             imgUrl: imgUrl
         }));
         $(".letter-btn").removeProp("disabled");
     }
     
+    function cloneObject(obj) {
+        var serialized = window.JSON.stringify(obj);
+        var clone = window.JSON.parse(serialized);
+        return clone;
+    }
+    
+    function initCheckboxes(selector, values) {
+        $(selector).removeProp('checked').parent().removeClass("active");
+        if (values) {
+            $.each(values, function(index, value) {
+                console.info("Checking checkbox " + value);
+                $(selector + "[value="+value+"]").prop('checked',true).parent().addClass("active");
+            });
+        }
+    }
+    
+    function initRadio(selector, value) {
+        $(selector).removeProp('checked').parent().removeClass("active");
+        $(selector + "[value="+value+"]").prop('checked',true).parent().addClass("active");
+    }
+    
+    function getCheckboxValues(selector) {
+        var values = [];
+        $(selector + ":checked").each(function() {
+            values.push($(this).val());
+        });
+        return values;
+    }
+    
+    settings.config = cloneObject(configurations.medium);
     ws.socketSend("get-ancestors " + token + " " + settings.userId);
 </script>
