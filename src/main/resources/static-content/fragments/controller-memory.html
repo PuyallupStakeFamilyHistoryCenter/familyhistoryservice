@@ -448,35 +448,6 @@ POSSIBILITY OF SUCH DAMAGE.
         
         return hasPrerequisites;
     }
-    
-    function cloneObject(obj) {
-        var serialized = window.JSON.stringify(obj);
-        var clone = window.JSON.parse(serialized);
-        return clone;
-    }
-    
-    function initCheckboxes(selector, values) {
-        $(selector).removeProp('checked').parent().removeClass("active");
-        if (values) {
-            $.each(values, function(index, value) {
-                console.info("Checking checkbox " + value);
-                $(selector + "[value="+value+"]").prop('checked','').parent().addClass("active");
-            });
-        }
-    }
-    
-    function initRadio(selector, value) {
-        $(selector).removeProp('checked').parent().removeClass("active");
-        $(selector + "[value="+value+"]").prop('checked','').parent().addClass("active");
-    }
-    
-    function getCheckboxValues(selector) {
-        var values = [];
-        $(selector + ":checked").each(function() {
-            values.push($(this).val());
-        });
-        return values;
-    }
 
     function adjustHeights(elem) {
       var fontstep = 1;

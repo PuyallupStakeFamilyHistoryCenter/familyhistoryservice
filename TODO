@@ -74,8 +74,10 @@ Set max-height on image
 Statistics:
 
 Quiz:
-*Add more questions
-*Image questions no longer appear (image URL contains '.', which is reserved)
+*Add more questions                               DONE
+*Image questions no longer appear (image URL contains '.', which is reserved) DONE
+Allow conditionals (e.g. "gender=Female?her:his") DONE
+Conditionalize relationship questions             DONE
 Difficulty levels
     Configurable # answers
     Give questions difficulty grades
@@ -89,8 +91,6 @@ Fix image questions
 Rethink layout
 Allow reporting problems with question/answers
 Figure out why some answers are 'undefined'
-Allow conditionals (e.g. "gender=Female?her:his") DONE
-Conditionalize relationship questions             DONE
 Add competitive mode (with multiple controllers?)
 
 Sliding tiles:
@@ -126,11 +126,9 @@ Library:
 Rewire sockete.js to accept a response callback
 
 Project:
+Figure out deployment strategy          DONE
+Turn features on/off for split/normal mode   DONE
 *Add third-party website links
-*Figure out deployment strategy
-*Turn features on/off for split/normal mode
-*Don't auto-disconnect controller (or increase timeout)
-Figure out why log4j & guava via Ivy aren't working
 Move css files into folder
 Move test files into folder
 Move these TODOs to the shared task board
@@ -166,6 +164,7 @@ Verify user is logged in before sending survey
 Story:
 Refine sentence-end logic
 Getting 'Synchronous XMLHttpRequest' warning
+Add option to read story aloud
 
 Memory:
 Add board size option                      DONE
@@ -174,12 +173,13 @@ Show images on controller buttons (when clicked) DONE
 Match person with facts like birth place and date DONE
 Add separate tab for settings              DONE
 Spouse name option isn't working           DONE
+Custom setting doesn't select type options DONE
 Configure number of generations to search for images
-Custom setting doesn't select type options
+Show information about matches
 
 Hangman:
-Add options tab
-Select words from other facts
+Add options tab                            DONE
+Select words from other facts              DONE
 Add hints option
 
 Screenshot:

@@ -283,26 +283,4 @@ POSSIBILITY OF SUCH DAMAGE.
         sendToDisplay("{\"responseType\":\"backgroundTransparency\",\"value\":" + config.backgroundTransparency + "}");
         sendToDisplay("{\"responseType\":\"thumbnail\",\"value\":" + config.thumbnail + "}");
     }
-
-    function cloneObject(obj) {
-        var serialized = window.JSON.stringify(obj);
-        var clone = window.JSON.parse(serialized);
-        return clone;
-    }
-    
-    function initCheckbox(selector, value) {
-        var checkbox = $(selector);
-        if (value) {
-            checkbox.prop('checked',"");
-            checkbox.parent().addClass("active");
-        } else {
-            checkbox.removeProp('checked');
-            checkbox.parent().removeClass("active");
-        }
-    }
-    
-    function initRadio(selector, value) {
-        $(selector).removeProp('checked').parent().removeClass("active");
-        $(selector + "[value="+value+"]").prop('checked','').parent().addClass("active");
-    }
 </script>

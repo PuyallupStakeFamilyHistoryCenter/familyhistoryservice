@@ -432,3 +432,9 @@ function takeScreenshot(userId) {
         background: "white"
     });
 }
+    
+function cloneObject(obj) {
+    var serialized = window.JSON.stringify(obj);
+    var clone = window.JSON.parse(serialized);
+    return clone;
+}
