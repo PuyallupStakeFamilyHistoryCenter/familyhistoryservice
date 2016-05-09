@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<!--
+Copyright (c) 2016, tibbitts
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+* Redistributions of source code must retain the above copyright notice, this
+  list of conditions and the following disclaimer.
+* Redistributions in binary form must reproduce the above copyright notice,
+  this list of conditions and the following disclaimer in the documentation
+  and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+POSSIBILITY OF SUCH DAMAGE.
+-->
+<html>
+    <head>
+        <title>Math quiz</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="/static-content/bootstrap.min.css">
+        <link rel="stylesheet" href="/static-content/bootstrap-theme.min.css">
+        <script src="http://fred-wang.github.io/mathjax.js/mpadded-min.js"></script>
+        <script src="/static-content/js/jquery-1.11.1.min.js"></script>
+        <script src="/static-content/js/bootstrap.min.js"></script>
+        <script src="/static-content/js/utils.js"></script>
+
+    </head>
+    <body>
+        <div class="jumbotron" >
+            <div id="score-div">Score: 0</div>
+            <h2 style="font-size: 3vh" >Question:</h2>
+            <div>
+                <div id="question" style="font-size:150%"> 
+                    
+                </div>
+                <input type="tel" id="answer" maxlength="3" style="margin-top: 10px" />
+                <button id="check-answer-btn" class="btn btn-primary">Submit</button>
+                <div id="response-div"></div>
+                <button type="submit" id="new-question-btn" class="btn btn-default" style="display:none">New question</button>
+            </div>
+
+        </div>
+            
+        <div id="media-holder" class="embed-responsive embed-responsive-16by9" style="display: none">
+            <iframe id="player" style="height: 100%; width: 100%; position: fixed; top: 0; left: 0;" type="text/html" src="https://www.youtube.com/embed/o_6wlKhsJ6w?controls=0&disablekb=1&enablejsapi=1&fs=1&modestbranding=1&rel=0" frameborder="0"></iframe>
+        </div>
+    
+        <script>
+            $(function() {
+                newQuestion();
+            });
+            
+            $("#new-question-btn").click(function() {
+                newQuestion();
+            })
+            
+            var score = 0;
+            var previousScore = 0;
+            var videos = [
+                {
+                    id:"o_6wlKhsJ6w",
+                    end: 180
+                },{
+                    id:"LNGGF_fzjcY",
+                },{
+                    id:"aoxXT6SiAzc",
+                },{
+                    id:"HD53JI2n9sk",
+                },{
+                    id:"8XiHjYzBH_g",
+                },{
+                    id:"joBlZ9r2jkE",
+                },{
+                    id:"tQByeGkJJSc",
+                },{
+                    id:"46CYK3QtVso",
+                },{
+                    id:"Pw6-bpZ0NnM",
+                },{
+                    id:"gFqOumnsBI8",
+                },{
+                    id:"Idh6xH9-sCk",
+                },{
+                    id:"sj73L1AHzPY",
+                    end: 309
+                },{
+                    id:"SA9an8oSpZ8",
+                    end: 227
+                },{
+                    id:"jOssxvQ3ybY",
+                    end: 221
+                },{
+                    id:"dfL5w5HNhPM",
+                    end: 113
+                }
+            ];
+            var currentPosition = 0;
+            var correctMultiplier = 1;
+            var incorrectMultiplier = .5;
+            function newQuestion() {
+                $("#response-div").html("");
+                
+                var questionAndAnswer = generateQuestion();
+                console.info("Generated question " + JSON.stringify(questionAndAnswer));
+                
+                $("#question").html(questionAndAnswer.question);
+                
+                if (questionAndAnswer.hints) {
+                    $.each(questionAndAnswer.hints, function(index, hint) {
+                        $("#hints").append("<div class='hidden hint'>"+hint+"</div>");
+                    });
+                }
+                
+                if (window.MathJax) {
+                    MathJax.Hub.Queue(["Typeset",MathJax.Hub])
+                }
+                $("#answer").val("").focus();
+                
+                $("#check-answer-btn").unbind().click(function() {
+                    var guess = $("#answer").val();
+                    
+                    var scoreChange;
+                    if (guess == questionAndAnswer.answer) {
+                        scoreChange = Math.max(.1, questionAndAnswer.difficulty * correctMultiplier + Math.floor((questionAndAnswer.template.correct?questionAndAnswer.template.correct:1)/30));
+                        $("#response-div").html("Correct! "+(questionAndAnswer.correctMessage?questionAndAnswer.correctMessage:"") + " You get " + scoreChange + " points")
+                    
+                        if (window.MathJax) {
+                            MathJax.Hub.Queue(["Typeset",MathJax.Hub])
+                        }
+                        
+                        $("#answer").prop("disabled",true);
+                        $("#check-answer-btn").prop("disabled",true);
+                        $("#new-question-btn").show();
+                        if (!questionAndAnswer.template.correct) {
+                            questionAndAnswer.template.correct = 1;
+                        } else {
+                            questionAndAnswer.template.correct++;
+                        }
+                    } else {
+                        var scoreChange = -incorrectMultiplier;
+                        $("#response-div").html("Incorrect! You lose " + scoreChange + " points");
+                        
+                        $(".hint.hidden:first").removeClass("hidden");
+                        
+                        if (!questionAndAnswer.template.correct) {
+                            questionAndAnswer.template.correct = 0;
+                        } else {
+                            questionAndAnswer.template.correct--;
+                        }
+                    }
+                    score = Math.max(score + scoreChange, 0);
+                    if (score - previousScore >= 10) {
+                        $("#media-holder").show();
+                        var additional = 0;
+                        if (currentPosition > 2) {
+                            additional = 2;
+                            skipBackwardTo(currentPosition-2);
+                        }
+                        play();
+                        currentPosition+=10;
+                        previousScore += 10;
+                        setTimeout(function() {
+                            pause();
+                            currentTime = getCurrentTime();
+                            $("#media-holder").hide();
+                        },(10 + additional) * 1000)
+                    }
+                    $("#score-div").html("Score: " + score)
+                }).removeProp("disabled");
+                $("#answer").removeProp("disabled");
+                $("#new-question-btn").hide()
+            }
+            
+            function generateQuestion() {
+                resetConstants();
+                
+                var qSet = $.merge([],$.merge($.merge(templateSets.doubles,templateSets.easy_addition_and_subtraction),templateSets.less_easy_addition_and_subtraction));
+                var templateName = getRandomElement(qSet);
+                var template = questionTemplates[templateName];
+                
+                if (!resolveConstants(template)) {
+                    throw "could not resolve template"
+                }
+                console.info("Resolved constants " + JSON.stringify(resolvedConstants));
+                
+                var hints;
+                if (template.hints) {
+                    hints = [];
+                    $.each(template.hints, function(index, hintTemplate) {
+                        hints.push(replaceVariables({}, hintTemplate, true));
+                    });
+                }
+                
+                var questionAndAnswer = {
+                    question: replaceVariables({}, template.renderTemplate, true),
+                    answer: resolvedConstants["answer"],
+                    hints: hints,
+                    difficulty: template.difficulty,
+                    correctMessage: replaceVariables({}, template.correctTemplate, true),
+                    template: template
+                };
+
+                return questionAndAnswer;
+            }
+    
+            function resolveConstants(template) {
+                var allResolved = true;
+                if (template.constants) {
+                    Object.keys(template.constants).forEach(function(key) {
+                        if ($.isFunction(template.constants[key])) {
+                            resolvedConstants[key] = template.constants[key]();
+                        } else {
+                            resolvedConstants[key] = resolveChildProperty({}, replaceVariables({}, template.constants[key], true));
+                        }
+                        allResolved = allResolved && (resolvedConstants[key]!==null&&resolvedConstants[key]!==undefined);
+                    });
+                }
+                return allResolved;
+            }
+            
+            var questionTemplates = {
+                doubles_easy: getDoublesTemplate(0,5,1),
+                doubles_less_easy: getDoublesTemplate(6,10,2),
+                addition_easy: getSimpleAdditionTemplate(0,10,0,5,1),
+                addition_less_easy: getSimpleAdditionTemplate(0,10,6,10,2),
+                subtraction_easy: getSimpleSubtractionTemplate(0,10,0,1),
+                subtraction_less_easy: getSimpleSubtractionTemplate(10,20,5,2),
+                multiplication_easy: getSimpleMultiplicationTemplate(0,4,0,4,2),
+                multiplication_less_easy: getSimpleMultiplicationTemplate(5,9,3,6,3),
+                division_easy: getSimpleDivisionTemplate(0,4,1,4,2),
+                division_less_easy: getSimpleDivisionTemplate(5,9,3,6,3),
+                fractions_easy1: getFractionReductionTemplate(10, 1, 6, 2, true),
+                fractions_easy2: getFractionReductionTemplate(10, 1, 6, 2, false),
+                fractions_less_easy1: getFractionReductionTemplate(20, 1, 10, 3, true),
+                fractions_less_easy2: getFractionReductionTemplate(20, 1, 10, 3, false),
+                algebra_addition_easy: getSimpleAlgebraWithAdditionTemplate(1,10,0,10,2)
+            }
+            var templateSets = {
+                easy_addition_and_subtraction: [
+                    "addition_easy",
+                    "addition_less_easy",
+                ],
+                less_easy_addition_and_subtraction: [
+                    "subtraction_easy",
+                    "subtraction_less_easy",
+                ],
+                double_digit_addition_and_subtraction: [
+                    
+                ],
+                easy_multiplication_and_division: [
+                    "multiplication_easy",
+                    "division_easy",
+                ],
+                less_easy_multiplication_and_division: [
+                    "multiplication_less_easy",
+                    "division_less_easy",
+                ],
+                easy_fraction_reduction: [
+                    "fractions_easy1",
+                    "fractions_easy2",
+                ],
+                less_easy_fraction_reduction: [
+                    "fractions_less_easy1",
+                    "fractions_less_easy2",
+                ],
+                easy_algebra: [
+                    "algebra_addition_easy"
+                ],
+                doubles: [
+                    "doubles_easy",
+//                    "doubles_less_easy"
+                ]
+            }
+            
+            function getDoublesTemplate(min, max, difficulty) {
+                return {
+                    constants: {
+                        n: function() {return rand(min,max)},
+                        answer: function() {return resolvedConstants["n"]*2}
+                    },
+                    difficulty: difficulty,
+                    renderTemplate: "<math><mn>${n}</mn><mo>+</mo><mn>${n}</mn><mo> = </mo></math>"
+                }
+            }
+            function getSimpleAdditionTemplate(min1, max1, min2, max2, difficulty) {
+                return {
+                    constants: {
+                        n1: function() {return rand(min1,max1)},
+                        n2: function() {return rand(min2,max2)},
+                        answer: function() {return resolvedConstants["n1"] + resolvedConstants["n2"]}
+                    },
+                    difficulty: difficulty,
+                    renderTemplate: "<math><mn>${n1}</mn><mo>+</mo><mn>${n2}</mn><mo> = </mo></math>"
+                }
+            }
+            function getSimpleSubtractionTemplate(min1, max1, min2, difficulty) {
+                return {
+                    constants: {
+                        n1: function() {return rand(min1,max1)},
+                        n2: function() {return rand(min2,resolvedConstants["n1"])},
+                        answer: function() {return resolvedConstants["n1"] - resolvedConstants["n2"]}
+                    },
+                    difficulty: difficulty,
+                    renderTemplate: "<math><mn>${n1}</mn><mo>-</mo><mn>${n2}</mn><mo> = </mo></math>"
+                }
+            }
+            function getSimpleMultiplicationTemplate(min1, max1, min2, max2, difficulty) {
+                return {
+                    constants: {
+                        n1: function() {return rand(min1,max1)},
+                        n2: function() {return rand(min2,max2)},
+                        answer: function() {return resolvedConstants["n1"] * resolvedConstants["n2"]}
+                    },
+                    difficulty: difficulty,
+                    renderTemplate: "<math><mn>${n1}</mn><mo>*</mo><mn>${n2}</mn><mo> = </mo></math>"
+                }
+            }
+            function getSimpleDivisionTemplate(min1, max1, min2, max2, difficulty) {
+                return {
+                    constants: {
+                        answer: function() {return rand(min1,max1)},
+                        n2: function() {return rand(min2,max2)},
+                        n1: function() {return resolvedConstants["answer"] * resolvedConstants["n2"]}
+                    },
+                    difficulty: difficulty,
+                    renderTemplate: "<math><mn>${n1}</mn><mo>&divide;</mo><mn>${n2}</mn><mo> = </mo></math>",
+                }
+            }
+            function getFractionReductionTemplate(max,fMin,fMax,difficulty,isNumerator) {
+                return {
+                    constants: {
+                        nd: function() {return getRelativelyPrimeNumbers(max)},
+                        n: function() {
+                            return resolvedConstants["nd"][0][0]
+                        },
+                        d: function() {
+                            return resolvedConstants["nd"][1][0]
+                        },
+                        f: function() {return rand(fMin,fMax)},
+                        nf: function() {
+                            return resolvedConstants["n"]*resolvedConstants["f"]
+                        },
+                        df: function() {
+                            return resolvedConstants["d"]*resolvedConstants["f"]
+                        },
+                        answer: function() {return isNumerator ? resolvedConstants["n"] : resolvedConstants["d"]}
+                    },
+                    difficulty: difficulty,
+                    renderTemplate: "What is the <strong>" + (isNumerator ? "numerator" : "denominator") + "</strong> of the reduced form of <math><mfrac><mn>${nf}</mn><mn>${df}</mn></mfrac></math>?",
+                    correctTemplate: "<math><mfrac><mn>${nf}</mn><mn>${df}</mn></mfrac></math> reduces to <math><mfrac><mn>${n}</mn><mn>${d}</mn></mfrac></math>."
+                }
+            }
+            var variableLetters = ['x','y','z','a','b','c']
+            function getSimpleAlgebraWithAdditionTemplate(min1,max1,min2,max2,difficulty) {
+                return {
+                    constants: {
+                        v: function() { 
+                            return getRandomElement(variableLetters) },
+                        n1: function() { 
+                            return rand(min1,max1) },
+                        answer: function() { 
+                            return rand(min2, max2) },
+                        n2: function() { return resolvedConstants["n1"] + resolvedConstants["answer"]}
+                        
+                    },
+                    difficulty: difficulty,
+                    renderTemplate: "Solve for <math><mi>${v}</mi></math>: <math><mi>${v}</mi><mo>+</mo><mn>${n1}</mn><mo>=</mo><mn>${n2}</mn></math><div id='hints'></div><math><mi>${v}</mi><mo>=</mo></math>",
+                    hints: [
+                        "First, subtract <math><mn>${n1}</mn></math> from each side: <math><mi>${v}</mi><mo>+</mo><mn>${n1}</mn><mo>-</mo><mn>${n1}</mn><mo>=</mo><mn>${n2}</mn><mo>-</mo><mn>${n1}</mn></math>",
+                        "Then, reduce on both sides: <math><mi>${v}</mi><mo>+</mo><menclose notation='horizontalstrike'><mn>${n1}</mn><mo>-</mo><mn>${n1}</mn></menclose><mo>=</mo><menclose notation='bottom'><mn>${n2}</mn><mo>-</mo><mn>${n1}</mn></menclose></math>",
+                    ]
+                }
+            }
+            
+            var primes = [2,3,5,7,11,13,17,19]
+            function getRelativelyPrimeNumbers(max) {
+                var filteredPrimes = filterArray(primes, "*<"+max);
+                var num1AndFactors = buildNumber(filteredPrimes, max);
+                var num2AndFactors = buildNumber(filteredPrimes, max);
+                return [num1AndFactors,num2AndFactors];
+            }
+            
+            function buildNumber(possibleFactors, max) {
+                var index = rand(0, possibleFactors.length-1);
+                var factor = possibleFactors[index];
+                var num = factor;
+                var actualFactors = [];
+                actualFactors[factor]=1;
+                possibleFactors.splice(index,1);
+                while (num < max) {
+                    if (rand(0,possibleFactors.length) !== possibleFactors.length) {
+                        index = rand(0, possibleFactors.length-1);
+                        factor = possibleFactors[index];
+                        if (num * factor > max) {
+                            break;
+                        }
+                        possibleFactors.splice(index,1);
+                    }
+                    num *= factor;
+                    if (actualFactors[factor]) {
+                        actualFactors[factor]++;
+                    } else {
+                        actualFactors[factor] = 1;
+                    }
+                }
+                return [num, actualFactors];
+            }
+            
+            $("#player").load(function () {
+                try {
+                    //Test if YouTube API already loaded
+                    onYouTubeIframeAPIReady();
+                } catch (e) {
+                    var tag = document.createElement('script');
+
+                    tag.src = "https://www.youtube.com/iframe_api";
+                    var player = document.getElementById("player");
+                    player.parentNode.insertBefore(tag, player);
+                }
+            });
+
+            var player,suppress;
+            function onYouTubeIframeAPIReady() {
+                player = new YT.Player('player', {
+                    events: {
+                        'onReady': onPlayerReady,
+                        'onStateChange': onPlayerStateChange
+                    }
+                });
+            }
+    
+            function onPlayerReady(event) {
+                ready = true;
+                load(getRandomElement(videos))
+            }
+
+            function onPlayerStateChange(event) {
+                if (!suppress) {
+                    switch (event.data) {
+                        case YT.PlayerState.ENDED:
+                            if (!suppress) {
+                                console.info("Video ended");
+                                $("#media-holder").hide();
+                                load(getRandomElement(videos));
+                            }
+                            break;
+                    }
+                }
+            }
+
+    
+            function load(video) {
+                console.info("Loading video");
+                var config = {
+                    'videoId': video.id,
+                    'startSeconds': video.start,
+                    'endSeconds': video.end
+                }
+                player.cueVideoById(config);
+                suppress = true;
+                setTimeout(function() {
+                    suppress = false;
+                },1000);
+            }
+            
+            function play() {
+                console.info("Playing video");
+                if (!suppress) player.playVideo();
+            }
+            
+            function pause() {
+                console.info("Pausing video");
+                if (!suppress) player.pauseVideo();
+            }
+            
+            function getCurrentTime() {
+                return player.getCurrentTime();
+            }
+            
+            function skipBackward(time) {
+                if (!time) {
+                    time = 2;
+                }
+                if (!suppress) {
+                    var currentTime = player.getCurrentTime();
+                    player.seekTo(currentTime - time, true);
+                }
+            }
+            
+            function skipBackwardTo(time) {
+                if (!suppress) {
+                    player.seekTo(time, true);
+                }
+            }
+        </script>
+    </body>
+</html>

@@ -181,7 +181,7 @@ function filterArray(array, rawFilters) {
         var rawKey2 = filterMatches[3] === "null" ? null : filterMatches[3];
 
         $.each(currentArray, function (index2, arrayValue) {
-            var value1 = resolveChildProperty(arrayValue,rawKey1,rawKey1);//filterKey != null && filterKey.length > 0 ? arrayValue[filterKey] : arrayValue;
+            var value1 = resolveChildProperty(arrayValue,rawKey1,arrayValue);//filterKey != null && filterKey.length > 0 ? arrayValue[filterKey] : arrayValue;
             var value2 = resolveChildProperty(arrayValue,rawKey2,rawKey2);
             if (evaluateBinaryExpression(value1, operator, value2)) {
                 newArray.push(arrayValue);
@@ -326,6 +326,10 @@ function replaceVariables(obj, original, encode) {
 }
     
 var resolvedConstants = {};
+
+function resetConstants() {
+    resolvedConstants = {};
+}
     
 function resolveChildProperty(obj, path, defaultValue) {
     if (path == null) {
@@ -365,7 +369,7 @@ function resolveChildProperty(obj, path, defaultValue) {
                     currentObject = stats;
                 } else if (key[0] === "*") {
                     currentObject = getRandomElement(filterArray(currentObject, key.substr(1)));
-                } else if (resolvedConstants[key] && index === 0) {
+                } else if (resolvedConstants[key] !== null && resolvedConstants[key] !== undefined && index === 0) {
                     currentObject = resolvedConstants[key];
                 } else if (currentObject && currentObject[key]) {
                     currentObject = currentObject[key];
@@ -376,7 +380,7 @@ function resolveChildProperty(obj, path, defaultValue) {
         } while (split[0] === "*" && currentObject === null && currentTry < maxTries);
     }
 
-    if (currentObject == null) {
+    if (currentObject === null || currentObject === undefined) {
         currentObject = defaultValue;
     }
     return currentObject;
