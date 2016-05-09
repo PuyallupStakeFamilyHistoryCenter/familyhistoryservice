@@ -29,6 +29,7 @@ POSSIBILITY OF SUCH DAMAGE.
         <title>Math quiz</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link href='https://fonts.googleapis.com/css?family=Open+Sans:700' rel='stylesheet' type='text/css'>
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
         <script src="http://fred-wang.github.io/mathjax.js/mpadded-min.js"></script>
         <script src="http://code.jquery.com/jquery-1.12.3.min.js"></script>
@@ -37,19 +38,24 @@ POSSIBILITY OF SUCH DAMAGE.
 
     </head>
     <body>
-        <div class="jumbotron" >
-            <div id="score-div">Score: 0</div>
-            <h2 style="font-size: 3vh" >Question:</h2>
-            <div>
-                <div id="question" style="font-size:150%"> 
-                    
-                </div>
-                <input type="tel" id="answer" maxlength="3" style="margin-top: 10px" />
-                <button id="check-answer-btn" class="btn btn-primary">Submit</button>
-                <div id="response-div"></div>
-                <button type="submit" id="new-question-btn" class="btn btn-default" style="display:none">New question</button>
-            </div>
+        <div class="page-header">
+            <h1 style="font-family: 'Open Sans', sans-serif, bold;">Game of Mastery <small>by Graham</small></h1>
+        </div>
+        <div class="container">
+            <div class="jumbotron" >
+                <div id="score-div">Score: 0</div>
+                <h2 style="font-size: 3vh" >Question:</h2>
+                <div>
+                    <div id="question" style="font-size:150%"> 
 
+                    </div>
+                    <input type="tel" id="answer" maxlength="3" style="margin-top: 10px" />
+                    <button id="check-answer-btn" class="btn btn-primary">Submit</button>
+                    <div id="response-div"></div>
+                    <button type="submit" id="new-question-btn" class="btn btn-default" style="display:none">New question</button>
+                </div>
+
+            </div>
         </div>
             
         <div id="media-holder" class="embed-responsive embed-responsive-16by9" style="display: none">
@@ -125,7 +131,6 @@ POSSIBILITY OF SUCH DAMAGE.
                 if (window.MathJax) {
                     MathJax.Hub.Queue(["Typeset",MathJax.Hub])
                 }
-                $("#answer").val("").focus();
                 
                 $("#check-answer-btn").unbind().click(function() {
                     var guess = $("#answer").val();
@@ -178,8 +183,10 @@ POSSIBILITY OF SUCH DAMAGE.
                     }
                     $("#score-div").html("Score: " + score)
                 }).removeProp("disabled");
+                $("#new-question-btn").hide();
                 $("#answer").removeProp("disabled");
-                $("#new-question-btn").hide()
+                $("#answer").val("");
+                document.getElementById("answer").focus();
             }
             
             function generateQuestion() {
@@ -234,8 +241,10 @@ POSSIBILITY OF SUCH DAMAGE.
                 doubles_less_easy: getDoublesTemplate(6,10,2),
                 addition_easy: getSimpleAdditionTemplate(0,10,0,5,1),
                 addition_less_easy: getSimpleAdditionTemplate(0,10,6,10,2),
+                addition_double_digit: getSimpleAdditionTemplate(10,50,10,50,3),
                 subtraction_easy: getSimpleSubtractionTemplate(0,10,0,1),
                 subtraction_less_easy: getSimpleSubtractionTemplate(10,20,5,2),
+                subtraction_double_digit: getSimpleSubtractionTemplate(50,100,10,3),
                 multiplication_easy: getSimpleMultiplicationTemplate(0,4,0,4,2),
                 multiplication_less_easy: getSimpleMultiplicationTemplate(5,9,3,6,3),
                 division_easy: getSimpleDivisionTemplate(0,4,1,4,2),
@@ -249,14 +258,15 @@ POSSIBILITY OF SUCH DAMAGE.
             var templateSets = {
                 easy_addition_and_subtraction: [
                     "addition_easy",
-                    "addition_less_easy",
+                    "subtraction_easy",
                 ],
                 less_easy_addition_and_subtraction: [
-                    "subtraction_easy",
+                    "addition_less_easy",
                     "subtraction_less_easy",
                 ],
                 double_digit_addition_and_subtraction: [
-                    
+                    "addition_double_digit",
+                    "subtraction_double_digit",
                 ],
                 easy_multiplication_and_division: [
                     "multiplication_easy",
