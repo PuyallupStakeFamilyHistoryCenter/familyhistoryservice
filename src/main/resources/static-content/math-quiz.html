@@ -24,81 +24,174 @@ CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 -->
+
+<!-- 
+TODO:
+
+Add more videos
+Factor utils.js out of JS
+Use local versions of JS files
+Save score and bonus
+Save current video and position
+Save config
+Set daily goals (per question type)
+-->
+
 <html>
     <head>
         <title>Math quiz</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         
-        <link href='https://fonts.googleapis.com/css?family=Open+Sans:700' rel='stylesheet' type='text/css'>
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
-        
         <script src="http://fred-wang.github.io/mathjax.js/mpadded-min.js"></script>
         <script src="http://code.jquery.com/jquery-1.12.3.min.js"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+        <script src="js/js.cookie.js"></script>
         <script src="/static-content/js/utils.js"></script>
 
-    </head>
-    <body>
-        <div class="container">
-            <div class="page-header">
-                <h1 style="font-family: 'Open Sans', sans-serif, bold;">Game of Mastery <small>by Graham</small></h1>
-            </div>
-            <h3 id="score-div" class="pull-right">Score: 0</h3>
-            <div class="jumbotron" style="clear: both" >
-                <h2 style="font-size: 3vh" >Question:</h2>
-                <div>
-                    <div id="question" style="font-size:150%"> 
-
-                    </div>
-                    <input type="tel" id="answer" maxlength="3" style="margin-top: 10px" />
-                    <button id="check-answer-btn" class="btn btn-primary">Submit</button>
-                    <div id="response-div"></div>
-                    <button type="submit" id="new-question-btn" class="btn btn-default" style="display:none">New question</button>
-                </div>
-
-            </div>
-        </div>
-            
-        <div id="media-holder" class="embed-responsive embed-responsive-16by9" style="display: none">
-            <iframe id="player" style="height: 100%; width: 100%; position: fixed; top: 0; left: 0;" type="text/html" src="https://www.youtube.com/embed/o_6wlKhsJ6w?controls=0&disablekb=1&enablejsapi=1&fs=1&modestbranding=1&rel=0" frameborder="0"></iframe>
-        </div>
-    
         <script>
+            var bonus = 0;
+            var score = 0;
+            var previousScore = 0;
+            var settings;
+            var selectedTemplateSets;
+            var currentPosition = 0;
+            var correctMultiplier = 1;
+            var incorrectMultiplier = .5;
             $(function() {
+            
+                $("#new-question-btn").click(function() {
+                    newQuestion();
+                });
+
+                $("#settings-btn").click(function() {
+                    $("#settings-modal").modal();
+                });
+
+                $("#save-settings-btn").click(function() {
+                    $("#settings-modal").modal("hide");
+                    selectedTemplateSets = [];
+                    $("input[name=type]:checked").each(function() {
+                        selectedTemplateSets.push($(this).val());
+                    });
+                    Cookies.set("types", selectedTemplateSets, { expires: 365 });
+                    
+                    settings = {};
+                    $("input[name=settings]").each(function() {
+                        var key = $(this).val();
+                        var value = !!$(this).prop("checked");
+                        
+                        settings[key] = value;
+                    });
+                    Cookies.set("settings", settings, { expires: 365 });
+                    
+                    newQuestion();
+                });
+            
+                $("#answer").change(function() {
+                    $("#check-answer-btn").removeProp("disabled");
+                });
+            
+                $("#player").load(function () {
+                    try {
+                        //Test if YouTube API already loaded
+                        onYouTubeIframeAPIReady();
+                    } catch (e) {
+                        var tag = document.createElement('script');
+
+                        tag.src = "https://www.youtube.com/iframe_api";
+                        var player = document.getElementById("player");
+                        player.parentNode.insertBefore(tag, player);
+                    }
+                });
+                
+                $.each(templateSets, function(index, templateSet) {
+                    var groupDiv = $("#types-" + templateSet.group);
+                    if (!groupDiv.length) {
+                        var templateSetGroup = templateSetGroups[templateSet.group];
+                        $("#types-div").append(
+                            "    <div class='panel-heading'>\n"+
+                            "        <h5><a data-toggle='collapse' data-parent='#types-div' href='#type-collapse-"+templateSet.group+"'>"+templateSetGroup.name+"</a></h5>\n"+
+                            "    </div>\n"+
+                            "    <div id='type-collapse-"+templateSet.group+"' class='panel-body collapse'>\n"+
+                            "        <div id='types-"+templateSet.group+"' class='btn-group btn-group-sm' data-toggle='buttons'></div>\n"+
+                            "    </div>"
+                            );
+                    }
+                    $("#types-"+templateSet.group).append(
+                            "<label class='btn btn-default'><input type='checkbox' name='type' value='"+index+"' />"+templateSet.name+"</label>");
+                });
+                
+                settings = Cookies.getJSON("settings");
+                if (!settings) {
+                    settings = {};
+                }
+                
+                selectedTemplateSets = Cookies.getJSON("types");
+                if (!selectedTemplateSets) {
+                    selectedTemplateSets = ["easy_addition_and_subtraction"];
+                }
+                
+                $.each(selectedTemplateSets, function(index, templateSetName) {
+                    $("input[name=type][value=" + templateSetName + "]").prop("checked", true).parent().addClass("active");
+                });
+                
+                state = Cookies.getJSON("state");
+                if (!state) {
+                    state = 0;
+                }
+                score = state.score;
+                if (!score) {
+                    score = 0;
+                }
+                bonus = state.bonus;
+                if (!bonus) {
+                    bonus = 0;
+                }
+                previousScore = state.previousScore;
+                if (!previousScore) {
+                    previousScore = 0;
+                }
+                displayScore();
+                
                 newQuestion();
             });
             
-            $("#new-question-btn").click(function() {
-                newQuestion();
-            })
-            
-            var score = 0;
-            var previousScore = 0;
             var videos = [
                 {
                     id:"o_6wlKhsJ6w",
                     end: 180
                 },{
                     id:"LNGGF_fzjcY",
+                    end: 174
                 },{
                     id:"aoxXT6SiAzc",
+                    end: 162
                 },{
                     id:"HD53JI2n9sk",
+                    end: 160
                 },{
                     id:"8XiHjYzBH_g",
+                    end: 171
                 },{
                     id:"joBlZ9r2jkE",
+                    end: 129
                 },{
                     id:"tQByeGkJJSc",
-                },{
-                    id:"46CYK3QtVso",
-                },{
+                    end: 209
+                },
+//                {
+//                    id:"46CYK3QtVso",
+//                },
+                {
                     id:"Pw6-bpZ0NnM",
+                    end: 158
                 },{
                     id:"gFqOumnsBI8",
+                    end: 155
                 },{
                     id:"Idh6xH9-sCk",
+                    end: 234
                 },{
                     id:"sj73L1AHzPY",
                     end: 309
@@ -113,9 +206,6 @@ POSSIBILITY OF SUCH DAMAGE.
                     end: 113
                 }
             ];
-            var currentPosition = 0;
-            var correctMultiplier = 1;
-            var incorrectMultiplier = .5;
             function newQuestion() {
                 $("#response-div").html("");
                 
@@ -134,12 +224,28 @@ POSSIBILITY OF SUCH DAMAGE.
                     MathJax.Hub.Queue(["Typeset",MathJax.Hub])
                 }
                 
-                $("#check-answer-btn").unbind().click(function() {
+                if (questionAndAnswer.speech) {
+                    say(questionAndAnswer.speech);
+                    
+                    $("#repeat-btn").unbind().click(function() {
+                        say(questionAndAnswer.speech);
+                    }).show();
+                } else {
+                    $("#repeat-btn").unbind().hide();
+                }
+                
+                $("#q-and-a-form").unbind().submit(function() {
                     var guess = $("#answer").val();
+                    
+                    if (guess === "") {
+                        return false;
+                    }
                     
                     var scoreChange;
                     if (guess == questionAndAnswer.answer) {
-                        scoreChange = Math.max(.1, questionAndAnswer.difficulty * correctMultiplier + Math.floor((questionAndAnswer.template.correct?questionAndAnswer.template.correct:1)/30));
+                        cancelCountdown();
+                        
+                        scoreChange = Math.max(.1, questionAndAnswer.difficulty * correctMultiplier + Math.floor((questionAndAnswer.template.correct?questionAndAnswer.template.correct:1)/30)+Math.ceil(timeLeft));
                         $("#response-div").html("Correct! "+(questionAndAnswer.correctMessage?questionAndAnswer.correctMessage:"") + " You get " + scoreChange + " points")
                     
                         if (window.MathJax) {
@@ -148,12 +254,17 @@ POSSIBILITY OF SUCH DAMAGE.
                         
                         $("#answer").prop("disabled",true);
                         $("#check-answer-btn").prop("disabled",true);
-                        $("#new-question-btn").show();
+                        
+                        setTimeout(function() {
+                            $("#new-question-btn").show().removeProp("disabled").focus();
+                        },100);
                         if (!questionAndAnswer.template.correct) {
                             questionAndAnswer.template.correct = 1;
                         } else {
                             questionAndAnswer.template.correct++;
                         }
+                        
+                        bonus++;
                     } else {
                         var scoreChange = -incorrectMultiplier;
                         $("#response-div").html("Incorrect! You lose " + scoreChange + " points");
@@ -165,38 +276,46 @@ POSSIBILITY OF SUCH DAMAGE.
                         } else {
                             questionAndAnswer.template.correct--;
                         }
+                        
+                        bonus = 0;
                     }
                     score = Math.max(score + scoreChange, 0);
-                    if (score - previousScore >= 10) {
-                        $("#media-holder").show();
-                        var additional = 0;
-                        if (currentPosition > 2) {
-                            additional = 2;
-                            skipBackwardTo(currentPosition-2);
-                        }
-                        play();
-                        currentPosition+=10;
+                    if (score - previousScore >= 10 && scoreChange > 0) {
                         previousScore += 10;
-                        setTimeout(function() {
-                            pause();
-                            currentTime = getCurrentTime();
-                            $("#media-holder").hide();
-                        },(10 + additional) * 1000)
+                        
+                        var additional = Math.floor(bonus/10)*3;
+                        playFor(10+additional);
                     }
-                    $("#score-div").html("Score: " + score)
-                }).removeProp("disabled");
-                $("#new-question-btn").hide();
+                    Cookies.set("state", {
+                        score: score,
+                        bonus: bonus,
+                        previousScore: previousScore
+                    })
+                    displayScore();
+                    return false;
+                });
+                $("#new-question-btn").hide().prop("disabled",true);
                 $("#answer").removeProp("disabled");
                 $("#answer").val("");
+                
+                setCountdown(questionAndAnswer.difficulty + 2);
+                
                 document.getElementById("answer").focus();
             }
             
             function generateQuestion() {
                 resetConstants();
                 
-                var qSet = $.merge([],$.merge($.merge(templateSets.doubles,templateSets.easy_addition_and_subtraction),templateSets.less_easy_addition_and_subtraction));
-                var templateName = getRandomElement(qSet);
-                var template = questionTemplates[templateName];
+                var template;
+                while (true) {
+                    var templateSetName = getRandomElement(selectedTemplateSets);
+                    var templateSet = templateSets[templateSetName];
+                    var templateName = getRandomElement(templateSet.templates);
+                    template = questionTemplates[templateName];
+                    if (!template.correct || rand(1,100) > template.correct) {
+                        break;
+                    }
+                }
                 
                 if (!resolveConstants(template)) {
                     throw "could not resolve template"
@@ -207,16 +326,22 @@ POSSIBILITY OF SUCH DAMAGE.
                 if (template.hints) {
                     hints = [];
                     $.each(template.hints, function(index, hintTemplate) {
-                        hints.push(replaceVariables({}, hintTemplate, true));
+                        hints.push(replaceVariables({}, hintTemplate, false));
                     });
                 }
                 
+                var speech;
+                if (template.speechTemplate) {
+                    speech = replaceVariables({}, template.speechTemplate, false);
+                }
+                
                 var questionAndAnswer = {
-                    question: replaceVariables({}, template.renderTemplate, true),
+                    question: replaceVariables({}, template.renderTemplate, false),
+                    speech: speech,
                     answer: resolvedConstants["answer"],
                     hints: hints,
                     difficulty: template.difficulty,
-                    correctMessage: replaceVariables({}, template.correctTemplate, true),
+                    correctMessage: replaceVariables({}, template.correctTemplate, false),
                     template: template
                 };
 
@@ -238,15 +363,45 @@ POSSIBILITY OF SUCH DAMAGE.
                 return allResolved;
             }
             
+            function displayScore() {
+                $("#score-div").html("Score: " + score + (bonus > 10 ? " <small>Bonus: " + Math.floor(bonus/10) : "") + "</small>")
+            }
+            
+            var simpleSpellingWords1 = ["max", "word", "cat", "hog", "smog", "log", "bog", "look", "hook", "book"]
+            var simpleSpellingWords2 = ["all", "and", "bag", "bat", "bed", "but", "bit", "bug"];
+            var simpleSpellingWords3 = ["dip", "hot", "how", "pay", "pen", "sat", "tub", "tap", "top"]
+            var simpleSpellingWords4 = ["one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"]
+
             var questionTemplates = {
                 doubles_easy: getDoublesTemplate(0,5,1),
                 doubles_less_easy: getDoublesTemplate(6,10,2),
+                ones_addition1: getSimpleAdditionTemplate(0,10,1,1,1),
+                ones_addition2: getSimpleAdditionTemplate(1,1,0,10,1),
+                twos_addition1: getSimpleAdditionTemplate(0,10,2,2,1),
+                twos_addition2: getSimpleAdditionTemplate(2,2,0,10,1),
+                threes_addition1: getSimpleAdditionTemplate(0,10,3,3,1),
+                threes_addition2: getSimpleAdditionTemplate(3,3,0,10,1),
+                fours_addition1: getSimpleAdditionTemplate(0,10,4,4,1),
+                fours_addition2: getSimpleAdditionTemplate(4,4,0,10,1),
+                fives_addition1: getSimpleAdditionTemplate(0,10,5,5,1),
+                fives_addition2: getSimpleAdditionTemplate(5,5,0,10,1),
+                sixes_addition1: getSimpleAdditionTemplate(0,10,6,6,2),
+                sixes_addition2: getSimpleAdditionTemplate(6,6,0,10,2),
+                sevens_addition1: getSimpleAdditionTemplate(0,10,7,7,2),
+                sevens_addition2: getSimpleAdditionTemplate(7,7,0,10,2),
+                eights_addition1: getSimpleAdditionTemplate(0,10,8,8,2),
+                eights_addition2: getSimpleAdditionTemplate(8,8,0,10,2),
+                nines_addition1: getSimpleAdditionTemplate(0,10,9,9,2),
+                nines_addition2: getSimpleAdditionTemplate(9,9,0,10,2),
+                tens_addition1: getSimpleAdditionTemplate(0,10,10,10,1),
+                tens_addition2: getSimpleAdditionTemplate(10,10,0,10,1),
                 addition_easy: getSimpleAdditionTemplate(0,10,0,5,1),
                 addition_less_easy: getSimpleAdditionTemplate(0,10,6,10,2),
                 addition_double_digit: getSimpleAdditionTemplate(10,50,10,50,3),
                 subtraction_easy: getSimpleSubtractionTemplate(0,10,0,1),
                 subtraction_less_easy: getSimpleSubtractionTemplate(10,20,5,2),
                 subtraction_double_digit: getSimpleSubtractionTemplate(50,100,10,3),
+                subtraction_easy_with_negative_answers: getSimpleSubtractionWithNegativeAnswerTemplate(0,10,13,3),
                 multiplication_easy: getSimpleMultiplicationTemplate(0,4,0,4,2),
                 multiplication_less_easy: getSimpleMultiplicationTemplate(5,9,3,6,3),
                 division_easy: getSimpleDivisionTemplate(0,4,1,4,2),
@@ -255,45 +410,215 @@ POSSIBILITY OF SUCH DAMAGE.
                 fractions_easy2: getFractionReductionTemplate(10, 1, 6, 2, false),
                 fractions_less_easy1: getFractionReductionTemplate(20, 1, 10, 3, true),
                 fractions_less_easy2: getFractionReductionTemplate(20, 1, 10, 3, false),
-                algebra_addition_easy: getSimpleAlgebraWithAdditionTemplate(1,10,0,10,2)
+                algebra_1_step_addition_and_subtraction_easy: getAlgebra1StepAdditionAndSubtractionTemplate(-10,10,-10,10,2),
+                algebra_1_step_multiplication_easy: getAlgebra1StepMultiplicationTemplate(-10,10,-10,10,3),
+//                algebra_1_step_division_easy: getAlgebra1StepDivisionTemplate(-10,10,-10,10,2),
+                spelling_easy1: getSimpleSpellingTemplate(simpleSpellingWords1),
+                spelling_easy2: getSimpleSpellingTemplate(simpleSpellingWords2),
+                spelling_easy3: getSimpleSpellingTemplate(simpleSpellingWords3),
+                spelling_easy4: getSimpleSpellingTemplate(simpleSpellingWords4),
+                reading_easy: getSimpleReadingTemplate()
             }
             var templateSets = {
-                easy_addition_and_subtraction: [
-                    "addition_easy",
-                    "subtraction_easy",
-                ],
-                less_easy_addition_and_subtraction: [
-                    "addition_less_easy",
-                    "subtraction_less_easy",
-                ],
-                double_digit_addition_and_subtraction: [
-                    "addition_double_digit",
-                    "subtraction_double_digit",
-                ],
-                easy_multiplication_and_division: [
-                    "multiplication_easy",
-                    "division_easy",
-                ],
-                less_easy_multiplication_and_division: [
-                    "multiplication_less_easy",
-                    "division_less_easy",
-                ],
-                easy_fraction_reduction: [
-                    "fractions_easy1",
-                    "fractions_easy2",
-                ],
-                less_easy_fraction_reduction: [
-                    "fractions_less_easy1",
-                    "fractions_less_easy2",
-                ],
-                easy_algebra: [
-                    "algebra_addition_easy"
-                ],
-                doubles: [
-                    "doubles_easy",
-//                    "doubles_less_easy"
-                ]
+                easy_addition_and_subtraction: {
+                    name: "Easy addition and subtraction",
+                    group: "addition_and_subtraction",
+                    templates: [
+                        "addition_easy",
+                        "subtraction_easy",
+                    ]
+                },
+                less_easy_addition_and_subtraction: {
+                    name: "Less easy addition and subtraction",
+                    group: "addition_and_subtraction",
+                    templates: [
+                        "addition_less_easy",
+                        "subtraction_less_easy",
+                    ]
+                },
+                double_digit_addition_and_subtraction: {
+                    name: "Double digit addition and subtraction",
+                    group: "addition_and_subtraction",
+                    templates: [
+                        "addition_double_digit",
+                        "subtraction_double_digit",
+                    ]
+                },
+                ones_addition: {
+                    name: "Ones addition",
+                    group: "addition_and_subtraction",
+                    templates: [
+                        "ones_addition1",
+                        "ones_addition2"
+                    ]
+                },
+                twos_addition: {
+                    name: "Twos addition",
+                    group: "addition_and_subtraction",
+                    templates: [
+                        "twos_addition1",
+                        "twos_addition2"
+                    ]
+                },
+                threes_addition: {
+                    name: "Threes addition",
+                    group: "addition_and_subtraction",
+                    templates: [
+                        "threes_addition1",
+                        "threes_addition2"
+                    ]
+                },
+                fours_addition: {
+                    name: "Fours addition",
+                    group: "addition_and_subtraction",
+                    templates: [
+                        "fours_addition1",
+                        "fours_addition2"
+                    ]
+                },
+                fives_addition: {
+                    name: "Fives addition",
+                    group: "addition_and_subtraction",
+                    templates: [
+                        "fives_addition1",
+                        "fives_addition2"
+                    ]
+                },
+                sixes_addition: {
+                    name: "Sixes addition",
+                    group: "addition_and_subtraction",
+                    templates: [
+                        "sixes_addition1",
+                        "sixes_addition2"
+                    ]
+                },
+                sevens_addition: {
+                    name: "Sevens addition",
+                    group: "addition_and_subtraction",
+                    templates: [
+                        "sevens_addition1",
+                        "sevens_addition2"
+                    ]
+                },
+                eights_addition: {
+                    name: "Eights addition",
+                    group: "addition_and_subtraction",
+                    templates: [
+                        "eights_addition1",
+                        "eights_addition2"
+                    ]
+                },
+                nines_addition: {
+                    name: "Nines addition",
+                    group: "addition_and_subtraction",
+                    templates: [
+                        "nines_addition1",
+                        "nines_addition2"
+                    ]
+                },
+                tens_addition: {
+                    name: "Tens addition",
+                    group: "addition_and_subtraction",
+                    templates: [
+                        "tens_addition1",
+                        "tens_addition2"
+                    ]
+                },
+                doubles: {
+                    name: "Doubles addition",
+                    group: "addition_and_subtraction",
+                    templates: [
+                        "doubles_easy",
+                        "doubles_less_easy"
+                    ]
+                },
+                easy_addition_and_subtraction_with_negative_answers: {
+                    name: "Easy addition and subtraction with negative answers",
+                    group: "addition_and_subtraction",
+                    templates: [
+                        "subtraction_easy_with_negative_answers"
+                    ]
+                },
+                easy_multiplication_and_division: {
+                    name: "Easy multiplication and division",
+                    group: "multiplication_and_division",
+                    templates: [
+                        "multiplication_easy",
+                        "division_easy",
+                    ]
+                },
+                less_easy_multiplication_and_division: {
+                    name: "Less easy multiplication and division",
+                    group: "multiplication_and_division",
+                    templates: [
+                        "multiplication_less_easy",
+                        "division_less_easy",
+                    ]
+                },
+                easy_fraction_reduction: {
+                    name: "Easy fraction reduction",
+                    group: "fractions",
+                    templates: [
+                        "fractions_easy1",
+                        "fractions_easy2",
+                    ]
+                },
+                less_easy_fraction_reduction: {
+                    name: "Less easy fraction reduction",
+                    group: "fractions",
+                    templates: [
+                        "fractions_less_easy1",
+                        "fractions_less_easy2",
+                    ]
+                },
+                easy_algebra: {
+                    name: "Easy algebra",
+                    group: "algebra",
+                    templates: [
+                        "algebra_1_step_addition_and_subtraction_easy",
+                        "algebra_1_step_multiplication_easy"
+                    ]
+                },
+                easy_spelling: {
+                    name: "Easy spelling",
+                    group: "spelling",
+                    templates: [
+                        "spelling_easy1",
+                        "spelling_easy2",
+                        "spelling_easy3",
+                        "spelling_easy4"
+                    ]
+                },
+                easy_reading: {
+                    name: "Easy reading",
+                    group: "reading",
+                    templates: [
+                        "reading_easy"
+                    ]
+                }
             }
+            
+            var templateSetGroups = {
+                addition_and_subtraction: {
+                    name: "Addition and Subtraction"
+                },
+                multiplication_and_division: {
+                    name: "Multiplication and Division"
+                },
+                fractions: {
+                    name: "Fractions"
+                },
+                algebra: {
+                    name: "Algebra"
+                },
+                spelling: {
+                    name: "Spelling"
+                },
+                reading: {
+                    name: "Reading"
+                }
+            }
+
             
             function getDoublesTemplate(min, max, difficulty) {
                 return {
@@ -321,6 +646,17 @@ POSSIBILITY OF SUCH DAMAGE.
                     constants: {
                         n1: function() {return rand(min1,max1)},
                         n2: function() {return rand(min2,resolvedConstants["n1"])},
+                        answer: function() {return resolvedConstants["n1"] - resolvedConstants["n2"]}
+                    },
+                    difficulty: difficulty,
+                    renderTemplate: "<math><mn>${n1}</mn><mo>-</mo><mn>${n2}</mn><mo> = </mo></math>"
+                }
+            }
+            function getSimpleSubtractionWithNegativeAnswerTemplate(min1, max1, max2, difficulty) {
+                return {
+                    constants: {
+                        n1: function() {return rand(min1,max1)},
+                        n2: function() {return rand(resolvedConstants["n1"]+1,max2)},
                         answer: function() {return resolvedConstants["n1"] - resolvedConstants["n2"]}
                     },
                     difficulty: difficulty,
@@ -366,32 +702,143 @@ POSSIBILITY OF SUCH DAMAGE.
                         df: function() {
                             return resolvedConstants["d"]*resolvedConstants["f"]
                         },
-                        answer: function() {return isNumerator ? resolvedConstants["n"] : resolvedConstants["d"]}
+                        answer: function() {return isNumerator ? resolvedConstants["n"] : resolvedConstants["d"]},
+                        correct: function() {
+                            if (resolvedConstants["f"] == 1) {
+                                return "<math><mfrac><mn>${nf}</mn><mn>${df}</mn></mfrac></math> is fully reduced.";
+                            } else {
+                                return "<math><mfrac><mn>${nf}</mn><mn>${df}</mn></mfrac></math> reduces to <math><mfrac><mn>${n}</mn><mn>${d}</mn></mfrac></math>."
+                            }
+                        }
                     },
                     difficulty: difficulty,
                     renderTemplate: "What is the <strong>" + (isNumerator ? "numerator" : "denominator") + "</strong> of the reduced form of <math><mfrac><mn>${nf}</mn><mn>${df}</mn></mfrac></math>?",
-                    correctTemplate: "<math><mfrac><mn>${nf}</mn><mn>${df}</mn></mfrac></math> reduces to <math><mfrac><mn>${n}</mn><mn>${d}</mn></mfrac></math>."
+                    correctTemplate: "${correct}"
                 }
             }
             var variableLetters = ['x','y','z','a','b','c']
-            function getSimpleAlgebraWithAdditionTemplate(min1,max1,min2,max2,difficulty) {
+            function getAlgebra1StepAdditionAndSubtractionTemplate(min1,max1,min2,max2,difficulty) {
                 return {
                     constants: {
                         v: function() { 
                             return getRandomElement(variableLetters) },
-                        n1: function() { 
-                            return rand(min1,max1) },
+                        n1: function() { return rand(min1,max1) },
+                        n1p: function() { 
+                            return Math.abs(resolvedConstants["n1"]) },
                         answer: function() { 
                             return rand(min2, max2) },
-                        n2: function() { return resolvedConstants["n1"] + resolvedConstants["answer"]}
-                        
+                        n2: function() { return resolvedConstants["n1"] + resolvedConstants["answer"]},
+                        equation: function() {
+                            if (resolvedConstants["n1"] >= 0) {
+                                return "<math><mi>${v}</mi><mo>+</mo><mn>${n1}</mn><mo>=</mo><mn>${n2}</mn></math>";
+                            } else {
+                                return "<math><mi>${v}</mi><mo>-</mo><mn>${n1p}</mn><mo>=</mo><mn>${n2}</mn></math>";
+                            }
+                        },
+                        firstStep: function() {
+                            if (resolvedConstants["n1"] >= 0) {
+                                return "First, subtract <math><mn>${n1}</mn></math> from each side: <math><mi>${v}</mi><mo>+</mo><mn>${n1}</mn><mo>-</mo><mn>${n1}</mn><mo>=</mo><mn>${n2}</mn><mo>-</mo><mn>${n1}</mn></math>";
+                            } else {
+                                return "First, add <math><mn>${n1p}</mn></math> to each side: <math><mi>${v}</mi><mo>-</mo><mn>${n1p}</mn><mo>+</mo><mn>${n1p}</mn><mo>=</mo><mn>${n2}</mn><mo>+</mo><mn>${n1p}</mn></math>";
+                            }
+                        },
+                        secondStep: function() {
+                            if (resolvedConstants["n1"] >= 0) {
+                                return "Then, reduce on both sides: <math><mi>${v}</mi><mo>+</mo><menclose notation='horizontalstrike'><mn>${n1p}</mn><mo>-</mo><mn>${n1}</mn></menclose><mo>=</mo><menclose notation='bottom'><mn>${n2}</mn><mo>-</mo><mn>${n1}</mn></menclose></math>";
+                            } else {
+                                return "Then, reduce on both sides: <math><mi>${v}</mi><mo>-</mo><menclose notation='horizontalstrike'><mn>${n1p}</mn><mo>+</mo><mn>${n1p}</mn></menclose><mo>=</mo><menclose notation='bottom'><mn>${n2}</mn><mo>+</mo><mn>${n1p}</mn></menclose></math>"
+                            }
+                        }
                     },
                     difficulty: difficulty,
-                    renderTemplate: "Solve for <math><mi>${v}</mi></math>: <math><mi>${v}</mi><mo>+</mo><mn>${n1}</mn><mo>=</mo><mn>${n2}</mn></math><div id='hints'></div><math><mi>${v}</mi><mo>=</mo></math>",
+                    renderTemplate: "Solve for <math><mi>${v}</mi></math>: ${equation}<div id='hints'></div><math><mi>${v}</mi><mo>=</mo></math>",
                     hints: [
-                        "First, subtract <math><mn>${n1}</mn></math> from each side: <math><mi>${v}</mi><mo>+</mo><mn>${n1}</mn><mo>-</mo><mn>${n1}</mn><mo>=</mo><mn>${n2}</mn><mo>-</mo><mn>${n1}</mn></math>",
-                        "Then, reduce on both sides: <math><mi>${v}</mi><mo>+</mo><menclose notation='horizontalstrike'><mn>${n1}</mn><mo>-</mo><mn>${n1}</mn></menclose><mo>=</mo><menclose notation='bottom'><mn>${n2}</mn><mo>-</mo><mn>${n1}</mn></menclose></math>",
+                        "${firstStep}",
+                        "${secondStep}",
                     ]
+                }
+            }
+            
+           function getAlgebra1StepMultiplicationTemplate(min1,max1,min2,max2,difficulty) {
+                return {
+                    constants: {
+                        v: function() { 
+                            return getRandomElement(variableLetters) },
+                        n1: function() { return rand(min1,max1) },
+                        n1p: function() { 
+                            return Math.abs(resolvedConstants["n1"]) },
+                        answer: function() { 
+                            return rand(min2, max2) },
+                        n2: function() { return resolvedConstants["n1"] * resolvedConstants["answer"]},
+                        equation: function() {
+                            return "<math><mn>${n1}</mn><mi>${v}</mi><mo>=</mo><mn>${n2}</mn></math>";
+                        },
+                        firstStep: function() {
+                            return "First, divide each side by <math><mn>${n1}</mn></math>: <math><mfrac><mrow><mn>${n1}</mn><mi>${v}</mi></mrow> <mrow><mn>${n1}</mn></mrow></frac><mo>=</mo><mn>${n2}</mn><mo>/</mo><mn>${n1}</mn></math>";
+                        },
+                        secondStep: function() {
+                            return "Then, reduce on both sides: <math><mi>${v}</mi><mo>+</mo><menclose notation='horizontalstrike'><mn>${n1p}</mn><mo>-</mo><mn>${n1}</mn></menclose><mo>=</mo><menclose notation='bottom'><mn>${n2}</mn><mo>-</mo><mn>${n1}</mn></menclose></math>";
+                        }
+                    },
+                    difficulty: difficulty,
+                    renderTemplate: "Solve for <math><mi>${v}</mi></math>: ${equation}<div id='hints'></div><math><mi>${v}</mi><mo>=</mo></math>",
+                    hints: [
+                        "${firstStep}",
+                        "${secondStep}",
+                    ]
+                }
+            }
+            
+            function getSimpleSpellingTemplate(wordSet) {
+                return {
+                    constants: {
+                        answer: function() {
+                            return getRandomElement(wordSet);
+                        },
+                    },
+                    difficulty: 2,
+                    renderTemplate: "Spell ______",
+                    speechTemplate: "Spell ${answer}"
+                }
+            }
+            
+            var simpleSentences = [
+                "how many eggs will the hen lay?",
+                "she will lay four or five",
+                "how do you know?",
+                "that hen is a good egg layer",
+                ""
+            ];
+            var words = ["how", "many", "eggs", "will", "the", "hen", "lay", "she", 
+                "will", "four", "or", "five", "how", "do", "you", "know", "that",
+                "is", "a", "good", "layer"
+            ];
+            function getSimpleReadingTemplate() {
+                return {
+                    constants: {
+                        sentence: function() { return getRandomElement(simpleSentences) },
+                        answer: function() { return getRandomElement(resolvedConstants["sentence"].replace(/[.,!?]/g, "").replace(/ +/g, " ").split(" ")) },
+                        sentence_hidden: function() { return resolvedConstants["sentence"].replace(resolvedConstants["answer"]+" ", "_____") },
+                        choices: function() {
+                            var allWords = [];
+                            $.each(words, function(index, word) {
+                                if (word !== resolvedConstants["answer"]) {
+                                    allWords.push(word);
+                                }
+                            });
+                            shuffle(allWords);
+                            var choices = allWords.splice(0,3);
+                            choices.push(resolvedConstants["answer"]);
+                            return shuffle(choices);
+                        },
+                        choice1: function() {return resolvedConstants["choices"][0] },
+                        choice2: function() {return resolvedConstants["choices"][1] },
+                        choice3: function() {return resolvedConstants["choices"][2] },
+                        choice4: function() {return resolvedConstants["choices"][3] },
+                    },
+                    difficulty: 5,
+                    renderTemplate: "Fill in the blank: \"${sentence_hidden}\"<br>" +
+                            "<ol><li>${choice1}</li><li>${choice2}</li><li>${choice3}</li><li>${choice4}</li></ol>"
                 }
             }
             
@@ -429,18 +876,33 @@ POSSIBILITY OF SUCH DAMAGE.
                 return [num, actualFactors];
             }
             
-            $("#player").load(function () {
-                try {
-                    //Test if YouTube API already loaded
-                    onYouTubeIframeAPIReady();
-                } catch (e) {
-                    var tag = document.createElement('script');
-
-                    tag.src = "https://www.youtube.com/iframe_api";
-                    var player = document.getElementById("player");
-                    player.parentNode.insertBefore(tag, player);
+            
+            /*
+             * TIMER
+             */
+            
+            var timeLeft;
+            var countdownTimeout;
+            function setCountdown(time, totalTime) {
+                if (time < 0) {
+                    time = 0;
                 }
-            });
+                
+                timeLeft = time;
+                if (!totalTime) {
+                    totalTime = time;
+                }
+                $("#timer-div div div").css("width", (time*100/totalTime)+"%");
+                if (time > 0) {
+                    countdownTimeout = setTimeout(function() {
+                        setCountdown(time-.25, totalTime);
+                    }, 250);
+                }
+            }
+            
+            function cancelCountdown() {
+                clearTimeout(countdownTimeout);
+            }
 
             var player,suppress;
             function onYouTubeIframeAPIReady() {
@@ -454,11 +916,11 @@ POSSIBILITY OF SUCH DAMAGE.
     
             function onPlayerReady(event) {
                 ready = true;
-                load(getRandomElement(videos))
+                load();
             }
 
             function onPlayerStateChange(event) {
-                if (!suppress) {
+                if (!suppress && settings.playVideo) {
                     switch (event.data) {
                         case YT.PlayerState.ENDED:
                             if (!suppress) {
@@ -473,46 +935,106 @@ POSSIBILITY OF SUCH DAMAGE.
 
     
             function load(video) {
-                console.info("Loading video");
+                
+                if (!video) {
+                    video = Cookies.getJSON("video");
+                    try {
+                        currentPosition = Cookies.getJSON("videoPosition")[0];
+                    } catch (e) {
+                        console.warn(e);
+                    }
+                }
+                if (!video) {
+                    video = getRandomElement(videos);
+                    currentPosition = 0;
+                }
+                Cookies.set("video", video, { expires: 1 });
+                Cookies.set("videoPosition", [currentPosition], { expires: 1 });
+                
+                console.info("Loading video " + video.id + " at " + currentPosition);
+                
                 var config = {
                     'videoId': video.id,
-                    'startSeconds': video.start,
+                    'startSeconds': currentPosition,
                     'endSeconds': video.end
                 }
-                player.cueVideoById(config);
+                player.loadVideoById(config);
                 suppress = true;
                 setTimeout(function() {
                     suppress = false;
+                    pause();
                 },1000);
             }
             
+            function playFor(seconds) {
+                skipBackward(2);
+                play();
+                setTimeout(function() {
+                    pause();
+                    currentTime = getCurrentTime();
+                },seconds * 1000)
+            }
+            
             function play() {
-                console.info("Playing video");
-                if (!suppress) player.playVideo();
+                try {
+                    if (!suppress && settings.playVideo) {
+                        console.info("Playing video");
+                        $("#media-holder").show();
+                        
+                        player.playVideo();
+                    }
+                } catch (e) {
+                    console.warn(e);
+                }
             }
             
             function pause() {
-                console.info("Pausing video");
-                if (!suppress) player.pauseVideo();
+                try {
+                    if (!suppress && settings.playVideo) {
+                        console.info("Pausing video");
+                        player.pauseVideo();
+                        currentPosition = getCurrentTime();
+                        Cookies.set("videoPosition", [currentPosition], { expires: 1 });
+                        $("#media-holder").hide();
+                    }
+                } catch (e) {
+                    console.warn(e);
+                }
             }
             
             function getCurrentTime() {
-                return player.getCurrentTime();
+                try {
+                    return player.getCurrentTime();
+                } catch (e) {
+                    console.warn(e);
+                }
+                return 0;
             }
             
             function skipBackward(time) {
-                if (!time) {
-                    time = 2;
-                }
-                if (!suppress) {
-                    var currentTime = player.getCurrentTime();
-                    player.seekTo(currentTime - time, true);
+                try {
+                    if (!suppress && settings.playVideo) {
+                        if (!time) {
+                            time = 2;
+                        }
+                        console.info("Skipping backward by " + time);
+                        var currentTime = player.getCurrentTime();
+                        var target = Math.max(currentTime - time, 0);
+                        player.seekTo(target, true);
+                    }
+                } catch (e) {
+                    console.warn(e);
                 }
             }
             
-            function skipBackwardTo(time) {
-                if (!suppress) {
-                    player.seekTo(time, true);
+            function skipTo(time) {
+                try {
+                    if (!suppress && settings.playVideo) {
+                        console.info("Seeking to " + time);
+                        player.seekTo(time, true);
+                    }
+                } catch (e) {
+                    console.warn(e);
                 }
             }
             
@@ -806,7 +1328,7 @@ function say(message, cancel) {
         speechSynthesis.cancel();
     }
     var msg = new SpeechSynthesisUtterance();
-    msg.lang = "en-GB";
+    msg.lang = "en-US";
     msg.text = message;
 
     speechSynthesis.speak(msg);
@@ -970,5 +1492,80 @@ function cloneObject(obj) {
     return clone;
 }
         </script>
+    </head>
+    <body>
+        <div class="container">
+            <div class="page-header">
+                <h1 style="font-family: 'Open Sans', sans-serif, bold;">Game of Mastery <small>by Graham</small>
+                    <button id="settings-btn" class="pull-right btn btn-sm"><span class="glyphicon glyphicon-menu-hamburger"></span></button>
+                </h1>
+            </div>
+            <h3 id="score-div" class="pull-right">Score: 0</h3>
+            <div class="jumbotron" style="clear: both" >
+                <div id='timer-div' >
+                    <div class="progress">
+                        <div class="progress-bar progress-bar-default progress-bar-striped active cached-prg" style="width: 0%">
+                        </div>
+                    </div>
+                </div>
+                <h2 style="font-size: 3vh" >Question:</h2>
+                <div>
+                    <div id="question" style="font-size:150%"> 
+
+                    </div>
+                    <button id="repeat-btn" style="display:none">Repeat</button>
+                    <form id="q-and-a-form">
+                        <input type="tel" id="answer" style="margin-top: 10px" />
+                        <!--<button type="submit" id="check-answer-btn" class="btn btn-primary" disabled>Submit</button>-->
+                    </form>
+                    <div id="response-div"></div>
+                    <button id="new-question-btn" class="btn btn-default" style="display:none">New question</button>
+                </div>
+
+            </div>
+        </div>
+        
+        
+        <div class="modal fade" id="settings-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">Setup</h4>
+              </div>
+              <div class="modal-body" style="max-height:calc(100vh - 200px); overflow-y: scroll">
+                  <h3>General settings</h3>
+                  <div class="btn-group btn-group-lg" data-toggle="buttons">
+                      <label class='btn btn-default active'>
+                          <input type='checkbox' name='settings' value='playVideo' checked />Play video
+                      </label>
+                      <label class='btn btn-default active'>
+                          <input type='checkbox' name='settings' value='giveBonus' checked />Give bonus
+                      </label>
+                      <label class='btn btn-default active'>
+                          <input type='checkbox' name='settings' value='timed' checked />Timed
+                      </label>
+                  </div>
+                  
+                  <h3>Question types</h3>
+                <div id="types-div" class="accordion panel panel-default">
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                <button id="save-settings-btn" type="button" class="btn btn-primary">Save</button>
+              </div>
+            </div>
+          </div>
+        </div>
+            
+        <div id="media-holder" class="embed-responsive embed-responsive-16by9" style="display: none">
+            <iframe id="player" style="height: 100%; width: 100%; position: fixed; top: 0; left: 0;" type="text/html" src="https://www.youtube.com/embed/o_6wlKhsJ6w?controls=0&disablekb=1&enablejsapi=1&fs=1&modestbranding=1&rel=0" frameborder="0"></iframe>
+        </div>
+    
+
+        
+        <link href='https://fonts.googleapis.com/css?family=Open+Sans:700' rel='stylesheet' type='text/css'>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
     </body>
 </html>
