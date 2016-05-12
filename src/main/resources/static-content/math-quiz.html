@@ -74,6 +74,10 @@ Set daily goals (per question type)
                     $("input[name=type]:checked").each(function() {
                         selectedTemplateSets.push($(this).val());
                     });
+                    if (!selectedTemplateSets.length) {
+                        selectedTemplateSets.push("easy_addition_and_subtraction");
+                    }
+                    
                     Cookies.set("types", selectedTemplateSets, { expires: 365 });
                     
                     settings = {};
@@ -86,6 +90,10 @@ Set daily goals (per question type)
                     Cookies.set("settings", settings, { expires: 365 });
                     
                     newQuestion();
+                });
+                
+                $("#clear-all-types-btn").click(function() {
+                    $("input[name=type]").removeProp("checked").parent().removeClass("active");
                 });
             
                 $("#answer").change(function() {
@@ -124,8 +132,20 @@ Set daily goals (per question type)
                 
                 settings = Cookies.getJSON("settings");
                 if (!settings) {
-                    settings = {};
+                    settings = {
+                        playVideo: true,
+                        giveBonus: true,
+                        timed: true
+                    };
                 }
+                
+                $.each(settings, function(key, value) {
+                    if (value) {
+                        $("input[value="+key+"]").prop("checked", true).parent().addClass("active");
+                    } else {
+                        $("input[value="+key+"]").removeProp("checked").parent().removeClass("active");
+                    }
+                });
                 
                 selectedTemplateSets = Cookies.getJSON("types");
                 if (!selectedTemplateSets) {
@@ -245,7 +265,8 @@ Set daily goals (per question type)
                     if (guess == questionAndAnswer.answer) {
                         cancelCountdown();
                         
-                        scoreChange = Math.max(.1, questionAndAnswer.difficulty * correctMultiplier + Math.floor((questionAndAnswer.template.correct?questionAndAnswer.template.correct:1)/30)+Math.ceil(timeLeft));
+                        scoreChange = Math.max(.1, questionAndAnswer.difficulty * correctMultiplier + Math.floor((questionAndAnswer.template.correct?questionAndAnswer.template.correct:1)/30)
+                                +(settings.timed?Math.ceil(timeLeft):0));
                         $("#response-div").html("Correct! "+(questionAndAnswer.correctMessage?questionAndAnswer.correctMessage:"") + " You get " + scoreChange + " points")
                     
                         if (window.MathJax) {
@@ -264,7 +285,9 @@ Set daily goals (per question type)
                             questionAndAnswer.template.correct++;
                         }
                         
-                        bonus++;
+                        if (settings.giveBonus) {
+                            bonus++;
+                        }
                     } else {
                         var scoreChange = -incorrectMultiplier;
                         $("#response-div").html("Incorrect! You lose " + scoreChange + " points");
@@ -277,13 +300,15 @@ Set daily goals (per question type)
                             questionAndAnswer.template.correct--;
                         }
                         
-                        bonus = 0;
+                        if (settings.giveBonus) {
+                            bonus = 0;
+                        }
                     }
                     score = Math.max(score + scoreChange, 0);
                     if (score - previousScore >= 10 && scoreChange > 0) {
                         previousScore += 10;
                         
-                        var additional = Math.floor(bonus/10)*3;
+                        var additional = settings.giveBonus ? Math.floor(bonus/10)*3 : 0;
                         playFor(10+additional);
                     }
                     Cookies.set("state", {
@@ -298,7 +323,12 @@ Set daily goals (per question type)
                 $("#answer").removeProp("disabled");
                 $("#answer").val("");
                 
-                setCountdown(questionAndAnswer.difficulty + 2);
+                if (settings.timed) {
+                    $("#timer-div").show();
+                    setCountdown(questionAndAnswer.difficulty + 2);
+                } else {
+                    $("#timer-div").hide();
+                }
                 
                 document.getElementById("answer").focus();
             }
@@ -364,7 +394,7 @@ Set daily goals (per question type)
             }
             
             function displayScore() {
-                $("#score-div").html("Score: " + score + (bonus > 10 ? " <small>Bonus: " + Math.floor(bonus/10) : "") + "</small>")
+                $("#score-div").html("Score: " + score + (bonus > 10 && settings.giveBonus ? " <small>Bonus: " + Math.floor(bonus/10) : "") + "</small>")
             }
             
             var simpleSpellingWords1 = ["max", "word", "cat", "hog", "smog", "log", "bog", "look", "hook", "book"]
@@ -395,6 +425,16 @@ Set daily goals (per question type)
                 nines_addition2: getSimpleAdditionTemplate(9,9,0,10,2),
                 tens_addition1: getSimpleAdditionTemplate(0,10,10,10,1),
                 tens_addition2: getSimpleAdditionTemplate(10,10,0,10,1),
+                ones_subtraction: getSimpleSubtractionWithFullBoundsTemplate(1,11,1,1,1),
+                twos_subtraction: getSimpleSubtractionWithFullBoundsTemplate(2,12,2,2,1),
+                threes_subtraction: getSimpleSubtractionWithFullBoundsTemplate(3,13,3,3,1),
+                fours_subtraction: getSimpleSubtractionWithFullBoundsTemplate(4,14,4,4,1),
+                fives_subtraction: getSimpleSubtractionWithFullBoundsTemplate(5,15,5,5,1),
+                sixes_subtraction: getSimpleSubtractionWithFullBoundsTemplate(6,16,6,6,2),
+                sevens_subtraction: getSimpleSubtractionWithFullBoundsTemplate(7,17,7,7,2),
+                eights_subtraction: getSimpleSubtractionWithFullBoundsTemplate(8,18,8,8,2),
+                nines_subtraction: getSimpleSubtractionWithFullBoundsTemplate(9,19,9,9,2),
+                tens_subtraction: getSimpleSubtractionWithFullBoundsTemplate(10,20,10,10,2),
                 addition_easy: getSimpleAdditionTemplate(0,10,0,5,1),
                 addition_less_easy: getSimpleAdditionTemplate(0,10,6,10,2),
                 addition_double_digit: getSimpleAdditionTemplate(10,50,10,50,3),
@@ -532,6 +572,76 @@ Set daily goals (per question type)
                         "doubles_less_easy"
                     ]
                 },
+                ones_subtraction: {
+                    name: "Ones subtraction",
+                    group: "addition_and_subtraction",
+                    templates: [
+                        "ones_subtraction"
+                    ]
+                },
+                twos_subtraction: {
+                    name: "Twos subtraction",
+                    group: "addition_and_subtraction",
+                    templates: [
+                        "twos_subtraction"
+                    ]
+                },
+                threes_subtraction: {
+                    name: "Threes subtraction",
+                    group: "addition_and_subtraction",
+                    templates: [
+                        "threes_subtraction"
+                    ]
+                },
+                fours_subtraction: {
+                    name: "Fours subtraction",
+                    group: "addition_and_subtraction",
+                    templates: [
+                        "fours_subtraction"
+                    ]
+                },
+                fives_subtraction: {
+                    name: "Fives subtraction",
+                    group: "addition_and_subtraction",
+                    templates: [
+                        "fives_subtraction"
+                    ]
+                },
+                sixes_subtraction: {
+                    name: "Sixes subtraction",
+                    group: "addition_and_subtraction",
+                    templates: [
+                        "sixes_subtraction"
+                    ]
+                },
+                sevens_subtraction: {
+                    name: "Sevens subtraction",
+                    group: "addition_and_subtraction",
+                    templates: [
+                        "sevens_subtraction"
+                    ]
+                },
+                eights_subtraction: {
+                    name: "Eights subtraction",
+                    group: "addition_and_subtraction",
+                    templates: [
+                        "eights_subtraction"
+                    ]
+                },
+                nines_subtraction: {
+                    name: "Nines subtraction",
+                    group: "addition_and_subtraction",
+                    templates: [
+                        "nines_subtraction"
+                    ]
+                },
+                tens_subtraction: {
+                    name: "Tens subtraction",
+                    group: "addition_and_subtraction",
+                    templates: [
+                        "tens_subtraction"
+                    ]
+                },
                 easy_addition_and_subtraction_with_negative_answers: {
                     name: "Easy addition and subtraction with negative answers",
                     group: "addition_and_subtraction",
@@ -657,6 +767,17 @@ Set daily goals (per question type)
                     constants: {
                         n1: function() {return rand(min1,max1)},
                         n2: function() {return rand(resolvedConstants["n1"]+1,max2)},
+                        answer: function() {return resolvedConstants["n1"] - resolvedConstants["n2"]}
+                    },
+                    difficulty: difficulty,
+                    renderTemplate: "<math><mn>${n1}</mn><mo>-</mo><mn>${n2}</mn><mo> = </mo></math>"
+                }
+            }
+            function getSimpleSubtractionWithFullBoundsTemplate(min1, max1, min2, max2, difficulty) {
+                return {
+                    constants: {
+                        n1: function() {return rand(min1,max1)},
+                        n2: function() {return rand(min2,max2)},
                         answer: function() {return resolvedConstants["n1"] - resolvedConstants["n2"]}
                     },
                     difficulty: difficulty,
@@ -926,7 +1047,7 @@ Set daily goals (per question type)
                             if (!suppress) {
                                 console.info("Video ended");
                                 $("#media-holder").hide();
-                                load(getRandomElement(videos));
+                                load(getRandomElement(videos), 0);
                             }
                             break;
                     }
@@ -934,13 +1055,15 @@ Set daily goals (per question type)
             }
 
     
-            function load(video) {
+            function load(video, position) {
+                currentPosition = position;
                 
                 if (!video) {
                     video = Cookies.getJSON("video");
                     try {
                         currentPosition = Cookies.getJSON("videoPosition")[0];
                     } catch (e) {
+                        currentPosition = 0;
                         console.warn(e);
                     }
                 }
@@ -958,12 +1081,7 @@ Set daily goals (per question type)
                     'startSeconds': currentPosition,
                     'endSeconds': video.end
                 }
-                player.loadVideoById(config);
-                suppress = true;
-                setTimeout(function() {
-                    suppress = false;
-                    pause();
-                },1000);
+                player.cueVideoById(config);
             }
             
             function playFor(seconds) {
@@ -990,7 +1108,7 @@ Set daily goals (per question type)
             
             function pause() {
                 try {
-                    if (!suppress && settings.playVideo) {
+                    if (!suppress) {
                         console.info("Pausing video");
                         player.pauseVideo();
                         currentPosition = getCurrentTime();
@@ -1047,7 +1165,7 @@ Set daily goals (per question type)
              * UTILS
              */
             
-            /* 
+/*
  * Copyright (c) 2014, tibbitts
  * All rights reserved.
  *
@@ -1547,7 +1665,8 @@ function cloneObject(obj) {
                       </label>
                   </div>
                   
-                  <h3>Question types</h3>
+                  <h3>Question types
+                      <button id="clear-all-types-btn" class="pull-right btn btn-sm btn-default">Clear all</button></h3>
                 <div id="types-div" class="accordion panel panel-default">
                 </div>
               </div>
