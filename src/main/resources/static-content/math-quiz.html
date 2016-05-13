@@ -48,15 +48,18 @@ Add more spelling words
 Add spelling sentences?
 Add more reading sentences
 Auto-generate reading distractor pool
-Add long division
+Add long division (https://www.dessci.com/en/products/mathplayer/tech/mathml3-elemmath-examples.htm)
 Maybe allow the reading sentences to form stories (need to preserve order)
 Allow configuring videos in settings (or adding new ones)
 Set daily goals (per question type)
 Fix backoff strategy
 Store historical stats per template (persist backoff)
-Add "reset score" button
 Set correct input type based on question
 Add mini-games (like memory game)
+Add proper multiple choice answers
+Warn before resetting score (or move button to settings)
+Allow purchasing other rewards (instead of just cash)
+Allow setting exchange rate (add management app?)
 
 Testing:
 Test on Kindle
@@ -120,6 +123,22 @@ Add unit tests
             
                 $("#new-question-btn").click(function() {
                     newQuestion();
+                });
+                
+                $("#reset-score-btn").click(function() {
+                    state = {
+                        score: 0,
+                        bonus: 0,
+                        previousScore: 0
+                    };
+                    
+                    score = state.score;
+                    bonus = state.bonus;
+                    previousScore = state.previousScore;
+                    
+                    Cookies.set("state", state);
+                    
+                    displayScore();
                 });
 
                 $("#settings-btn").click(function() {
@@ -310,6 +329,12 @@ Add unit tests
                     }).show();
                 } else {
                     $("#repeat-btn").unbind().hide();
+                }
+                
+                if (questionAndAnswer.template.inputType) {
+                    $("#answer").prop("type", questionAndAnswer.template.inputType);
+                } else {
+                    $("#answer").prop("type", "tel");
                 }
                 
                 $("#q-and-a-form").unbind().submit(function() {
@@ -1105,7 +1130,8 @@ Add unit tests
                     },
                     difficulty: 2,
                     renderTemplate: "Spell ______",
-                    speechTemplate: "Spell ${answer}"
+                    speechTemplate: "Spell ${answer}",
+                    inputType: "text"
                 }
             }
             var simpleSentences = [
@@ -1159,7 +1185,8 @@ Add unit tests
                     },
                     difficulty: 5,
                     renderTemplate: "Fill in the blank: \"${sentence_hidden}\"<br>" +
-                            "<ol><li>${choice1}</li><li>${choice2}</li><li>${choice3}</li><li>${choice4}</li></ol>"
+                            "<ol><li>${choice1}</li><li>${choice2}</li><li>${choice3}</li><li>${choice4}</li></ol>",
+                    inputType: "text"
                 }
             }
             
@@ -1365,7 +1392,7 @@ Add unit tests
                     <button id="settings-btn" class="pull-right btn btn-sm"><span class="glyphicon glyphicon-menu-hamburger"></span></button>
                 </h1>
             </div>
-            <h3 id="score-div" class="pull-right">Score: 0</h3>
+            <h3 id="score-div" class="pull-right"><span id="score-div">Score: 0</span></h3>
             <div class="jumbotron" style="clear: both" >
                 <div id='timer-div' >
                     <div class="progress">
@@ -1400,6 +1427,8 @@ Add unit tests
               </div>
               <div class="modal-body" style="max-height:calc(100vh - 200px); overflow-y: scroll">
                   <h3>General settings</h3>
+                  <button id="reset-score-btn" class="btn btn-warning pull-right">Reset score</button>
+            
                   <div class="btn-group btn-group-lg" data-toggle="buttons">
                       <label class='btn btn-default active'>
                           <input type='checkbox' name='settings' value='playVideo' checked />Play video
