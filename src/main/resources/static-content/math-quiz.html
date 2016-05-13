@@ -58,6 +58,35 @@ Abstract out 'term' (e.g. 2ab) to make display easier
             var correctMultiplier = 1;
             var incorrectMultiplier = .5;
             $(function() {
+                
+                //Prevent backspace navigation (which is really annoying!)
+                $(document).unbind('keydown').bind('keydown', function (event) {
+                    var doPrevent = false;
+                    if (event.keyCode === 8) {
+                        var d = event.srcElement || event.target;
+                        if ((d.tagName.toUpperCase() === 'INPUT' && 
+                             (
+                                 d.type.toUpperCase() === 'TEXT' ||
+                                 d.type.toUpperCase() === 'PASSWORD' || 
+                                 d.type.toUpperCase() === 'FILE' || 
+                                 d.type.toUpperCase() === 'SEARCH' || 
+                                 d.type.toUpperCase() === 'EMAIL' || 
+                                 d.type.toUpperCase() === 'NUMBER' || 
+                                 d.type.toUpperCase() === 'DATE' || 
+                                 d.type.toUpperCase() === 'TEL' )
+                             ) || 
+                             d.tagName.toUpperCase() === 'TEXTAREA') {
+                            doPrevent = d.readOnly || d.disabled;
+                        }
+                        else {
+                            doPrevent = true;
+                        }
+                    }
+
+                    if (doPrevent) {
+                        event.preventDefault();
+                    }
+                });
             
                 $("#new-question-btn").click(function() {
                     newQuestion();
@@ -443,6 +472,26 @@ Abstract out 'term' (e.g. 2ab) to make display easier
                 subtraction_easy_with_negative_answers: getSimpleSubtractionWithNegativeAnswerTemplate(0,10,13,3),
                 multiplication_easy: getSimpleMultiplicationTemplate(0,4,0,4,2),
                 multiplication_less_easy: getSimpleMultiplicationTemplate(5,9,3,6,3),
+                ones_multiplication1: getSimpleMultiplicationTemplate(0,10,1,1,1),
+                twos_multiplication1: getSimpleMultiplicationTemplate(0,10,2,2,2),
+                threes_multiplication1: getSimpleMultiplicationTemplate(0,10,3,3,2),
+                fours_multiplication1: getSimpleMultiplicationTemplate(0,10,4,4,2),
+                fives_multiplication1: getSimpleMultiplicationTemplate(0,10,5,5,2),
+                sixes_multiplication1: getSimpleMultiplicationTemplate(0,10,6,6,3),
+                sevens_multiplication1: getSimpleMultiplicationTemplate(0,10,7,7,3),
+                eights_multiplication1: getSimpleMultiplicationTemplate(0,10,8,8,3),
+                nines_multiplication1: getSimpleMultiplicationTemplate(0,10,9,9,3),
+                tens_multiplication1: getSimpleMultiplicationTemplate(0,10,10,10,2),
+                ones_multiplication2: getSimpleMultiplicationTemplate(1,1,0,10,1),
+                twos_multiplication2: getSimpleMultiplicationTemplate(2,2,0,10,2),
+                threes_multiplication2: getSimpleMultiplicationTemplate(3,3,0,10,2),
+                fours_multiplication2: getSimpleMultiplicationTemplate(4,4,0,10,2),
+                fives_multiplication2: getSimpleMultiplicationTemplate(5,5,0,10,2),
+                sixes_multiplication2: getSimpleMultiplicationTemplate(6,6,0,10,3),
+                sevens_multiplication2: getSimpleMultiplicationTemplate(7,7,0,10,3),
+                eights_multiplication2: getSimpleMultiplicationTemplate(8,8,0,10,3),
+                nines_multiplication2: getSimpleMultiplicationTemplate(9,9,0,10,3),
+                tens_multiplication2: getSimpleMultiplicationTemplate(10,10,0,10,2),
                 division_easy: getSimpleDivisionTemplate(0,4,1,4,2),
                 division_less_easy: getSimpleDivisionTemplate(5,9,3,6,3),
                 fractions_easy1: getFractionReductionTemplate(10, 1, 6, 2, true),
@@ -665,6 +714,86 @@ Abstract out 'term' (e.g. 2ab) to make display easier
                     templates: [
                         "multiplication_less_easy",
                         "division_less_easy",
+                    ]
+                },
+                ones_multiplication: {
+                    name: "Ones multiplication",
+                    group: "multiplication_and_division",
+                    templates: [
+                        "ones_multiplication1",
+                        "ones_multiplication2",
+                    ]
+                },
+                twos_multiplication: {
+                    name: "Twos multiplication",
+                    group: "multiplication_and_division",
+                    templates: [
+                        "twos_multiplication1",
+                        "twos_multiplication2",
+                    ]
+                },
+                threes_multiplication: {
+                    name: "Threes multiplication",
+                    group: "multiplication_and_division",
+                    templates: [
+                        "threes_multiplication1",
+                        "threes_multiplication2",
+                    ]
+                },
+                fours_multiplication: {
+                    name: "Fours multiplication",
+                    group: "multiplication_and_division",
+                    templates: [
+                        "fours_multiplication1",
+                        "fours_multiplication2",
+                    ]
+                },
+                fives_multiplication: {
+                    name: "Fives multiplication",
+                    group: "multiplication_and_division",
+                    templates: [
+                        "fives_multiplication1",
+                        "fives_multiplication2",
+                    ]
+                },
+                sixes_multiplication: {
+                    name: "Sixes multiplication",
+                    group: "multiplication_and_division",
+                    templates: [
+                        "sixes_multiplication1",
+                        "sixes_multiplication2",
+                    ]
+                },
+                sevens_multiplication: {
+                    name: "Sevens multiplication",
+                    group: "multiplication_and_division",
+                    templates: [
+                        "sevens_multiplication1",
+                        "sevens_multiplication2",
+                    ]
+                },
+                eights_multiplication: {
+                    name: "Eights multiplication",
+                    group: "multiplication_and_division",
+                    templates: [
+                        "eights_multiplication1",
+                        "eights_multiplication2",
+                    ]
+                },
+                nines_multiplication: {
+                    name: "Nines multiplication",
+                    group: "multiplication_and_division",
+                    templates: [
+                        "nines_multiplication1",
+                        "nines_multiplication2",
+                    ]
+                },
+                tens_multiplication: {
+                    name: "Tens multiplication",
+                    group: "multiplication_and_division",
+                    templates: [
+                        "tens_multiplication1",
+                        "tens_multiplication2",
                     ]
                 },
                 easy_fraction_reduction: {
