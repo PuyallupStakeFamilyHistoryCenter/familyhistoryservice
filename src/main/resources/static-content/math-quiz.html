@@ -29,12 +29,11 @@ POSSIBILITY OF SUCH DAMAGE.
 TODO:
 
 Add more videos
+Allow configuring videos in settings (or adding new ones)
 Factor utils.js out of JS
 Use local versions of JS files
-Save score and bonus
-Save current video and position
-Save config
 Set daily goals (per question type)
+Abstract out 'term' (e.g. 2ab) to make display easier
 -->
 
 <html>
@@ -262,7 +261,7 @@ Set daily goals (per question type)
                     }
                     
                     var scoreChange;
-                    if (guess == questionAndAnswer.answer) {
+                    if (guess.replace(/ /g, "") == questionAndAnswer.answer) {
                         cancelCountdown();
                         
                         scoreChange = Math.max(.1, questionAndAnswer.difficulty * correctMultiplier + Math.floor((questionAndAnswer.template.correct?questionAndAnswer.template.correct:1)/30)
@@ -306,7 +305,7 @@ Set daily goals (per question type)
                     }
                     score = Math.max(score + scoreChange, 0);
                     if (score - previousScore >= 10 && scoreChange > 0) {
-                        previousScore += 10;
+                        previousScore = Math.round(score,1);
                         
                         var additional = settings.giveBonus ? Math.floor(bonus/10)*3 : 0;
                         playFor(10+additional);
@@ -452,7 +451,10 @@ Set daily goals (per question type)
                 fractions_less_easy2: getFractionReductionTemplate(20, 1, 10, 3, false),
                 algebra_1_step_addition_and_subtraction_easy: getAlgebra1StepAdditionAndSubtractionTemplate(-10,10,-10,10,2),
                 algebra_1_step_multiplication_easy: getAlgebra1StepMultiplicationTemplate(-10,10,-10,10,3),
+                algebra_1_step_multiplication_positive_easy: getAlgebra1StepMultiplicationTemplate(1,10,-10,10,3),
+                algebra_1_step_multiplication_negative_easy: getAlgebra1StepMultiplicationTemplate(-10,-1,-10,10,3),
 //                algebra_1_step_division_easy: getAlgebra1StepDivisionTemplate(-10,10,-10,10,2),
+                two_term_factoring: getSimpleFactoringTemplate(10, 2, 10, 3),
                 spelling_easy1: getSimpleSpellingTemplate(simpleSpellingWords1),
                 spelling_easy2: getSimpleSpellingTemplate(simpleSpellingWords2),
                 spelling_easy3: getSimpleSpellingTemplate(simpleSpellingWords3),
@@ -686,7 +688,15 @@ Set daily goals (per question type)
                     group: "algebra",
                     templates: [
                         "algebra_1_step_addition_and_subtraction_easy",
-                        "algebra_1_step_multiplication_easy"
+                        "algebra_1_step_multiplication_positive_easy",
+                        "algebra_1_step_multiplication_negative_easy"
+                    ]
+                },
+                easy_factoring: {
+                    name: "Easy factoring",
+                    group: "algebra",
+                    templates: [
+                        "two_term_factoring"
                     ]
                 },
                 easy_spelling: {
@@ -879,8 +889,7 @@ Set daily goals (per question type)
                     ]
                 }
             }
-            
-           function getAlgebra1StepMultiplicationTemplate(min1,max1,min2,max2,difficulty) {
+            function getAlgebra1StepMultiplicationTemplate(min1,max1,min2,max2,difficulty) {
                 return {
                     constants: {
                         v: function() { 
@@ -909,7 +918,25 @@ Set daily goals (per question type)
                     ]
                 }
             }
-            
+            function getSimpleFactoringTemplate(max,fmin,fmax,difficulty) {
+                return {
+                    constants: {
+                        rps: function() { 
+                            return getRelativelyPrimeNumbers(max) },
+                        c1: function() { 
+                            return resolvedConstants["rps"][0][0] },
+                        c2: function() { return resolvedConstants["rps"][1][0] },
+                        f: function() { return rand(fmin, fmax) },
+                        fc1: function() { return resolvedConstants["f"] * resolvedConstants["c1"]; },
+                        fc2: function() { return resolvedConstants["f"] * resolvedConstants["c2"]; },
+                        v: function() { return getRandomElement(variableLetters); },
+                        answer: function() { return resolvedConstants["f"] + "(" + resolvedConstants["c1"] + resolvedConstants["v"] + "+" + resolvedConstants["c2"] + ")" }
+                    },
+                    difficulty: difficulty,
+                    renderTemplate: "Factor completely: <math><mn>${fc1}</mn><mi>${v}</mi><mo>+</mo><mn>${fc2}</mn></math>",
+                    hints: []
+                }
+            }
             function getSimpleSpellingTemplate(wordSet) {
                 return {
                     constants: {
@@ -922,13 +949,27 @@ Set daily goals (per question type)
                     speechTemplate: "Spell ${answer}"
                 }
             }
-            
             var simpleSentences = [
                 "how many eggs will the hen lay?",
                 "she will lay four or five",
                 "how do you know?",
                 "that hen is a good egg layer",
-                ""
+                "how many days are in a week?",
+                "is your name long?",
+//                "say 'hot' three times fast",
+                "does an egg roll?",
+                "did you miss me?",
+                "ten tall men sing songs",
+                "when will you be here?",
+                "i wish you were here",
+                "i wish i were there, too",
+                "i like to play games",
+                "do you like to play games?",
+                "this is the best year ever!",
+                "how long is the wire?",
+                "the wire is three feet long",
+                "do you want an egg roll?"
+                
             ];
             var words = ["how", "many", "eggs", "will", "the", "hen", "lay", "she", 
                 "will", "four", "or", "five", "how", "do", "you", "know", "that",
@@ -939,7 +980,7 @@ Set daily goals (per question type)
                     constants: {
                         sentence: function() { return getRandomElement(simpleSentences) },
                         answer: function() { return getRandomElement(resolvedConstants["sentence"].replace(/[.,!?]/g, "").replace(/ +/g, " ").split(" ")) },
-                        sentence_hidden: function() { return resolvedConstants["sentence"].replace(resolvedConstants["answer"]+" ", "_____") },
+                        sentence_hidden: function() { return resolvedConstants["sentence"].replace(resolvedConstants["answer"], "_____") },
                         choices: function() {
                             var allWords = [];
                             $.each(words, function(index, word) {
