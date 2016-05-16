@@ -47,6 +47,9 @@ Add more videos
 Add more spelling words
 Add spelling sentences?
 Add more reading sentences
+Add history questions
+Add science questions
+Add lessons (or links to YouTube lessons)
 Auto-generate reading distractor pool
 Add long division (https://www.dessci.com/en/products/mathplayer/tech/mathml3-elemmath-examples.htm)
 Maybe allow the reading sentences to form stories (need to preserve order)
@@ -56,7 +59,6 @@ Fix backoff strategy
 Store historical stats per template (persist backoff)
 Set correct input type based on question
 Add mini-games (like memory game)
-Add proper multiple choice answers
 Warn before resetting score (or move button to settings)
 Allow purchasing other rewards (instead of just cash)
 Allow setting exchange rate (add management app?)
@@ -254,59 +256,11 @@ Add unit tests
                 newQuestion();
             });
             
-            var videos = [
-                {
-                    id:"o_6wlKhsJ6w",
-                    end: 180
-                },{
-                    id:"LNGGF_fzjcY",
-                    end: 174
-                },{
-                    id:"aoxXT6SiAzc",
-                    end: 162
-                },{
-                    id:"HD53JI2n9sk",
-                    end: 160
-                },{
-                    id:"8XiHjYzBH_g",
-                    end: 171
-                },{
-                    id:"joBlZ9r2jkE",
-                    end: 129
-                },{
-                    id:"tQByeGkJJSc",
-                    end: 209
-                },
-//                {
-//                    id:"46CYK3QtVso",
-//                },
-                {
-                    id:"Pw6-bpZ0NnM",
-                    end: 158
-                },{
-                    id:"gFqOumnsBI8",
-                    end: 155
-                },{
-                    id:"Idh6xH9-sCk",
-                    end: 234
-                },{
-                    id:"sj73L1AHzPY",
-                    end: 309
-                },{
-                    id:"SA9an8oSpZ8",
-                    end: 227
-                },{
-                    id:"jOssxvQ3ybY",
-                    end: 221
-                },{
-                    id:"dfL5w5HNhPM",
-                    end: 113
-                }
-            ];
+            var questionAndAnswer;
             function newQuestion() {
                 $("#response-div").html("");
                 
-                var questionAndAnswer = generateQuestion();
+                questionAndAnswer = generateQuestion();
                 console.info("Generated question " + JSON.stringify(questionAndAnswer));
                 
                 $("#question").html(questionAndAnswer.question);
@@ -337,71 +291,43 @@ Add unit tests
                     $("#answer").prop("type", "tel");
                 }
                 
-                $("#q-and-a-form").unbind().submit(function() {
-                    var guess = $("#answer").val();
+                if (questionAndAnswer.choices) {
+                    $("#choices-div").html("").show();
+                    $("#q-and-a-form").hide();
                     
-                    if (guess === "") {
-                        return false;
-                    }
+                    var correct = questionAndAnswer.choices[0];
+                    shuffle(questionAndAnswer.choices);
                     
-                    var scoreChange;
-                    if (guess.replace(/ /g, "") == questionAndAnswer.answer) {
-                        cancelCountdown();
-                        
-                        scoreChange = Math.max(.1, questionAndAnswer.difficulty * correctMultiplier + Math.floor((questionAndAnswer.template.correct?questionAndAnswer.template.correct:1)/30)
-                                +(settings.timed?Math.ceil(timeLeft):0));
-                        $("#response-div").html("Correct! "+(questionAndAnswer.correctMessage?questionAndAnswer.correctMessage:"") + " You get " + scoreChange + " points")
+                    $.each(questionAndAnswer.choices, function(index, choice) {
+                        $("#choices-div").append("<div><button class='btn btn-lg btn-default choice-btn'>"+choice+"</button></div>")
+                    });
                     
-                        if (window.MathJax) {
-                            MathJax.Hub.Queue(["Typeset",MathJax.Hub])
-                        }
+                    $(".choice-btn").click(function() {
+                        var val = $(this).html();
                         
-                        $("#answer").prop("disabled",true);
-                        $("#check-answer-btn").prop("disabled",true);
-                        
-                        setTimeout(function() {
-                            $("#new-question-btn").show().removeProp("disabled").focus();
-                        },100);
-                        if (!questionAndAnswer.template.correct) {
-                            questionAndAnswer.template.correct = 1;
+                        reactToAnswer(val === correct);
+                        if (val == correct) {
+                            $(".choice-btn").prop("disabled", true);
+                            $(this).removeClass("btn-default").addClass("btn-success")
                         } else {
-                            questionAndAnswer.template.correct++;
+                            $(this).prop("disabled", true).removeClass("btn-default").addClass("btn-danger");
                         }
-                        
-                        if (settings.giveBonus) {
-                            bonus++;
-                        }
-                    } else {
-                        var scoreChange = -incorrectMultiplier;
-                        $("#response-div").html("Incorrect! You lose " + scoreChange + " points");
-                        
-                        $(".hint.hidden:first").removeClass("hidden");
-                        
-                        if (!questionAndAnswer.template.correct) {
-                            questionAndAnswer.template.correct = 0;
-                        } else {
-                            questionAndAnswer.template.correct--;
-                        }
-                        
-                        if (settings.giveBonus) {
-                            bonus = 0;
-                        }
-                    }
-                    score = Math.max(score + scoreChange, 0);
-                    if (score - previousScore >= 10 && scoreChange > 0) {
-                        previousScore = Math.round(score,1);
-                        
-                        var additional = settings.giveBonus ? Math.floor(bonus/10)*3 : 0;
-                        playFor(10+additional);
-                    }
-                    Cookies.set("state", {
-                        score: score,
-                        bonus: bonus,
-                        previousScore: previousScore
                     })
-                    displayScore();
-                    return false;
-                });
+                } else {
+                    $("#choices-div").hide();
+                    $("#q-and-a-form").show().unbind().submit(function() {
+                        var guess = $("#answer").val();
+
+                        if (guess === "") {
+                            return false;
+                        }
+
+                        reactToAnswer(guess.replace(/ /g, "") == questionAndAnswer.answer);
+
+                        return false;
+                    });
+                }
+                
                 $("#new-question-btn").hide().prop("disabled",true);
                 $("#answer").removeProp("disabled");
                 $("#answer").val("");
@@ -414,6 +340,65 @@ Add unit tests
                 }
                 
                 document.getElementById("answer").focus();
+            }
+            
+            function reactToAnswer(isCorrect) {
+                var scoreChange;
+                if (isCorrect) {
+                    cancelCountdown();
+
+                    scoreChange = Math.max(.1, questionAndAnswer.difficulty * correctMultiplier + Math.floor((questionAndAnswer.template.correct?questionAndAnswer.template.correct:1)/30)
+                            +(settings.timed?Math.ceil(timeLeft):0));
+                    $("#response-div").html("Correct! "+(questionAndAnswer.correctMessage?questionAndAnswer.correctMessage:"") + " You get " + scoreChange + " points")
+
+                    if (window.MathJax) {
+                        MathJax.Hub.Queue(["Typeset",MathJax.Hub])
+                    }
+
+                    $("#answer").prop("disabled",true);
+                    $("#check-answer-btn").prop("disabled",true);
+
+                    setTimeout(function() {
+                        $("#new-question-btn").show().removeProp("disabled").focus();
+                    },100);
+                    if (!questionAndAnswer.template.correct) {
+                        questionAndAnswer.template.correct = 1;
+                    } else {
+                        questionAndAnswer.template.correct++;
+                    }
+
+                    if (settings.giveBonus) {
+                        bonus++;
+                    }
+                } else {
+                    var scoreChange = -incorrectMultiplier;
+                    $("#response-div").html("Incorrect! You lose " + scoreChange + " points");
+
+                    $(".hint.hidden:first").removeClass("hidden");
+
+                    if (!questionAndAnswer.template.correct) {
+                        questionAndAnswer.template.correct = 0;
+                    } else {
+                        questionAndAnswer.template.correct--;
+                    }
+
+                    if (settings.giveBonus) {
+                        bonus = 0;
+                    }
+                }
+                score = Math.max(score + scoreChange, 0);
+                if (score - previousScore >= 10 && scoreChange > 0) {
+                    previousScore = Math.round(score,1);
+
+                    var additional = settings.giveBonus ? Math.floor(bonus/10)*3 : 0;
+                    playFor(10+additional);
+                }
+                Cookies.set("state", {
+                    score: score,
+                    bonus: bonus,
+                    previousScore: previousScore
+                })
+                displayScore();                
             }
             
             function generateQuestion() {
@@ -448,10 +433,20 @@ Add unit tests
                     speech = replaceVariables({}, template.speechTemplate, false);
                 }
                 
+                var choices;
+                if (template.choiceTemplates) {
+                    choices = [];
+                    
+                    $.each(template.choiceTemplates, function(index, choiceTemplate) {
+                        choices.push(replaceVariables({}, choiceTemplate, false));
+                    });
+                }
+                
                 var questionAndAnswer = {
                     question: replaceVariables({}, template.renderTemplate, false),
                     speech: speech,
                     answer: resolvedConstants["answer"],
+                    choices: choices,
                     hints: hints,
                     difficulty: template.difficulty,
                     correctMessage: replaceVariables({}, template.correctTemplate, false),
@@ -486,6 +481,7 @@ Add unit tests
             var simpleSpellingWords4 = ["one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"]
 
             var questionTemplates = {
+                // Addition and subtraction templates
                 doubles_easy: getDoublesTemplate(0,5,1),
                 doubles_less_easy: getDoublesTemplate(6,10,2),
                 ones_addition1: getSimpleAdditionTemplate(0,10,1,1,1),
@@ -518,15 +514,11 @@ Add unit tests
                 eights_subtraction: getSimpleSubtractionWithFullBoundsTemplate(8,18,8,8,2),
                 nines_subtraction: getSimpleSubtractionWithFullBoundsTemplate(9,19,9,9,2),
                 tens_subtraction: getSimpleSubtractionWithFullBoundsTemplate(10,20,10,10,2),
-                addition_easy: getSimpleAdditionTemplate(0,10,0,5,1),
-                addition_less_easy: getSimpleAdditionTemplate(0,10,6,10,2),
                 addition_double_digit: getSimpleAdditionTemplate(10,50,10,50,3),
-                subtraction_easy: getSimpleSubtractionTemplate(0,10,0,1),
-                subtraction_less_easy: getSimpleSubtractionTemplate(10,20,5,2),
                 subtraction_double_digit: getSimpleSubtractionTemplate(50,100,10,3),
                 subtraction_easy_with_negative_answers: getSimpleSubtractionWithNegativeAnswerTemplate(0,10,13,3),
-                multiplication_easy: getSimpleMultiplicationTemplate(0,4,0,4,2),
-                multiplication_less_easy: getSimpleMultiplicationTemplate(5,9,3,6,3),
+                
+                // Multiplication and division templates
                 ones_multiplication1: getSimpleMultiplicationTemplate(0,10,1,1,1),
                 twos_multiplication1: getSimpleMultiplicationTemplate(0,10,2,2,2),
                 threes_multiplication1: getSimpleMultiplicationTemplate(0,10,3,3,2),
@@ -547,22 +539,38 @@ Add unit tests
                 eights_multiplication2: getSimpleMultiplicationTemplate(8,8,0,10,3),
                 nines_multiplication2: getSimpleMultiplicationTemplate(9,9,0,10,3),
                 tens_multiplication2: getSimpleMultiplicationTemplate(10,10,0,10,2),
-                division_easy: getSimpleDivisionTemplate(0,4,1,4,2),
-                division_less_easy: getSimpleDivisionTemplate(5,9,3,6,3),
+                ones_division: getSimpleDivisionTemplate(1,10,1,1,2),
+                twos_division: getSimpleDivisionTemplate(1,10,2,2,2),
+                threes_division: getSimpleDivisionTemplate(1,10,3,3,2),
+                fours_division: getSimpleDivisionTemplate(1,10,4,4,2),
+                fives_division: getSimpleDivisionTemplate(1,10,5,5,2),
+                sixes_division: getSimpleDivisionTemplate(1,10,6,6,3),
+                sevens_division: getSimpleDivisionTemplate(1,10,7,7,3),
+                eights_division: getSimpleDivisionTemplate(1,10,8,8,3),
+                nines_division: getSimpleDivisionTemplate(1,10,9,9,3),
+                tens_division: getSimpleDivisionTemplate(1,10,10,10,3),
+                
+                // Fractions templates
                 fractions_easy1: getFractionReductionTemplate(10, 1, 6, 2, true),
                 fractions_easy2: getFractionReductionTemplate(10, 1, 6, 2, false),
                 fractions_less_easy1: getFractionReductionTemplate(20, 1, 10, 3, true),
                 fractions_less_easy2: getFractionReductionTemplate(20, 1, 10, 3, false),
+                
+                // Algebra templates
                 algebra_1_step_addition_and_subtraction_easy: getAlgebra1StepAdditionAndSubtractionTemplate(-10,10,-10,10,2),
                 algebra_1_step_multiplication_easy: getAlgebra1StepMultiplicationTemplate(-10,10,-10,10,3),
                 algebra_1_step_multiplication_positive_easy: getAlgebra1StepMultiplicationTemplate(1,10,-10,10,3),
                 algebra_1_step_multiplication_negative_easy: getAlgebra1StepMultiplicationTemplate(-10,-1,-10,10,3),
 //                algebra_1_step_division_easy: getAlgebra1StepDivisionTemplate(-10,10,-10,10,2),
                 two_term_factoring: getSimpleFactoringTemplate(10, 2, 10, 3),
+                
+                // Spelling templates
                 spelling_easy1: getSimpleSpellingTemplate(simpleSpellingWords1),
                 spelling_easy2: getSimpleSpellingTemplate(simpleSpellingWords2),
                 spelling_easy3: getSimpleSpellingTemplate(simpleSpellingWords3),
                 spelling_easy4: getSimpleSpellingTemplate(simpleSpellingWords4),
+                
+                // Reading templates
                 reading_easy: getSimpleReadingTemplate()
             }
             var templateSets = {
@@ -570,16 +578,42 @@ Add unit tests
                     name: "Easy addition and subtraction",
                     group: "addition_and_subtraction",
                     templates: [
-                        "addition_easy",
-                        "subtraction_easy",
+                        "ones_addition1",
+                        "ones_addition2",
+                        "twos_addition1",
+                        "twos_addition2",
+                        "threes_addition1",
+                        "threes_addition2",
+                        "fours_addition1",
+                        "fours_addition2",
+                        "fives_addition1",
+                        "fives_addition2",
+                        "ones_subtraction",
+                        "twos_subtraction",
+                        "threes_subtraction",
+                        "fours_subtraction",
+                        "fives_subtraction",
                     ]
                 },
                 less_easy_addition_and_subtraction: {
                     name: "Less easy addition and subtraction",
                     group: "addition_and_subtraction",
                     templates: [
-                        "addition_less_easy",
-                        "subtraction_less_easy",
+                        "sixes_addition1",
+                        "sixes_addition2",
+                        "sevens_addition1",
+                        "sevens_addition2",
+                        "eights_addition1",
+                        "eights_addition2",
+                        "nines_addition1",
+                        "nines_addition2",
+                        "tens_addition1",
+                        "tens_addition2",
+                        "sixes_subtraction",
+                        "sevens_subtraction",
+                        "eights_subtraction",
+                        "nines_subtraction",
+                        "tens_subtraction",
                     ]
                 },
                 double_digit_addition_and_subtraction: {
@@ -849,6 +883,76 @@ Add unit tests
                     templates: [
                         "tens_multiplication1",
                         "tens_multiplication2",
+                    ]
+                },
+                ones_division: {
+                    name: "Ones division",
+                    group: "multiplication_and_division",
+                    templates: [
+                        "ones_division",
+                    ]
+                },
+                twos_division: {
+                    name: "Twos division",
+                    group: "multiplication_and_division",
+                    templates: [
+                        "twos_division",
+                    ]
+                },
+                threes_division: {
+                    name: "Threes division",
+                    group: "multiplication_and_division",
+                    templates: [
+                        "threes_division",
+                    ]
+                },
+                fours_division: {
+                    name: "Fours division",
+                    group: "multiplication_and_division",
+                    templates: [
+                        "fours_division",
+                    ]
+                },
+                fives_division: {
+                    name: "Fives division",
+                    group: "multiplication_and_division",
+                    templates: [
+                        "fives_division",
+                    ]
+                },
+                sixes_division: {
+                    name: "Sixes division",
+                    group: "multiplication_and_division",
+                    templates: [
+                        "sixes_division",
+                    ]
+                },
+                sevens_division: {
+                    name: "Sevens division",
+                    group: "multiplication_and_division",
+                    templates: [
+                        "sevens_division",
+                    ]
+                },
+                eights_division: {
+                    name: "Eights division",
+                    group: "multiplication_and_division",
+                    templates: [
+                        "eights_division",
+                    ]
+                },
+                nines_division: {
+                    name: "Nines division",
+                    group: "multiplication_and_division",
+                    templates: [
+                        "nines_division",
+                    ]
+                },
+                tens_division: {
+                    name: "Tens division",
+                    group: "multiplication_and_division",
+                    templates: [
+                        "tens_division",
                     ]
                 },
                 easy_fraction_reduction: {
@@ -1174,18 +1278,20 @@ Add unit tests
                                 }
                             });
                             shuffle(allWords);
-                            var choices = allWords.splice(0,3);
-                            choices.push(resolvedConstants["answer"]);
-                            return shuffle(choices);
+                            return allWords.splice(0,3);
                         },
-                        choice1: function() {return resolvedConstants["choices"][0] },
-                        choice2: function() {return resolvedConstants["choices"][1] },
-                        choice3: function() {return resolvedConstants["choices"][2] },
-                        choice4: function() {return resolvedConstants["choices"][3] },
+                        choice0: function() {return resolvedConstants["choices"][0] },
+                        choice1: function() {return resolvedConstants["choices"][1] },
+                        choice2: function() {return resolvedConstants["choices"][2] },
                     },
                     difficulty: 5,
-                    renderTemplate: "Fill in the blank: \"${sentence_hidden}\"<br>" +
-                            "<ol><li>${choice1}</li><li>${choice2}</li><li>${choice3}</li><li>${choice4}</li></ol>",
+                    renderTemplate: "Fill in the blank: \"${sentence_hidden}\"",
+                    choiceTemplates: [
+                        "${answer}",
+                        "${choice0}",
+                        "${choice1}",
+                        "${choice2}"
+                    ],
                     inputType: "text"
                 }
             }
@@ -1252,6 +1358,77 @@ Add unit tests
                 clearTimeout(countdownTimeout);
             }
 
+
+            // Video player
+            var videos = [
+                {
+                    id:"o_6wlKhsJ6w",
+                    end: 180
+                },{
+                    id:"LNGGF_fzjcY",
+                    end: 174
+                },{
+                    id:"aoxXT6SiAzc",
+                    end: 162
+                },{
+                    id:"HD53JI2n9sk",
+                    end: 160
+                },{
+                    id:"8XiHjYzBH_g",
+                    end: 171
+                },{
+                    id:"joBlZ9r2jkE",
+                    end: 129
+                },{
+                    id:"tQByeGkJJSc",
+                    end: 209
+                },
+//                {
+//                    id:"46CYK3QtVso",
+//                },
+                {
+                    id:"Pw6-bpZ0NnM",
+                    end: 158
+                },{
+                    id:"gFqOumnsBI8",
+                    end: 155
+                },{
+                    id:"Idh6xH9-sCk",
+                    end: 234
+                },{
+                    id:"sj73L1AHzPY",
+                    end: 309
+                },{
+                    id:"SA9an8oSpZ8",
+                    end: 227
+                },{
+                    id:"jOssxvQ3ybY",
+                    end: 221
+                },{
+                    id:"dfL5w5HNhPM",
+                    end: 113
+                },
+                {
+                    id:"xXHt7GHNQ3c",
+                    start: 10,
+                    end: 104
+                },
+                {
+                    id:"ZRQDrCze4fk",
+                    start: 6,
+                    end: 144
+                },
+                {
+                    id:"7PLVRXQrozg",
+                    start: 6,
+                    end: 144
+                },
+                {
+                    id:"MTijWHF20Rs",
+                    start: 7,
+                    end: 132
+                }
+            ];
             var player,suppress;
             function onYouTubeIframeAPIReady() {
                 player = new YT.Player('player', {
@@ -1296,7 +1473,7 @@ Add unit tests
                 }
                 if (!video) {
                     video = getRandomElement(videos);
-                    currentPosition = 0;
+                    currentPosition = video.start ? video.start : 0;
                 }
                 Cookies.set("video", video, { expires: 1 });
                 Cookies.set("videoPosition", [currentPosition], { expires: 1 });
@@ -1408,8 +1585,8 @@ Add unit tests
                     <button id="repeat-btn" style="display:none">Repeat</button>
                     <form id="q-and-a-form">
                         <input type="tel" id="answer" style="margin-top: 10px" />
-                        <!--<button type="submit" id="check-answer-btn" class="btn btn-primary" disabled>Submit</button>-->
                     </form>
+                    <div id="choices-div" style="display:none"></div>
                     <div id="response-div"></div>
                     <button id="new-question-btn" class="btn btn-default" style="display:none">New question</button>
                 </div>
