@@ -42,6 +42,7 @@ Look and feel:
 Everything feels jammed to together on right side
 
 Features:
+Keep playing video in background?
 Add division problem types
 Add more videos
 Add more spelling words
@@ -131,23 +132,7 @@ Add unit tests
                 });
                 
                 $("#reset-score-btn").click(function() {
-                    state = {
-                        score: 0,
-                        possibleScore: 0,
-                        bonus: 0,
-                        previousScore: 0,
-                        questionNumber: 0
-                    };
-                    
-                    score = state.score;
-                    possibleScore = state.possibleScore;
-                    bonus = state.bonus;
-                    previousScore = state.previousScore;
-                    questionNumber = state.questionNumber;
-                    
-                    Cookies.set("state", state);
-                    
-                    displayScore();
+                    resetScore();
                 });
 
                 $("#settings-btn").click(function() {
@@ -456,7 +441,17 @@ Add unit tests
                     previousScore: previousScore,
                     questionNumber: questionNumber
                 })
-                displayScore();                
+                displayScore();
+                
+                if (questionNumber >= settings.quizLength && settings.length === "fixedLength") {
+                    $(".total-correct").html(score);
+                    $(".total-questions").html(possibleScore);
+                    $(".percent-correct").html(score * 100.0/possibleScore);
+                    $(".letter-grade").html(getLetterGrade(score,possibleScore));
+                    $("#end-game-modal").modal();
+                    resetScore();
+                }
+                
             }
             
             function generateQuestion() {
@@ -540,6 +535,26 @@ Add unit tests
                 } else {
                     $("#question-count-div").hide();
                 }
+            }
+            
+            function resetScore() {
+                state = {
+                    score: 0,
+                    possibleScore: 0,
+                    bonus: 0,
+                    previousScore: 0,
+                    questionNumber: 0
+                };
+
+                score = state.score;
+                possibleScore = state.possibleScore;
+                bonus = state.bonus;
+                previousScore = state.previousScore;
+                questionNumber = state.questionNumber;
+
+                Cookies.set("state", state);
+
+                displayScore();
             }
             
             function getLetterGrade(score, possibleScore) {
@@ -1472,7 +1487,7 @@ Add unit tests
 
 
             // Video player
-            var videos = [
+            var funVideos = [
                 {
                     id:"o_6wlKhsJ6w",
                     end: 180
@@ -1541,6 +1556,25 @@ Add unit tests
                     end: 132
                 }
             ];
+            var educationalVideos = [
+                {
+                    id:"lEXBxijQREo"
+                },
+                {
+                    id:"QEzlsjAqADA"
+                },
+                {
+                    id:"VwRLIt6jgdM"
+                },
+                {
+                    id:"Hhk4N9A0oCA",
+                    start: 8
+                },
+                {
+                    id:"QhUrc4BnPgg",
+                    start: 8
+                }
+            ]
             var player,suppress;
             function onYouTubeIframeAPIReady() {
                 player = new YT.Player('player', {
@@ -1563,7 +1597,7 @@ Add unit tests
                             if (!suppress) {
                                 console.info("Video ended");
                                 $("#media-holder").hide();
-                                load(getRandomElement(videos), 0);
+                                load(getRandomElement(funVideos), 0);
                             }
                             break;
                     }
@@ -1584,7 +1618,7 @@ Add unit tests
                     }
                 }
                 if (!video) {
-                    video = getRandomElement(videos);
+                    video = getRandomElement(funVideos);
                     currentPosition = video.start ? video.start : 0;
                 }
                 Cookies.set("video", video, { expires: 1 });
