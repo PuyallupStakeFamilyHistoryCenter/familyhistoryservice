@@ -43,7 +43,8 @@ Look and feel:
 Everything feels jammed to together on right side
 
 Features:
-Add hints for double digit addition and subtraction
+Split double-digit subtraction by with vs without borrowing
+Add hints for double digit subtraction
 Add division problem types
 Add more videos
 Add more spelling words
@@ -54,6 +55,10 @@ Add science questions
 Add lessons (or links to YouTube lessons)
 Add fixed-length quizzes with calculated grade
 Auto-generate reading distractor pool
+Add graphing questions
+Add rounding questions (what category?)
+Add trigonometry questions
+Add calculus questions
 Add long division (https://www.dessci.com/en/products/mathplayer/tech/mathml3-elemmath-examples.htm)
 Maybe allow the reading sentences to form stories (need to preserve order)
 Allow configuring videos in settings (or adding new ones)
@@ -81,6 +86,13 @@ Add unit tests
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         
         <script src="js/mathjax.min.js"></script>
+        <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({
+          MathML: {
+            extensions: ["mml3.js"]
+          }
+        });
+        </script>
         <script src="js/jquery-1.11.1.min.js"></script>
         <script src="js/bootstrap.min.js"></script>
         <script src="js/js.cookie.js"></script>
@@ -329,9 +341,10 @@ Add unit tests
                 
                 $("#question").html(questionAndAnswer.question);
                 
+                $("#hints").html("");
                 if (questionAndAnswer.hints) {
                     $.each(questionAndAnswer.hints, function(index, hint) {
-                        $("#hints").append("<div class='hidden hint'>"+hint+"</div>");
+                        $("#hints").append("<li class='hidden hint'>"+hint+"</li>");
                     });
                 }
                 
@@ -507,9 +520,9 @@ Add unit tests
                 console.info("Resolved constants " + JSON.stringify(resolvedConstants));
                 
                 var hints;
-                if (template.hints) {
+                if (template.hintTemplates) {
                     hints = [];
-                    $.each(template.hints, function(index, hintTemplate) {
+                    $.each(template.hintTemplates, function(index, hintTemplate) {
                         hints.push(replaceVariables({}, hintTemplate, false));
                     });
                 }
@@ -1240,7 +1253,10 @@ Add unit tests
                         answer: function() {return resolvedConstants["n1"] + resolvedConstants["n2"]}
                     },
                     difficulty: difficulty,
-                    renderTemplate: "<math><mn>${n1}</mn><mo>+</mo><mn>${n2}</mn><mo> = </mo></math>"
+                    renderTemplate: "<math><mn>${n1}</mn><mo>+</mo><mn>${n2}</mn><mo> = </mo></math>",
+                    hintTemplates: [
+                        "Rewrite problem and add straight down: <div style='padding: 10px 0'><math><mstack><mn>${n1}</mn><msrow> <mo>+</mo> <none/> <mn>${n2}</mn> </msrow><msline/></mstack></math></div>",
+                    ]
                 }
             }
             function getSimpleAdditionTemplateWithCarry(min1, max1, min2, max2, difficulty) {
@@ -1253,10 +1269,54 @@ Add unit tests
                             var ones = rand(10-n1 % 10,9);
                             return tens * 10 + ones;
                         },
-                        answer: function() {return resolvedConstants["n1"] + resolvedConstants["n2"]}
+                        answer: function() {return resolvedConstants["n1"] + resolvedConstants["n2"]},
+                        answerOnes: function() {return resolvedConstants.answer % 10}
                     },
                     difficulty: difficulty,
-                    renderTemplate: "<math><mn>${n1}</mn><mo>+</mo><mn>${n2}</mn><mo> = </mo></math>"
+                    renderTemplate: "<math><mn>${n1}</mn><mo>+</mo><mn>${n2}</mn><mo> = </mo></math>",
+                    hintTemplates: [
+                        "Rewrite problem: <div style='padding: 10px 0'><math><mstack><mn>${n1}</mn><msrow> <mo>+</mo> <none/> <mn>${n2}</mn> </msrow><msline/></mstack></math></div>",
+                        "Add straight down on the ones side: \n\
+                          <div style='padding: 10px 0'>\n\
+                            <math>\n\
+                              <mstack>\n\
+                                <mscarries position='1'>\n\
+                                  <mn>1</mn>\n\
+                                </mscarries>\n\
+                                <mn>${n1}</mn>\n\
+                                <msrow> \n\
+                                  <mo>+</mo> \n\
+                                  <none/>\n\
+                                  <mn>${n2}</mn> \n\
+                                </msrow>\n\
+                                <msline/>\n\
+                                <mrow>\n\
+                                  <mn>${answerOnes}</mn>\n\
+                                </mrow>\n\
+                              </mstack>\n\
+                            </math>\n\
+                          </div>Don't forget to carry!",
+                        "Add straight down on the tens side including the carried 1: \n\
+                          <div style='padding: 10px 0'>\n\
+                            <math>\n\
+                              <mstack>\n\
+                                <mscarries position='1'>\n\
+                                  <mn>1</mn>\n\
+                                </mscarries>\n\
+                                <mn>${n1}</mn>\n\
+                                <msrow> \n\
+                                  <mo>+</mo> \n\
+                                  <none/>\n\
+                                  <mn>${n2}</mn> \n\
+                                </msrow>\n\
+                                <msline/>\n\
+                                <mrow>\n\
+                                  <mn>${answer}</mn>\n\
+                                </mrow>\n\
+                              </mstack>\n\
+                            </math>\n\
+                          </div>"
+                    ]
                 }
             }
             function getSimpleSubtractionTemplate(min1, max1, min2, difficulty) {
@@ -1380,8 +1440,8 @@ Add unit tests
                         }
                     },
                     difficulty: difficulty,
-                    renderTemplate: "Solve for <math><mi>${v}</mi></math>: ${equation}<div id='hints'></div><math><mi>${v}</mi><mo>=</mo></math>",
-                    hints: [
+                    renderTemplate: "Solve for <math><mi>${v}</mi></math>: ${equation}<math><mi>${v}</mi><mo>=</mo></math>",
+                    hintTemplates: [
                         "${firstStep}",
                         "${secondStep}",
                     ]
@@ -1410,7 +1470,7 @@ Add unit tests
                     },
                     difficulty: difficulty,
                     renderTemplate: "Solve for <math><mi>${v}</mi></math>: ${equation}<div id='hints'></div><math><mi>${v}</mi><mo>=</mo></math>",
-                    hints: [
+                    hintTemplates: [
                         "${firstStep}",
                         "${secondStep}",
                     ]
@@ -1432,7 +1492,7 @@ Add unit tests
                     },
                     difficulty: difficulty,
                     renderTemplate: "Factor completely: <math><mn>${fc1}</mn><mi>${v}</mi><mo>+</mo><mn>${fc2}</mn></math>",
-                    hints: []
+                    hintTemplates: []
                 }
             }
             function getSimpleSpellingTemplate(wordSet) {
@@ -1816,6 +1876,12 @@ Add unit tests
             }
             
         </script>
+        
+        <style>
+            #hints li {
+                padding-top: 10px
+            }
+        </style>
     </head>
     <body>
         <div class="container">
@@ -1838,6 +1904,7 @@ Add unit tests
                     <div id="question" style="font-size:150%"> 
 
                     </div>
+                    <ol id="hints"></ol>
                     <button id="repeat-btn" style="display:none">Repeat</button>
                     <form id="q-and-a-form">
                         <input type="tel" id="answer" style="margin-top: 10px" />
