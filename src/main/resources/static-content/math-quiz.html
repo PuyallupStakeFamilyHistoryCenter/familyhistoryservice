@@ -36,12 +36,14 @@ Factor out question logic
 Factor out video widget
 Factor out timer widget
 Separate from FHC app
+Separate out hints from questions
 
 Look and feel:
 "correct" and "incorrect" messages are underwhelming
 Everything feels jammed to together on right side
 
 Features:
+Add hints for double digit addition and subtraction
 Add division problem types
 Add more videos
 Add more spelling words
@@ -672,7 +674,10 @@ Add unit tests
                 eights_subtraction: getSimpleSubtractionWithFullBoundsTemplate(8,18,8,8,2),
                 nines_subtraction: getSimpleSubtractionWithFullBoundsTemplate(9,19,9,9,2),
                 tens_subtraction: getSimpleSubtractionWithFullBoundsTemplate(10,20,10,10,2),
-                addition_double_digit: getSimpleAdditionTemplate(10,50,10,50,3),
+                addition_double_digit_no_carry_easy: getSimpleAdditionTemplateWithNoCarry(10,50,1,50,3),
+                addition_double_digit_carry_easy: getSimpleAdditionTemplateWithCarry(10,50,1,50,4),
+                addition_double_digit_no_carry_less_easy: getSimpleAdditionTemplateWithNoCarry(50,99,1,99,4),
+                addition_double_digit_carry_less_easy: getSimpleAdditionTemplateWithCarry(50,99,1,99,5),
                 subtraction_double_digit: getSimpleSubtractionTemplate(50,100,10,3),
                 subtraction_easy_with_negative_answers: getSimpleSubtractionWithNegativeAnswerTemplate(0,10,13,3),
                 
@@ -774,11 +779,26 @@ Add unit tests
                         "tens_subtraction",
                     ]
                 },
-                double_digit_addition_and_subtraction: {
-                    name: "Double digit addition and subtraction",
+                double_digit_addition_no_carry: {
+                    name: "Double digit addition with no carry",
                     group: "addition_and_subtraction",
                     templates: [
-                        "addition_double_digit",
+                        "addition_double_digit_no_carry_easy",
+                        "addition_double_digit_no_carry_less_easy",
+                    ]
+                },
+                double_digit_addition_carry: {
+                    name: "Double digit addition with carry",
+                    group: "addition_and_subtraction",
+                    templates: [
+                        "addition_double_digit_carry_easy",
+                        "addition_double_digit_carry_less_easy",
+                    ]
+                },
+                double_digit_subtraction: {
+                    name: "Double digit subtraction",
+                    group: "addition_and_subtraction",
+                    templates: [
                         "subtraction_double_digit",
                     ]
                 },
@@ -1201,6 +1221,38 @@ Add unit tests
                     constants: {
                         n1: function() {return rand(min1,max1)},
                         n2: function() {return rand(min2,max2)},
+                        answer: function() {return resolvedConstants["n1"] + resolvedConstants["n2"]}
+                    },
+                    difficulty: difficulty,
+                    renderTemplate: "<math><mn>${n1}</mn><mo>+</mo><mn>${n2}</mn><mo> = </mo></math>"
+                }
+            }
+            function getSimpleAdditionTemplateWithNoCarry(min1, max1, min2, max2, difficulty) {
+                return {
+                    constants: {
+                        n1: function() {return rand(min1,max1)},
+                        n2: function() {
+                            var n1 = resolvedConstants.n1;
+                            var tens = rand(Math.floor(min2 / 10), Math.floor(max2 / 10));
+                            var ones = rand(0, 9-n1 % 10);
+                            return tens * 10 + ones;
+                        },
+                        answer: function() {return resolvedConstants["n1"] + resolvedConstants["n2"]}
+                    },
+                    difficulty: difficulty,
+                    renderTemplate: "<math><mn>${n1}</mn><mo>+</mo><mn>${n2}</mn><mo> = </mo></math>"
+                }
+            }
+            function getSimpleAdditionTemplateWithCarry(min1, max1, min2, max2, difficulty) {
+                return {
+                    constants: {
+                        n1: function() {return rand(min1,max1)},
+                        n2: function() {
+                            var n1 = resolvedConstants.n1;
+                            var tens = rand(Math.floor(min2 / 10), Math.floor(max2 / 10));
+                            var ones = rand(10-n1 % 10,9);
+                            return tens * 10 + ones;
+                        },
                         answer: function() {return resolvedConstants["n1"] + resolvedConstants["n2"]}
                     },
                     difficulty: difficulty,
