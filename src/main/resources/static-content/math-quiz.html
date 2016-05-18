@@ -159,9 +159,19 @@ Add unit tests
                         settings[key] = value;
                     });
                     
-                    settings["length"] = $("[name=length]:checked").val();
-                    if (settings["length"] === "fixedLength") {
-                        settings["quizLength"] = 1*$("input[name=quizLength]").val()
+                    settings.videoTypes = [];
+                    $("input[name=videoTypes]:checked").each(function() {
+                        settings.videoTypes.push($(this).val());
+                    });
+                    if (!settings.videoTypes.length) {
+                        settings.videoTypes = ["fun"];
+                    }
+                    video = null;
+                    Cookies.remove("video");
+                    
+                    settings.quizLengthMode = $("[name=quizLengthMode]:checked").val();
+                    if (settings.quizLengthMode === "fixedLength") {
+                        settings.quizLength = 1*$("input[name=quizLength]").val()
                     }
                     
                     settings["graded"] = $("[name=graded]:checked").length > 0;
@@ -176,30 +186,26 @@ Add unit tests
                     $("input[name=type]").removeProp("checked").parent().removeClass("active");
                 });
                 
-                $("[name=length]").change(function() {
+                $("[name=quizLengthMode]").change(function() {
                     var val = $(this).val();
                     if (val === "fixedLength") {
-                        $("#quiz-length-div").show();
+                        $("#quiz-length-div").slideDown();
                     } else {
-                        $("#quiz-length-div").hide();
+                        $("#quiz-length-div").slideUp();
                     }
+                })
+                
+                $("[name=settings][value=playVideo]").change(function() {
+                    var val = $(this).prop("checked");
+                    if (val) {
+                        $("#video-types-div").slideDown();
+                    } else {
+                        $("#video-types-div").slideUp();
+                    }   
                 })
             
                 $("#answer").change(function() {
                     $("#check-answer-btn").removeProp("disabled");
-                });
-            
-                $("#player").load(function () {
-                    try {
-                        //Test if YouTube API already loaded
-                        onYouTubeIframeAPIReady();
-                    } catch (e) {
-                        var tag = document.createElement('script');
-
-                        tag.src = "https://www.youtube.com/iframe_api";
-                        var player = document.getElementById("player");
-                        player.parentNode.insertBefore(tag, player);
-                    }
                 });
                 
                 $.each(templateSets, function(index, templateSet) {
@@ -226,7 +232,7 @@ Add unit tests
                         giveBonus: true,
                         timed: true,
                         graded: false,
-                        length: "endless"
+                        quizLengthMode: "endless"
                     };
                 }
                 
@@ -234,6 +240,11 @@ Add unit tests
                     if (value === true) {
                         $("input[value="+key+"]").prop("checked", true).parent().addClass("active");
                         $("input[name="+key+"]").prop("checked", true).parent().addClass("active");
+                    } else if (Array.isArray(value)) {
+                        $("input[name="+key+"]").removeProp("checked").parent().removeClass("active");
+                        $.each(value, function(index, innerValue) {
+                            $("input[name="+key+"][value="+innerValue+"]").prop("checked", true).parent().addClass("active");
+                        })
                     } else if (value) {
                         $("input[type=radio][name="+key+"][value=" + value + "]").prop("checked", true).parent().addClass("active");
                         $("input[type=number][name="+key+"]").val(value);
@@ -242,8 +253,12 @@ Add unit tests
                     }
                 });
                 
-                if (settings.length === "fixedLength") {
+                if (settings.quizLengthMode === "fixedLength") {
                     $("#quiz-length-div").show();
+                }
+                
+                if (settings.playVideo) {
+                    $("#video-types-div").show();
                 }
                 
                 selectedTemplateSets = Cookies.getJSON("types");
@@ -278,6 +293,23 @@ Add unit tests
                 questionNumber = state.questionNumber;
                 if (!questionNumber) {
                     questionNumber = 0;
+                }
+            
+                // Setup YouTube if necessary
+                if (settings.playVideo) {
+                    $("#media-holder").html("<iframe id='player' style='height: 100%; width: 100%; position: fixed; top: 0; left: 0;' type='text/html' src='https://www.youtube.com/embed/o_6wlKhsJ6w?controls=0&disablekb=1&enablejsapi=1&fs=1&modestbranding=1&rel=0' frameborder='0'></iframe>")
+                    $("#player").load(function () {
+                        try {
+                            //Test if YouTube API already loaded
+                            onYouTubeIframeAPIReady();
+                        } catch (e) {
+                            var tag = document.createElement('script');
+
+                            tag.src = "https://www.youtube.com/iframe_api";
+                            var player = document.getElementById("player");
+                            player.parentNode.insertBefore(tag, player);
+                        }
+                    });
                 }
                 
                 displayScore();
@@ -443,7 +475,7 @@ Add unit tests
                 })
                 displayScore();
                 
-                if (questionNumber >= settings.quizLength && settings.length === "fixedLength") {
+                if (questionNumber >= settings.quizLength && settings.quizLengthMode === "fixedLength") {
                     $(".total-correct").html(score);
                     $(".total-questions").html(possibleScore);
                     $(".percent-correct").html(score * 100.0/possibleScore);
@@ -530,7 +562,7 @@ Add unit tests
                 } else {
                     $("#score-div").html("Score: " + score + (bonus > 10 && settings.giveBonus ? " <small>Bonus: " + Math.floor(bonus/10) : "") + "</small>")
                 }
-                if (settings.length === "fixedLength") {
+                if (settings.quizLengthMode === "fixedLength") {
                     $("#question-count-div").show().html("Question " + questionNumber + "/" + settings.quizLength)
                 } else {
                     $("#question-count-div").hide();
@@ -1558,24 +1590,40 @@ Add unit tests
             ];
             var educationalVideos = [
                 {
-                    id:"lEXBxijQREo"
+                    id:"lEXBxijQREo",
+                    mode: "entire"
                 },
                 {
-                    id:"QEzlsjAqADA"
+                    id:"QEzlsjAqADA",
+                    mode: "entire"
                 },
                 {
-                    id:"VwRLIt6jgdM"
+                    id:"VwRLIt6jgdM",
+                    mode: "entire"
                 },
                 {
                     id:"Hhk4N9A0oCA",
-                    start: 8
+                    start: 8,
+                    mode: "entire"
                 },
                 {
                     id:"QhUrc4BnPgg",
-                    start: 8
+                    start: 8,
+                    mode: "entire"
                 }
             ]
-            var player,suppress;
+            var player,suppress,videoMode;
+            function getRandomVideo() {
+                var chosenVideos = [];
+                if (settings.videoTypes.indexOf("fun") >= 0) {
+                    $.merge(chosenVideos, funVideos);
+                }
+                if (settings.videoTypes.indexOf("educational") >= 0) {
+                    $.merge(chosenVideos, educationalVideos);
+                }
+                return getRandomElement(chosenVideos);
+            }
+            
             function onYouTubeIframeAPIReady() {
                 player = new YT.Player('player', {
                     events: {
@@ -1597,7 +1645,7 @@ Add unit tests
                             if (!suppress) {
                                 console.info("Video ended");
                                 $("#media-holder").hide();
-                                load(getRandomElement(funVideos), 0);
+                                load(getRandomVideo(), 0);
                             }
                             break;
                     }
@@ -1609,20 +1657,27 @@ Add unit tests
                 currentPosition = position;
                 
                 if (!video) {
-                    video = Cookies.getJSON("video");
                     try {
+                        video = Cookies.getJSON("video");
                         currentPosition = Cookies.getJSON("videoPosition")[0];
+                        videoMode = video.mode;
                     } catch (e) {
+                        video = null;
                         currentPosition = 0;
                         console.warn(e);
                     }
                 }
                 if (!video) {
-                    video = getRandomElement(funVideos);
+                    video = getRandomVideo();
                     currentPosition = video.start ? video.start : 0;
+                    videoMode = video.mode;
+                }
+                if (!videoMode) {
+                    videoMode = "short"
                 }
                 Cookies.set("video", video, { expires: 1 });
                 Cookies.set("videoPosition", [currentPosition], { expires: 1 });
+                Cookies.set("videoMode", videoMode, {expires: 1})
                 
                 console.info("Loading video " + video.id + " at " + currentPosition);
                 
@@ -1637,10 +1692,13 @@ Add unit tests
             function playFor(seconds) {
                 skipBackward(2);
                 play();
-                setTimeout(function() {
-                    pause();
-                    currentTime = getCurrentTime();
-                },seconds * 1000)
+                
+                if (videoMode !== "entire") {
+                    setTimeout(function() {
+                        pause();
+                        currentTime = getCurrentTime();
+                    },seconds * 1000)
+                }
             }
             
             function play() {
@@ -1765,13 +1823,25 @@ Add unit tests
                             </label>
                         </div>
 
-                        <h4>Mode</h4>
+                        <div id="video-types-div" style="display: none">
+                            <h4>Video types</h4>
+                            <div class="btn-group btn-group-lg" data-toggle="buttons">
+                                <label class="btn btn-default">
+                                    <input type="checkbox" name="videoTypes" value="fun">Fun
+                                </label>
+                                <label class="btn btn-default">
+                                    <input type="checkbox" name="videoTypes" value="educational">Educational
+                                </label>
+                            </div>
+                        </div>
+
+                        <h4>Quiz length</h4>
                         <div class="btn-group btn-group-lg" data-toggle="buttons">
                             <label class="btn btn-default">
-                                <input type="radio" name="length" value="endless">Endless
+                                <input type="radio" name="quizLengthMode" value="endless">Endless
                             </label>
                             <label class="btn btn-default">
-                                <input type="radio" name="length" value="fixedLength">Fixed length
+                                <input type="radio" name="quizLengthMode" value="fixedLength">Fixed length
                             </label>
                         </div>
                         
@@ -1826,7 +1896,7 @@ Add unit tests
         </div>
 
         <div id="media-holder" class="embed-responsive embed-responsive-16by9" style="display: none">
-            <iframe id="player" style="height: 100%; width: 100%; position: fixed; top: 0; left: 0;" type="text/html" src="https://www.youtube.com/embed/o_6wlKhsJ6w?controls=0&disablekb=1&enablejsapi=1&fs=1&modestbranding=1&rel=0" frameborder="0"></iframe>
+            
         </div>
 
 
