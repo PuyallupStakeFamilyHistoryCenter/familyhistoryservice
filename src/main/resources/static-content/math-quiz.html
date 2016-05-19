@@ -187,7 +187,7 @@ Add unit tests
                         settings.quizLength = 1*$("input[name=quizLength]").val()
                     }
                     
-                    settings["graded"] = $("[name=graded]:checked").length > 0;
+                    settings.graded = $("[name=graded]:checked").length > 0;
                     
                     Cookies.set("settings", settings, { expires: 365 });
                     
@@ -544,7 +544,7 @@ Add unit tests
                 var questionAndAnswer = {
                     question: replaceVariables({}, template.renderTemplate, false),
                     speech: speech,
-                    answer: resolvedConstants["answer"],
+                    answer: resolvedConstants.answer,
                     choices: choices,
                     hints: hints,
                     difficulty: template.difficulty,
@@ -1223,7 +1223,7 @@ Add unit tests
                 return {
                     constants: {
                         n: function() {return rand(min,max)},
-                        answer: function() {return resolvedConstants["n"]*2}
+                        answer: function() {return resolvedConstants.n*2}
                     },
                     difficulty: difficulty,
                     renderTemplate: "<math><mn>${n}</mn><mo>+</mo><mn>${n}</mn><mo> = </mo></math>"
@@ -1234,7 +1234,7 @@ Add unit tests
                     constants: {
                         n1: function() {return rand(min1,max1)},
                         n2: function() {return rand(min2,max2)},
-                        answer: function() {return resolvedConstants["n1"] + resolvedConstants["n2"]}
+                        answer: function() {return resolvedConstants.n1 + resolvedConstants.n2}
                     },
                     difficulty: difficulty,
                     renderTemplate: "<math><mn>${n1}</mn><mo>+</mo><mn>${n2}</mn><mo> = </mo></math>"
@@ -1250,7 +1250,7 @@ Add unit tests
                             var ones = rand(0, 9-n1 % 10);
                             return tens * 10 + ones;
                         },
-                        answer: function() {return resolvedConstants["n1"] + resolvedConstants["n2"]}
+                        answer: function() {return resolvedConstants.n1 + resolvedConstants.n2}
                     },
                     difficulty: difficulty,
                     renderTemplate: "<math><mn>${n1}</mn><mo>+</mo><mn>${n2}</mn><mo> = </mo></math>",
@@ -1269,7 +1269,7 @@ Add unit tests
                             var ones = rand(10-n1 % 10,9);
                             return tens * 10 + ones;
                         },
-                        answer: function() {return resolvedConstants["n1"] + resolvedConstants["n2"]},
+                        answer: function() {return resolvedConstants.n1 + resolvedConstants.n2},
                         answerOnes: function() {return resolvedConstants.answer % 10}
                     },
                     difficulty: difficulty,
@@ -1323,8 +1323,8 @@ Add unit tests
                 return {
                     constants: {
                         n1: function() {return rand(min1,max1)},
-                        n2: function() {return rand(min2,resolvedConstants["n1"])},
-                        answer: function() {return resolvedConstants["n1"] - resolvedConstants["n2"]}
+                        n2: function() {return rand(min2,resolvedConstants.n1)},
+                        answer: function() {return resolvedConstants.n1 - resolvedConstants.n2}
                     },
                     difficulty: difficulty,
                     renderTemplate: "<math><mn>${n1}</mn><mo>-</mo><mn>${n2}</mn><mo> = </mo></math>"
@@ -1334,8 +1334,8 @@ Add unit tests
                 return {
                     constants: {
                         n1: function() {return rand(min1,max1)},
-                        n2: function() {return rand(resolvedConstants["n1"]+1,max2)},
-                        answer: function() {return resolvedConstants["n1"] - resolvedConstants["n2"]}
+                        n2: function() {return rand(resolvedConstants.n1+1,max2)},
+                        answer: function() {return resolvedConstants.n1 - resolvedConstants.n2}
                     },
                     difficulty: difficulty,
                     renderTemplate: "<math><mn>${n1}</mn><mo>-</mo><mn>${n2}</mn><mo> = </mo></math>"
@@ -1346,7 +1346,7 @@ Add unit tests
                     constants: {
                         n1: function() {return rand(min1,max1)},
                         n2: function() {return rand(min2,max2)},
-                        answer: function() {return resolvedConstants["n1"] - resolvedConstants["n2"]}
+                        answer: function() {return resolvedConstants.n1 - resolvedConstants.n2}
                     },
                     difficulty: difficulty,
                     renderTemplate: "<math><mn>${n1}</mn><mo>-</mo><mn>${n2}</mn><mo> = </mo></math>"
@@ -1357,7 +1357,7 @@ Add unit tests
                     constants: {
                         n1: function() {return rand(min1,max1)},
                         n2: function() {return rand(min2,max2)},
-                        answer: function() {return resolvedConstants["n1"] * resolvedConstants["n2"]}
+                        answer: function() {return resolvedConstants.n1 * resolvedConstants.n2}
                     },
                     difficulty: difficulty,
                     renderTemplate: "<math><mn>${n1}</mn><mo>*</mo><mn>${n2}</mn><mo> = </mo></math>"
@@ -1368,7 +1368,7 @@ Add unit tests
                     constants: {
                         answer: function() {return rand(min1,max1)},
                         n2: function() {return rand(min2,max2)},
-                        n1: function() {return resolvedConstants["answer"] * resolvedConstants["n2"]}
+                        n1: function() {return resolvedConstants.answer * resolvedConstants.n2; }
                     },
                     difficulty: difficulty,
                     renderTemplate: "<math><mn>${n1}</mn><mo>&divide;</mo><mn>${n2}</mn><mo> = </mo></math>",
@@ -1379,21 +1379,21 @@ Add unit tests
                     constants: {
                         nd: function() {return getRelativelyPrimeNumbers(max)},
                         n: function() {
-                            return resolvedConstants["nd"][0][0]
+                            return resolvedConstants.nd[0][0]
                         },
                         d: function() {
-                            return resolvedConstants["nd"][1][0]
+                            return resolvedConstants.nd[1][0]
                         },
                         f: function() {return rand(fMin,fMax)},
                         nf: function() {
-                            return resolvedConstants["n"]*resolvedConstants["f"]
+                            return resolvedConstants.n*resolvedConstants.f
                         },
                         df: function() {
-                            return resolvedConstants["d"]*resolvedConstants["f"]
+                            return resolvedConstants.d*resolvedConstants.f
                         },
-                        answer: function() {return isNumerator ? resolvedConstants["n"] : resolvedConstants["d"]},
+                        answer: function() {return isNumerator ? resolvedConstants.n : resolvedConstants.d},
                         correct: function() {
-                            if (resolvedConstants["f"] == 1) {
+                            if (resolvedConstants.f == 1) {
                                 return "<math><mfrac><mn>${nf}</mn><mn>${df}</mn></mfrac></math> is fully reduced.";
                             } else {
                                 return "<math><mfrac><mn>${nf}</mn><mn>${df}</mn></mfrac></math> reduces to <math><mfrac><mn>${n}</mn><mn>${d}</mn></mfrac></math>."
@@ -1413,26 +1413,26 @@ Add unit tests
                             return getRandomElement(variableLetters) },
                         n1: function() { return rand(min1,max1) },
                         n1p: function() { 
-                            return Math.abs(resolvedConstants["n1"]) },
+                            return Math.abs(resolvedConstants.n1) },
                         answer: function() { 
                             return rand(min2, max2) },
-                        n2: function() { return resolvedConstants["n1"] + resolvedConstants["answer"]},
+                        n2: function() { return resolvedConstants.n1 + resolvedConstants.answer},
                         equation: function() {
-                            if (resolvedConstants["n1"] >= 0) {
+                            if (resolvedConstants.n1 >= 0) {
                                 return "<math><mi>${v}</mi><mo>+</mo><mn>${n1}</mn><mo>=</mo><mn>${n2}</mn></math>";
                             } else {
                                 return "<math><mi>${v}</mi><mo>-</mo><mn>${n1p}</mn><mo>=</mo><mn>${n2}</mn></math>";
                             }
                         },
                         firstStep: function() {
-                            if (resolvedConstants["n1"] >= 0) {
+                            if (resolvedConstants.n1 >= 0) {
                                 return "First, subtract <math><mn>${n1}</mn></math> from each side: <math><mi>${v}</mi><mo>+</mo><mn>${n1}</mn><mo>-</mo><mn>${n1}</mn><mo>=</mo><mn>${n2}</mn><mo>-</mo><mn>${n1}</mn></math>";
                             } else {
                                 return "First, add <math><mn>${n1p}</mn></math> to each side: <math><mi>${v}</mi><mo>-</mo><mn>${n1p}</mn><mo>+</mo><mn>${n1p}</mn><mo>=</mo><mn>${n2}</mn><mo>+</mo><mn>${n1p}</mn></math>";
                             }
                         },
                         secondStep: function() {
-                            if (resolvedConstants["n1"] >= 0) {
+                            if (resolvedConstants.n1 >= 0) {
                                 return "Then, reduce on both sides: <math><mi>${v}</mi><mo>+</mo><menclose notation='horizontalstrike'><mn>${n1p}</mn><mo>-</mo><mn>${n1}</mn></menclose><mo>=</mo><menclose notation='bottom'><mn>${n2}</mn><mo>-</mo><mn>${n1}</mn></menclose></math>";
                             } else {
                                 return "Then, reduce on both sides: <math><mi>${v}</mi><mo>-</mo><menclose notation='horizontalstrike'><mn>${n1p}</mn><mo>+</mo><mn>${n1p}</mn></menclose><mo>=</mo><menclose notation='bottom'><mn>${n2}</mn><mo>+</mo><mn>${n1p}</mn></menclose></math>"
@@ -1454,10 +1454,10 @@ Add unit tests
                             return getRandomElement(variableLetters) },
                         n1: function() { return rand(min1,max1) },
                         n1p: function() { 
-                            return Math.abs(resolvedConstants["n1"]) },
+                            return Math.abs(resolvedConstants.n1) },
                         answer: function() { 
                             return rand(min2, max2) },
-                        n2: function() { return resolvedConstants["n1"] * resolvedConstants["answer"]},
+                        n2: function() { return resolvedConstants.n1 * resolvedConstants.answer},
                         equation: function() {
                             return "<math><mn>${n1}</mn><mi>${v}</mi><mo>=</mo><mn>${n2}</mn></math>";
                         },
@@ -1482,13 +1482,13 @@ Add unit tests
                         rps: function() { 
                             return getRelativelyPrimeNumbers(max) },
                         c1: function() { 
-                            return resolvedConstants["rps"][0][0] },
-                        c2: function() { return resolvedConstants["rps"][1][0] },
+                            return resolvedConstants.rps[0][0] },
+                        c2: function() { return resolvedConstants.rps[1][0] },
                         f: function() { return rand(fmin, fmax) },
-                        fc1: function() { return resolvedConstants["f"] * resolvedConstants["c1"]; },
-                        fc2: function() { return resolvedConstants["f"] * resolvedConstants["c2"]; },
+                        fc1: function() { return resolvedConstants.f * resolvedConstants.c1; },
+                        fc2: function() { return resolvedConstants.f * resolvedConstants.c2; },
                         v: function() { return getRandomElement(variableLetters); },
-                        answer: function() { return resolvedConstants["f"] + "(" + resolvedConstants["c1"] + resolvedConstants["v"] + "+" + resolvedConstants["c2"] + ")" }
+                        answer: function() { return resolvedConstants.f + "(" + resolvedConstants.c1 + resolvedConstants.v + "+" + resolvedConstants.c2 + ")" }
                     },
                     difficulty: difficulty,
                     renderTemplate: "Factor completely: <math><mn>${fc1}</mn><mi>${v}</mi><mo>+</mo><mn>${fc2}</mn></math>",
@@ -1538,21 +1538,21 @@ Add unit tests
                 return {
                     constants: {
                         sentence: function() { return getRandomElement(simpleSentences) },
-                        answer: function() { return getRandomElement(resolvedConstants["sentence"].replace(/[.,!?]/g, "").replace(/ +/g, " ").split(" ")) },
-                        sentence_hidden: function() { return resolvedConstants["sentence"].replace(resolvedConstants["answer"], "_____") },
+                        answer: function() { return getRandomElement(resolvedConstants.sentence.replace(/[.,!?]/g, "").replace(/ +/g, " ").split(" ")) },
+                        sentence_hidden: function() { return resolvedConstants.sentence.replace(resolvedConstants.answer, "_____") },
                         choices: function() {
                             var allWords = [];
                             $.each(words, function(index, word) {
-                                if (word !== resolvedConstants["answer"]) {
+                                if (word !== resolvedConstants.answer) {
                                     allWords.push(word);
                                 }
                             });
                             shuffle(allWords);
                             return allWords.splice(0,3);
                         },
-                        choice0: function() {return resolvedConstants["choices"][0] },
-                        choice1: function() {return resolvedConstants["choices"][1] },
-                        choice2: function() {return resolvedConstants["choices"][2] },
+                        choice0: function() {return resolvedConstants.choices[0] },
+                        choice1: function() {return resolvedConstants.choices[1] },
+                        choice2: function() {return resolvedConstants.choices[2] },
                     },
                     difficulty: 5,
                     renderTemplate: "Fill in the blank: \"${sentence_hidden}\"",
