@@ -67,9 +67,10 @@ Fix backoff strategy
 Store historical stats per template (persist backoff)
 Set correct input type based on question
 Add mini-games (like memory game)
-Warn before resetting score (or move button to settings)
 Allow purchasing other rewards (instead of just cash)
 Allow setting exchange rate (add management app?)
+Add mastery tests
+Record scores for homework quizzes and mastery tests
 
 Testing:
 Test on Kindle
@@ -695,7 +696,8 @@ Add unit tests
                 addition_double_digit_carry_easy: getSimpleAdditionTemplateWithCarry(10,50,1,50,4),
                 addition_double_digit_no_carry_less_easy: getSimpleAdditionTemplateWithNoCarry(50,99,1,99,4),
                 addition_double_digit_carry_less_easy: getSimpleAdditionTemplateWithCarry(50,99,1,99,5),
-                subtraction_double_digit: getSimpleSubtractionTemplate(50,100,10,3),
+                subtraction_double_digit_no_borrow_easy: getSimpleSubtractionTemplateWithNoBorrow(10,50,1,50,3),
+                subtraction_double_digit_borrow_easy: getSimpleSubtractionTemplateWithBorrow(10,50,1,50,4),
                 subtraction_easy_with_negative_answers: getSimpleSubtractionWithNegativeAnswerTemplate(0,10,13,3),
                 
                 // Multiplication and division templates
@@ -810,6 +812,20 @@ Add unit tests
                     templates: [
                         "addition_double_digit_carry_easy",
                         "addition_double_digit_carry_less_easy",
+                    ]
+                },
+                double_digit_subtraction_no_borrow: {
+                    name: "Double digit subtraction with no borrowing",
+                    group: "addition_and_subtraction",
+                    templates: [
+                        "subtraction_double_digit_no_borrow_easy",
+                    ]
+                },
+                double_digit_subtraction_borrow: {
+                    name: "Double digit subtraction with borrowing",
+                    group: "addition_and_subtraction",
+                    templates: [
+                        "subtraction_double_digit_borrow_easy",
                     ]
                 },
                 double_digit_subtraction: {
@@ -1294,9 +1310,9 @@ Add unit tests
                                   <mn>${n2}</mn> \n\
                                 </msrow>\n\
                                 <msline/>\n\
-                                <mrow>\n\
+                                <msrow>\n\
                                   <mn>${answerOnes}</mn>\n\
-                                </mrow>\n\
+                                </msrow>\n\
                               </mstack>\n\
                             </math>\n\
                           </div>Don't forget to carry!",
@@ -1314,9 +1330,9 @@ Add unit tests
                                   <mn>${n2}</mn> \n\
                                 </msrow>\n\
                                 <msline/>\n\
-                                <mrow>\n\
+                                <msrow>\n\
                                   <mn>${answer}</mn>\n\
-                                </mrow>\n\
+                                </msrow>\n\
                               </mstack>\n\
                             </math>\n\
                           </div>"
@@ -1354,6 +1370,112 @@ Add unit tests
                     },
                     difficulty: difficulty,
                     renderTemplate: "<math><mn>${n1}</mn><mo>-</mo><mn>${n2}</mn><mo> = </mo></math>"
+                }
+            }
+            function getSimpleSubtractionTemplateWithNoBorrow(min1, max1, min2, max2, difficulty) {
+                return {
+                    constants: {
+                        n1: function() {return rand(min1,max1)},
+                        answer: function() {
+                            var n1 = resolvedConstants.n1;
+                            var tens = rand(Math.floor(min2 / 10), Math.floor(max2 / 10));
+                            var ones = rand(0, 9-n1 % 10);
+                            return tens * 10 + ones;
+                        },
+                        n2: function() {return resolvedConstants.n1 + resolvedConstants.answer}
+                    },
+                    difficulty: difficulty,
+                    renderTemplate: "<math><mn>${n2}</mn><mo>-</mo><mn>${n1}</mn><mo> = </mo></math>",
+                    hintTemplates: [
+                        "Rewrite problem and subtract straight down: <div style='padding: 10px 0'><math><mstack><mn>${n2}</mn><msrow> <mo>-</mo> <none/> <mn>${n1}</mn> </msrow><msline/></mstack></math></div>",
+                    ]
+                }
+            }
+            function getSimpleSubtractionTemplateWithBorrow(min1, max1, min2, max2, difficulty) {
+                return {
+                    constants: {
+                        n1: function() {return rand(min1,max1)},
+                        answer: function() {
+                            var n1 = resolvedConstants.n1;
+                            var tens = rand(Math.floor(min2 / 10), Math.floor(max2 / 10));
+                            var ones = rand(10-n1 % 10,9);
+                            return tens * 10 + ones;
+                        },
+                        n2: function() {return resolvedConstants.n1 + resolvedConstants.answer},
+                        n2TensMinus1: function() {return Math.floor(resolvedConstants.n2/10)-1 },
+                        answerOnes: function() {return resolvedConstants.answer % 10}
+                    },
+                    difficulty: difficulty,
+                    renderTemplate: "<math><mn>${n2}</mn><mo>-</mo><mn>${n1}</mn><mo> = </mo></math>",
+                    hintTemplates: [
+                        "Rewrite problem: <div style='padding: 10px 0'><math><mstack><mn>${n2}</mn><msrow> <mo>-</mo> <none/> <mn>${n1}</mn> </msrow><msline/></mstack></math></div>",
+                        "The ones will have to borrow from the tens: \n\
+                          <div style='padding: 10px 0'>\n\
+                            <math>\n\
+                              <mstack>\n\
+                                <mscarries location='nw'>\n\
+                                  <mscarry crossout='updiagonalstrike' location='n'>\n\
+                                    ${n2TensMinus1}\n\
+                                  </mscarry>\n\
+                                  <mn>1</mn>\n\
+                                </mscarries>\n\
+                                <mn>${n2}</mn>\n\
+                                <msrow> \n\
+                                  <mo>-</mo> \n\
+                                  <none/>\n\
+                                  <mn>${n1}</mn> \n\
+                                </msrow>\n\
+                                <msline/>\n\
+                              </mstack>\n\
+                            </math>\n\
+                          </div>",
+                        "Subtract the ones: \n\
+                          <div style='padding: 10px 0'>\n\
+                            <math>\n\
+                              <mstack>\n\
+                                <mscarries location='nw'>\n\
+                                  <mscarry crossout='updiagonalstrike' location='n'>\n\
+                                    ${n2TensMinus1}\n\
+                                  </mscarry>\n\
+                                  <mn>1</mn>\n\
+                                </mscarries>\n\
+                                <mn>${n2}</mn>\n\
+                                <msrow> \n\
+                                  <mo>-</mo> \n\
+                                  <none/>\n\
+                                  <mn>${n1}</mn> \n\
+                                </msrow>\n\
+                                <msline/>\n\
+                                <msrow>\n\
+                                  <mn>${answerOnes}</mn>\n\
+                                </msrow>\n\
+                              </mstack>\n\
+                            </math>\n\
+                          </div>",
+                        "Now subtract the tens: \n\
+                          <div style='padding: 10px 0'>\n\
+                            <math>\n\
+                              <mstack>\n\
+                                <mscarries location='nw'>\n\
+                                  <mscarry crossout='updiagonalstrike' location='n'>\n\
+                                    ${n2TensMinus1}\n\
+                                  </mscarry>\n\
+                                  <mn>1</mn>\n\
+                                </mscarries>\n\
+                                <mn>${n2}</mn>\n\
+                                <msrow> \n\
+                                  <mo>-</mo> \n\
+                                  <none/>\n\
+                                  <mn>${n1}</mn> \n\
+                                </msrow>\n\
+                                <msline/>\n\
+                                <msrow>\n\
+                                  <mn>${answer}</mn>\n\
+                                </msrow>\n\
+                              </mstack>\n\
+                            </math>\n\
+                          </div>"
+                    ]
                 }
             }
             function getSimpleMultiplicationTemplate(min1, max1, min2, max2, difficulty) {
@@ -1883,7 +2005,8 @@ Add unit tests
         
         <style>
             #hints li {
-                padding-top: 10px
+                padding-top: 10px;
+                font-size: 120%;
             }
         </style>
     </head>
@@ -1897,6 +2020,7 @@ Add unit tests
             <h3 id="score-div" class="pull-right"><span id="score-div">Score: 0</span></h3>
             <h3 id="question-count-div" class="pull-left" style="display: none"></h3>
             <div class="jumbotron" style="clear: both" >
+                <ol id="hints" class="pull-right"></ol>
                 <div id='timer-div' >
                     <div class="progress">
                         <div class="progress-bar progress-bar-default progress-bar-striped active cached-prg" style="width: 0%">
@@ -1908,7 +2032,6 @@ Add unit tests
                     <div id="question" style="font-size:150%"> 
 
                     </div>
-                    <ol id="hints"></ol>
                     <button id="repeat-btn" style="display:none">Repeat</button>
                     <form id="q-and-a-form">
                         <input type="tel" id="answer" style="margin-top: 10px" />
@@ -1917,7 +2040,7 @@ Add unit tests
                     <div id="response-div"></div>
                     <button id="new-question-btn" class="btn btn-default" style="display:none">New question</button>
                 </div>
-
+                <div style="clear:both"></div>
             </div>
         </div>
 
