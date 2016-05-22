@@ -36,16 +36,16 @@ Factor out question logic
 Factor out video widget
 Factor out timer widget
 Separate from FHC app
-Separate out hints from questions
 
 Look and feel:
 "correct" and "incorrect" messages are underwhelming
 Everything feels jammed to together on right side
 
 Features:
-Split double-digit subtraction by with vs without borrowing
+Generalize addition and subtraction template function so number of digits is an input?
 Add hints for double digit subtraction
 Add division problem types
+Add fraction addition and subtraction
 Add more videos
 Add more spelling words
 Add spelling sentences?
@@ -53,13 +53,12 @@ Add more reading sentences
 Add history questions
 Add science questions
 Add lessons (or links to YouTube lessons)
-Add fixed-length quizzes with calculated grade
 Auto-generate reading distractor pool
 Add graphing questions
 Add rounding questions (what category?)
 Add trigonometry questions
 Add calculus questions
-Add long division (https://www.dessci.com/en/products/mathplayer/tech/mathml3-elemmath-examples.htm)
+Fix long division hints (https://www.dessci.com/en/products/mathplayer/tech/mathml3-elemmath-examples.htm )
 Maybe allow the reading sentences to form stories (need to preserve order)
 Allow configuring videos in settings (or adding new ones)
 Set daily goals (per question type)
@@ -347,6 +346,7 @@ Add unit tests
                     $.each(questionAndAnswer.hints, function(index, hint) {
                         $("#hints").append("<li class='hidden hint'>"+hint+"</li>");
                     });
+                    $("li.hint").children().addClass("pull-right").after("<div style='clear:both'></div>");
                 }
                 
                 if (window.MathJax) {
@@ -461,7 +461,15 @@ Add unit tests
                         scoreChange = -incorrectMultiplier;
                         $("#response-div").html("Incorrect! You lose " + scoreChange + " points");
 
-                        $(".hint.hidden:first").removeClass("hidden");
+                        if ($(".hint.visible").length > 0) {
+                            $(".hint.visible").addClass("hidden").removeClass("visible")
+                                    .next().removeClass("hidden").addClass("visible")
+                            var index = $(".hint.visible").index();
+                            $(".hint.visible").parent().attr("start", index + 1);
+                        } else {
+                            $(".hint:first").removeClass("hidden").addClass("visible").parent().attr("start", 1);
+                        }
+                        
                     }
 
                     if (!questionAndAnswer.template.correct) {
@@ -721,6 +729,8 @@ Add unit tests
                 eights_multiplication2: getSimpleMultiplicationTemplate(8,8,0,10,3),
                 nines_multiplication2: getSimpleMultiplicationTemplate(9,9,0,10,3),
                 tens_multiplication2: getSimpleMultiplicationTemplate(10,10,0,10,2),
+                double_single_digit_multiplication: getLongMultiplicationTemplate(10,99,2,9,4),
+                double_digit_multiplication: getLongMultiplicationTemplate(10,99,10,99,5),
                 ones_division: getSimpleDivisionTemplate(1,10,1,1,2),
                 twos_division: getSimpleDivisionTemplate(1,10,2,2,2),
                 threes_division: getSimpleDivisionTemplate(1,10,3,3,2),
@@ -731,6 +741,7 @@ Add unit tests
                 eights_division: getSimpleDivisionTemplate(1,10,8,8,3),
                 nines_division: getSimpleDivisionTemplate(1,10,9,9,3),
                 tens_division: getSimpleDivisionTemplate(1,10,10,10,3),
+                double_digit_division: getLongDivisionTemplate(10,99,10,99,5),
                 
                 // Fractions templates
                 fractions_easy1: getFractionReductionTemplate(10, 1, 6, 2, true),
@@ -1096,6 +1107,14 @@ Add unit tests
                         "tens_multiplication2",
                     ]
                 },
+                double_digit_multiplication: {
+                    name: "Double digit multiplication",
+                    group: "multiplication_and_division",
+                    templates: [
+                        "double_single_digit_multiplication",
+                        "double_digit_multiplication",
+                    ]
+                },
                 ones_division: {
                     name: "Ones division",
                     group: "multiplication_and_division",
@@ -1164,6 +1183,13 @@ Add unit tests
                     group: "multiplication_and_division",
                     templates: [
                         "tens_division",
+                    ]
+                },
+                double_digit_division: {
+                    name: "Double digit division",
+                    group: "multiplication_and_division",
+                    templates: [
+                        "double_digit_division",
                     ]
                 },
                 easy_fraction_reduction: {
@@ -1486,7 +1512,82 @@ Add unit tests
                         answer: function() {return resolvedConstants.n1 * resolvedConstants.n2}
                     },
                     difficulty: difficulty,
-                    renderTemplate: "<math><mn>${n1}</mn><mo>*</mo><mn>${n2}</mn><mo> = </mo></math>"
+                    renderTemplate: "<math><mn>${n1}</mn><mo>&times;</mo><mn>${n2}</mn><mo> = </mo></math>"
+                }
+            }
+            function getLongMultiplicationTemplate(min1, max1, min2, max2, difficulty) {
+                return {
+                    constants: {
+                        n1: function() {return rand(min1,max1)},
+                        n2: function() {return rand(min2,max2)},
+                        answer: function() {return resolvedConstants.n1 * resolvedConstants.n2},
+                        answerOnesProduct: function() {return resolvedConstants.n2 % 10 * resolvedConstants.n1},
+                        answerTensProduct: function() {return Math.floor(resolvedConstants.n2 / 10) * resolvedConstants.n1},
+                        answerTensProductFull: function() {return resolvedConstants.answerTensProduct * 10}
+                    },
+                    difficulty: difficulty,
+                    renderTemplate: "<math><mn>${n1}</mn><mo>&times;</mo><mn>${n2}</mn><mo> = </mo></math>",
+                    hintTemplates: [
+                        "Rewrite problem: <div style='padding: 10px 0'><math><mstack><mn>${n1}</mn><msrow> <mo>&times;</mo> <none/> <mn>${n2}</mn> </msrow><msline/></mstack></math></div>",
+                        "Multiply the ones of the bottom number by each of the digits of the top number: \n\
+                          <div style='padding: 10px 0'>\n\
+                            <math>\n\
+                              <mstack>\n\
+                                <mn>${n1}</mn>\n\
+                                <msrow> \n\
+                                  <mo>&times;</mo> \n\
+                                  <none/>\n\
+                                  <mn>${n2}</mn> \n\
+                                </msrow>\n\
+                                <msline/>\n\
+                                <msrow>\n\
+                                  <mn>${answerOnesProduct}</mn>\n\
+                                </msrow>\n\
+                              </mstack>\n\
+                            </math>",
+                        "Multiply the tens of the bottom number by each of the digits of the top number: \n\
+                          <div style='padding: 10px 0'>\n\
+                            <math>\n\
+                              <mstack>\n\
+                                <mn>${n1}</mn>\n\
+                                <msrow> \n\
+                                  <mo>&times;</mo> \n\
+                                  <none/>\n\
+                                  <mn>${n2}</mn> \n\
+                                </msrow>\n\
+                                <msline/>\n\
+                                <msrow>\n\
+                                  <mn>${answerOnesProduct}</mn>\n\
+                                </msrow>\n\
+                                <msrow position='1'>\n\
+                                  <mn>${answerTensProduct}</mn>\n\
+                                </msrow>\n\
+                              </mstack>\n\
+                            </math>\n\
+                          </div>",
+                        "Add straight down: \n\
+                          <div style='padding: 10px 0'>\n\
+                            <math>\n\
+                              <mstack>\n\
+                                <mn>${n1}</mn>\n\
+                                <msrow> \n\
+                                  <mo>&times;</mo> \n\
+                                  <none/>\n\
+                                  <mn>${n2}</mn> \n\
+                                </msrow>\n\
+                                <msline/>\n\
+                                <msrow>\n\
+                                  <mn>${answerOnesProduct}</mn>\n\
+                                </msrow>\n\
+                                <msrow>\n\
+                                  <mo>+</mo>\n\
+                                  <mn>${answerTensProductFull}</mn>\n\
+                                </msrow>\n\
+                                <msline/>\n\
+                              </mstack>\n\
+                            </math>\n\
+                          </div>"
+                    ]
                 }
             }
             function getSimpleDivisionTemplate(min1, max1, min2, max2, difficulty) {
@@ -1498,6 +1599,155 @@ Add unit tests
                     },
                     difficulty: difficulty,
                     renderTemplate: "<math><mn>${n1}</mn><mo>&divide;</mo><mn>${n2}</mn><mo> = </mo></math>",
+                }
+            }
+            function getLongDivisionTemplate(min1, max1, min2, max2, difficulty) {
+                return {
+                    constants: {
+                        n1: function() {return rand(min1,max1)},
+                        answer: function() {return rand(min2,max2)},
+                        n2: function() {return resolvedConstants.n1 * resolvedConstants.answer},
+                        answerTens: function() { return Math.floor(resolvedConstants.answer/10) },
+                        answerOnes: function() { return resolvedConstants.answer%10 },
+                        firstDividendPart: function() { 
+                            var stringDividend = "" + resolvedConstants.n2;
+                            var index = 0;
+                            while (index++ < stringDividend.length) {
+                                var part = stringDividend.substr(0, index) * 1;
+                                if (part >= resolvedConstants.n1) {
+                                    return part;
+                                }
+                            }
+                            return resolvedConstants.n2;
+                        },
+                        tensProduct: function() { return resolvedConstants.answerTens * resolvedConstants.n1 },
+                        tensProductDifference: function() { return resolvedConstants.firstDividendPart - resolvedConstants.tensProduct },
+                        secondDividendPart: function() { return resolvedConstants.tensProductDifference*10 + (resolvedConstants.n2 - resolvedConstants.firstDividendPart*10) },
+                        onesProduct: function() { return resolvedConstants.answerOnes * resolvedConstants.n1 },
+                        onesProductDifference: function() { return resolvedConstants.secondDividendPart - resolvedConstants.onesProduct },
+                    },
+                    difficulty: difficulty,
+                    renderTemplate: "<math><mn>${n2}</mn><mo>&divide;</mo><mn>${n1}</mn><mo> = </mo></math>",
+                    hintTemplates: [
+                        "<div>Rewrite problem:</div>\n\
+                        <div><math>\n\
+                          <mlongdiv>\n\
+                            <mn> ${n1} </mn>\n\
+                            <none/> \n\
+                            <mn> ${n2} </mn>\n\
+                          </mlongdiv>\n\
+                        </math></div>",
+                        "<div>Divide the first set of digits that are larger than or equal the dividend:</div>\n\
+                        <div><math>\n\
+                          <mlongdiv>\n\
+                            <mn> ${n1} </mn>\n\
+                            <mn position='1'> ${answerTens} </mn> \n\
+                            <mn> ${n2} </mn>\n\
+                          </mlongdiv>\n\
+                        </math></div>",
+                        "<div>Multiply the result by the dividend:</div>\n\
+                        <div><math>\n\
+                          <mlongdiv>\n\
+                            <mn> ${n1} </mn>\n\
+                            <mn position='1'> ${answerTens} </mn>\n\
+                            <mn> ${n2} </mn>\n\
+                            <msgroup position='1' shift='-1'>\n\
+                              <msgroup>\n\
+                                <mn> ${tensProduct}</mn>\n\
+                              </msgroup>\n\
+                            </msgroup>\n\
+                          </mlongdiv>\n\
+                        </math></div>",
+                        "<div>Subtract the group of numbers you divided and the new product</div>\n\
+                        <div><math>\n\
+                          <mlongdiv>\n\
+                            <mn> ${n1} </mn>\n\
+                            <mn position='1'> ${answerTens} </mn>\n\
+                            <mn> ${n2} </mn>\n\
+                            <msgroup position='1'> <!-- shift='-1'> -->\n\
+                              <msgroup>\n\
+                                <mn> ${tensProduct}</mn>\n\
+                                <msline length='2'/>\n\
+                              </msgroup>\n\
+                              <msgroup>\n\
+                                <mn> ${tensProductDifference}</mn>\n\
+                              </msgroup>\n\
+                            </msgroup>\n\
+                          </mlongdiv>\n\
+                        </math></div>",
+                        "<div>Bring down the ones from the dividend:</div>\n\
+                        <div><math>\n\
+                          <mlongdiv>\n\
+                            <mn> ${n1} </mn>\n\
+                            <mn position='1'> ${answerTens} </mn>\n\
+                            <mn> ${n2} </mn>\n\
+                            <msgroup position='1' shift='-1'>\n\
+                              <msgroup>\n\
+                                <mn> ${tensProduct}</mn>\n\
+                                <msline length='2'/>\n\
+                              </msgroup>\n\
+                              <msgroup>\n\
+                                <mn> ${secondDividendPart}</mn>\n\
+                              </msgroup>\n\
+                            </msgroup>\n\
+                          </mlongdiv>\n\
+                        </math></div>",
+                        "<div>Divide the new dividend:</div>\n\
+                        <div><math>\n\
+                          <mlongdiv>\n\
+                            <mn> ${n1} </mn>\n\
+                            <mn position='1'> ${answer} </mn>\n\
+                            <mn> ${n2} </mn>\n\
+                            <msgroup position='1' shift='-1'>\n\
+                              <msgroup>\n\
+                                <mn> ${tensProduct}</mn>\n\
+                                <msline length='2'/>\n\
+                              </msgroup>\n\
+                              <msgroup>\n\
+                                <mn> ${secondDividendPart}</mn>\n\
+                              </msgroup>\n\
+                            </msgroup>\n\
+                          </mlongdiv>\n\
+                        </math></div>",
+                        "<div>Multiply by the divisor:</div>\n\
+                        <div><math>\n\
+                          <mlongdiv>\n\
+                            <mn> ${n1} </mn>\n\
+                            <mn position='1'> ${answer} </mn>\n\
+                            <mn> ${n2} </mn>\n\
+                            <msgroup position='1' shift='-1'>\n\
+                              <msgroup>\n\
+                                <mn> ${tensProduct}</mn>\n\
+                                <msline length='2'/>\n\
+                              </msgroup>\n\
+                              <msgroup>\n\
+                                <mn> ${secondDividendPart}</mn>\n\
+                                <mn> ${onesProduct}</mn>\n\
+                              </msgroup>\n\
+                            </msgroup>\n\
+                          </mlongdiv>\n\
+                        </math></div>",
+                        "<div>Subtract:</div>\n\
+                        <div><math>\n\
+                          <mlongdiv>\n\
+                            <mn> ${n1} </mn>\n\
+                            <mn position='1'> ${answer} </mn>\n\
+                            <mn> ${n2} </mn>\n\
+                            <msgroup position='1' shift='-1'>\n\
+                              <msgroup>\n\
+                                <mn> ${tensProduct}</mn>\n\
+                                <msline length='2'/>\n\
+                              </msgroup>\n\
+                              <msgroup>\n\
+                                <mn> ${secondDividendPart}</mn>\n\
+                                <mn> ${onesProduct}</mn>\n\
+                                <msline length='2' />\n\
+                                <mn> ${onesProductDifference} </mn>\n\
+                              </msgroup>\n\
+                            </msgroup>\n\
+                          </mlongdiv>\n\
+                        </math></div>",
+                    ]
                 }
             }
             function getFractionReductionTemplate(max,fMin,fMax,difficulty,isNumerator) {
