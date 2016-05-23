@@ -438,6 +438,10 @@ function takeScreenshot(userId) {
 }
     
 function cloneObject(obj) {
+    if (!obj) {
+        return obj;
+    }
+    
     var serialized = window.JSON.stringify(obj);
     var clone = window.JSON.parse(serialized);
     return clone;

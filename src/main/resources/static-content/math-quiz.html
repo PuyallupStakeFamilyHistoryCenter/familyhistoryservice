@@ -153,6 +153,9 @@ Add unit tests
                 });
 
                 $("#save-settings-btn").click(function() {
+                    var previouslySelectedTemplateSets = cloneObject(selectedTemplateSets);
+                    var previousVideoTypes = cloneObject(settings.videoTypes);
+                    
                     $("#settings-modal").modal("hide");
                     selectedTemplateSets = [];
                     $("input[name=type]:checked").each(function() {
@@ -190,9 +193,19 @@ Add unit tests
                     settings.graded = $("[name=graded]:checked").length > 0;
                     
                     Cookies.set("settings", settings, { expires: 365 });
+                    if (JSON.stringify(previousVideoTypes) !== JSON.stringify(settings.videoTypes)) {
+                        Cookies.remove("video");
+                        if (settings.playVideo) {
+                            load();
+                        }
+                    }
                     
                     displayScore();
-                    newQuestion();
+                    
+                    
+                    if (JSON.stringify(previouslySelectedTemplateSets) !== JSON.stringify(selectedTemplateSets)) {
+                        newQuestion();
+                    }
                 });
                 
                 $("#clear-all-types-btn").click(function() {
