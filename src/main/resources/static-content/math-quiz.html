@@ -42,6 +42,7 @@ Look and feel:
 Everything feels jammed to together on right side
 
 Features:
+Save current question (so refreshing doesn't give new one)
 Generalize addition and subtraction template function so number of digits is an input?
 Add hints for double digit subtraction
 Add division problem types
@@ -85,6 +86,15 @@ Add unit tests
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         
+        <link href='https://fonts.googleapis.com/css?family=Open+Sans:700' rel='stylesheet' type='text/css'>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+        <style>
+            #hints li {
+                padding-top: 10px;
+                font-size: 120%;
+            }
+        </style>
+
         <script src="js/mathjax.min.js"></script>
         <script type="text/x-mathjax-config">
         MathJax.Hub.Config({
@@ -703,6 +713,10 @@ Add unit tests
                 nines_addition2: getSimpleAdditionTemplate(9,9,0,10,2),
                 tens_addition1: getSimpleAdditionTemplate(0,10,10,10,1),
                 tens_addition2: getSimpleAdditionTemplate(10,10,0,10,1),
+                elevens_addition1: getSimpleAdditionTemplate(0,11,11,11,2),
+                elevens_addition2: getSimpleAdditionTemplate(11,11,0,11,2),
+                twelves_addition1: getSimpleAdditionTemplate(0,12,12,12,2),
+                twelves_addition2: getSimpleAdditionTemplate(12,12,0,12,2),
                 ones_subtraction: getSimpleSubtractionWithFullBoundsTemplate(1,11,1,1,1),
                 twos_subtraction: getSimpleSubtractionWithFullBoundsTemplate(2,12,2,2,1),
                 threes_subtraction: getSimpleSubtractionWithFullBoundsTemplate(3,13,3,3,1),
@@ -713,6 +727,8 @@ Add unit tests
                 eights_subtraction: getSimpleSubtractionWithFullBoundsTemplate(8,18,8,8,2),
                 nines_subtraction: getSimpleSubtractionWithFullBoundsTemplate(9,19,9,9,2),
                 tens_subtraction: getSimpleSubtractionWithFullBoundsTemplate(10,20,10,10,2),
+                elevens_subtraction: getSimpleSubtractionWithFullBoundsTemplate(11,21,11,11,2),
+                twelves_subtraction: getSimpleSubtractionWithFullBoundsTemplate(12,22,12,12,2),
                 addition_double_digit_no_carry_easy: getSimpleAdditionTemplateWithNoCarry(10,50,1,50,3),
                 addition_double_digit_carry_easy: getSimpleAdditionTemplateWithCarry(10,50,1,50,4),
                 addition_double_digit_no_carry_less_easy: getSimpleAdditionTemplateWithNoCarry(50,99,1,99,4),
@@ -939,6 +955,22 @@ Add unit tests
                         "tens_addition2"
                     ]
                 },
+                elevens_addition: {
+                    name: "Elevens addition",
+                    group: "addition_and_subtraction",
+                    templates: [
+                        "elevens_addition1",
+                        "elevens_addition2"
+                    ]
+                },
+                twelves_addition: {
+                    name: "Twelves addition",
+                    group: "addition_and_subtraction",
+                    templates: [
+                        "twelves_addition1",
+                        "twelves_addition2"
+                    ]
+                },
                 doubles: {
                     name: "Doubles addition",
                     group: "addition_and_subtraction",
@@ -1015,6 +1047,20 @@ Add unit tests
                     group: "addition_and_subtraction",
                     templates: [
                         "tens_subtraction"
+                    ]
+                },
+                elevens_subtraction: {
+                    name: "Elevens subtraction",
+                    group: "addition_and_subtraction",
+                    templates: [
+                        "elevens_subtraction"
+                    ]
+                },
+                twelves_subtraction: {
+                    name: "Twelves subtraction",
+                    group: "addition_and_subtraction",
+                    templates: [
+                        "twelves_subtraction"
                     ]
                 },
                 easy_addition_and_subtraction_with_negative_answers: {
@@ -2266,12 +2312,6 @@ Add unit tests
             
         </script>
         
-        <style>
-            #hints li {
-                padding-top: 10px;
-                font-size: 120%;
-            }
-        </style>
     </head>
     <body>
         <div class="container">
@@ -2409,7 +2449,5 @@ Add unit tests
 
 
 
-        <link href='https://fonts.googleapis.com/css?family=Open+Sans:700' rel='stylesheet' type='text/css'>
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
     </body>
 </html>
