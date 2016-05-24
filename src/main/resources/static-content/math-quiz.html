@@ -551,15 +551,19 @@ Add unit tests
             }
             
             function finalizeQuiz() {
+                if (settings.quizLengthMode === "fixedLength") {
+                    for (var i = questionNumber; i < settings.quizLength; i++) {
+                        var questionAndAnswer = generateQuestion();
+                        possibleScore += questionAndAnswer.difficulty;
+                    }
+                }
+                
                 $(".total-questions").html(questionNumber);
                 $(".total-correct").html(score);
                 $(".total-possible-points").html(possibleScore);
-                $(".percent-correct").html(score * 100.0/possibleScore);
+                $(".percent-correct").html((score * 100.0/possibleScore).toPrecision(4));
                 $(".letter-grade").html(getLetterGrade(score,possibleScore));
                 $("#end-game-modal").modal();
-                settings.quizLengthMode = "endless";
-                $("input[name=quizLengthMode][value=fixedLength]").removeProp("checked").parent().removeClass("active");
-                $("input[name=quizLengthMode][value=endless]").prop("checked",true).parent().addClass("active");
                 $("#quiz-length-div").hide();
                 resetScore();
             }
