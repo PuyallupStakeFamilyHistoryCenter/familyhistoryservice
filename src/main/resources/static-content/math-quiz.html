@@ -42,6 +42,10 @@ Look and feel:
 Everything feels jammed to together on right side
 
 Features:
+Generate entire quiz at once
+Add password or pin to settings menu
+Add stopwatch function and store best times (for each question?)
+Add overall timer functions
 Save current question (so refreshing doesn't give new one)
 Generalize addition and subtraction template function so number of digits is an input?
 Add hints for double digit subtraction
@@ -200,6 +204,9 @@ Add unit tests
                         settings.quizLength = 1*$("input[name=quizLength]").val()
                     }
                     
+                    settings.timerStyle = $("[name=timerStyle]:checked").val();
+                    settings.maxQuizTime = $("[name=maxQuizTime]").val() * 1;
+                    
                     settings.graded = $("[name=graded]:checked").length > 0;
                     
                     Cookies.set("settings", settings, { expires: 365 });
@@ -216,6 +223,10 @@ Add unit tests
                     if (JSON.stringify(previouslySelectedTemplateSets) !== JSON.stringify(selectedTemplateSets)) {
                         newQuestion();
                     }
+                    
+                    if (settings.timerStyle === "timer") {
+                        setCountdown(settings.maxQuizTime, settings.maxQuizTime, finalizeQuiz);
+                    }
                 });
                 
                 $("#clear-all-types-btn").click(function() {
@@ -228,6 +239,15 @@ Add unit tests
                         $("#quiz-length-div").slideDown();
                     } else {
                         $("#quiz-length-div").slideUp();
+                    }
+                });
+                
+                $("[name=timerStyle]").change(function() {
+                    var val = $(this).val();
+                    if (val === "timer") {
+                        $("#timer-time-div").slideDown();
+                    } else {
+                        $("#timer-time-div").slideUp();
                     }
                 })
                 
@@ -268,7 +288,9 @@ Add unit tests
                         giveBonus: true,
                         timed: true,
                         graded: false,
-                        quizLengthMode: "endless"
+                        quizLengthMode: "endless",
+                        timerStyle: "none",
+                        maxQuizTime: 60
                     };
                 }
                 
@@ -434,7 +456,6 @@ Add unit tests
                 $("#answer").val("");
                 
                 if (settings.timed) {
-                    $("#timer-div").show();
                     setCountdown(questionAndAnswer.difficulty + 2);
                 } else {
                     $("#timer-div").hide();
@@ -448,7 +469,9 @@ Add unit tests
                 possibleScore += questionAndAnswer.difficulty;
                 var scoreChange = 0;
                 if (isCorrect) {
-                    cancelCountdown();
+                    if (settings.timerStyle === "none") {
+                        cancelCountdown();
+                    }
 
                     scoreChange = Math.max(.1, questionAndAnswer.difficulty * correctMultiplier + Math.floor((questionAndAnswer.template.correct?questionAndAnswer.template.correct:1)/30)
                             +(settings.timed?Math.ceil(timeLeft):0));
@@ -522,18 +545,23 @@ Add unit tests
                 displayScore();
                 
                 if (questionNumber >= settings.quizLength && settings.quizLengthMode === "fixedLength") {
-                    $(".total-correct").html(score);
-                    $(".total-questions").html(possibleScore);
-                    $(".percent-correct").html(score * 100.0/possibleScore);
-                    $(".letter-grade").html(getLetterGrade(score,possibleScore));
-                    $("#end-game-modal").modal();
-                    settings.quizLengthMode = "endless";
-                    $("input[name=quizLengthMode][value=fixedLength]").removeProp("checked").parent().removeClass("active");
-                    $("input[name=quizLengthMode][value=endless]").prop("checked",true).parent().addClass("active");
-                    $("#quiz-length-div").hide();
-                    resetScore();
+                    finalizeQuiz();
                 }
                 
+            }
+            
+            function finalizeQuiz() {
+                $(".total-questions").html(questionNumber);
+                $(".total-correct").html(score);
+                $(".total-possible-points").html(possibleScore);
+                $(".percent-correct").html(score * 100.0/possibleScore);
+                $(".letter-grade").html(getLetterGrade(score,possibleScore));
+                $("#end-game-modal").modal();
+                settings.quizLengthMode = "endless";
+                $("input[name=quizLengthMode][value=fixedLength]").removeProp("checked").parent().removeClass("active");
+                $("input[name=quizLengthMode][value=endless]").prop("checked",true).parent().addClass("active");
+                $("#quiz-length-div").hide();
+                resetScore();
             }
             
             function generateQuestion() {
@@ -2042,7 +2070,8 @@ Add unit tests
             
             var timeLeft;
             var countdownTimeout;
-            function setCountdown(time, totalTime) {
+            function setCountdown(time, totalTime, callback) {
+                cancelCountdown();
                 if (time < 0) {
                     time = 0;
                 }
@@ -2051,11 +2080,16 @@ Add unit tests
                 if (!totalTime) {
                     totalTime = time;
                 }
+                $("#timer-div").show();
                 $("#timer-div div div").css("width", (time*100/totalTime)+"%");
                 if (time > 0) {
                     countdownTimeout = setTimeout(function() {
-                        setCountdown(time-.25, totalTime);
+                        setCountdown(time-.25, totalTime, callback);
                     }, 250);
+                } else {
+                    if (callback) {
+                        callback();
+                    }
                 }
             }
             
@@ -2393,11 +2427,32 @@ Add unit tests
                             </label>
                         </div>
                         
-                        <div id="quiz-length-div" style="display: none">
+                        <div id="quiz-length-div" style="display: none; padding-left: 20px">
                             <h4>Number of questions</h4>
                             <div class="input-group" style="width: 20%">
                                 <span class="input-group-addon" id="basic-addon1">@</span>
                                 <input type="number" min="1" max="100" name="quizLength" class="form-control" value="10" aria-describedby="basic-addon1" />
+                            </div>
+                        </div>
+                            
+                        <h4>Quiz timer</h4>
+                        <div class="btn-group" data-toggle="buttons">
+                            <label class="btn btn-default">
+                                <input type="radio" name="timerStyle" value="none" />None
+                            </label>
+                            <label class="btn btn-default disabled">
+                                <input type="radio" name="timerStyle" value="stopwatch" disabled />Stopwatch
+                            </label>
+                            <label class="btn btn-default">
+                                <input type="radio" name="timerStyle" value="timer" />Timer
+                            </label>
+                        </div>
+
+                        <div id="timer-time-div" style="display:none; padding-left: 20px">
+                            <h4>Time (seconds)</h4>
+                            <div class="input-group" style="width: 20%">
+                                <span class="input-group-addon" id="basic-addon1">@</span>
+                                <input type=number name="maxQuizTime" class="form-control" value="60"  aria-describedby="basic-addon1" />
                             </div>
                         </div>
 
@@ -2430,7 +2485,7 @@ Add unit tests
                     </div>
                     <div class="modal-body" style="max-height:calc(100vh - 200px); overflow-y: scroll">
                         <div class="h4">
-                            You have finished the quiz with <span class="total-correct"></span> out of <span class="total-questions"></span> correct (<span class="percent-correct"></span>%).
+                            You have finished <span class="total-questions"></span> questions with <span class="total-correct"></span> out of <span class="total-possible-points"></span> points (<span class="percent-correct"></span>%).
                         </div>
                         <div class="h4">
                             You get a(n) <span class="letter-grade h3"></span>
