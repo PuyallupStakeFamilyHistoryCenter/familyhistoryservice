@@ -319,6 +319,10 @@ Add unit tests
                     $("#video-types-div").show();
                 }
                 
+                if (settings.timerStyle === "timer") {
+                    $("#timer-time-div").show();
+                }
+                
                 selectedTemplateSets = Cookies.getJSON("types");
                 if (!selectedTemplateSets) {
                     selectedTemplateSets = ["easy_addition_and_subtraction"];
@@ -350,7 +354,7 @@ Add unit tests
                 }
                 questionNumber = state.questionNumber;
                 if (!questionNumber) {
-                    questionNumber = 0;
+                    questionNumber = 1;
                 }
             
                 // Setup YouTube if necessary
@@ -551,6 +555,7 @@ Add unit tests
             }
             
             function finalizeQuiz() {
+                cancelCountdown();
                 if (settings.quizLengthMode === "fixedLength") {
                     for (var i = questionNumber; i < settings.quizLength; i++) {
                         var questionAndAnswer = generateQuestion();
@@ -558,13 +563,13 @@ Add unit tests
                     }
                 }
                 
-                $(".total-questions").html(questionNumber);
+                $(".total-questions").html(questionNumber-1);
+                $(".total-possible-questions").html(settings.quizLength);
                 $(".total-correct").html(score);
                 $(".total-possible-points").html(possibleScore);
                 $(".percent-correct").html((score * 100.0/possibleScore).toPrecision(4));
                 $(".letter-grade").html(getLetterGrade(score,possibleScore));
                 $("#end-game-modal").modal();
-                $("#quiz-length-div").hide();
                 resetScore();
             }
             
@@ -657,7 +662,7 @@ Add unit tests
                     possibleScore: 0,
                     bonus: 0,
                     previousScore: 0,
-                    questionNumber: 0
+                    questionNumber: 1
                 };
 
                 score = state.score;
@@ -1907,7 +1912,7 @@ Add unit tests
                         }
                     },
                     difficulty: difficulty,
-                    renderTemplate: "Solve for <math><mi>${v}</mi></math>: ${equation}<math><mi>${v}</mi><mo>=</mo></math>",
+                    renderTemplate: "Solve for <math><mi>${v}</mi></math>: ${equation}<div><math><mi>${v}</mi><mo>=</mo></math></div>",
                     hintTemplates: [
                         "${firstStep}",
                         "${secondStep}",
@@ -1936,7 +1941,7 @@ Add unit tests
                         }
                     },
                     difficulty: difficulty,
-                    renderTemplate: "Solve for <math><mi>${v}</mi></math>: ${equation}<div id='hints'></div><math><mi>${v}</mi><mo>=</mo></math>",
+                    renderTemplate: "Solve for <math><mi>${v}</mi></math>: ${equation}<div><math><mi>${v}</mi><mo>=</mo></math></div>",
                     hintTemplates: [
                         "${firstStep}",
                         "${secondStep}",
@@ -2193,6 +2198,98 @@ Add unit tests
                 {
                     id:"QhUrc4BnPgg",
                     start: 8,
+                    mode: "entire"
+                },
+                {
+                    id:"U69LIr0OrNc",
+                    mode: "entire"
+                },
+                {
+                    id:"Wn_eBrIDUuc",
+                    mode: "entire"
+                },
+                {
+                    id:"gCfzeONu3Mo",
+                    mode: "entire"
+                },
+                {
+                    id:"UuW1jhxCgx0",
+                    mode: "entire"
+                },
+                {
+                    id:"X4BmV2t83SM",
+                    mode: "entire"
+                },
+                {
+                    id:"TWbzjGIec20",
+                    mode: "entire"
+                },
+                {
+                    id:"YEaSxhcns7Y",
+                    mode: "entire"
+                },
+                {
+                    id:"iWDKsHm6gTA",
+                    mode: "entire"
+                },
+                {
+                    id:"xOXSqy05EO0",
+                    mode: "entire"
+                },
+                {
+                    id:"sI8NsYIyQ2A",
+                    mode: "entire"
+                },
+                {
+                    id:"uy9GFAOGGXU",
+                    mode: "entire"
+                },
+                {
+                    id:"dkP8NUwB2io",
+                    mode: "entire"
+                },
+                {
+                    id:"2ivZ6GSaK1M",
+                    mode: "entire"
+                },
+                {
+                    id:"l5VgOdgptRg",
+                    mode: "entire"
+                },
+                {
+                    id:"m57cimnJ7fc",
+                    mode: "entire"
+                },
+                {
+                    id:"91XI7M9l3no",
+                    mode: "entire"
+                },
+                {
+                    id:"UjaAxUO6-Uw",
+                    mode: "entire"
+                },
+                {
+                    id:"46NanUtEIhk",
+                    mode: "entire"
+                },
+                {
+                    id:"91801Y1lsCg",
+                    mode: "entire"
+                },
+                {
+                    id:"TQKELOE9eY4",
+                    mode: "entire"
+                },
+                {
+                    id:"Hk3fgjHNQ2Q",
+                    mode: "entire"
+                },
+                {
+                    id:"VDf00z8sMFw",
+                    mode: "entire"
+                },
+                {
+                    id:"NAXHHBUY9_E",
                     mode: "entire"
                 }
             ]
@@ -2456,7 +2553,7 @@ Add unit tests
                             <h4>Time (seconds)</h4>
                             <div class="input-group" style="width: 20%">
                                 <span class="input-group-addon" id="basic-addon1">@</span>
-                                <input type=number name="maxQuizTime" class="form-control" value="60"  aria-describedby="basic-addon1" />
+                                <input type=number name="maxQuizTime" class="form-control" value="60" min="1" aria-describedby="basic-addon1" />
                             </div>
                         </div>
 
@@ -2489,7 +2586,7 @@ Add unit tests
                     </div>
                     <div class="modal-body" style="max-height:calc(100vh - 200px); overflow-y: scroll">
                         <div class="h4">
-                            You have finished <span class="total-questions"></span> questions with <span class="total-correct"></span> out of <span class="total-possible-points"></span> points (<span class="percent-correct"></span>%).
+                            You have answered <span class="total-questions"></span> out of <span class="total-possible-questions"></span> questions with <span class="total-correct"></span> out of <span class="total-possible-points"></span> points (<span class="percent-correct"></span>%).
                         </div>
                         <div class="h4">
                             You get a(n) <span class="letter-grade h3"></span>
