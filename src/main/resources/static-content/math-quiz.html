@@ -783,6 +783,8 @@ Add unit tests
                 addition_double_digit_carry_easy: getSimpleAdditionTemplateWithCarry(10,50,1,50,4),
                 addition_double_digit_no_carry_less_easy: getSimpleAdditionTemplateWithNoCarry(50,99,1,99,4),
                 addition_double_digit_carry_less_easy: getSimpleAdditionTemplateWithCarry(50,99,1,99,5),
+                addition_triple_digit_no_carry_easy: getSimpleAdditionTemplateWithNoCarry(100,500,10,500,3),
+                addition_triple_digit_no_carry_less_easy: getSimpleAdditionTemplateWithNoCarry(501,999,1,999,3),
                 subtraction_double_digit_no_borrow_easy: getSimpleSubtractionTemplateWithNoBorrow(10,50,1,50,3),
                 subtraction_double_digit_borrow_easy: getSimpleSubtractionTemplateWithBorrow(10,50,1,50,4),
                 subtraction_easy_with_negative_answers: getSimpleSubtractionWithNegativeAnswerTemplate(0,10,13,3),
@@ -902,6 +904,14 @@ Add unit tests
                     templates: [
                         "addition_double_digit_carry_easy",
                         "addition_double_digit_carry_less_easy",
+                    ]
+                },
+                triple_digit_addition_no_carry: {
+                    name: "Triple digit addition with no carry",
+                    group: "addition_and_subtraction",
+                    templates: [
+                        "addition_triple_digit_no_carry_easy",
+                        "addition_triple_digit_no_carry_less_easy",
                     ]
                 },
                 double_digit_subtraction_no_borrow: {
@@ -1396,14 +1406,23 @@ Add unit tests
                 }
             }
             function getSimpleAdditionTemplateWithNoCarry(min1, max1, min2, max2, difficulty) {
+                var logBase10 = Math.log(10);
                 return {
                     constants: {
                         n1: function() {return rand(min1,max1)},
                         n2: function() {
                             var n1 = resolvedConstants.n1;
-                            var tens = rand(Math.floor(min2 / 10), Math.floor(max2 / 10));
-                            var ones = rand(0, 9-n1 % 10);
-                            return tens * 10 + ones;
+                            var maxDigits = Math.floor(Math.log(max2)/logBase10) + 1;
+                            var cN1 = n1;
+                            var cN2 = 0;
+                            
+                            for (var i = 0; i < maxDigits; i++) {
+                                var digit = Math.floor(cN1 / Math.pow(10, maxDigits - i - 1))
+                                cN1 -= digit * Math.pow(10, maxDigits - i - 1);
+                                cN2 += rand(0, 9-digit) * Math.pow(10, maxDigits - i - 1);
+                            }
+                            
+                            return cN2;
                         },
                         answer: function() {return resolvedConstants.n1 + resolvedConstants.n2}
                     },
