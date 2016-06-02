@@ -220,7 +220,11 @@ Add unit tests
                     displayScore();
                     
                     
-                    if (JSON.stringify(previouslySelectedTemplateSets) !== JSON.stringify(selectedTemplateSets)) {
+                    if (settings.quizLengthMode === "fixedLength" ||
+                            settings.timerStyle === "timer") {
+                        newQuestion();
+                        resetScore();
+                    } else if (JSON.stringify(previouslySelectedTemplateSets) !== JSON.stringify(selectedTemplateSets)) {
                         newQuestion();
                     }
                     
@@ -354,7 +358,7 @@ Add unit tests
                 }
                 questionNumber = state.questionNumber;
                 if (!questionNumber) {
-                    questionNumber = 1;
+                    questionNumber = 0;
                 }
             
                 // Setup YouTube if necessary
@@ -383,10 +387,13 @@ Add unit tests
             function newQuestion() {
                 $("#response-div").html("");
                 
-                questionNumber++;
-                
-                questionAndAnswer = generateQuestion();
-                console.info("Generated question " + JSON.stringify(questionAndAnswer));
+                questionAndAnswer = Cookies.getJSON("question");
+                if (!questionAndAnswer) {
+                    questionAndAnswer = generateQuestion();
+                    console.info("Generated question " + JSON.stringify(questionAndAnswer));
+
+                    Cookies.set("question", questionAndAnswer, { expires: 1 });
+                }
                 
                 $("#question").html(questionAndAnswer.question);
                 
@@ -432,6 +439,7 @@ Add unit tests
                     $(".choice-btn").click(function() {
                         var val = $(this).html();
                         
+                        //TODO: Graded mode should disable all buttons
                         reactToAnswer(val === correct);
                         if (val == correct) {
                             $(".choice-btn").prop("disabled", true);
@@ -470,6 +478,7 @@ Add unit tests
             }
             
             function reactToAnswer(isCorrect) {
+                questionNumber++;
                 possibleScore += questionAndAnswer.difficulty;
                 var scoreChange = 0;
                 if (isCorrect) {
@@ -532,6 +541,10 @@ Add unit tests
                         bonus = 0;
                     }
                 }
+                if (isCorrect || settings.graded) {
+                    Cookies.remove("question");
+                }
+                
                 score = Math.max(score + scoreChange, 0);
                 if (score - previousScore >= 10 && scoreChange > 0) {
                     previousScore = Math.round(score,1);
@@ -563,7 +576,7 @@ Add unit tests
                     }
                 }
                 
-                $(".total-questions").html(questionNumber-1);
+                $(".total-questions").html(questionNumber);
                 $(".total-possible-questions").html(settings.quizLength);
                 $(".total-correct").html(score);
                 $(".total-possible-points").html(possibleScore);
@@ -650,7 +663,7 @@ Add unit tests
                     $("#score-div").html("Score: " + score + (bonus > 10 && settings.giveBonus ? " <small>Bonus: " + Math.floor(bonus/10) : "") + "</small>")
                 }
                 if (settings.quizLengthMode === "fixedLength") {
-                    $("#question-count-div").show().html("Question " + questionNumber + "/" + settings.quizLength)
+                    $("#question-count-div").show().html("Question " + (questionNumber + 1) + "/" + settings.quizLength)
                 } else {
                     $("#question-count-div").hide();
                 }
@@ -662,7 +675,7 @@ Add unit tests
                     possibleScore: 0,
                     bonus: 0,
                     previousScore: 0,
-                    questionNumber: 1
+                    questionNumber: 0
                 };
 
                 score = state.score;
@@ -2465,7 +2478,7 @@ Add unit tests
                         </div>
                     </div>
                 </div>
-                <h2 style="font-size: 3vh" >Question:</h2>
+                <h2>Question:</h2>
                 <div>
                     <div id="question" style="font-size:150%"> 
 
