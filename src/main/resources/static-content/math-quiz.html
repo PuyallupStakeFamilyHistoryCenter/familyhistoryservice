@@ -222,9 +222,11 @@ Add unit tests
                     
                     if (settings.quizLengthMode === "fixedLength" ||
                             settings.timerStyle === "timer") {
+                        resetQuestion();
                         newQuestion();
                         resetScore();
                     } else if (JSON.stringify(previouslySelectedTemplateSets) !== JSON.stringify(selectedTemplateSets)) {
+                        resetQuestion();
                         newQuestion();
                     }
                     
@@ -384,6 +386,10 @@ Add unit tests
             });
             
             var questionAndAnswer;
+            function resetQuestion() {
+                Cookies.remove("question");
+            }
+            
             function newQuestion() {
                 $("#response-div").html("");
                 
@@ -784,7 +790,7 @@ Add unit tests
                 addition_double_digit_no_carry_less_easy: getSimpleAdditionTemplateWithNoCarry(50,99,1,99,4),
                 addition_double_digit_carry_less_easy: getSimpleAdditionTemplateWithCarry(50,99,1,99,5),
                 addition_triple_digit_no_carry_easy: getSimpleAdditionTemplateWithNoCarry(100,500,10,500,5),
-                addition_triple_digit_no_carry_less_easy: getSimpleAdditionTemplateWithNoCarry(501,999,1,999,5),
+                addition_triple_digit_no_carry_less_easy: getSimpleAdditionTemplateWithNoCarry(501,999,10,999,5),
                 subtraction_double_digit_no_borrow_easy: getSimpleSubtractionTemplateWithNoBorrow(10,50,1,50,3),
                 subtraction_double_digit_borrow_easy: getSimpleSubtractionTemplateWithBorrow(10,50,1,50,4),
                 subtraction_easy_with_negative_answers: getSimpleSubtractionWithNegativeAnswerTemplate(0,10,13,3),
