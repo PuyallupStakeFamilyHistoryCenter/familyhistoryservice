@@ -56,9 +56,51 @@ POSSIBILITY OF SUCH DAMAGE.
     var pageSize = 10;
     var defaultPeople = [
         {
-            name: "Demo",
+            name: "Children",
             images: [
-                "/media/default.jpg"
+                "/media/default/default.jpg"
+            ]
+        },
+        {
+            name: "Brigham Young",
+            images: [
+                "/media/default/brigham_young.jpg"
+            ]
+        },
+        {
+            name: "Joseph Smith",
+            images: [
+                "/media/default/joseph_smith.jpg"
+            ]
+        },
+        {
+            name: "Mark Twain",
+            images: [
+                "/media/default/mark_twain.jpeg"
+            ]
+        },
+        {
+            name: "Moulton Brothers",
+            images: [
+                "/media/default/moulton_brothers.jpeg"
+            ]
+        },
+        {
+            name: "George Washington",
+            images: [
+                "/media/default/george_washington.jpg"
+            ]
+        },
+        {
+            name: "Nelson Mandela",
+            images: [
+                "/media/default/nelson_mandela.jpg"
+            ]
+        },
+        {
+            name: "Leonardo da Vinci",
+            images: [
+                "/media/default/da_vinci.jpg"
             ]
         }
     ]
@@ -141,4 +183,6 @@ POSSIBILITY OF SUCH DAMAGE.
     } else {
         ws.socketSend("get-ancestor-images " + token + " " + settings.userId);
     }
+    
+    asdf()
 </script>
