@@ -26,6 +26,7 @@
 package org.puyallupfamilyhistorycenter.service.cache;
 
 import com.google.common.base.Joiner;
+import com.google.common.collect.AbstractIterator;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -41,7 +42,7 @@ import org.puyallupfamilyhistorycenter.service.models.PersonReference;
  */
 
 
-public class AncestorsIterator implements Iterator<Person> {
+public class AncestorsIterator extends AbstractIterator<Person> {
     private static final Logger logger = Logger.getLogger(AncestorsIterator.class);
 
     private final String personId;
@@ -65,15 +66,10 @@ public class AncestorsIterator implements Iterator<Person> {
     }
 
     @Override
-    public boolean hasNext() {
-        return !frontier.isEmpty();
-    }
-
-    @Override
-    public Person next() {
+    protected Person computeNext() {
         PersonReference next = null;
         Person person = null;
-        while (person == null) {
+        while (person == null && !frontier.isEmpty()) {
             try {
                 do {
                     next = frontier.remove();
@@ -87,6 +83,10 @@ public class AncestorsIterator implements Iterator<Person> {
             }
         }
         
+        if (person == null) {
+            return endOfData();
+        }
+        
         if (next.getDepth() < maxDepth) {
             if (person.parents != null) {
                 for (PersonReference parent : person.parents) {
@@ -97,11 +97,6 @@ public class AncestorsIterator implements Iterator<Person> {
         
         addRelationshipToPerson(person, next.getDepth());
         return person;
-    }
-
-    @Override
-    public void remove() {
-        throw new UnsupportedOperationException("Not supported");
     }
 
     protected static void addRelationshipToPerson(Person person, int depth) {
