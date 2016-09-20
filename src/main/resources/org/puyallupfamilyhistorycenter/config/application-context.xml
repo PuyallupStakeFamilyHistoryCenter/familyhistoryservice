@@ -110,7 +110,7 @@ POSSIBILITY OF SUCH DAMAGE.
     <bean id="media-handler" class="org.eclipse.jetty.server.handler.ResourceHandler" >
         <property name="directoriesListed" value="true" />
         <property name="baseResource" ref="media-resource" />
-        <property name="cacheControl" value="public, max-age=86400" />
+        <property name="cacheControl" value="public, max-age=0" />
     </bean>
     <bean id="media-handler-gzip" class="org.eclipse.jetty.servlets.gzip.GzipHandler">
         <property name="handler" ref="media-handler" />
