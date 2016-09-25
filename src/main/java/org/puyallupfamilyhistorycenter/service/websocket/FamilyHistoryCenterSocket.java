@@ -681,6 +681,9 @@ public class FamilyHistoryCenterSocket {
                                     }
                                 }
                             }
+                            
+                            Precacher precacher = new Precacher(ApplicationProperties.getGuestPersonId(), accessToken, 8);
+                            precacher.precache();
                         }
 
                         @Override
