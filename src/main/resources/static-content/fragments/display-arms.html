@@ -79,53 +79,12 @@ POSSIBILITY OF SUCH DAMAGE.
                     var html = $("#arms-div").html();
                     $("#arms-div").empty().html(html);
                 });
+            },
+            colors: function(data) {
+                foregroundColorSets = data.foregroundColorSets;
+                highlightColorSets = data.highlightColorSets;
+                backgroundColorSets = data.backgroundColorSets;
             }
-        }
-    }
-    
-    var foregroundColorSets = {
-        blue: {
-            "main-dark": "#1265b1",
-            "main-middle": "#377bc8",
-            "main-light": "#61b3fd",
-            "main-outline": "#2c5aa0"
-        },
-        red: {
-            "main-dark": "#cd0707",
-            "main-middle": "#e94545",
-            "main-light": "#ee6c6c",
-            "main-outline": "#800000"
-        },
-        yellow: {
-            "main-dark": "#d1b948",
-            "main-middle": "#fee46e",
-            "main-light": "#f8eca8",
-            "main-outline": "#806600"
-        }
-    }
-    
-    var highlightColorSets = {
-        blue: {
-            "highlight-middle": "#377bc8",
-            "highlight-outline": "#2c5aa0"
-        },
-        red: {
-            "highlight-dark": "#cd0707",
-            "highlight-middle": "#e94545",
-            "highlight-light": "#ee6c6c",
-            "highlight-outline": "#800000"
-        },
-        yellow: {
-            "highlight-dark": "#d1b948",
-            "highlight-middle": "#fee46e",
-            "highlight-light": "#f8eca8",
-            "highlight-outline": "#806600"
-        }
-    }
-    
-    var backgroundColorSets = {
-        yellow: {
-            background: "#fee46e"
         }
     }
     
