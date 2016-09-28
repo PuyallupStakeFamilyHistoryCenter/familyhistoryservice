@@ -28,25 +28,46 @@ POSSIBILITY OF SUCH DAMAGE.
 </div>
 
 <script>
+    var foregroundColorSets, highlightColorSets, backgroundColorSets;
     settings.local = {
         verbs: {
             arms: function(data) {
                 var fullBackColorSet = backgroundColorSets[data.fullBackColor];
-                var fullForeColor = foregroundColorSets[data.fullForeColor];
+                var fullForeColorSet = foregroundColorSets[data.fullForeColor];
                 var fullHighlightColorSet = highlightColorSets[data.fullHighlightColor];
-                var fullColorSet = $.extend({},fullBackColorSet,fullForeColor,fullHighlightColorSet);
+                var fullColorSet = $.extend({},fullBackColorSet,fullForeColorSet,fullHighlightColorSet);
+                
+                var upperLeftBackColorSet = backgroundColorSets[data.upperLeftBackColor];
+                var upperLeftForeColorSet = foregroundColorSets[data.upperLeftForeColor];
+                var upperLeftHighlightColorSet = highlightColorSets[data.upperLeftHighlightColor];
+                var upperLeftColorSet = $.extend({},upperLeftBackColorSet,upperLeftForeColorSet,upperLeftHighlightColorSet);
+                
+                var upperRightBackColorSet = backgroundColorSets[data.upperRightBackColor];
+                var upperRightForeColorSet = foregroundColorSets[data.upperRightForeColor];
+                var upperRightHighlightColorSet = highlightColorSets[data.upperRightHighlightColor];
+                var upperRightColorSet = $.extend({},upperRightBackColorSet,upperRightForeColorSet,upperRightHighlightColorSet);
+                
+                var lowerLeftBackColorSet = backgroundColorSets[data.lowerLeftBackColor];
+                var lowerLeftForeColorSet = foregroundColorSets[data.lowerLeftForeColor];
+                var lowerLeftHighlightColorSet = highlightColorSets[data.lowerLeftHighlightColor];
+                var lowerLeftColorSet = $.extend({},lowerLeftBackColorSet,lowerLeftForeColorSet,lowerLeftHighlightColorSet);
+                
+                var lowerRightBackColorSet = backgroundColorSets[data.lowerRightBackColor];
+                var lowerRightForeColorSet = foregroundColorSets[data.lowerRIghtForeColor];
+                var lowerRightHighlightColorSet = highlightColorSets[data.lowerRightHighlightColor];
+                var lowerRightColorSet = $.extend({},lowerRightBackColorSet,lowerRightForeColorSet,lowerRightHighlightColorSet);
                 
                 var promises = [];
-                get(promises, data.fullBack);
+                get(promises, data.fullBack, fullColorSet);
                 get(promises, data.fullFore, fullColorSet);
-                get(promises, data.upperLeftBack);
-                get(promises, data.upperLeftFore);
-                get(promises, data.upperRightBack);
-                get(promises, data.upperRightFore);
-                get(promises, data.lowerLeftBack);
-                get(promises, data.lowerLeftFore);
-                get(promises, data.lowerRightBack);
-                get(promises, data.lowerRightFore);
+                get(promises, data.upperLeftBack, upperLeftColorSet);
+                get(promises, data.upperLeftFore, upperLeftColorSet);
+                get(promises, data.upperRightBack, upperRightColorSet);
+                get(promises, data.upperRightFore, upperRightColorSet);
+                get(promises, data.lowerLeftBack, lowerLeftColorSet);
+                get(promises, data.lowerLeftFore, lowerLeftColorSet);
+                get(promises, data.lowerRightBack, lowerRightColorSet);
+                get(promises, data.lowerRightFore, lowerRightColorSet);
                 get(promises, data.outline);
                 
                 
