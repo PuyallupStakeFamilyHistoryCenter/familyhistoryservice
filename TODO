@@ -181,6 +181,7 @@ Hangman:
 Add options tab                            DONE
 Select words from other facts              DONE
 Add hints option
+Screenshot doesn't hide svg elements correctly in hangman
 
 Screenshot:
 Truncates tiles game                       DONE
@@ -188,18 +189,19 @@ Doesn't work on stats map view             DONE
 Family tree is truncated sometimes         DONE
 Remove dedicated 'Save' button in the coloring app DONE
 Disable screenshot in apps where it doesn't work DONE
-Doesn't hide svg elements correctly in hangman
 Stats graph view shows two headings and two x-axis labels
 Doesn't work on maps
 
 Coat of arms:
+Allow changing foreground colors           DONE
 Should fill screen
-Add auto-generated blazon?
+Add auto-generated blazon
 Add definitions
 Add more elements
 Allow more complicated divisions?
-Allow changing foreground colors
 Blazon search: http://oanda.sca.org/
+Add border (with auto-resize to fit)
+Fix green and blue
 
 New feature ideas:
 Word search (maybe printable version in email?)
