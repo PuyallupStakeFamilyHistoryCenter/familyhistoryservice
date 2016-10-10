@@ -1,4 +1,5 @@
-<g xmlns="http://www.w3.org/2000/svg" id="layer1" transform="translate(890.02296,500.08333)" style="display:inline">
+<g ${transform}>
+  <g xmlns="http://www.w3.org/2000/svg" id="layer1" transform="translate(890.02296,500.08333)" style="display:inline">
     
     
     
@@ -86,3 +87,4 @@
       </g>
     </g>
   </g>
+</g>

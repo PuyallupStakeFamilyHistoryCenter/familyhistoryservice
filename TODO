@@ -191,6 +191,8 @@ Remove dedicated 'Save' button in the coloring app DONE
 Disable screenshot in apps where it doesn't work DONE
 Stats graph view shows two headings and two x-axis labels
 Doesn't work on maps
+SVG elements should be preserved
+Guest account: we need to collect email address
 
 Coat of arms:
 Allow changing foreground colors           DONE
@@ -202,6 +204,7 @@ Allow more complicated divisions?
 Blazon search: http://oanda.sca.org/
 Add border (with auto-resize to fit)
 Fix green and blue
+Confirm before closing (several apps require this)
 
 New feature ideas:
 Word search (maybe printable version in email?)
