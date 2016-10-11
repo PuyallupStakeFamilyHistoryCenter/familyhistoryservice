@@ -1,4 +1,5 @@
-<g xmlns="http://www.w3.org/2000/svg" id="layer1" transform="translate(-170.17566,-293.2025)">
+<g ${transform}>
+  <g xmlns="http://www.w3.org/2000/svg" id="layer1" transform="translate(-170.17566,-293.2025)">
     <g id="g17715" transform="translate(-706.70745,1007.0794)">
       
       <g style="stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none" transform="translate(1.0820874e-5,0)" id="g17547">
@@ -203,3 +204,4 @@
       </g>
     </g>
   </g>
+</g>

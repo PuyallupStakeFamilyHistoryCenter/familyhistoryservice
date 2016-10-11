@@ -196,6 +196,9 @@ Guest account: we need to collect email address
 
 Coat of arms:
 Allow changing foreground colors           DONE
+Harp string color                          DONE
+Separate border from lion rampant          DONE
+Show 'meaning' on display
 Should fill screen
 Add auto-generated blazon
 Add definitions
@@ -205,6 +208,10 @@ Blazon search: http://oanda.sca.org/
 Add border (with auto-resize to fit)
 Fix green and blue
 Confirm before closing (several apps require this)
+Castle foreground color
+Ship foreground color
+Rearrange element buttons (alphabetically?)
+Add attribution
 
 New feature ideas:
 Word search (maybe printable version in email?)

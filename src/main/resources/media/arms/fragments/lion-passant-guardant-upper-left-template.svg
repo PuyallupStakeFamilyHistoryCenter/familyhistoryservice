@@ -1,11 +1,7 @@
-<g xmlns="http://www.w3.org/2000/svg" id="layer1" transform="translate(1188.705,52.67259)" style="display:inline">
-    
+<g ${transform}>
+  <g xmlns="http://www.w3.org/2000/svg" id="layer1" transform="translate(1188.705,52.67259)" style="display:inline">
     <g id="g8389">
       <g transform="translate(-66.53533,-15.51634)" id="g6562">
-        
-        
-        
-        
         <g transform="matrix(0.99838426,-0.05682312,0.05682312,0.99838426,-730.83933,-22.045103)" style="stroke-width:1.5;stroke-miterlimit:4;stroke-dasharray:none;display:inline" id="g6781-5">
           <g id="g6635-0" style="stroke-width:1.5;stroke-miterlimit:4;stroke-dasharray:none">
             <g id="g6553-7" style="stroke-width:1.5;stroke-miterlimit:4;stroke-dasharray:none">
@@ -111,6 +107,5 @@
         
       </g>
     </g>
-    
-    
   </g>
+</g>

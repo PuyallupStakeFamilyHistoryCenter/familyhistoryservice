@@ -1,4 +1,5 @@
-<g xmlns="http://www.w3.org/2000/svg" id="layer1" transform="translate(-552.31852,-147.48816)">
+<g ${transform}>
+  <g xmlns="http://www.w3.org/2000/svg" id="layer1" transform="translate(-552.31852,-147.48816)">
     <g id="g43544" transform="translate(217.93773,365.75034)">
       <g id="g43237">
         <g id="g41855" transform="translate(-14.380521,-4.7935072)">
@@ -406,11 +407,6 @@
           <path id="path6949-2-4-6-8-1-6-9-3-8-9" d="m 592.26355,232.56023 0,-8.81111 c 0,0 0.84297,1.61929 1.41784,2.12677 0.47536,0.41964 1.4196,0.52056 1.89047,0.94523 0.68639,0.61906 1.47412,1.69277 1.65415,2.59939 l -4.96246,3.13972 z" style="fill:${main-light};fill-opacity:1;fill-rule:evenodd;stroke:none"/>
         </g>
       </g>
-      
-      
-      
-      
-      
-      
     </g>
   </g>
+</g>

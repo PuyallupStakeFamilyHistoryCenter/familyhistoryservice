@@ -1,0 +1,11 @@
+<g ${transform}>
+    <g transform='scale(.87)'>
+      <g xmlns="http://www.w3.org/2000/svg" id="layer1" transform="translate(-391.10266,51.859456)" style="display:inline">
+        <g transform="matrix(1.1495,0,0,1.1495,644.56407,772.72521)" id="g17994" style="stroke-width:0.86994344;stroke-miterlimit:4;stroke-dasharray:none">
+          <g transform="translate(-76.696114,-19.174029)" id="g37058" style="stroke-width:0.86994344;stroke-miterlimit:4;stroke-dasharray:none">
+            <path id="path7014-6-7-0-40-7-0-4" style="fill:${main-dark};fill-opacity:1;stroke:none" d="m 60.833053,-366.69161 c 0,0 0.0534,27.58244 0.0534,27.58244 l 76.716067,0 0,78.68106 27.12216,-16.69356 23.58427,-16.78783 0,-45.19967 44.0596,0 c 0,0 10.20972,-18.05035 13.99998,-27.66571 3.50814,-8.89965 7.99999,-27.5608 7.99999,-27.5608 l -66.05957,0 0,-82.6824 -25.46097,0 -25.24546,0 0,82.6824 -76.747567,0 c -0.007,9.19402 -0.0146,18.44995 -0.0219,27.64407 z"/>
+          </g>
+        </g>
+      </g>
+    </g>
+</g>
