@@ -24,7 +24,7 @@ CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 -->
-<div id="arms-div" style="width: 410px; margin: 0 auto;">
+<div id="arms-div" style="position:fixed; top: 8px; left: 8px; background-color: white">
 </div>
 <div id="blazon-div">
     
@@ -86,6 +86,7 @@ POSSIBILITY OF SUCH DAMAGE.
                     });
                     var html = $("#arms-div").html();
                     $("#arms-div").empty().html(html);
+                    resize();
                 });
             },
             colors: function(data) {
@@ -115,7 +116,19 @@ POSSIBILITY OF SUCH DAMAGE.
         $.get("/media/arms/base.svg", function(data) {
             $("#arms-div").empty().append(data);
         }, "text");
+        resize();
     }
+    
+    function resize() {
+        $("#arms-div").css("width", (window.innerWidth - 16) + "px")
+                .css("height", (window.innerHeight - 16) + "px");
+        $("#root").attr("style", "display: block; top: 1%; bottom: 1%; left: 1%; right: 1%; max-height: 710px; max-height:" + (window.innerHeight - 16) + "px");
+    }
+    
+    $(window).resize(new function() {
+        resize();
+    });
+    resize();
     
     reset();
     asdf();

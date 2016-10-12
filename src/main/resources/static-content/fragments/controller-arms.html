@@ -156,7 +156,7 @@ POSSIBILITY OF SUCH DAMAGE.
         },
         threeLionsInPale: {
             name: "Three lions in pale",
-            blazon: "three lions in pale ${heraldicForeColor}, armed and langued ${heraldicHighlightColor}",
+            blazon: "three lions passant guardant in pale ${heraldicForeColor}, armed and langued ${heraldicHighlightColor}",
             full: {
                 key: "fullFore|fullForeTransform",
                 value: "media/arms/fragments/england-template.svg|"
@@ -298,24 +298,24 @@ POSSIBILITY OF SUCH DAMAGE.
                 value: "media/arms/fragments/france-old-lower-right-template.svg|",
             },
         },
-        checkers: {
-            name: "Checkers",
-            blazon: "FIX ME! ${heraldicForeColor}",
+        fessChecked: {
+            name: "Checked fess",
+            blazon: "fess checky ${heraldicForeColor} and ${heraldicHighlightColor}",
             upperLeft: {
                 key: "upperLeftFore|upperLeftForeTransform",
-                value: "media/arms/fragments/check-upper-left-template.svg|",
+                value: "media/arms/fragments/fess-checky-upper-left-template.svg|",
             },
             upperRight: {
                 key: "upperRightFore|upperRightForeTransform",
-                value: "media/arms/fragments/check-upper-left-template.svg|upperLeftToUpperRightMirror",
+                value: "media/arms/fragments/fess-checky-upper-left-template.svg|upperLeftToUpperRightMirror",
             },
             lowerLeft: {
                 key: "lowerLeftFore|lowerLeftForeTransform",
-                value: "media/arms/fragments/check-lower-right-template.svg|lowerRightToLowerLeftMirror",
+                value: "media/arms/fragments/fess-checky-lower-right-template.svg|lowerRightToLowerLeftMirror",
             },
             lowerRight: {
                 key: "lowerRightFore|lowerRightForeTransform",
-                value: "media/arms/fragments/check-lower-right-template.svg|",
+                value: "media/arms/fragments/fess-checky-lower-right-template.svg|",
             },
         },
         cross: {
@@ -340,7 +340,7 @@ POSSIBILITY OF SUCH DAMAGE.
         },
         harp: {
             name: "Harp",
-            blazon: "a harp ${heraldicForeColor} stringed ${heraldicBackColor}",
+            blazon: "a harp ${heraldicForeColor} stringed ${heraldicHighlightColor}",
             full: {
                 key: "fullFore|fullForeTransform",
                 value: "media/arms/fragments/ireland-lower-left-template.svg|lowerLeftToFullHarp",
@@ -374,6 +374,62 @@ POSSIBILITY OF SUCH DAMAGE.
                 value: "media/arms/fragments/castle-lower-right-template.svg|",
             },
         },
+        griffin: {
+            name: "Griffin",
+            blazon: "a griffin segreant ${heraldicForeColor} armed ${heraldicHighlightColor}",
+            full: {
+                key: "fullFore|fullForeTransform",
+                value: "media/arms/fragments/griffin-segreant-template.svg|",
+            },
+            upperLeft: {
+                key: "upperLeftFore|upperLeftForeTransform",
+                value: "media/arms/fragments/griffin-segreant-template.svg|fullToUpperLeft",
+            },
+            upperRight: {
+                key: "upperRightFore|upperRightForeTransform",
+                value: "media/arms/fragments/griffin-segreant-template.svg|fullToUpperRight",
+            },
+//            lowerLeft: {
+//                key: "lowerLeftFore|lowerLeftForeTransform",
+//                value: "media/arms/fragments/ireland-lower-left-template.svg|",
+//            },
+//            lowerRight: {
+//                key: "lowerRightFore|lowerRightForeTransform",
+//                value: "media/arms/fragments/ireland-lower-left-template.svg|lowerLeftToLowerRightMirror",
+//            },
+        },
+        dolphin: {
+            name: "Dolphin",
+            blazon: "a dolphin hauriant ${heraldicForeColor} armed ${heraldicHighlightColor}",
+            full: {
+                key: "fullFore|fullForeTransform",
+                value: "media/arms/fragments/dolphin-hauriant-template.svg|",
+            },
+            upperLeft: {
+                key: "upperLeftFore|upperLeftForeTransform",
+                value: "media/arms/fragments/dolphin-hauriant-template.svg|fullToUpperLeft",
+            },
+            upperRight: {
+                key: "upperRightFore|upperRightForeTransform",
+                value: "media/arms/fragments/dolphin-hauriant-template.svg|fullToUpperRight",
+            },
+            lowerRight: {
+                key: "lowerRightFore|lowerRightForeTransform",
+                value: "media/arms/fragments/dolphin-hauriant-template.svg|fullToLowerRightDolphin",
+            },
+        },
+        checkers: {
+            name: "Checked",
+            blazon: "checky ${heraldicForeColor} and ${heraldicHighlightColor}",
+            lowerLeft: {
+                key: "lowerLeftFore|lowerLeftForeTransform",
+                value: "media/arms/fragments/checky-lower-left-template.svg|",
+            },
+            lowerRight: {
+                key: "lowerRightFore|lowerRightForeTransform",
+                value: "media/arms/fragments/checky-lower-left-template.svg|lowerLeftToLowerRightMirror",
+            },
+        }
 //        doubleTressure: {
 //            name: "Double tressure",
 //            blazon: "FIX ME! ${heraldicForeColor}",
@@ -475,7 +531,7 @@ POSSIBILITY OF SUCH DAMAGE.
         },
         red: {
             "heraldic-name": "gules",
-            "background": "#e94545",
+            "background": "#cd0707",
         },
         green: {
             "heraldic-name": "vert",
@@ -497,6 +553,7 @@ POSSIBILITY OF SUCH DAMAGE.
         fullToUpperRight: "transform='scale(.5) translate(409)'",
         fullToLowerLeft: "transform='scale(.5) translate(0 478)'",
         fullToLowerRight: "transform='scale(.5) translate(409 478)'",
+        fullToLowerRightDolphin: "transform='scale(.5) translate(370 478)'",
         upperLeftToFull: "transform='scale(2)'",
         upperRightToFull: "transform='translate(-409) scale(2)'",
         upperLeftToUpperRight: "transform='translate(205)'",
@@ -529,19 +586,19 @@ POSSIBILITY OF SUCH DAMAGE.
         responseType: "arms",
         fullForeColor: "white",
         fullBackColor: "white",
-        fullHighlightColor: "white",
+        fullHighlightColor: "black",
         upperLeftForeColor: "white",
         upperLeftBackColor: "white",
-        upperLeftHighlightColor: "white",
+        upperLeftHighlightColor: "black",
         upperRightForeColor: "white",
         upperRightBackColor: "white",
-        upperRightHighlightColor: "white",
+        upperRightHighlightColor: "black",
         lowerLeftForeColor: "white",
         lowerLeftBackColor: "white",
-        lowerLeftHighlightColor: "white",
+        lowerLeftHighlightColor: "black",
         lowerRightForeColor: "white",
         lowerRightBackColor: "white",
-        lowerRightHighlightColor: "white",
+        lowerRightHighlightColor: "black",
     }
     
     setup();
