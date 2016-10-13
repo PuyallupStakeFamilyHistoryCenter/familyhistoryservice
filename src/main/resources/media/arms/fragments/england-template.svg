@@ -1,6 +1,6 @@
-<g xmlns="http://www.w3.org/2000/svg" id="layer1" transform="translate(-170.17561,-293.2025)">
+<g ${transform}>
+  <g xmlns="http://www.w3.org/2000/svg" id="layer1" transform="translate(-170.17561,-293.2025)">
     <g id="g11527" transform="translate(-1826.2163,433.71267)">
-      
       <g style="stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none" transform="translate(1.3043331,0)" id="g10741">
         <g style="stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none" id="g9789" transform="translate(-1.3043005,0)">
           <g transform="matrix(1.9487171,0,0,1.9487171,1190.944,329.39578)" id="g5915-3-0-8" style="stroke-width:0.51315814;stroke-miterlimit:4;stroke-dasharray:none">
@@ -302,3 +302,4 @@
       </g>
     </g>
   </g>
+</g>

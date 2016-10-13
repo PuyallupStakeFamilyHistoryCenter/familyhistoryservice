@@ -38,31 +38,31 @@ POSSIBILITY OF SUCH DAMAGE.
                 var fullBackColorSet = backgroundColorSets[data.fullBackColor];
                 var fullForeColorSet = foregroundColorSets[data.fullForeColor];
                 var fullHighlightColorSet = highlightColorSets[data.fullHighlightColor];
-                var fullForeTransform = namedTransforms[data.fullForeTransform];
+                var fullForeTransform = resolveCompoundTransform(data.fullForeTransform);
                 var fullColorSet = $.extend({transform:fullForeTransform},fullBackColorSet,fullForeColorSet,fullHighlightColorSet);
                 
                 var upperLeftBackColorSet = backgroundColorSets[data.upperLeftBackColor];
                 var upperLeftForeColorSet = foregroundColorSets[data.upperLeftForeColor];
                 var upperLeftHighlightColorSet = highlightColorSets[data.upperLeftHighlightColor];
-                var upperLeftForeTransform = namedTransforms[data.upperLeftForeTransform];
+                var upperLeftForeTransform = resolveCompoundTransform(data.upperLeftForeTransform);
                 var upperLeftColorSet = $.extend({transform:upperLeftForeTransform},upperLeftBackColorSet,upperLeftForeColorSet,upperLeftHighlightColorSet);
                 
                 var upperRightBackColorSet = backgroundColorSets[data.upperRightBackColor];
                 var upperRightForeColorSet = foregroundColorSets[data.upperRightForeColor];
                 var upperRightHighlightColorSet = highlightColorSets[data.upperRightHighlightColor];
-                var upperRightForeTransform = namedTransforms[data.upperRightForeTransform];
+                var upperRightForeTransform = resolveCompoundTransform(data.upperRightForeTransform);
                 var upperRightColorSet = $.extend({transform:upperRightForeTransform},upperRightBackColorSet,upperRightForeColorSet,upperRightHighlightColorSet);
                 
                 var lowerLeftBackColorSet = backgroundColorSets[data.lowerLeftBackColor];
                 var lowerLeftForeColorSet = foregroundColorSets[data.lowerLeftForeColor];
                 var lowerLeftHighlightColorSet = highlightColorSets[data.lowerLeftHighlightColor];
-                var lowerLeftForeTransform = namedTransforms[data.lowerLeftForeTransform];
+                var lowerLeftForeTransform = resolveCompoundTransform(data.lowerLeftForeTransform);
                 var lowerLeftColorSet = $.extend({transform:lowerLeftForeTransform},lowerLeftBackColorSet,lowerLeftForeColorSet,lowerLeftHighlightColorSet);
                 
                 var lowerRightBackColorSet = backgroundColorSets[data.lowerRightBackColor];
                 var lowerRightForeColorSet = foregroundColorSets[data.lowerRightForeColor];
                 var lowerRightHighlightColorSet = highlightColorSets[data.lowerRightHighlightColor];
-                var lowerRightForeTransform = namedTransforms[data.lowerRightForeTransform];
+                var lowerRightForeTransform = resolveCompoundTransform(data.lowerRightForeTransform);
                 var lowerRightColorSet = $.extend({transform:lowerRightForeTransform},lowerRightBackColorSet,lowerRightForeColorSet,lowerRightHighlightColorSet);
                 
                 var promises = [];
@@ -123,6 +123,19 @@ POSSIBILITY OF SUCH DAMAGE.
         $("#arms-div").css("width", (window.innerWidth - 16) + "px")
                 .css("height", (window.innerHeight - 16) + "px");
         $("#root").attr("style", "display: block; top: 1%; bottom: 1%; left: 1%; right: 1%; max-height: 710px; max-height:" + (window.innerHeight - 16) + "px");
+    }
+    
+    function resolveCompoundTransform(compoundTransformName) {
+        if (!compoundTransformName) {
+            return null;
+        }
+        var compoundTransformNames = compoundTransformName.split("+");
+        var resolvedCompoundTransform = "";
+        $.each(compoundTransformNames, function(index, name) {
+            resolvedCompoundTransform = namedTransforms[name] + " " + resolvedCompoundTransform;
+        })
+        resolvedCompoundTransform = resolvedCompoundTransform.replace(/['"] *transform *= *['"]/g, " ");
+        return resolvedCompoundTransform;
     }
     
     $(window).resize(new function() {

@@ -111,15 +111,18 @@ POSSIBILITY OF SUCH DAMAGE.
             blazon: "lion rampant within a double tressure flory-counter-flory ${heraldicForeColor}, armed and langued ${heraldicHighlightColor}",
             full: {
                 key: "fullFore|fullForeTransform",
-                value: "media/arms/fragments/scotland-template.svg|"
+                value: "media/arms/fragments/scotland-template.svg|",
+                reversedValue: "media/arms/fragments/scotland-template.svg|fullReversed"
             },
             upperLeft: {
                 key: "upperLeftFore|upperLeftForeTransform",
                 value: "media/arms/fragments/scotland-upper-left-template.svg|",
+                reversedValue: "media/arms/fragments/scotland-upper-left-template.svg|upperLeftReversed",
             },
             upperRight: {
                 key: "upperRightFore|upperRightForeTransform",
-                value: "media/arms/fragments/scotland-upper-right-template.svg|",
+                value: "media/arms/fragments/scotland-upper-left-template.svg|upperLeftToUpperRight",
+                reversedValue: "media/arms/fragments/scotland-upper-left-template.svg|upperLeftToUpperRightMirror"
             },
             lowerLeft: {
                 key: "lowerLeftFore|lowerLeftForeTransform",
@@ -140,10 +143,12 @@ POSSIBILITY OF SUCH DAMAGE.
             upperLeft: {
                 key: "upperLeftFore|upperLeftForeTransform",
                 value: "media/arms/fragments/lion-passant-guardant-upper-left-template.svg|",
+                reversedValue: "media/arms/fragments/lion-passant-guardant-upper-left-template.svg|upperLeftReversed"
             },
             upperRight: {
                 key: "upperRightFore|upperRightForeTransform",
                 value: "media/arms/fragments/lion-passant-guardant-upper-left-template.svg|upperLeftToUpperRight",
+                reversedValue: "media/arms/fragments/lion-passant-guardant-upper-left-template.svg|upperLeftToUpperRightMirror"
             },
 //            lowerLeft: {
 //                key: "lowerLeftFore|lowerLeftForeTransform",
@@ -159,18 +164,21 @@ POSSIBILITY OF SUCH DAMAGE.
             blazon: "three lions passant guardant in pale ${heraldicForeColor}, armed and langued ${heraldicHighlightColor}",
             full: {
                 key: "fullFore|fullForeTransform",
-                value: "media/arms/fragments/england-template.svg|"
+                value: "media/arms/fragments/england-template.svg|",
+                reversedValue: "media/arms/fragments/england-template.svg|fullReversed"
             },
             upperLeft: {
                 key: "upperLeftFore|upperLeftForeTransform",
                 value: "media/arms/fragments/england-upper-left-template.svg|",
+                reversedValue: "media/arms/fragments/england-upper-left-template.svg|upperLeftReversed",
             },
             upperRight: {
                 key: "upperRightFore|upperRightForeTransform",
-                value: "media/arms/fragments/england-upper-right-template.svg|",
+                value: "media/arms/fragments/england-upper-left-template.svg|upperLeftToUpperRight",
+                reversedValue: "media/arms/fragments/england-upper-left-template.svg|upperLeftToUpperRightMirror",
             },
 //            lowerLeft: {
-//                key: "lowerLowerFore|lowerRightForeTransform",
+//                key: "lowerLowerFore|lowerLeftForeTransform",
 //                value: "media/arms/fragments/england-lower-left-template.svg",
 //            },
             lowerRight: {
@@ -199,15 +207,18 @@ POSSIBILITY OF SUCH DAMAGE.
             blazon: "two lions passant ${heraldicForeColor}, armed and langued ${heraldicHighlightColor}",
             full: {
                 key: "fullFore|fullForeTransform",
-                value: "media/arms/fragments/two-lions-passant-template.svg|"
+                value: "media/arms/fragments/two-lions-passant-template.svg|",
+                reversedValue: "media/arms/fragments/two-lions-passant-template.svg|fullReversed",
             },
             upperLeft: {
                 key: "upperLeftFore|upperLeftForeTransform",
                 value: "media/arms/fragments/two-lions-passant-template.svg|fullToUpperLeft",
+                reversedValue: "media/arms/fragments/two-lions-passant-template.svg|fullReversed+fullToUpperLeft",
             },
             upperRight: {
                 key: "upperRightFore|upperRightForeTransform",
                 value: "media/arms/fragments/two-lions-passant-template.svg|fullToUpperRight",
+                reversedValue: "media/arms/fragments/two-lions-passant-template.svg|fullReversed+fullToUpperRight",
             }
         },
         ship: {
@@ -429,7 +440,31 @@ POSSIBILITY OF SUCH DAMAGE.
                 key: "lowerRightFore|lowerRightForeTransform",
                 value: "media/arms/fragments/checky-lower-left-template.svg|lowerLeftToLowerRightMirror",
             },
-        }
+        },
+        crown: {
+            name: "Crancelin",
+            blazon: "a crancelin ${heraldicForeColor}",
+            full: {
+                key: "fullFore|fullForeTransform",
+                value: "media/arms/fragments/crancelin-template.svg|",
+            },
+            upperLeft: {
+                key: "upperLeftFore|upperLeftForeTransform",
+                value: "media/arms/fragments/crancelin-upper-right-template.svg|upperRightToUpperLeftMirror",
+            },
+            upperRight: {
+                key: "upperRightFore|upperRightForeTransform",
+                value: "media/arms/fragments/crancelin-upper-right-template.svg|",
+            },
+            lowerLeft: {
+                key: "lowerLeftFore|lowerLeftForeTransform",
+                value: "media/arms/fragments/crancelin-lower-left-template.svg|",
+            },
+            lowerRight: {
+                key: "lowerRightFore|lowerRightForeTransform",
+                value: "media/arms/fragments/crancelin-lower-left-template.svg|lowerLeftToLowerRightMirror",
+            },
+        },
 //        doubleTressure: {
 //            name: "Double tressure",
 //            blazon: "FIX ME! ${heraldicForeColor}",
@@ -549,6 +584,8 @@ POSSIBILITY OF SUCH DAMAGE.
     
     var namedTransforms = {
         "": "",
+        fullReversed: "transform='scale(-1 1) translate(-409)'",
+        upperLeftReversed: "transform='translate(205) scale(-1 1)'",
         fullToUpperLeft: "transform='scale(.5)'",
         fullToUpperRight: "transform='scale(.5) translate(409)'",
         fullToLowerLeft: "transform='scale(.5) translate(0 478)'",
@@ -693,6 +730,10 @@ POSSIBILITY OF SUCH DAMAGE.
                 if (config[position]) {
                     t.append("<button class='element-btn btn btn-default' data-value='"
                             + config[position].value +"' data-key='"+config[position].key+"'>"+config.name+"</button>");
+                    if (config[position].reversedValue) {
+                        t.append("<button class='element-btn btn btn-default' data-value='"
+                                + config[position].reversedValue +"' data-key='"+config[position].key+"'>"+config.name+ " reversed</button>");
+                    }
                 }
             });
         });

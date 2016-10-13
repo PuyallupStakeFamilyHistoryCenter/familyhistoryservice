@@ -198,6 +198,7 @@ Coat of arms:
 Allow changing foreground colors           DONE
 Harp string color                          DONE
 Separate border from lion rampant          DONE
+Separate border from quarterly lions rampant DONE
 Show 'meaning' on display
 Should fill screen
 Add auto-generated blazon
@@ -211,6 +212,8 @@ Castle foreground color
 Ship foreground color
 Rearrange element buttons (alphabetically?)
 Add attribution (sodacan on wikipedia)
+Change stroke width when transforming elements?
+Allow reversing elements (when possible)
 
 New feature ideas:
 Word search (maybe printable version in email?)
