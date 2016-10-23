@@ -199,21 +199,22 @@ Allow changing foreground colors           DONE
 Harp string color                          DONE
 Separate border from lion rampant          DONE
 Separate border from quarterly lions rampant DONE
+Confirm before closing (several apps require this) DONE
+Allow reversing elements (when possible)   DONE
+Should fill screen                         DONE
+Add more elements                          DONE
 Show 'meaning' on display
-Should fill screen
 Add auto-generated blazon
-Add more elements
 Allow more complicated divisions?
 Blazon search: http://oanda.sca.org/
 Add border (with auto-resize to fit)
 Fix green and blue
-Confirm before closing (several apps require this)
 Castle foreground color
 Ship foreground color
 Rearrange element buttons (alphabetically?)
 Add attribution (sodacan on wikipedia)
 Change stroke width when transforming elements?
-Allow reversing elements (when possible)
+Fix border color
 
 New feature ideas:
 Word search (maybe printable version in email?)

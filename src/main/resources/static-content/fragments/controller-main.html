@@ -68,7 +68,8 @@ POSSIBILITY OF SUCH DAMAGE.
                     name: "arms",
                     label: "Arms",
                     image: "arms.jpeg",
-                    nav: "arms"
+                    nav: "arms",
+                    confirmBack: true
                 }
             ]
         },
@@ -164,7 +165,8 @@ POSSIBILITY OF SUCH DAMAGE.
                     name: "arms",
                     label: "Arms",
                     image: "arms.jpeg",
-                    nav: "arms"
+                    nav: "arms",
+                    confirmBack: true
                 }
             ]
         },
@@ -245,6 +247,8 @@ POSSIBILITY OF SUCH DAMAGE.
                 } else if (buttonInfo.child) {
                     navigate("controller-main?group="+child);
                 }
+                
+                settings.page.confirmBack = buttonInfo.confirmBack ? true : false;
                 
                 e.preventDefault();
             });

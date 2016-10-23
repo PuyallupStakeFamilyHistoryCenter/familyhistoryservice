@@ -95,8 +95,12 @@ POSSIBILITY OF SUCH DAMAGE.
         <dt>Castle</dt><dd>Safety; protection</dd>
         <dt>Checkered</dt><dd>Constancy</dd>
         <dt>Cross</dt><dd>Faith; Christianity; Service in the Crusades</dd>
+        <dt>Crown</dt><dd>Royal or seigniorial authority</dd>
+        <dt>Dolphin</dt><dd>Swiftness, diligence, salvation, charity, and love</dd>
         <dt>Fleur-de-lis</dt><dd>Purity; light; floral badge of France; represents sixth son as mark of difference</dd>
+        <dt>Griffin</dt><dd>Valour and death-defying bravery; vigilance</dd>
         <dt>Harp</dt><dd>Well-composed person of tempered judgment; contemplation</dd>
+        <dt>Horn</dt><dd>One who is fond of the chase, of high pursuits</dd>
         <dt>Lion</dt><dd>Bravery, strength, ferocity, and valor</dd>
         <dt>Ship</dt><dd>Ancient sea voyages</dd>
         <dt>Wheat</dt><dd>The harvest of one's hopes has been secured</dd>
@@ -489,6 +493,30 @@ POSSIBILITY OF SUCH DAMAGE.
                 value: "media/arms/fragments/crancelin-lower-left-template.svg|lowerLeftToLowerRightMirror",
             },
         },
+        horn: {
+            name: "Horn",
+            blazon: "FIXME ${heraldicForeColor}",
+            full: {
+                key: "fullFore|fullForeTransform",
+                value: "media/arms/fragments/horn-template.svg|",
+            },
+            upperLeft: {
+                key: "upperLeftFore|upperLeftForeTransform",
+                value: "media/arms/fragments/horn-template.svg|fullToUpperLeft",
+            },
+            upperRight: {
+                key: "upperRightFore|upperRightForeTransform",
+                value: "media/arms/fragments/horn-template.svg|fullToUpperRight",
+            },
+            lowerLeft: {
+                key: "lowerLeftFore|lowerLeftForeTransform",
+                value: "media/arms/fragments/horn-template.svg|fullToLowerLeft",
+            },
+            lowerRight: {
+                key: "lowerRightFore|lowerRightForeTransform",
+                value: "media/arms/fragments/horn-template.svg|fullToLowerRight",
+            },
+        },
 //        doubleTressure: {
 //            name: "Double tressure",
 //            blazon: "FIX ME! ${heraldicForeColor}",
@@ -517,10 +545,10 @@ POSSIBILITY OF SUCH DAMAGE.
         },
         blue: {
             "heraldic-name": "azure",
-            "main-dark": "#1265b1",
-            "main-middle": "#377bc8",
-            "main-light": "#61b3fd",
-            "main-outline": "#2c5aa0"
+            "main-dark": "#1248b3",
+            "main-middle": "#134fc3",
+            "main-light": "#376acb",
+            "main-outline": "#0c2c6d"
         },
         red: {
             "heraldic-name": "gules",
@@ -612,8 +640,8 @@ POSSIBILITY OF SUCH DAMAGE.
         upperLeftReversed: "transform='translate(205) scale(-1 1)'",
         fullToUpperLeft: "transform='scale(.5)'",
         fullToUpperRight: "transform='scale(.5) translate(409)'",
-        fullToLowerLeft: "transform='scale(.5) translate(0 378)'",
-        fullToLowerRight: "transform='scale(.5) translate(409 378)'",
+        fullToLowerLeft: "transform='scale(.5) translate(20 398)'",
+        fullToLowerRight: "transform='scale(.5) translate(389 398)'",
         fullToLowerRightDolphin: "transform='scale(.5) translate(370 478)'",
         upperLeftToFull: "transform='scale(2)'",
         upperRightToFull: "transform='translate(-409) scale(2)'",

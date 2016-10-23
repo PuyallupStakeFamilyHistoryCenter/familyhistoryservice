@@ -58,6 +58,26 @@ POSSIBILITY OF SUCH DAMAGE.
     <hr>
 </div>
 
+
+<div class="modal fade" id="confirmBackModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">Are you sure?</h4>
+      </div>
+      <div class="modal-body">
+        Do you want to discard your progress on this page? You can take a screenshot before you leave.
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+        <button id="screenshotAndBackButton" type="button" class="btn btn-primary">Take screenshot first</button>
+        <button id="confirmBackButton" type="button" class="btn btn-warning">Continue</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>;
     
     $("#logout-link").click(function() {
@@ -97,15 +117,39 @@ POSSIBILITY OF SUCH DAMAGE.
     }
     
     $("#back-btn").click(function(e) {
-        popHistory();
-        navigate(navHistory[navHistory.length - 1]);
+        if (settings.page.confirmBack) {
+            $("#confirmBackModal").modal();
+        } else {
+            navigateBack();
+        }
+    });
+    
+    $("#confirmBackButton").click(function(e) {
+        $("#confirmBackModal").modal("hide");
+        navigateBack();
+    });
+    
+    $("#screenshotAndBackButton").click(function(e) {
+        $("#confirmBackModal").modal("hide");
+        takeScreenshot();
+        navigateBack();
     });
     
     $("#screenshot").click(function() {
         $("#bs-example-navbar-collapse-1").removeClass("in");
+        takeScreenshot();
+    });
+    
+    function navigateBack() {
+        popHistory();
+        navigate(navHistory[navHistory.length - 1]);
+    }
+    
+    function takeScreenshot() {
         sendToDisplay(JSON.stringify({
             responseType:"screenshot",
             userId: settings.userId
         }))
-    });
+    }
+    
 </script>  
