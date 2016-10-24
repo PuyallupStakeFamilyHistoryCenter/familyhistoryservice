@@ -596,6 +596,18 @@ public class FamilyHistoryCenterSocket {
                     
                     break;
                 }
+                
+                case "temp-account": {
+                    String name = URLDecoder.decode(scanner.next(), StandardCharsets.UTF_8.name());
+                    String email = scanner.next();
+                    String salt = newSalt();
+                    String pin = hashPin(scanner.next(), salt);
+                    
+                    userContextMap.put(email, new UserContext(email, name, email, pin, null, null));
+                    
+                    resendUserList();
+                    break;
+                }
 
                 case "access-token": {
                     userId = scanner.next();

@@ -264,6 +264,9 @@ var defaultSettings = {
         }, 
         gotAccessToken: function(userId, userName, pin, accessToken) {
             ws.socketSend("access-token " + userId + " " + encodeURI(userName) + " " + pin + " " + accessToken);
+        },
+        setupTemporaryAccount: function(name, email, pin) {
+            ws.socketSend("temp-account " + encodeURIComponent(name) + " " + email + " " + pin);
         }
     },
     "change-display-name": {

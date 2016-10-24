@@ -38,8 +38,35 @@ POSSIBILITY OF SUCH DAMAGE.
 
         <p>
             <button class='btn btn-lg btn-primary' id='show-login-screen'>Log in to FamilySearch.org</button>
+            <button class='btn btn-lg btn-warning' id='create-temp-account'>Create temporary account</button>
 
         </p>
+    </div>
+    
+    <div id="no-fs-account-continue">
+        <p>
+            Create a temporary account for your visit.
+        </p>
+        <form id="create-account-form">
+            <div class="input-group input-group-lg">
+                <span class="input-group-addon"><span class="glyphicon glyphicon-user"></span></span>
+                <input type="text" id="name" class="form-control" placeholder="Name" />
+            </div>
+            <div class="input-group input-group-lg">
+                <span class="input-group-addon"><span class="glyphicon glyphicon-envelope"></span></span>
+                <input type="email" id="email" class="form-control" placeholder="Email" />
+            </div>
+            <div class="input-group input-group-lg">
+                <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
+                <input type="password" id="user-account-pin-input" pattern="[0-9]*" class="form-control" placeholder="PIN" maxlength="6" />
+            </div>
+            <div class="input-group input-group-lg">
+                <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
+                <input type="password" id="user-account-pin-confirm" pattern="[0-9]*" class="form-control" placeholder="Confirm PIN" maxlength="6" />
+            </div>
+            <br>
+            <button type="submit" class='btn btn-lg btn-primary' id='create-account' >Create temporary account</button>
+        </form>
     </div>
 
     <div id="login-wait">
@@ -144,9 +171,6 @@ POSSIBILITY OF SUCH DAMAGE.
                 var user = result.getUser();
                 var displayName = user.displayName;
                 var userId = user.personId;
-//                var displayName = "Willow Ufgood"; //["Willow Ufgood", "Luke Skywalker", "Indiana Jones"][//Choose random element];
-//                var userId = "AEF-2344";        //TODO
-//                var accessToken = "fake-access-token-replace-with-actual";
 
                 $("#user-name").html(displayName);
 
@@ -195,6 +219,47 @@ POSSIBILITY OF SUCH DAMAGE.
             logger.error("Failed to log in to FamilySearch: " + message);
         });
     });
+    
+    $("#create-temp-account").click(function(e) {
+        $("#login-start").hide();
+        $("#no-fs-account-continue").show();
+    });
+    
+    $("#create-account-form").submit(function() {
+        event.preventDefault();
+
+        var pin = $("#user-account-pin-input").val();
+        var pinConfirm = $("#user-account-pin-confirm").val();
+        var name = $("#name").val();
+        var email = $("#email").val();
+
+        if (pin !== pinConfirm) {
+            //TODO: Replace this with actual validation
+            logger.error("PINs don't match");
+            clearTimeout();
+            timeout = setTimeout(function () {
+                reset("Timeout creating PIN. Please log in again.");
+            }, 300000);
+            return;
+        }
+
+        if (!validatePin(pin)) {
+            logger.error("Pin is too simple: the pin may not be all the same digit, or an ascending or descending run (e.g. '1234', '9876'");
+            clearTimeout();
+            timeout = setTimeout(function () {
+                reset("Timeout creating PIN. Please log in again.");
+            }, 300000);
+            return;
+        }
+        
+        settings.page.setupTemporaryAccount(name, email, pin);
+        
+        $("#no-fs-account-continue").hide();
+        $("#login-success").show();
+        setTimeout(function () {
+            reset(null, 5000);
+        }, 10000);
+    })
 
     function reset(message) {
         logger.clear();
@@ -205,6 +270,7 @@ POSSIBILITY OF SUCH DAMAGE.
         }
     }
     
+    $("#no-fs-account-continue").hide();
     $("#login-start").hide();
     $("#login-wait").hide();
     $("#login-continue").hide();
