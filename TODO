@@ -203,12 +203,13 @@ Confirm before closing (several apps require this) DONE
 Allow reversing elements (when possible)   DONE
 Should fill screen                         DONE
 Add more elements                          DONE
+Fix green                                  DONE
 Show 'meaning' on display
 Add auto-generated blazon
 Allow more complicated divisions?
 Blazon search: http://oanda.sca.org/
 Add border (with auto-resize to fit)
-Fix green and blue
+Fix blue
 Castle foreground color
 Ship foreground color
 Rearrange element buttons (alphabetically?)
