@@ -80,6 +80,11 @@ public class SaveImageHandler extends AbstractHandler {
         
         Part part = hsr.getPart("image");
         File file = new File(saveImageDir, "saved-image-" + imageId + ".png");
+        if (part == null) {
+            part = hsr.getPart("svg");
+            file = new File(saveImageDir, "saved-image-" + imageId + ".svg");
+        }
+        
         file.deleteOnExit();
         
         try (InputStream in = part.getInputStream();

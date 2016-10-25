@@ -418,8 +418,30 @@ function saveCanvas(canvas, userId, imageId) {
     });
 }
 
+function saveSvg(svg, userId, imageId) {
+    var formData = new FormData();
+
+    formData.append("svg", svg.outerHTML);
+
+    $.ajax({
+        url: '/image-save/?user-id='+userId+'&image-id='+imageId,
+        data: formData,
+        processData: false,
+        contentType: false,
+        type: 'POST',
+        success: function(data){
+            if (logger) {
+                logger.info("Successfully saved image");
+            }
+        }
+    });
+}
+
 function takeScreenshot(userId) {
     var element = document.getElementById("canvas");
+    if (!element) {
+        element = document.getElementById("root");
+    }
     if (!element) {
         element = document.getElementById("content");
     }
@@ -429,12 +451,16 @@ function takeScreenshot(userId) {
     if (!element) {
         console.error("Failed to take screenshot of page " + window.location.href);
     }
-    html2canvas(element, {
-        onrendered: function(canvas) {
-            saveCanvas(canvas, userId, rand(0, 1000000000));
-        },
-        background: "white"
-    });
+    if (element.tagName === 'svg') {
+        saveSvg(element, userId, rand(0, 1000000000));
+    } else {
+        html2canvas(element, {
+            onrendered: function(canvas) {
+                saveCanvas(canvas, userId, rand(0, 1000000000));
+            },
+            background: "white"
+        });
+    }
 }
     
 function cloneObject(obj) {
