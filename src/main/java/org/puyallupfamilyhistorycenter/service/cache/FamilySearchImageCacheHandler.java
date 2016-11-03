@@ -115,7 +115,7 @@ public class FamilySearchImageCacheHandler extends AbstractHandler {
             }
         }
         
-        if (!cachedFile.exists()) {
+        if (!cachedFile.exists() || ! metadataFile.exists()) {
             response.sendError(500, "Failed to retrieve cached file for resource " + ref);
             return;
         }
