@@ -982,7 +982,7 @@ public class FamilyHistoryCenterSocket {
 
     private static void sendFinalEmail(String userId) {
         UserContext context = userContextMap.get(userId);
-        if (context != null && ApplicationProperties.enableEmail()) {
+        if (context != null && context.userEmail != null && ApplicationProperties.enableEmail()) {
             EmailUtils.sendFinalEmail(context.userName, context.userEmail, imageRegistry.getImages(context.userId));
         }
     }

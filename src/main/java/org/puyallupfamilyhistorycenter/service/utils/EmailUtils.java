@@ -38,6 +38,7 @@ import com.amazonaws.services.simpleemail.model.Message;
 import com.amazonaws.services.simpleemail.model.RawMessage;
 import com.amazonaws.services.simpleemail.model.SendEmailRequest;
 import com.amazonaws.services.simpleemail.model.SendRawEmailRequest;
+import com.google.common.base.Verify;
 import java.io.ByteArrayOutputStream;
 import java.nio.ByteBuffer;
 import java.time.LocalDate;
@@ -112,6 +113,8 @@ public class EmailUtils {
     
     protected static void sendEmailWithAttachments(String recipientName, String recipientEmail, String[] ccList, String subjectString, String bodyString, Collection<String> attachments) {
         try {
+            Verify.verifyNotNull(recipientEmail, "Null email address");
+            
             Session session = Session.getDefaultInstance(new Properties());
             MimeMessage message = new MimeMessage(session);
             message.setSubject(subjectString, "UTF-8");
