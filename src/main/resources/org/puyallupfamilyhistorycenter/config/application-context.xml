@@ -43,6 +43,23 @@ POSSIBILITY OF SUCH DAMAGE.
     <bean id="app-key-config" class="org.puyallupfamilyhistorycenter.service.websocket.AppKeyConfig" />
     
     <bean id="family-search-person-source" class="org.puyallupfamilyhistorycenter.service.cache.FamilySearchPersonSource" />
+
+    <bean id="not-found-exception-class" class="java.lang.Class" factory-method="forName" >
+        <constructor-arg value="org.puyallupfamilyhistorycenter.service.cache.NotFoundException" />
+    </bean>
+    <util:set id="retryable-exceptions">
+        <ref bean="not-found-exception-class" />
+    </util:set>
+    <bean id="exponential-retry-strategy" class="org.puyallupfamilyhistorycenter.service.cache.retry.RetryStrategies" factory-method="exponential" >
+        <constructor-arg value="3" />
+        <constructor-arg value="3" />
+        <constructor-arg value="2.0" />
+        <constructor-arg ref="retryable-exceptions" />
+    </bean>
+    <bean id="retrying-person-source" class="org.puyallupfamilyhistorycenter.service.cache.retry.RetryingSource">
+        <constructor-arg ref="family-search-person-source" />
+        <constructor-arg ref="exponential-retry-strategy" />
+    </bean>
     <bean id="person-class" class="java.lang.Class" factory-method="forName">
         <constructor-arg value="org.puyallupfamilyhistorycenter.service.models.Person" />
     </bean>
@@ -53,7 +70,7 @@ POSSIBILITY OF SUCH DAMAGE.
         <constructor-arg value="${person-cache-ttl}" />
     </bean>
     <bean id="file-source" class="org.puyallupfamilyhistorycenter.service.cache.CachingSource">
-        <constructor-arg ref="family-search-person-source" />
+        <constructor-arg ref="retrying-person-source" />
         <constructor-arg ref="file-cache" />
         <property name="decider" ref="allow-all-decider" />
     </bean>

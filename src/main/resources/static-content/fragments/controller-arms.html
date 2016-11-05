@@ -547,42 +547,42 @@ POSSIBILITY OF SUCH DAMAGE.
     
     var foregroundColorSets = {
         black: {
-            "heraldic-name": "sable",
+            "blazon": "Sable",
             "main-dark": "#222222",
             "main-middle": "#444444",
             "main-light": "#666666",
             "main-outline": "#000000"
         },
         blue: {
-            "heraldic-name": "azure",
+            "blazon": "Azure",
             "main-dark": "#1248b3",
             "main-middle": "#134fc3",
             "main-light": "#376acb",
             "main-outline": "#0c2c6d"
         },
         red: {
-            "heraldic-name": "gules",
+            "blazon": "Gules",
             "main-dark": "#cd0707",
             "main-middle": "#e94545",
             "main-light": "#ee6c6c",
             "main-outline": "#800000"
         },
         green: {
-            "heraldic-name": "vert",
+            "blazon": "Vert",
             "main-dark": "#548630",
             "main-middle": "#5e9436",
             "main-light": "#69a141",
             "main-outline": "#4e7b2f"
         },
         yellow: {
-            "heraldic-name": "or",
+            "blazon": "Or",
             "main-dark": "#d1b948",
             "main-middle": "#fee46e",
             "main-light": "#f8eca8",
             "main-outline": "#806600"
         },
         white: {
-            "heraldic-name": "argent",
+            "blazon": "Argent",
             "main-dark": "#bbbbbb",
             "main-middle": "#dddddd",
             "main-light": "#ffffff",
@@ -592,26 +592,32 @@ POSSIBILITY OF SUCH DAMAGE.
     
     var highlightColorSets = {
         black: {
+            "blazon": "Sable",
             "highlight-middle": "#444444",
             "highlight-outline": "#000000"
         },
         blue: {
+            "blazon": "Azure",
             "highlight-middle": "#377bc8",
             "highlight-outline": "#2c5aa0"
         },
         red: {
+            "blazon": "Gules",
             "highlight-middle": "#e94545",
             "highlight-outline": "#800000"
         },
         green: {
+            "blazon": "Vert",
             "highlight-middle": "#5e9436",
             "highlight-outline": "#4e7b2f"
         },
         yellow: {
+            "blazon": "Or",
             "highlight-middle": "#fee46e",
             "highlight-outline": "#806600"
         },
         white: {
+            "blazon": "Argent",
             "highlight-middle": "#ffffff",
             "highlight-outline": "#999999"
         }
@@ -619,27 +625,27 @@ POSSIBILITY OF SUCH DAMAGE.
     
     var backgroundColorSets = {
         black: {
-            "heraldic-name": "sable",
+            "blazon": "Sable",
             "background": "#111111",
         },
         blue: {
-            "heraldic-name": "azure",
+            "blazon": "Azure",
             "background": "#377bc8",
         },
         red: {
-            "heraldic-name": "gules",
+            "blazon": "Gules",
             "background": "#cd0707",
         },
         green: {
-            "heraldic-name": "vert",
+            "blazon": "Vert",
             "background": "#69a141",
         },
         yellow: {
-            "heraldic-name": "or",
+            "blazon": "Or",
             "background": "#fee46e",
         },
         white: {
-            "heraldic-name": "argent",
+            "blazon": "Argent",
             "background": "#ffffff",
         }
     }
@@ -718,17 +724,17 @@ POSSIBILITY OF SUCH DAMAGE.
                 delete settings.config["lowerRightFore"];
                 delete settings.config["lowerRightBack"];
                 settings.config.outline = "/media/arms/fragments/outline-full.svg";
+                settings.config.baseBlazonTemplate = "${heraldicBackColor} ${foreBlazon}"
             } else {
                 delete settings.config["fullFore"];
                 delete settings.config["fullBack"];
                 settings.config.outline = "/media/arms/fragments/outline-quartered.svg";
+                settings.config.baseBlazonTemplate = "Quarterly, 1st ${heraldicUpperLeftBackColor} ${upperLeftForeBlazon}, 2nd ${heraldicUpperRightBackColor} ${upperRightForeBlazon}, 3rd ${heraldicLowerRightBackColor} ${lowerRightForeBlazon}, 4th ${heraldicLowerLeftBackColor} ${lowerLeftForeBlazon}";
             }
             settings.config[key] = value;
         }
         sendToDisplay(JSON.stringify(settings.config));
     })
-    
-    
 
     $("#full-tab").click(function() {
         $("#full-div").show();
@@ -808,11 +814,12 @@ POSSIBILITY OF SUCH DAMAGE.
             var hyphenatedPosition = styleHyphenFormat(position);
             $.each(colorSet, function(value) {
                 var key = position + clazz.substring(0,1).toUpperCase() + clazz.substring(1);
+//                var blazon = 
                 var label = value.substring(0,1).toUpperCase() + value.substring(1);
                 var keyWithPrefix = injectPositionStrings((keyPrefix ? keyPrefix : "") + key, position, hyphenatedPosition);
                 var valueWithPrefix = injectPositionStrings((valuePrefix ? valuePrefix : "" ) + value, position, hyphenatedPosition);
                 t.append("<button class='element-btn btn btn-default' data-value='"
-                        + valueWithPrefix+"' data-key='"+keyWithPrefix+"'>"+label+"</button>");
+                        + valueWithPrefix+"' data-key='"+keyWithPrefix+"' data-blazon='"+"'>"+label+"</button>");
            })
         })
     }
@@ -833,5 +840,16 @@ POSSIBILITY OF SUCH DAMAGE.
         setupColorButtons("foreColor", foregroundColorSets);
         setupColorButtons("highlightColor", highlightColorSets);
         setupColorButtons("backColor", backgroundColorSets, "${position}Back|", "media/arms/fragments/back-${hyphenatedPosition}-template.svg|");
+    }
+    
+    function buildBlazon() {
+        var blazon;
+        if (settings.config["fullBack"]) {
+            blazon = "${heraldicBackColor} ${foreBlazon}";
+        } else {
+            blazon = "Quarterly, 1st ${heraldicUpperLeftBackColor} ${upperLeftForeBlazon}, 2nd ${heraldicUpperRightBackColor} ${upperRightForeBlazon}, 3rd ${heraldicLowerRightBackColor} ${lowerRightForeBlazon}, 4th ${heraldicLowerLeftBackColor} ${lowerLeftForeBlazon}";
+        }
+        
+        
     }
 </script>

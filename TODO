@@ -223,3 +223,7 @@ Word search (maybe printable version in email?)
 Todo feature (for data quality issues?)
 Create image collage
 Last name meanings (oxford)
+
+Tech Debt:
+Split server and client code into separate java/javascript packages
+Get tests running again
