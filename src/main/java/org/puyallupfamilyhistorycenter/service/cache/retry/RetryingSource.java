@@ -75,7 +75,7 @@ public class RetryingSource<T> implements Source<T> {
                 return f.apply(in);
             } catch (Exception t) {
                 exception = t;
-                msToWait = strategy.getMillisToWait(t, currentTry);
+                msToWait = strategy.getMillisToWait(t, currentTry++);
             }
             if (msToWait != null) {
                 logger.warn("Failed to execute operation on input " + in, exception);

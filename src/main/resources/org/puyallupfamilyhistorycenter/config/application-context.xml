@@ -52,7 +52,7 @@ POSSIBILITY OF SUCH DAMAGE.
     </util:set>
     <bean id="exponential-retry-strategy" class="org.puyallupfamilyhistorycenter.service.cache.retry.RetryStrategies" factory-method="exponential" >
         <constructor-arg value="3" />
-        <constructor-arg value="3" />
+        <constructor-arg value="1000" />
         <constructor-arg value="2.0" />
         <constructor-arg ref="retryable-exceptions" />
     </bean>

@@ -189,10 +189,10 @@ Doesn't work on stats map view             DONE
 Family tree is truncated sometimes         DONE
 Remove dedicated 'Save' button in the coloring app DONE
 Disable screenshot in apps where it doesn't work DONE
+SVG elements should be preserved           DONE
+Guest account: we need to collect email address DONE
 Stats graph view shows two headings and two x-axis labels
 Doesn't work on maps
-SVG elements should be preserved           DONE
-Guest account: we need to collect email address
 
 Coat of arms:
 Allow changing foreground colors           DONE
@@ -227,3 +227,7 @@ Last name meanings (oxford)
 Tech Debt:
 Split server and client code into separate java/javascript packages
 Get tests running again
+
+Add hard restart button to server
+Investigate partial family tree showing up
+Add reload button to tree
