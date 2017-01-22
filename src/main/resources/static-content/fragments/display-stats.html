@@ -25,7 +25,14 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 -->
 
-
+<div id='loading-div' >
+    <div id="cache" style="width:.1px; height:.1px; overflow: hidden"></div>
+    <div class="progress">
+        <div class="progress-bar progress-bar-default progress-bar-striped active cached-prg" style="width: 100%">
+            Loading...
+        </div>
+    </div>
+</div>
 <div id="stats-content" style="min-height: 500px"></div>
 
 <script>
@@ -35,6 +42,7 @@ POSSIBILITY OF SUCH DAMAGE.
         verbs: {
             stats: function(obj) {
                 stats = obj.stats;
+                $("#loading-div").hide();
                 $("#stats-content").html("<h3>Choose a statistic</h3><p>We've gathered statistics from the " + obj.stats.count + " currently available ancestors. If you refresh the page later, you might see more data")
             },
             lifespan: function() {
