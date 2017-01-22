@@ -41,6 +41,10 @@ Add path from ancestor to root
 ?Allow choosing depth for ancestors/descendants
 ?Horizontal scrolling on ipad
 
+Person menu:
+Map sometimes only loads after leaving map app
+Show something when loading person menu
+
 Color:
 Fix canvas ratio             DONE
 Set up email function        DONE
@@ -72,6 +76,7 @@ Set max-height on image
 *Ensure all of data fits on the screen
 
 Statistics:
+Add loading widget                                DONE
 
 Quiz:
 *Add more questions                               DONE
@@ -217,6 +222,7 @@ Add attribution (sodacan on wikipedia)
 Change stroke width when transforming elements?
 Fix border color
 Use radio buttons in controller
+Add griffins combatant
 
 New feature ideas:
 Word search (maybe printable version in email?)

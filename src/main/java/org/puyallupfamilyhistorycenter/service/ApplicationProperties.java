@@ -55,6 +55,8 @@ public class ApplicationProperties {
     private static final String VIDEO_S3_KEY_PREFIX = "videoS3KeyPrefix";
     private static final String INTEREST_PREFIX = "interest_";
     private static final String WARD_CONTACT_PREFIX = "wardContact_";
+    private static final String RESTART_SCRIPT = "restart_script";
+    private static final String PATH = "path";
 
     private static final Properties props;
     static {
@@ -139,5 +141,13 @@ public class ApplicationProperties {
             interests.add(getInterest(id));
         }
         return interests;
+    }
+    
+    public static String getRestartScript() {
+        return props.getProperty(RESTART_SCRIPT);
+    }
+    
+    public static String getPath() {
+        return props.getProperty(PATH);
     }
 }

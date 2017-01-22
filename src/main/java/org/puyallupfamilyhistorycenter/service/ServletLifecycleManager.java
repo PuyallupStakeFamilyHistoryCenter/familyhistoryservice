@@ -33,8 +33,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.apache.commons.io.IOUtils;
+import org.apache.log4j.Logger;
 import org.eclipse.jetty.server.Server;
 import static org.puyallupfamilyhistorycenter.service.SpringContextInitializer.resetContext;
 
@@ -45,6 +45,8 @@ import static org.puyallupfamilyhistorycenter.service.SpringContextInitializer.r
  * @author tibbitts
  */
 public class ServletLifecycleManager {
+    private static final Logger logger = Logger.getLogger(ServletLifecycleManager.class);
+    
     private static Server server;
     
     private static final AtomicReference<LifecycleAction> action = new AtomicReference<>();
@@ -116,11 +118,28 @@ public class ServletLifecycleManager {
     }
     
     private static void doRestart() {
-        File launchServerScript = new File("run-server.sh");
+        String restartScriptPath = ApplicationProperties.getRestartScript().replace("~", System.getProperty("user.home"));
+        File launchServerScript = new File(restartScriptPath);
         if (launchServerScript.exists()) {
             try {
+                String path = System.getenv("PATH") + ":" + ApplicationProperties.getPath();
                 //This is pretty hacky, but it should be safe for now
-                Runtime.getRuntime().exec(new String[] {"/bin/sh", "-c", launchServerScript.getCanonicalPath()});
+                Process proc = Runtime.getRuntime().exec(
+                        new String[] {"/bin/sh", "-c", launchServerScript.getCanonicalPath()}, 
+                        new String[] {"PATH=" + path}, 
+                        launchServerScript.getParentFile()
+                );
+                
+                String output = IOUtils.toString(proc.getInputStream());
+                String error = IOUtils.toString(proc.getErrorStream());
+                
+                int exitValue = proc.exitValue();
+                
+                logger.info(output);
+                if (!error.isEmpty()) {
+                    logger.error(error);
+                }
+                
                 System.exit(0);
             } catch (IOException ex) {
                 throw new IllegalStateException("Failed to run restart script '" + launchServerScript + "'", ex);
