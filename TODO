@@ -83,6 +83,7 @@ Quiz:
 *Image questions no longer appear (image URL contains '.', which is reserved) DONE
 Allow conditionals (e.g. "gender=Female?her:his") DONE
 Conditionalize relationship questions             DONE
+*Don't read html markup in image mode             DONE
 Difficulty levels
     Configurable # answers
     Give questions difficulty grades

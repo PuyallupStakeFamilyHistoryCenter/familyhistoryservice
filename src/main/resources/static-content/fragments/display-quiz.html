@@ -42,7 +42,8 @@ POSSIBILITY OF SUCH DAMAGE.
             question: function(obj) {
                 questionAndAnswers = obj;
                 
-                $("#question").html(obj.question);
+                var fullQuestion = obj.question + (obj.questionAnnex ? obj.questionAnnex : "");
+                $("#question").html(fullQuestion);
                 $("#answers").html("");
                 
                 questionText = obj.question + ',,, ';
