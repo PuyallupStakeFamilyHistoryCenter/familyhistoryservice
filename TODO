@@ -84,6 +84,8 @@ Quiz:
 Allow conditionals (e.g. "gender=Female?her:his") DONE
 Conditionalize relationship questions             DONE
 *Don't read html markup in image mode             DONE
+Stat questions allow both 0 and 0.0 as answers    DONE
+Round stat answers to nearest whole number        DONE
 Difficulty levels
     Configurable # answers
     Give questions difficulty grades
@@ -98,8 +100,6 @@ Rethink layout
 Allow reporting problems with question/answers
 Figure out why some answers are 'undefined'
 Add competitive mode (with multiple controllers?)
-Stat questions allow both 0 and 0.0 as answers
-Round stat answers to nearest whole number
 
 Sliding tiles:
 
