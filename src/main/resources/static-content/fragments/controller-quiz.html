@@ -60,27 +60,6 @@ POSSIBILITY OF SUCH DAMAGE.
             <dt>Types</dt>
             <dd>
                 <div id="types-div" class="btn-group btn-group-lg" data-toggle="buttons">
-                    <label class="btn btn-default active">
-                        <input type="checkbox" name="type" value="image" checked>Image
-                    </label>
-                    <label class="btn btn-default">
-                        <input type="checkbox" name="type" value="name">Name
-                    </label>
-                    <label class="btn btn-default">
-                        <input type="checkbox" name="type" value="relationship">Relationship
-                    </label>
-                    <label class="btn btn-default">
-                        <input type="checkbox" name="type" value="birthplace">Birth place
-                    </label>
-                    <label class="btn btn-default">
-                        <input type="checkbox" name="type" value="birthdate">Birth date
-                    </label>
-                    <label class="btn btn-default disabled">
-                        <input type="checkbox" name="type" value="spouseimage" disabled>Spouse image
-                    </label>
-                    <label class="btn btn-default">
-                        <input type="checkbox" name="type" value="spouse">Spouse name
-                    </label>
                 </div>
             </dd>
             </dl>
@@ -120,6 +99,30 @@ POSSIBILITY OF SUCH DAMAGE.
             console.info(results);
 	}
     });
+    
+    var answerSortFunctions = {
+        default: function(a,b) {
+            return a.text < b.text ? -1 : 1;
+        },
+        trueOrFalse: function(a,b) {
+            if (a.text.toLowerCase() === "true") {
+                return -1;
+            } else {
+                return 1;
+            }
+        },
+        numeric: function(a,b) {
+            var aV, bV;
+            if (a.text.charAt(0) === '$') {
+                aV = parseFloat(a.text.substr(1));
+                bV = parseFloat(b.text.substr(1));
+            } else {
+                aV = parseFloat(a.text);
+                bV = parseFloat(b.text);
+            }
+            return aV < bV ? -1 : 1;
+        }
+    }
     
     var personQuestionTemplates = {
         birth1: {
@@ -310,6 +313,7 @@ POSSIBILITY OF SUCH DAMAGE.
                     text: 'False'
                 }
             ],
+            answerSort: answerSortFunctions.trueOrFalse
         },
         is_this_an_image_of_2:{
             prerequisites: [
@@ -331,6 +335,7 @@ POSSIBILITY OF SUCH DAMAGE.
                     text: 'True'
                 }
             ],
+            answerSort: answerSortFunctions.trueOrFalse
         },
         children1: {
             prerequisites: [
@@ -696,6 +701,7 @@ POSSIBILITY OF SUCH DAMAGE.
                     text: '${stat.*!=${stat.text}}',
                 },
             ],
+            answerSort: answerSortFunctions.numeric
         },
         
         //Question ideas
@@ -765,7 +771,8 @@ POSSIBILITY OF SUCH DAMAGE.
     var selectedQuestionSets = [
         "relationship",
         "statistic",
-        "how_are_they_related"
+        "how_are_they_related",
+        "image"
     ]
     
     $("#settings").ready(function() {
@@ -925,7 +932,11 @@ POSSIBILITY OF SUCH DAMAGE.
             }
         });
         
-        shuffle(questionAndAnswers.answers);
+        if (!template.answerSort) {
+            questionAndAnswers.answers.sort(answerSortFunctions.default);
+        } else {
+            questionAndAnswers.answers.sort(template.answerSort);
+        }
         
         return questionAndAnswers;
     }
