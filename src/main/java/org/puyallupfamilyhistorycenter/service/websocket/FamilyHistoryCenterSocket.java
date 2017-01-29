@@ -28,20 +28,17 @@ package org.puyallupfamilyhistorycenter.service.websocket;
 
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
-import org.puyallupfamilyhistorycenter.service.ServletLifecycleManager;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
-import org.puyallupfamilyhistorycenter.service.cache.PersonDao;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -54,7 +51,6 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -76,7 +72,6 @@ import org.apache.commons.io.filefilter.WildcardFileFilter;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.eclipse.jetty.websocket.api.RemoteEndpoint;
-
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.*;
 import org.familysearch.api.client.UserState;
@@ -85,14 +80,16 @@ import org.gedcomx.rs.client.PersonState;
 import org.joda.time.DateTime;
 import org.puyallupfamilyhistorycenter.service.ApplicationProperties;
 import org.puyallupfamilyhistorycenter.service.Contact;
+import org.puyallupfamilyhistorycenter.service.ServletLifecycleManager;
 import org.puyallupfamilyhistorycenter.service.SpringContextInitializer;
+import org.puyallupfamilyhistorycenter.service.cache.PersonDao;
 import org.puyallupfamilyhistorycenter.service.cache.Precacher;
 import org.puyallupfamilyhistorycenter.service.models.Checklist;
 import org.puyallupfamilyhistorycenter.service.models.ChecklistAction;
 import org.puyallupfamilyhistorycenter.service.models.ChecklistItem;
-import org.puyallupfamilyhistorycenter.service.models.Statistics;
 import org.puyallupfamilyhistorycenter.service.models.Person;
 import org.puyallupfamilyhistorycenter.service.models.PersonImage;
+import org.puyallupfamilyhistorycenter.service.models.Statistics;
 import org.puyallupfamilyhistorycenter.service.models.Video;
 import org.puyallupfamilyhistorycenter.service.utils.EmailUtils;
 import org.puyallupfamilyhistorycenter.service.utils.S3Utils;
@@ -419,6 +416,36 @@ public class FamilyHistoryCenterSocket {
                     userContextMap.get(userId).tokens.remove(token);
                     
                     token = null;
+                    break;
+                }
+                
+                case "change-display-name": {
+                    String currentDisplayName = scanner.next();
+                    String newDisplayName = scanner.next();
+                    
+                    RemoteEndpoint displayRemote = remoteDisplays.get(currentDisplayName);
+                    RemoteEndpoint controllerRemote = remoteControllers.get(currentDisplayName);
+                    
+                    String changeDisplayNameCommand = "{\"responseType\":\"changeDisplayName\",\"displayName\":\""+newDisplayName+"\"}";
+                    
+                    if (displayRemote != null) {
+                        sendToDisplay(currentDisplayName, changeDisplayNameCommand);
+                    }
+                    
+                    if (controllerRemote != null) {
+                        sendToController(currentDisplayName, changeDisplayNameCommand);
+                    }
+                    
+                    remoteDisplays.put(newDisplayName, displayRemote);
+                    remoteControllers.put(newDisplayName, controllerRemote);
+
+                    if (!isDisplayActive(newDisplayName)) {
+                        response = getErrorResponse("Failed to change display name");
+                    }
+                    
+                    remoteDisplays.remove(currentDisplayName);
+                    remoteControllers.remove(currentDisplayName);
+                    
                     break;
                 }
                 

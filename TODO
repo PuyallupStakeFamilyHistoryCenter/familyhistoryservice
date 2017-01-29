@@ -34,6 +34,7 @@ Spacing between tabs and controls
 
 Person chooser:
 Allow switching to spouse                DONE
+* Sometimes loading half tree
 Don't show 'focus' button if a person has no parents on record
 Spacing between tabs and controls
 Show loading spinner while waiting for server
@@ -212,6 +213,8 @@ Allow reversing elements (when possible)   DONE
 Should fill screen                         DONE
 Add more elements                          DONE
 Fix green                                  DONE
+*Save progress so it doesn't get lost
+?Auto-save the final version of the arms
 Show 'meaning' on display
 Add auto-generated blazon
 Allow more complicated divisions?

@@ -69,6 +69,10 @@ var settings = {
             },
             screenshot: function(obj) {
                 takeScreenshot(obj.userId);
+            },
+            changeDisplayName: function(obj) {
+                displayName = obj.displayName;
+                $.cookie("display-name", displayName);
             }
         }
     },
