@@ -40,7 +40,7 @@ POSSIBILITY OF SUCH DAMAGE.
 
 <div id="save-div" style="margin-bottom: 30px">
     <hr/>
-    <button id="save-btn" class="btn btn-primary" disabled>Save</button>
+    <button id="save-btn" class="btn btn-primary">Save</button>
 </div>
 
 <script>
@@ -55,10 +55,6 @@ POSSIBILITY OF SUCH DAMAGE.
         }
     });
     
-    $("#display-name").change(function() {
-        anyChange();
-    })
-    
     function validate() {
         var displayName = $("#display-name").val();
         if (displayName.length > 3) {
@@ -69,10 +65,4 @@ POSSIBILITY OF SUCH DAMAGE.
     function save() {
         ws.socketSend("change-display-name " + getParameterByName("displayId") + " " + $("#display-name").val());
     }
-    
-    function anyChange() {
-        $("#save-btn").removeProp("disabled");
-    }
-    
-    asdf();
 </script>
