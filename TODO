@@ -78,6 +78,7 @@ Set max-height on image
 
 Statistics:
 Add loading widget                                DONE
+Graphs should fill page
 
 Quiz:
 *Add more questions                               DONE
@@ -243,3 +244,6 @@ Get tests running again
 Add hard restart button to server
 Investigate partial family tree showing up
 Add reload button to tree
+
+Stats not working on kids ipad
+Coat-of-arms not working on kids ipad

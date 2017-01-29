@@ -48,7 +48,7 @@ public class CountryCanonicalization {
             "montana", "mt", "minnesota", "mn", "oregon", "or", "new mexico", "nm",
             "del", "illn", "colorado", "co", "us", "cn", "pocatello bannock idaho",
             "unted states", "wilkes county georgia", "new london county", "va or md",
-            "new hampshire", "british colonial america"
+            "new hampshire", "british colonial america", "il", "colonies"
         },
         "england", new String[] {
             "eng", "engl", "bristol"
