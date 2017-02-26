@@ -153,18 +153,18 @@ POSSIBILITY OF SUCH DAMAGE.
             
             $(".flipbook").turn("addPage", "<div class='cover'><div class='cover-florish'></div></div>")
             
-            var previousPage = 0;
-            $('.flipbook').bind('turn', function(e, page, view) {
-                if (previousPage < page) {
-                    if (sentences.length > page-2) {
-                        say(sentences[page-2]);
-                    }
-                    if (sentences.length > page-1) {
-                        say(sentences[page-1]);
-                    }
-                    previousPage = page;
-                }
-            });
+//            var previousPage = 0;
+//            $('.flipbook').bind('turn', function(e, page, view) {
+//                if (previousPage < page) {
+//                    if (sentences.length > page-2) {
+//                        say(sentences[page-2]);
+//                    }
+//                    if (sentences.length > page-1) {
+//                        say(sentences[page-1]);
+//                    }
+//                    previousPage = page;
+//                }
+//            });
         });
     }
 </script>
