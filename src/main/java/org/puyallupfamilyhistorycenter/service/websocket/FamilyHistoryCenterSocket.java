@@ -273,30 +273,30 @@ public class FamilyHistoryCenterSocket {
                 }
                     
                 case "restart-server": {
-                    Iterator<UserContext> it = userContextMap.values().iterator();
-                    while (it.hasNext()) {
-                        UserContext context = it.next();
-                        //TODO: Invalidate access tokens
-                        if (context.precacher != null) {
-                            context.precacher.cancel();
-                            it.remove();
-                        }
-                    }
-                    
-                    for (RemoteEndpoint endpoint : remoteDisplays.values()) {
-                        scheduleReload(endpoint, 10);
-                    }
-                    remoteDisplays.clear();
-                    
-                    for (RemoteEndpoint endpoint : remoteControllers.values()) {
-                        scheduleReload(endpoint, 15);
-                    }
-                    remoteControllers.clear();
-                    
-                    for (RemoteEndpoint endpoint : otherRemotes) {
-                        scheduleReload(endpoint, 15);
-                    }
-                    otherRemotes.clear();
+//                    Iterator<UserContext> it = userContextMap.values().iterator();
+//                    while (it.hasNext()) {
+//                        UserContext context = it.next();
+//                        //TODO: Invalidate access tokens
+//                        if (context.precacher != null) {
+//                            context.precacher.cancel();
+//                            it.remove();
+//                        }
+//                    }
+//                    
+//                    for (RemoteEndpoint endpoint : remoteDisplays.values()) {
+//                        scheduleReload(endpoint, 10);
+//                    }
+//                    remoteDisplays.clear();
+//                    
+//                    for (RemoteEndpoint endpoint : remoteControllers.values()) {
+//                        scheduleReload(endpoint, 15);
+//                    }
+//                    remoteControllers.clear();
+//                    
+//                    for (RemoteEndpoint endpoint : otherRemotes) {
+//                        scheduleReload(endpoint, 15);
+//                    }
+//                    otherRemotes.clear();
                     
                     ServletLifecycleManager.restart();
                     break;
