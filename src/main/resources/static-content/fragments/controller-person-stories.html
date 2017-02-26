@@ -35,6 +35,14 @@ POSSIBILITY OF SUCH DAMAGE.
 
 <div id="story-controls" style="display: none;">
     <hr />
+    
+    <div>
+        <div class="btn-group btn-group-lg" data-toggle="buttons">
+            <label class="btn btn-default active">
+                <input type="checkbox" name="mute" value="mute" checked>Mute
+            </label>
+        </div>
+    </div>
 
     <div>
         <button id="previous-page-btn" class="btn btn-lg btn-primary">Previous page</button>
@@ -74,6 +82,13 @@ POSSIBILITY OF SUCH DAMAGE.
                         images:person.images
                     }));
             $('#story-controls').show();
+        });
+        
+        $("[name=mute]").change(function() {
+            sendToDisplay(JSON.stringify({
+                responseType: "mute",
+                value: $(this).prop("checked")
+            }));
         });
         
         $("#previous-page-btn").click(function() {

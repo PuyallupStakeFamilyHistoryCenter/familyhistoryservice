@@ -173,7 +173,7 @@ Add counts of adults and children who attended DONE
 Verify user is logged in before sending survey
 
 Story:
-Add option to read story aloud
+Add option to read story aloud             DONE
 Refine sentence-end logic
 Getting 'Synchronous XMLHttpRequest' warning
 
