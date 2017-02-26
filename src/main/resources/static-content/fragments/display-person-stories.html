@@ -111,6 +111,8 @@ POSSIBILITY OF SUCH DAMAGE.
     }
     
     function loadStory(storyHero, storyUrl, images) {
+        console.info("Starting story");
+        
         $.get(storyUrl, function(data) {
             $("#flipbook-holder").html("<div class='flipbook'><div class='cover'><div class='cover-florish'><div class='story-title'>A story about</div><div class='story-title-lg'>"+storyHero+"</div><div></div></div>");
             $('.flipbook').turn({
@@ -126,7 +128,7 @@ POSSIBILITY OF SUCH DAMAGE.
                 height: $(window).height() - $("#page-header").height() - 10
             });
             
-            var sentences = data.split(/[\.?!][ \n]/);
+            var sentences = data.split(/[\.?!][ \n]+|\n+/);
             
             var imgIndex = 0;
             images = shuffle(images);
@@ -150,6 +152,19 @@ POSSIBILITY OF SUCH DAMAGE.
             }
             
             $(".flipbook").turn("addPage", "<div class='cover'><div class='cover-florish'></div></div>")
+            
+            var previousPage = 0;
+            $('.flipbook').bind('turn', function(e, page, view) {
+                if (previousPage < page) {
+                    if (sentences.length > page-2) {
+                        say(sentences[page-2]);
+                    }
+                    if (sentences.length > page-1) {
+                        say(sentences[page-1]);
+                    }
+                    previousPage = page;
+                }
+            });
         });
     }
 </script>

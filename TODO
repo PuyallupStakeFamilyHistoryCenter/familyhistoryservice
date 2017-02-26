@@ -68,7 +68,7 @@ Remove parents from family mode
 Narrated tour should be less repetitive
 Narrated tour doesn't work on iPad
 Investigate throttling issue
-?Add spiral effect from RootsMapper
+Allow turning off speech
 ?Color-code markers
 ?Set max zoom in map
 
@@ -88,7 +88,7 @@ Conditionalize relationship questions             DONE
 *Don't read html markup in image mode             DONE
 Stat questions allow both 0 and 0.0 as answers    DONE
 Round stat answers to nearest whole number        DONE
-Allow turning off text-to-speech
+Allow turning off text-to-speech                  DONE
 Difficulty levels
     Configurable # answers
     Give questions difficulty grades
@@ -173,9 +173,9 @@ Add counts of adults and children who attended DONE
 Verify user is logged in before sending survey
 
 Story:
+Add option to read story aloud             DONE
 Refine sentence-end logic
 Getting 'Synchronous XMLHttpRequest' warning
-Add option to read story aloud
 
 Memory:
 Add board size option                      DONE
