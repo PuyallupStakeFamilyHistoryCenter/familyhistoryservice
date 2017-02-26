@@ -194,7 +194,8 @@ POSSIBILITY OF SUCH DAMAGE.
                     name: "stories",
                     label: "Stories",
                     image: "old-book.jpg",
-                    nav: "person-stories?personId=${personId}"
+                    nav: "person-stories?personId=${personId}",
+                    visible: "${hasStories}"
                 },
             ]
         },
@@ -232,7 +233,7 @@ POSSIBILITY OF SUCH DAMAGE.
             var visible = replaceVariables(fragmentVars, buttonInfo.visible);
             
             navButtons.append('<button id="'+name+'-button" class="btn btn-lg btn-default" style="margin: 5px; ' +
-                    (visible==="0"||visible==="null"?"display:none;":"")+
+                    (visible==="0"||visible==="null"||visible==="undefined"?"display:none;":"")+
                     '" '+(buttonInfo.disabled?"disabled":"")+'>'+
                     '<span class="btn-nav"><img src="../media/' + image + '" /></span><br><strong>'+
                     label + '</strong></button>');
