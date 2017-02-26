@@ -33,6 +33,7 @@ POSSIBILITY OF SUCH DAMAGE.
 </div>
 
 <script>
+    var mute = false;
     var letters = ["A", "B", "C", "D", "E", "F"];
     var questionText;
     var answerText;
@@ -54,21 +55,21 @@ POSSIBILITY OF SUCH DAMAGE.
                     answerText += (index === obj.answers.length - 1 ? " or " : "") + (index + 1) + ",, " + answer.text + ",,, ";
                 });
                 
-                say(questionText, true);
-                say(answerText, false);
+                mySay(questionText, true);
+                mySay(answerText, false);
             },
             read: function(obj) {
-                say(questionText, true);
-                say(answerText, false);
+                mySay(questionText, true);
+                mySay(answerText, false);
             },
             correctAnswer: function(obj) {
                 $("li[data-id=" + obj.index + "]").addClass("list-group-item-success").children(".glyphicon-ok").show();
                 incrementAnswers(true);
                 
                 if (filterArray(questionAndAnswers.answers, "index=" + obj.index)[0].hint) {
-                    say(filterArray(questionAndAnswers.answers, "index=" + obj.index)[0].hint, true);
+                    mySay(filterArray(questionAndAnswers.answers, "index=" + obj.index)[0].hint, true);
                 } else {
-                    say(filterArray(questionAndAnswers.answers, "index=" + obj.index)[0].text + ",, is correct", true)
+                    mySay(filterArray(questionAndAnswers.answers, "index=" + obj.index)[0].text + ",, is correct", true)
                 }
             },
             incorrectAnswer: function(obj) {
@@ -76,13 +77,22 @@ POSSIBILITY OF SUCH DAMAGE.
                 incrementAnswers(false);
                 
                 if (filterArray(questionAndAnswers.answers, "index=" + obj.index)[0].hint) {
-                    say(filterArray(questionAndAnswers.answers, "index=" + obj.index)[0].hint, true);
+                    mySay(filterArray(questionAndAnswers.answers, "index=" + obj.index)[0].hint, true);
                 } else {
-                    say(filterArray(questionAndAnswers.answers, "index=" + obj.index)[0].text + ",, is not correct", true)
+                    mySay(filterArray(questionAndAnswers.answers, "index=" + obj.index)[0].text + ",, is not correct", true)
                 }
+            },
+            speech: function(obj) {
+                mute = obj.speech === 'mute';
             }
         }
     };
+    
+    function mySay(content) {
+        if (!mute) {
+            say(content);
+        }
+    }
     
     var totalCorrect = 0;
     var totalAnswered = 0;

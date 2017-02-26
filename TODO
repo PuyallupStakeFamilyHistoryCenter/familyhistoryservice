@@ -88,6 +88,7 @@ Conditionalize relationship questions             DONE
 *Don't read html markup in image mode             DONE
 Stat questions allow both 0 and 0.0 as answers    DONE
 Round stat answers to nearest whole number        DONE
+Allow turning off text-to-speech
 Difficulty levels
     Configurable # answers
     Give questions difficulty grades

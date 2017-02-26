@@ -41,7 +41,7 @@ POSSIBILITY OF SUCH DAMAGE.
         </div>
 
         <button id="new-question" style="display: none;" class="btn btn-lg btn-primary">New question</button>
-        <button id="read-question" style="display: none;" class="btn btn-sm btn-default"><span class="glyphicon glyphicon-volume-up"></span> Read question again</button> 
+        <button id="read-question" style="display: none;" class="btn btn-sm btn-default"><span class="glyphicon glyphicon-volume-up"></span> Read question again</button>
     </div>
 
 
@@ -57,17 +57,37 @@ POSSIBILITY OF SUCH DAMAGE.
 <div id="settings" style="display:none">
     <div id="customControls">
         <dl class="dl-horizontal">
+            <dt>Speech</dt>
+            <dd>
+                <div class="btn-group btn-group-lg" data-toggle="buttons">
+                    <label class="btn btn-default">
+                        <input type="radio" name="speech" value="mute">Mute
+                    </label>
+                    <label class="btn btn-default active">
+                        <input type="radio" name="speech" value="british" checked>British
+                    </label>
+                </div>
+            </dd>
+        </dl>
+        <dl class="dl-horizontal">
             <dt>Types</dt>
             <dd>
                 <div id="types-div" class="btn-group btn-group-lg" data-toggle="buttons">
                 </div>
             </dd>
-            </dl>
+        </dl>
     </div>
 </div>
 
 <script>
     console.info("Starting quiz controller");
+    
+    $('input[name=speech]:radio').change(function () {
+        sendToDisplay(JSON.stringify({
+            responseType: "speech",
+            speech: $(this).val()
+        }));
+    });
     
     var people;
     var nextDepth = 1;
