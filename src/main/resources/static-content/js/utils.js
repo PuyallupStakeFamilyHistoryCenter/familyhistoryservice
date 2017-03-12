@@ -298,7 +298,7 @@ function validatePin(pin) {
 }
     
 function replaceVariables(obj, original, encode) {
-    if (original == null) {
+    if (original == null || !(original.match)) {
         return;
     }
     
