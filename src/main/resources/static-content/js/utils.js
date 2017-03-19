@@ -472,3 +472,13 @@ function cloneObject(obj) {
     var clone = window.JSON.parse(serialized);
     return clone;
 }
+
+function currentDateMatches(targetDateStr) {
+    var targetDate = new Date(targetDateStr);
+    var currentDate = new Date();
+    var dateMatches = targetDate.getUTCFullYear() === currentDate.getUTCFullYear() &&
+            targetDate.getUTCMonth() === currentDate.getUTCMonth() &&
+            targetDate.getUTCDate() === currentDate.getUTCDate();
+    console.info("Target date: " + targetDate + "; current date: " + currentDate);
+    return dateMatches;
+}

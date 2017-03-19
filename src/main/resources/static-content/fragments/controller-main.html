@@ -51,21 +51,21 @@ POSSIBILITY OF SUCH DAMAGE.
                     label: "Quiz",
                     image: "quiz.jpg",
                     nav: "quiz",
-                    visible: false
+                    invisibleOn: "2017-04-08"
                 },
                 {
                     name: "hangman",
                     label: "Hangman",
                     image: "hangman.png",
                     nav: "hangman",
-                    visible: false
+                    invisibleOn: "2017-04-08"
                 },
                 {
                     name: "memory",
                     label: "Memory",
                     image: "memory.jpg",
                     nav: "memory",
-                    visible: false
+                    invisibleOn: "2017-04-08"
                 },
                 {
                     name: "arms",
@@ -73,7 +73,7 @@ POSSIBILITY OF SUCH DAMAGE.
                     image: "arms.jpeg",
                     nav: "arms",
                     confirmBack: true,
-                    visible: false
+                    invisibleOn: "2017-04-08"
                 }
             ]
         },
@@ -234,11 +234,19 @@ POSSIBILITY OF SUCH DAMAGE.
             var display = replaceVariables(fragmentVars, buttonInfo.display);
             var child = replaceVariables(fragmentVars, buttonInfo.child);
             var label = replaceVariables(fragmentVars, buttonInfo.label);
-            var visible = replaceVariables(fragmentVars, buttonInfo.visible);
+            var visibleStr = replaceVariables(fragmentVars, buttonInfo.visible);
+            var invisible = (visibleStr==="0"||visibleStr==="null"||visibleStr==="undefined");
+            if (buttonInfo.invisibleOn && currentDateMatches(buttonInfo.invisibleOn)) {
+                invisible = true;
+            }
+            var disabled = replaceVariables(fragmentVars, buttonInfo.disabled);
+            if (buttonInfo.disabledOn && currentDateMatches(buttonInfo.disabledOn)) {
+                disabled = true;
+            }
             
             navButtons.append('<button id="'+name+'-button" class="btn btn-lg btn-default" style="margin: 5px; ' +
-                    (visible==="0"||visible==="null"||visible==="undefined"?"display:none;":"")+
-                    '" '+(buttonInfo.disabled?"disabled":"")+'>'+
+                    (invisible?"display:none;":"")+
+                    '" '+(disabled?"disabled":"")+'>'+
                     '<span class="btn-nav"><img src="../media/' + image + '" /></span><br><strong>'+
                     label + '</strong></button>');
             $("#" + name + "-button").click(function(e) {
