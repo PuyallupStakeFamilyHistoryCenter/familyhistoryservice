@@ -493,7 +493,7 @@ public class FamilyHistoryCenterSocket {
                         depth = scanner.nextInt();
                     }
                     
-                    List<Person> family = personDao.listAncestors(personId, depth, accessToken, false);
+                    List<Person> family = personDao.listAncestors(personId, depth, accessToken, true);
                     if (!family.isEmpty()) {
                         response = getPeopleResponse(family);
                     } else {
