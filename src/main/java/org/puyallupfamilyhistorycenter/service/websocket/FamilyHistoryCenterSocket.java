@@ -47,6 +47,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.rmi.AccessException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
@@ -492,7 +493,7 @@ public class FamilyHistoryCenterSocket {
                         depth = scanner.nextInt();
                     }
                     
-                    List<Person> family = personDao.listAncestors(personId, depth, accessToken, true);
+                    List<Person> family = personDao.listAncestors(personId, depth, accessToken, false);
                     if (!family.isEmpty()) {
                         response = getPeopleResponse(family);
                     } else {
@@ -630,82 +631,7 @@ public class FamilyHistoryCenterSocket {
                     
                     String email = user.getUser().getEmail();
                     
-                    //TODO: Factor this out into separate class (it's pretty complicated
-                    final String finalUserId = userId;
-                    final AtomicReference currentEvent = new AtomicReference();
-                    final Future<?> progressThrottle = scheduler.scheduleAtFixedRate(new Runnable() {
-
-                        @Override
-                        public void run() {
-                            Precacher.PrecacheEvent event = (Precacher.PrecacheEvent) currentEvent.get();
-                            UserContext context = userContextMap.get(finalUserId);
-                            if (event != null && context != null) {
-                                Iterator<String> it = context.tokens.iterator();
-                                while (it.hasNext()) {
-                                    String token = it.next();
-                                    try {
-                                        tokenControllerMap.get(token).sendString(GSON.toJson(event));
-                                    } catch (Exception e) {
-                                        logger.warn("Failed to notify controller " + token + " about precache event; removing");
-                                        it.remove();
-                                        tokenControllerMap.remove(token);
-                                    }
-                                }
-                                
-                                Iterator<RemoteEndpoint> rit = remotePresenters.iterator();
-                                while (rit.hasNext()) {
-                                    RemoteEndpoint endpoint = rit.next();
-                                    try {
-                                        endpoint.sendString(GSON.toJson(event));
-                                    } catch (Exception e) {
-                                        logger.warn("Failed to notify presenter about precache event; removing");
-                                        rit.remove();
-                                        otherRemotes.remove(endpoint);
-                                    }
-                                }
-                            }
-                        }
-                    }, 10, 10, TimeUnit.SECONDS);
-                    
-                    Precacher precacher = new Precacher(userId, accessToken, 8);
-                    
-                    precacher.addPrecacheListener(new Precacher.PrecacheListener() {
-
-                        @Override
-                        public void onPrecache(Precacher.PrecacheEvent event) {
-                            currentEvent.set(event);
-                        }
-
-                        @Override
-                        public void onFinish() {
-                            progressThrottle.cancel(false);
-                            UserContext context = userContextMap.get(finalUserId);
-                            Precacher.PrecacheEvent previousEvent = (Precacher.PrecacheEvent) currentEvent.get();
-                            if (previousEvent != null && context != null) {
-                                Precacher.PrecacheEvent event = new Precacher.PrecacheEvent(finalUserId, previousEvent.totalCached + previousEvent.totalQueueSize, 0, 0, previousEvent.currentGeneration);
-                                Iterator<String> it = context.tokens.iterator();
-                                while (it.hasNext()) {
-                                    String token = it.next();
-                                    try {
-                                        tokenControllerMap.get(token).sendString(GSON.toJson(event));
-                                    } catch (Exception e) {
-                                        logger.warn("Failed to notify controller " + token + " about precache event; removing");
-                                        it.remove();
-                                        tokenControllerMap.remove(token);
-                                    }
-                                }
-                            }
-                            
-                            Precacher precacher = new Precacher(ApplicationProperties.getGuestPersonId(), accessToken, 8);
-                            precacher.precache();
-                        }
-
-                        @Override
-                        public void onCancel() {
-                            progressThrottle.cancel(true);
-                        }
-                    });
-                    precacher.precache();
+                    Precacher precacher = startPrecaching(userId, accessToken);
                     
                     Set<String> tokens = null;
                     if (userContextMap.containsKey(userId)) {
@@ -717,6 +643,22 @@ public class FamilyHistoryCenterSocket {
                     userContextMap.put(userId, new UserContext(userId, userName, email, pin, accessToken, precacher, tokens));
                     
                     resendUserList();
+                    break;
+                }
+                
+                case "recache": {
+                    String rootUserId = scanner.next();
+                    token = scanner.next();
+                    
+                    userId = tokenUserIdMap.get(token);
+                    if (userId == null) {
+                        throw new AccessException("Unrecognized token");
+                    }
+                    
+                    UserContext ctx = userContextMap.get(userId);
+                    
+                    startPrecaching(rootUserId, ctx.accessToken);
+                    
                     break;
                 }
 
@@ -1181,5 +1123,87 @@ public class FamilyHistoryCenterSocket {
         } catch (IOException e) {
             throw new IllegalStateException("Failed to record bug report " + reportId);
         }
+    }
+    
+    private static Precacher startPrecaching(String userId, String accessToken) {
+
+        //TODO: Factor this out into separate class (it's pretty complicated)
+        final String finalUserId = userId;
+        final AtomicReference currentEvent = new AtomicReference();
+        final Future<?> progressThrottle = scheduler.scheduleAtFixedRate(new Runnable() {
+
+            @Override
+            public void run() {
+                Precacher.PrecacheEvent event = (Precacher.PrecacheEvent) currentEvent.get();
+                UserContext context = userContextMap.get(finalUserId);
+                if (event != null && context != null) {
+                    Iterator<String> it = context.tokens.iterator();
+                    while (it.hasNext()) {
+                        String token = it.next();
+                        try {
+                            tokenControllerMap.get(token).sendString(GSON.toJson(event));
+                        } catch (Exception e) {
+                            logger.warn("Failed to notify controller " + token + " about precache event; removing");
+                            it.remove();
+                            tokenControllerMap.remove(token);
+                        }
+                    }
+
+                    Iterator<RemoteEndpoint> rit = remotePresenters.iterator();
+                    while (rit.hasNext()) {
+                        RemoteEndpoint endpoint = rit.next();
+                        try {
+                            endpoint.sendString(GSON.toJson(event));
+                        } catch (Exception e) {
+                            logger.warn("Failed to notify presenter about precache event; removing");
+                            rit.remove();
+                            otherRemotes.remove(endpoint);
+                        }
+                    }
+                }
+            }
+        }, 10, 10, TimeUnit.SECONDS);
+
+        Precacher precacher = new Precacher(userId, accessToken, 8);
+
+        precacher.addPrecacheListener(new Precacher.PrecacheListener() {
+
+            @Override
+            public void onPrecache(Precacher.PrecacheEvent event) {
+                currentEvent.set(event);
+            }
+
+            @Override
+            public void onFinish() {
+                progressThrottle.cancel(false);
+                UserContext context = userContextMap.get(finalUserId);
+                Precacher.PrecacheEvent previousEvent = (Precacher.PrecacheEvent) currentEvent.get();
+                if (previousEvent != null && context != null) {
+                    Precacher.PrecacheEvent event = new Precacher.PrecacheEvent(finalUserId, previousEvent.totalCached + previousEvent.totalQueueSize, 0, 0, previousEvent.currentGeneration);
+                    Iterator<String> it = context.tokens.iterator();
+                    while (it.hasNext()) {
+                        String token = it.next();
+                        try {
+                            tokenControllerMap.get(token).sendString(GSON.toJson(event));
+                        } catch (Exception e) {
+                            logger.warn("Failed to notify controller " + token + " about precache event; removing");
+                            it.remove();
+                            tokenControllerMap.remove(token);
+                        }
+                    }
+                }
+
+                Precacher precacher = new Precacher(ApplicationProperties.getGuestPersonId(), accessToken, 8);
+                precacher.precache();
+            }
+
+            @Override
+            public void onCancel() {
+                progressThrottle.cancel(true);
+            }
+        });
+        precacher.precache();
+        
+        return precacher;
     }
 }

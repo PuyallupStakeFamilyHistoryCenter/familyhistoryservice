@@ -445,6 +445,10 @@ function sendToDisplay(message) {
     ws.socketSend("send " + token + " " + displayName + " " + message);
 }
 
+function sendToServer(message) {
+    ws.socketSend(message);
+}
+
 function setHeaderName(headerName) {}
 
     

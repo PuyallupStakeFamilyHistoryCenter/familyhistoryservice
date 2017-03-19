@@ -30,6 +30,7 @@ POSSIBILITY OF SUCH DAMAGE.
         verbs: {
             person: function(obj) {
                 settings.userId = obj.person.id;
+                sendToServer("recache " + obj.person.id + " " + token);
                 clearHistory();
                 navigate("controller-main");
             }
