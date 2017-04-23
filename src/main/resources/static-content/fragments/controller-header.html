@@ -46,6 +46,7 @@ POSSIBILITY OF SUCH DAMAGE.
                     <li><a href="#" id="screenshot" style="display:none">Screenshot</a></li>
                     <li><a href="#" id="change-root-link" style="display:none">Change root user</a></li>
                     <li><a href="#" id="logout-link" style="display:none">Switch user</a></li>
+                    <li><a href="#" id="reload-link">Reload</a></li>
                 </ul>
             </div> <!--/.navbar-collapse -->
         </div> <!-- /.container-fluid -->
@@ -79,6 +80,10 @@ POSSIBILITY OF SUCH DAMAGE.
 </div>
 
 <script>;
+    
+    $("#reload-link").click(function() {
+        ws.socketSend("reloadDisplay " + displayName);
+    });
     
     $("#logout-link").click(function() {
         $(".navbar-toggle").click();
@@ -151,5 +156,4 @@ POSSIBILITY OF SUCH DAMAGE.
             userId: settings.userId
         }))
     }
-    
 </script>  

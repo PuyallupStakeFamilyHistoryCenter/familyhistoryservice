@@ -24,7 +24,6 @@ CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 -->
-
 <div class="row">
     <div class="col-md-6">
         <div class="panel panel-default">
@@ -51,6 +50,7 @@ POSSIBILITY OF SUCH DAMAGE.
         <button class="btn btn-lg btn-danger" id="resetButton" >Restart server</button>
         <button class="btn btn-lg btn-warning" id="reportBugButton" >Report bug</button>
         <button class="btn btn-lg btn-success pull-right" id="checklistButton" >Checklist</button>
+        <button class='btn btn-lg btn-default reload-presenter-btn pull-right'><span class='glyphicon glyphicon-refresh' ></span></button>
     </div>
 </div>
 
@@ -232,6 +232,10 @@ POSSIBILITY OF SUCH DAMAGE.
     
     $("#resetButton").click(function() {
         $("#confirmModal").modal();
+    });
+        
+    $(".reload-presenter-btn").click(function() {
+        location.reload();
     });
     
     $("#confirmRestartButton").click(function() {
