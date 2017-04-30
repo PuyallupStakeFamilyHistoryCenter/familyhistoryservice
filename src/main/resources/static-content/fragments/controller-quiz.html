@@ -297,7 +297,7 @@ POSSIBILITY OF SUCH DAMAGE.
                 otherPerson3: '*gender!=${gender},images !contains ${image},id!=${otherPerson1.id},id!=${otherPerson2.id}'
             },
             question: "Who is this?",
-            questionAnnex: "<br/><img src='${image}' style='max-width:600px; max-height:600px' />",
+            questionAnnex: "<br/><img src='${image.url}' style='max-width:600px; max-height:600px' />",
             answers: [
                 { 
                     text: '${name}', 
@@ -323,7 +323,7 @@ POSSIBILITY OF SUCH DAMAGE.
                 image: "images.*",
             },
             question: "True or false, this is an image of ${name}?",
-            questionAnnex: "<br><img src='${image}' style='max-width:600px; max-height:600px' />",
+            questionAnnex: "<br><img src='${image.url}' style='max-width:600px; max-height:600px' />",
             answers: [
                 { 
                     text: 'True', 
@@ -345,7 +345,7 @@ POSSIBILITY OF SUCH DAMAGE.
                 person: "*gender=${gender},name!=${name}"
             },
             question: "True or false, this is an image of ${person.name}?",
-            questionAnnex: "<br><img src='${image}' style='max-width:600px; max-height:600px' />",
+            questionAnnex: "<br><img src='${image.url}' style='max-width:600px; max-height:600px' />",
             answers: [
                 { 
                     text: 'False', 

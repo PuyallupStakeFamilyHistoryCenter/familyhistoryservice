@@ -84,7 +84,7 @@ POSSIBILITY OF SUCH DAMAGE.
         $("#person-bio").show();
         var hideImage = parseBool(getParameterByName("hide_image"));
         if (person.images && person.images[0] && !hideImage) {
-            $("#person-img").attr("src", person.images[0]).attr("alt", "Image of " + person.name).show();
+            $("#person-img").attr("src", person.images[0].url).attr("alt", "Image of " + person.name).show();
         } else {
             $("#person-img").hide();
         }

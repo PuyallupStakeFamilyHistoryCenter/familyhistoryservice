@@ -89,7 +89,7 @@ import org.puyallupfamilyhistorycenter.service.models.Checklist;
 import org.puyallupfamilyhistorycenter.service.models.ChecklistAction;
 import org.puyallupfamilyhistorycenter.service.models.ChecklistItem;
 import org.puyallupfamilyhistorycenter.service.models.Person;
-import org.puyallupfamilyhistorycenter.service.models.PersonImage;
+import org.puyallupfamilyhistorycenter.service.models.ImageReference;
 import org.puyallupfamilyhistorycenter.service.models.Statistics;
 import org.puyallupfamilyhistorycenter.service.models.Video;
 import org.puyallupfamilyhistorycenter.service.utils.EmailUtils;
@@ -990,7 +990,7 @@ public class FamilyHistoryCenterSocket {
         return "{\"responseType\":\"people\",\"people\":"+GSON.toJson(people)+"}";
     }
     
-    protected static String getImagesResponse(List<PersonImage> images) {
+    protected static String getImagesResponse(List<ImageReference> images) {
         return "{\"responseType\":\"images\",\"images\":"+GSON.toJson(images)+"}";
     }
 

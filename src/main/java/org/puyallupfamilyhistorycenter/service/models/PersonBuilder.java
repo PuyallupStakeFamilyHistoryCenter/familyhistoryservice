@@ -40,7 +40,7 @@ public class PersonBuilder {
     private PersonReference[] parents;
     private PersonReference[] spouses;
     private PersonReference[] children;
-    private String[] images;
+    private ImageReference[] images;
     private String[] stories;
     
     public PersonBuilder withId(String id) {
@@ -83,7 +83,7 @@ public class PersonBuilder {
         return this;
     }
     
-    public PersonBuilder withImages(String[] images) {
+    public PersonBuilder withImages(ImageReference[] images) {
         this.images = images;
         return this;
     }

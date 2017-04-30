@@ -25,18 +25,20 @@
  */
 package org.puyallupfamilyhistorycenter.service.models;
 
+import java.util.List;
+
 /**
  *
  * @author tibbitts
  */
-
-
-public class PersonImage {
+public class ImageReference {
     public final String id;
     public final String url;
+    public final List<String> names;
 
-    public PersonImage(String id, String url) {
+    public ImageReference(String id, String url, List<String> names) {
         this.id = id;
         this.url = url;
+        this.names = names;
     }
 }
