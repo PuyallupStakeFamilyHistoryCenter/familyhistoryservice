@@ -63,7 +63,7 @@ POSSIBILITY OF SUCH DAMAGE.
         $("#person-img").attr("src", personImage.url).attr("alt", "Image of " + personImage.person.name);
         $("#names").html("");
         $.each(personImage.names, function(index, name) {
-            $("#names").append("<dt></dt><dd>" + name + "</dd>");
+            $("#names").append("<h3>" + name + "</h3>");
         })
     }
 
