@@ -46,11 +46,11 @@ public class Person {
     public final PersonReference[] parents;
     public final PersonReference[] spouses;
     public final PersonReference[] children;
-    public final ImageReference[] images;
+    public final String[] images;
     public final String[] stories;
     //TODO: Finish this (quickly!)
 
-    Person(String id, String name, String gender, Boolean living, Fact[] facts, PersonReference[] parents, PersonReference[] spouses, PersonReference[] children, ImageReference[] images, String[] stories) {
+    Person(String id, String name, String gender, Boolean living, Fact[] facts, PersonReference[] parents, PersonReference[] spouses, PersonReference[] children, String[] images, String[] stories) {
         this.id = id;
         this.name = name;
         this.gender = gender;

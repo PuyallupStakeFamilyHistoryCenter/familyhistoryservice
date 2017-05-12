@@ -29,11 +29,8 @@ import com.google.gson.Gson;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 import org.apache.log4j.Logger;
 import org.familysearch.api.client.ft.FamilySearchFamilyTree;
 import org.familysearch.api.client.ft.FamilyTreePersonState;
@@ -48,7 +45,6 @@ import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.puyallupfamilyhistorycenter.service.models.Fact;
-import org.puyallupfamilyhistorycenter.service.models.ImageReference;
 import org.puyallupfamilyhistorycenter.service.models.Person;
 import org.puyallupfamilyhistorycenter.service.models.PersonBuilder;
 import org.puyallupfamilyhistorycenter.service.models.PersonReference;
@@ -62,8 +58,6 @@ public class FamilySearchPersonSource implements Source<Person> {
 
     private static final Logger logger = Logger.getLogger(FamilySearchPersonSource.class);
     private static final Gson GSON = new Gson();
-    
-    private static final Map<String, ImageReference> personImages = new HashMap<String, ImageReference>();
 
     @Override
     public Person get(String personId, String accessToken) {
@@ -97,15 +91,12 @@ public class FamilySearchPersonSource implements Source<Person> {
                 builder.withChildren(fsPersonsToPersonRefs(childrenState.getPersons(), null));
             }
             
-            String personName = "";
             if (originalPerson.getLiving()) {
-                personName = "Living";
-                builder.withName(personName);
+                builder.withName("Living");
             } else {
                 Name name = state.getName();
                 if (name != null) {
-                    personName = name.getNameForm().getFullText();
-                    builder.withName(personName);
+                    builder.withName(name.getNameForm().getFullText());
                 }
 
                 {
@@ -139,15 +130,11 @@ public class FamilySearchPersonSource implements Source<Person> {
                             String url = "/image-cache?ref=" + URLEncoder.encode(source.getAbout().toString() + "&access_token=" + accessToken, StandardCharsets.UTF_8.name());
                             if (url.contains(".jpg") || url.contains(".png") || url.contains(".tif")) {
                                 imageUrls.add(url);
-                                personImages.computeIfAbsent(url, u -> new ImageReference(u, url, new ArrayList())).names.add(personName);
                             } else {
                                 storyUrls.add(url);
                             }
                         }
-                        builder.withImages(imageUrls.stream()
-                                        .map(personImages::get)
-                                        .collect(Collectors.toList())
-                                        .toArray(new ImageReference[imageUrls.size()]))
+                        builder.withImages(imageUrls.toArray(new String[imageUrls.size()]))
                                 .withStories(storyUrls.toArray(new String[storyUrls.size()]));
                     }
                 }

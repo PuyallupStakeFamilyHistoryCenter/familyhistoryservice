@@ -57,51 +57,51 @@ POSSIBILITY OF SUCH DAMAGE.
     var defaultPeople = [
         {
             name: "Children",
-            images: {
-                url: "/media/default/default.jpg"
-            }
+            images: [
+                "/media/default/default.jpg"
+            ]
         },
         {
             name: "Brigham Young",
-            images: {
-                url: "/media/default/brigham_young.jpg"
-            }
+            images: [
+                "/media/default/brigham_young.jpg"
+            ]
         },
         {
             name: "Joseph Smith",
-            images: {
-                url: "/media/default/joseph_smith.jpg"
-            }
+            images: [
+                "/media/default/joseph_smith.jpg"
+            ]
         },
         {
             name: "Mark Twain",
-            images: {
-                url: "/media/default/mark_twain.jpeg"
-            }
+            images: [
+                "/media/default/mark_twain.jpeg"
+            ]
         },
         {
             name: "Moulton Brothers",
-            images: {
-                url: "/media/default/moulton_brothers.jpeg"
-            }
+            images: [
+                "/media/default/moulton_brothers.jpeg"
+            ]
         },
         {
             name: "George Washington",
-            images: {
-                url: "/media/default/george_washington.jpg"
-            }
+            images: [
+                "/media/default/george_washington.jpg"
+            ]
         },
         {
             name: "Nelson Mandela",
-            images: {
-                url: "/media/default/nelson_mandela.jpg"
-            }
+            images: [
+                "/media/default/nelson_mandela.jpg"
+            ]
         },
         {
             name: "Leonardo da Vinci",
-            images: {
-                url: "/media/default/da_vinci.jpg"
-            }
+            images: [
+                "/media/default/da_vinci.jpg"
+            ]
         }
     ]
 
@@ -126,9 +126,8 @@ POSSIBILITY OF SUCH DAMAGE.
         $.each(people, function(index, person) {
             var filteredIndex = 0;
             $.each(person.images, function(imageIndex, image) {
-                console.info(image);
-                if (image && image.url && !imageUseMap[image.url]) {
-                    images.push({responseType:"personImage", url: image.url, person: person, names: image.names, imageIndex: filteredIndex++});
+                if (!imageUseMap[image]) {
+                    images.push({responseType:"personImage", url: image, person: person, imageIndex: filteredIndex++});
                     imageUseMap[image] = 1;
                 }
             });
