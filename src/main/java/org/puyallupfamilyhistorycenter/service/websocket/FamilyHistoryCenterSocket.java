@@ -46,6 +46,7 @@ import java.lang.reflect.Type;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.rmi.AccessException;
 import java.security.NoSuchAlgorithmException;
@@ -66,11 +67,13 @@ import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
+import static java.util.stream.Collectors.toList;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.filefilter.WildcardFileFilter;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
 import org.eclipse.jetty.websocket.api.RemoteEndpoint;
 import org.eclipse.jetty.websocket.api.Session;
@@ -148,6 +151,7 @@ public class FamilyHistoryCenterSocket {
         public long lastUsed;
         public final Set<String> tokens; //TODO: Rename to prevent confusion with access token
         public final Precacher precacher;
+        public final List<Pair<String, String>> bucketsAndKeys;
         public UserContext(String userId, String userName, String userEmail, String hashedPin, String accessToken, Precacher precacher) {
             this(userId, userName, userEmail, hashedPin, accessToken, precacher, new HashSet<String>());
         }
@@ -160,6 +164,7 @@ public class FamilyHistoryCenterSocket {
             this.lastUsed = System.currentTimeMillis();
             this.tokens = tokens==null? new HashSet<String>() : tokens;
             this.precacher = precacher;
+            this.bucketsAndKeys = new ArrayList<>();
         }
     }
     
@@ -742,7 +747,7 @@ public class FamilyHistoryCenterSocket {
                     getChecklist(displayId).setChecked(id, value);
                     break;
                 }
-                
+
                 case "signedPutUrl": {
                     token = scanner.next();
                     String userName = "anonymous";
@@ -751,15 +756,46 @@ public class FamilyHistoryCenterSocket {
                         UserContext context = userContextMap.get(userId);
                         userName = context.userName;
                     }
-                    
+
                     String contentType = scanner.next();
                     URL url = S3Utils.getSignedPutUrl(
-                            ApplicationProperties.getVideoS3Bucket(), 
+                            ApplicationProperties.getVideoS3Bucket(),
                             ApplicationProperties.getVideoS3KeyPrefix() + userName + "/" + new DateTime().getMillis(),
                             contentType
                     );
                     response = "{\"responseType\":\"signedPutUrl\",\"signedUrl\":\"" + url.toString() + "\"}";
+
+                    break;
+                }
+
+                case "requestScreenshot": {
+                    token = scanner.next();
+                    userId = tokenUserIdMap.get(token);
+                    UserContext context = userContextMap.get(userId);
+                    String userName = context.userName;
                     
+                    String displayName = scanner.next();
+
+                    String bucket = ApplicationProperties.getVideoS3Bucket();
+                    String key = ApplicationProperties.getVideoS3KeyPrefix() + "/" + URLEncoder.encode(userName, StandardCharsets.UTF_8.name()) + "/" + new DateTime().getMillis();
+                    String contentType = scanner.next();
+                    URL url = S3Utils.getSignedPutUrl(
+                            bucket,
+                            key,
+                            contentType
+                    );
+                    sendToDisplay(displayName, "{\"responseType\":\"screenshot\",\"userId\":\""+userId+"\",\"url\":\""+url+"\",\"bucket\":\""+bucket+"\",\"key\":\""+key+"\"}");
+
+                    break;
+                }
+                
+                case "registerAttachment": {
+                    userId = scanner.next();
+                    String bucket = scanner.next();
+                    String key = scanner.next();
+                    
+                    UserContext context = userContextMap.get(userId);
+                    context.bucketsAndKeys.add(Pair.of(bucket, key));
                     break;
                 }
                 
@@ -927,7 +963,12 @@ public class FamilyHistoryCenterSocket {
     private static void sendFinalEmail(String userId) {
         UserContext context = userContextMap.get(userId);
         if (context != null && context.userEmail != null && ApplicationProperties.enableEmail()) {
-            EmailUtils.sendFinalEmail(context.userName, context.userEmail, imageRegistry.getImages(context.userId));
+            EmailUtils.sendFinalEmail(context.userName, context.userEmail, imageRegistry.getImages(context.userId), 
+                    context.bucketsAndKeys.stream()
+                            .map(pair -> S3Utils.getSignedGetUrl(pair.getLeft(), pair.getRight()))
+                            .map(Object::toString)
+                            .collect(toList())
+            );
         }
     }
     

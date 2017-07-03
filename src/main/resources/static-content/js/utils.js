@@ -397,20 +397,18 @@ function toFirstCaps(string) {
     return string.substring(0,1).toUpperCase() + string.substring(1);
 }
 
-function saveCanvas(canvas, userId, imageId) {
+function saveCanvas(canvas, url, callback) {
     canvas.toBlob(function(blob) {
-        var formData = new FormData();
-
-        formData.append("image", blob);
 
         $.ajax({
-            url: '/image-save/?user-id='+userId+'&image-id='+imageId,
-            data: formData,
+            url: url,
+            data: blob,
             processData: false,
-            contentType: false,
-            type: 'POST',
+            contentType: "image/png",
+            type: 'PUT',
             success: function(data){
                 if (logger) {
+                    callback();
                     logger.info("Successfully saved image");
                 }
             }
@@ -418,26 +416,24 @@ function saveCanvas(canvas, userId, imageId) {
     });
 }
 
-function saveSvg(svg, userId, imageId) {
-    var formData = new FormData();
-
-    formData.append("svg", svg.outerHTML);
+function saveSvg(svg, url, callback) {
 
     $.ajax({
-        url: '/image-save/?user-id='+userId+'&image-id='+imageId,
-        data: formData,
+        url: url,
+        data: svg.outerHTML,
         processData: false,
-        contentType: false,
-        type: 'POST',
+        contentType: "image/svg+xml",
+        type: 'PUT',
         success: function(data){
             if (logger) {
+                callback();
                 logger.info("Successfully saved image");
             }
         }
     });
 }
 
-function takeScreenshot(userId) {
+function takeScreenshot(userId, url, callback) {
     var element = document.getElementById("canvas");
     if (!element) {
         element = document.getElementById("root");
@@ -452,11 +448,11 @@ function takeScreenshot(userId) {
         console.error("Failed to take screenshot of page " + window.location.href);
     }
     if (element.tagName === 'svg') {
-        saveSvg(element, userId, rand(0, 1000000000));
+        saveSvg(element, url, callback);
     } else {
         html2canvas(element, {
             onrendered: function(canvas) {
-                saveCanvas(canvas, userId, rand(0, 1000000000));
+                saveCanvas(canvas, url, callback);
             },
             background: "white"
         });

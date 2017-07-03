@@ -58,7 +58,8 @@ POSSIBILITY OF SUCH DAMAGE.
                     label: "Hangman",
                     image: "hangman.png",
                     nav: "hangman",
-                    invisibleOn: "2017-04-08"
+                    invisibleOn: "2017-04-08",
+                    contentType: "image/svg+xml"
                 },
                 {
                     name: "memory",
@@ -73,7 +74,8 @@ POSSIBILITY OF SUCH DAMAGE.
                     image: "arms.jpeg",
                     nav: "arms",
                     confirmBack: true,
-                    invisibleOn: "2017-04-08"
+                    invisibleOn: "2017-04-08",
+                    contentType: "image/svg+xml"
                 }
             ]
         },
@@ -150,7 +152,8 @@ POSSIBILITY OF SUCH DAMAGE.
                     name: "hangman",
                     label: "Hangman",
                     image: "hangman.png",
-                    nav: "hangman"
+                    nav: "hangman",
+                    contentType: "image/svg+xml"
                 },
                 {
                     name: "stories",
@@ -170,7 +173,8 @@ POSSIBILITY OF SUCH DAMAGE.
                     label: "Arms",
                     image: "arms.jpeg",
                     nav: "arms",
-                    confirmBack: true
+                    confirmBack: true,
+                    contentType: "image/svg+xml"
                 }
             ]
         },
@@ -235,6 +239,7 @@ POSSIBILITY OF SUCH DAMAGE.
             var child = replaceVariables(fragmentVars, buttonInfo.child);
             var label = replaceVariables(fragmentVars, buttonInfo.label);
             var visibleStr = replaceVariables(fragmentVars, buttonInfo.visible);
+            var ct = buttonInfo.contentType;
             var invisible = (visibleStr==="0"||visibleStr==="null"||visibleStr==="undefined");
             if (buttonInfo.invisibleOn && currentDateMatches(buttonInfo.invisibleOn)) {
                 invisible = true;
@@ -260,6 +265,8 @@ POSSIBILITY OF SUCH DAMAGE.
                 } else if (buttonInfo.child) {
                     navigate("controller-main?group="+child);
                 }
+                
+                contentType = ct ? ct : "image/png";
                 
                 settings.page.confirmBack = buttonInfo.confirmBack ? true : false;
                 

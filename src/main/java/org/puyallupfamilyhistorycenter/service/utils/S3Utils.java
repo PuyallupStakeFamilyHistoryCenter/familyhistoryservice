@@ -66,4 +66,11 @@ public class S3Utils {
         request.setContentType(contentType);
         return getClient().generatePresignedUrl(request);
     }
+
+    public static URL getSignedGetUrl(String bucket, String key) {
+        GeneratePresignedUrlRequest request = new GeneratePresignedUrlRequest(bucket, key);
+        request.setMethod(HttpMethod.GET);
+        request.setExpiration(new DateTime().plusDays(30).toDate());
+        return getClient().generatePresignedUrl(request);
+    }
 }

@@ -87,8 +87,8 @@ public class EmailUtils {
         sendEmail(contactName, contactEmail, new String[] { "normanse@gmail.com" }, subject, emailBody);
     }
     
-    public static void sendFinalEmail(String userName, String userEmail, Collection<String> imageFiles) {
-        String emailBody = buildFinalEmailBody(userName, null);
+    public static void sendFinalEmail(String userName, String userEmail, Collection<String> imageFiles, Iterable<String> attachmentUrls) {
+        String emailBody = buildFinalEmailBody(userName, null, attachmentUrls);
         String subject = ApplicationProperties.getEmailSubject();
         
         sendEmailWithAttachments(userName, userEmail, new String[] {}, subject, emailBody, imageFiles);
@@ -210,7 +210,7 @@ public class EmailUtils {
         return builder.toString();
     }
     
-    protected static String buildFinalEmailBody(String personName, Iterable<PersonTemple> prospects) {
+    protected static String buildFinalEmailBody(String personName, Iterable<PersonTemple> prospects, Iterable<String> attachmentUrls) {
         StringBuilder builder = new StringBuilder();
         //TODO: Make this configurable
         builder.append("<p>")
@@ -245,6 +245,10 @@ public class EmailUtils {
         builder.append("<p>")
                 .append(ApplicationProperties.getEmailSignature().replaceAll("\n", "</p><p>"))
                 .append("</p>");
+        
+        attachmentUrls.spliterator().forEachRemaining(url -> {
+            builder.append("<a href='").append(url).append("'><img style='padding: 5px; max-width: 200px' alt='Attachment' src='").append(url).append("' /></a>");
+        });
         
         return builder.toString();
     }

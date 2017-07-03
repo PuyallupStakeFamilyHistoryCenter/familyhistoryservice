@@ -80,6 +80,7 @@ POSSIBILITY OF SUCH DAMAGE.
 </div>
 
 <script>;
+    var contentType = "image/png";
     
     $("#reload-link").click(function() {
         ws.socketSend("reloadDisplay " + displayName);
@@ -151,9 +152,6 @@ POSSIBILITY OF SUCH DAMAGE.
     }
     
     function takeScreenshot() {
-        sendToDisplay(JSON.stringify({
-            responseType:"screenshot",
-            userId: settings.userId
-        }))
+        sendToServer("requestScreenshot " + token + " " + displayName + " " + contentType); //TODO: Content type
     }
 </script>  

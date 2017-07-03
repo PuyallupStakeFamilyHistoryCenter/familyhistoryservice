@@ -68,7 +68,9 @@ var settings = {
                 countdownFunction();
             },
             screenshot: function(obj) {
-                takeScreenshot(obj.userId);
+                takeScreenshot(obj.userId, obj.url, function() {
+                    sendToServer("registerAttachment " + obj.userId + " " + obj.bucket + " " + obj.key)
+                });
             },
             changeDisplayName: function(obj) {
                 displayName = obj.displayName;

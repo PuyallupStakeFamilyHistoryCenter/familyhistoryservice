@@ -109,6 +109,7 @@ Sliding tiles:
 Media:
 Add support for videos from lds.org
 Allow displaying discussion points after videos
+Add 'Saviors on Mount Zion' video
 
 Display main:
 Put sample content into carousel           DONE
@@ -231,6 +232,7 @@ Change stroke width when transforming elements?
 Fix border color
 Use radio buttons in controller
 Add griffins combatant
+Only prompt for screenshot if 'dirty'
 
 New feature ideas:
 Word search (maybe printable version in email?)
