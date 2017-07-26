@@ -24,6 +24,10 @@ CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 -->
+<style>
+    .navbar-fixed-bottom { display: none; }
+</style>
+
 <div class="row">
     <div class="col-md-6">
         <div class="panel panel-default">
@@ -155,24 +159,19 @@ POSSIBILITY OF SUCH DAMAGE.
         $("#display-btns").html("");
         
         $.each(displayIds, function(index, displayId) {
-            $("#display-btns").append("<div><button class='btn btn-lg btn-default display-btn' data-display='"+displayId+"'>"+displayId+"</button>" +
-                    "<button class='btn btn-lg btn-default survey-btn' data-display='"+displayId+"'><span class='glyphicon glyphicon-comment'></span></span></button>" + 
-                    "<button class='btn btn-lg btn-default ping-display-btn' data-display='"+displayId+"'><span class='glyphicon glyphicon-bell'></span></span></button>" + 
-                    "<button class='btn btn-lg btn-default reload-display-btn' data-display='"+displayId+"'><span class='glyphicon glyphicon-refresh' ></span></button>" +
-                    "<button class='btn btn-lg btn-default session-checklist-btn' data-display='"+displayId+"'><span class='glyphicon glyphicon-check'></span></button>" +
-                    "<button class='btn btn-lg btn-default config-btn' data-display='"+displayId+"'><span class='glyphicon glyphicon-cog'></span></button></div>");
+            $("#display-btns").append("<div><button class='btn btn-lg btn-default display-btn' data-display='"+displayId+"'>"+displayId+"</button>");
         });
         
         $(".survey-btn").click(function() {
-            displayName = $(this).attr("data-display");
+            displayId = $(this).attr("data-display");
             
-            ws.socketSend("forceNavigateController " + displayName + " controller-survey");
+            ws.socketSend("forceNavigateController " + displayId + " controller-survey");
         });
         
         $(".display-btn").click(function() {
-            displayName = $(this).attr("data-display");
+            displayId = $(this).attr("data-display");
             
-            navigate("controller-main?group=presenter");
+            navigate("controller-main?group=presenter&displayId=" + displayId);
         });
         
         $(".ping-display-btn").click(function() {

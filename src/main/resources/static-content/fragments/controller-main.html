@@ -89,6 +89,36 @@ POSSIBILITY OF SUCH DAMAGE.
                     image: "tutorials.jpg",
                     nav: "media-youtube"
                 },
+                {
+                    name: "survey",
+                    label: "Survey",
+                    image: "survey.jpg",
+                    send: "forceNavigateController ${displayId} controller-survey"
+                },
+                {
+                    name: "ping-display",
+                    label: "Ping",
+                    image: "school-bell.jpg",
+                    send: "pingDisplay ${displayId}"
+                },
+                {
+                    name: "reload-display",
+                    label: "Reload",
+                    image: "reload.jpeg",
+                    send: "reloadDisplay ${displayId}"
+                },
+                {
+                    name: "session-checklist",
+                    label: "Checklist",
+                    image: "checklist.jpeg",
+                    controller: "presenter-checklist?type=session&displayId=${displayId}"
+                },
+                {
+                    name: "config",
+                    label: "Configuration",
+                    image: "settings.jpeg",
+                    controller: "presenter-config?displayId=${displayId}"
+                },
             ]
         },
         tutorials: {
@@ -235,7 +265,9 @@ POSSIBILITY OF SUCH DAMAGE.
             var name = replaceVariables(fragmentVars, buttonInfo.name);
             var image = replaceVariables(fragmentVars, buttonInfo.image);
             var nav = replaceVariables(fragmentVars, buttonInfo.nav);
+            var controller = replaceVariables(fragmentVars, buttonInfo.controller);
             var display = replaceVariables(fragmentVars, buttonInfo.display);
+            var send = replaceVariables(fragmentVars, buttonInfo.send);
             var child = replaceVariables(fragmentVars, buttonInfo.child);
             var label = replaceVariables(fragmentVars, buttonInfo.label);
             var visibleStr = replaceVariables(fragmentVars, buttonInfo.visible);
@@ -255,7 +287,9 @@ POSSIBILITY OF SUCH DAMAGE.
                     '<span class="btn-nav"><img src="../media/' + image + '" /></span><br><strong>'+
                     label + '</strong></button>');
             $("#" + name + "-button").click(function(e) {
-                if (nav) {
+                if (controller) {
+                    navigate(controller);
+                } else if (nav) {
                     if (display) {
                         navigateDisplay("display-" + display);
                     } else {
@@ -264,6 +298,10 @@ POSSIBILITY OF SUCH DAMAGE.
                     navigate("controller-" + nav);
                 } else if (buttonInfo.child) {
                     navigate("controller-main?group="+child);
+                }
+                
+                if (send) {
+                    ws.socketSend(send);
                 }
                 
                 contentType = ct ? ct : "image/png";

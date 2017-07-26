@@ -1176,20 +1176,7 @@ public class FamilyHistoryCenterSocket {
             @Override
             public void run() {
                 Precacher.PrecacheEvent event = (Precacher.PrecacheEvent) currentEvent.get();
-                UserContext context = userContextMap.get(finalUserId);
-                if (event != null && context != null) {
-                    Iterator<String> it = context.tokens.iterator();
-                    while (it.hasNext()) {
-                        String token = it.next();
-                        try {
-                            tokenControllerMap.get(token).sendString(GSON.toJson(event));
-                        } catch (Exception e) {
-                            logger.warn("Failed to notify controller " + token + " about precache event; removing");
-                            it.remove();
-                            tokenControllerMap.remove(token);
-                        }
-                    }
-
+                if (event != null) {
                     Iterator<RemoteEndpoint> rit = remotePresenters.iterator();
                     while (rit.hasNext()) {
                         RemoteEndpoint endpoint = rit.next();

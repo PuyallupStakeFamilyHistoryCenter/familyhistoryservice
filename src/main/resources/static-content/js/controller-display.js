@@ -200,7 +200,6 @@ var defaultSettings = {
         title: "Controller",
         header: '',
         headerFile: 'controller-header.html',
-        footerFile: 'controller-footer.html',
         contentPadding: true,
         verbs: {
             attached: function() {
