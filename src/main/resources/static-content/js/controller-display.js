@@ -250,7 +250,6 @@ var defaultSettings = {
         title: "Presenter",
         header: '',
         headerFile: 'controller-header.html',
-        footerFile: 'controller-footer.html',
         contentPadding: true,
         begin: function() {
             navigate("presenter-attach");
