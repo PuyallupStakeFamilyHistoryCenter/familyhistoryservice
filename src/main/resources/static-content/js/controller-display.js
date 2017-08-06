@@ -43,7 +43,7 @@ var settings = {
                 $(".beacon").show();
                 setTimeout(function() {
                     $(".beacon").hide();
-                },1000);
+                },5000);
             },
             scheduleReload: function(obj) {
                 if (reloadScheduled) return;

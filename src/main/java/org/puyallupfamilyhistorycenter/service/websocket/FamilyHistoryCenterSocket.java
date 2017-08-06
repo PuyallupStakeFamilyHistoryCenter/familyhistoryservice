@@ -27,6 +27,8 @@
 package org.puyallupfamilyhistorycenter.service.websocket;
 
 import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
 import com.google.common.collect.Table;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -53,6 +55,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -171,7 +174,7 @@ public class FamilyHistoryCenterSocket {
     private static final long tokenInactivityTimeout = TimeUnit.MINUTES.toMillis(30); //TODO: Reset this
     private static final long userInactivityTimeout  = TimeUnit.MINUTES.toMillis(60);
     
-    private static final Map<String, RemoteEndpoint> remoteDisplays = new HashMap<>();
+    private static final Multimap<String, RemoteEndpoint> remoteDisplays = HashMultimap.create();
     private static final Map<String, RemoteEndpoint> remoteControllers = new HashMap<>();
     private static final Set<RemoteEndpoint> remotePresenters = new HashSet<>();
     private static final Set<RemoteEndpoint> otherRemotes = new HashSet<>();
@@ -285,8 +288,8 @@ public class FamilyHistoryCenterSocket {
 
                 case "controller": {
                     String id = scanner.next();
-                    RemoteEndpoint displayEndpoint = remoteDisplays.get(id);
-                    if (displayEndpoint == null) {
+                    Collection<RemoteEndpoint> displayEndpoint = remoteDisplays.get(id);
+                    if (displayEndpoint.isEmpty()) {
                         response = "{\"responseType\":\"error\",\"message\":\"display not found '" + id + "'\"}";
                         break;
                     }
@@ -311,14 +314,10 @@ public class FamilyHistoryCenterSocket {
 
                 case "display": {
                     String id = scanner.next();
-                    if (!isDisplayActive(id)) {
-                        remoteDisplays.put(id, session.getRemote());
-                        displayChecklists.put(id, newSessionChecklist());
-                        response = "{\"responseType\":\"standby\"}";
-                        resendDisplayList();
-                    } else {
-                        response = "{\"responseType\":\"error\",\"message\":\"display " + id + " is already connected\"}";
-                    }
+                    remoteDisplays.put(id, session.getRemote());
+                    displayChecklists.put(id, newSessionChecklist());
+                    response = "{\"responseType\":\"standby\"}";
+                    resendDisplayList();
                     break;
                 }
 
@@ -404,27 +403,25 @@ public class FamilyHistoryCenterSocket {
                     String currentDisplayName = scanner.next();
                     String newDisplayName = scanner.next();
                     
-                    RemoteEndpoint displayRemote = remoteDisplays.get(currentDisplayName);
+                    Collection<RemoteEndpoint> displayRemotes = remoteDisplays.get(currentDisplayName);
                     RemoteEndpoint controllerRemote = remoteControllers.get(currentDisplayName);
                     
                     String changeDisplayNameCommand = "{\"responseType\":\"changeDisplayName\",\"displayName\":\""+newDisplayName+"\"}";
                     
-                    if (displayRemote != null) {
-                        sendToDisplay(currentDisplayName, changeDisplayNameCommand);
-                    }
+                    sendToDisplay(currentDisplayName, changeDisplayNameCommand);
                     
                     if (controllerRemote != null) {
                         sendToController(currentDisplayName, changeDisplayNameCommand);
                     }
                     
-                    remoteDisplays.put(newDisplayName, displayRemote);
+                    remoteDisplays.putAll(newDisplayName, displayRemotes);
                     remoteControllers.put(newDisplayName, controllerRemote);
 
                     if (!isDisplayActive(newDisplayName)) {
                         response = getErrorResponse("Failed to change display name");
                     }
                     
-                    remoteDisplays.remove(currentDisplayName);
+                    remoteDisplays.removeAll(currentDisplayName);
                     remoteControllers.remove(currentDisplayName);
                     
                     break;
@@ -1011,9 +1008,13 @@ public class FamilyHistoryCenterSocket {
         return secondHash.equals(hashedPin);
     }
 
+    private void scheduleReload(Collection<RemoteEndpoint> endpoints, int delay) {
+        endpoints.forEach(e -> scheduleReload(e, delay));
+    }
+
     private void scheduleReload(RemoteEndpoint endpoint, int delay) {
         try {
-            endpoint.sendString("{\"responseType\":\"scheduleReload\",\"delay\":"+(delay*1000)+"}");
+            endpoint.sendString("{\"responseType\":\"scheduleReload\",\"delay\":" + (delay * 1000) + "}");
         } catch (IOException ex) {
             // IGNORE
         }
@@ -1058,17 +1059,22 @@ public class FamilyHistoryCenterSocket {
     }
     
     protected static String sendToDisplay(String id, String message) {
-        RemoteEndpoint displayEndpoint = remoteDisplays.get(id);
-        if (displayEndpoint != null) {
+        Collection<RemoteEndpoint> displayEndpoints = remoteDisplays.get(id);
+        Set<RemoteEndpoint> failedDisplays = new HashSet<>();
+        displayEndpoints.forEach(de -> {
             try {
                 logger.info("Sending '" + message + "' to display " + id);
-                displayEndpoint.sendString(message);
+                de.sendString(message);
             } catch (Exception e) {
-                throw new IllegalStateException("failed to communicate with display " + id + ": " + e.getMessage(), e);
+                failedDisplays.add(de);
             }
-        } else {
-            throw new IllegalStateException("display not found '" + id + "'");
+        });
+        displayEndpoints.removeAll(failedDisplays);
+        
+        if (displayEndpoints.isEmpty()) {
+            throw new IllegalStateException("Failed to send " + message + " to display " + id);
         }
+        
         return OK_RESPONSE;
     }
     
