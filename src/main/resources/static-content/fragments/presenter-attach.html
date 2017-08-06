@@ -162,36 +162,11 @@ POSSIBILITY OF SUCH DAMAGE.
             $("#display-btns").append("<div><button class='btn btn-lg btn-default display-btn' data-display='"+displayId+"'>"+displayId+"</button>");
         });
         
-        $(".survey-btn").click(function() {
-            displayId = $(this).attr("data-display");
-            
-            ws.socketSend("forceNavigateController " + displayId + " controller-survey");
-        });
-        
         $(".display-btn").click(function() {
             displayId = $(this).attr("data-display");
+            displayName = $(this).attr("data-display");
             
             navigate("controller-main?group=presenter&displayId=" + displayId);
-        });
-        
-        $(".ping-display-btn").click(function() {
-            var displayId = $(this).attr("data-display");
-            ws.socketSend("pingDisplay " + displayId);
-        });
-        
-        $(".reload-display-btn").click(function() {
-            var displayId = $(this).attr("data-display");
-            ws.socketSend("reloadDisplay " + displayId);
-        });
-        
-        $(".session-checklist-btn").click(function() {
-            var displayId = $(this).attr("data-display");
-            navigate("presenter-checklist?type=session&displayId=" + displayId);
-        });
-        
-        $(".config-btn").click(function() {
-            var displayId = $(this).attr("data-display");
-            navigate("presenter-config?displayId=" + displayId);
         });
     }
     
