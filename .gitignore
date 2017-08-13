@@ -16,3 +16,4 @@ bugReports
 target/
 nbactions.xml
 /nbproject/
+common.properties
