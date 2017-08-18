@@ -312,11 +312,8 @@ function messageHandler(message) {
         var errorMessage;
         if (obj.responseType === "error") {
             errorMessage = obj.message;
-        } else {
-            errorMessage = "unrecognized command '" + obj.responseType + "'";
+            logger.error(errorMessage);
         }
-        logger.error(errorMessage);
-        //throw new Error(errorMessage);
     }
     return;
 }
