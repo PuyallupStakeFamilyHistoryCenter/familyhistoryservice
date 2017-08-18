@@ -33,12 +33,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
+import org.apache.log4j.Logger;
 
 /**
  *
  * @author tibbitts
  */
 public class ApplicationProperties {
+
+    private static final Logger logger = Logger.getLogger(ApplicationProperties.class);
+    
     private static final String ENABLE_EMAIL = "enableEmail";
     private static final String EMAIL_WHITELIST = "emailWhitelist";
     private static final String EMAIL_SALUTATION = "emailSalutation";
@@ -58,13 +62,12 @@ public class ApplicationProperties {
     private static final String RESTART_SCRIPT = "restart_script";
     private static final String PATH = "path";
 
-    private static final Properties props;
+    private static final Properties props = new Properties();
     static {
         try {
-            props = new Properties();
             props.load(new FileReader("common.properties"));
         } catch (IOException ex) {
-            throw new IllegalStateException("Failed to load properties", ex);
+            logger.error("Failed to load application properties", ex);
         }
     }
     
