@@ -263,5 +263,7 @@ POSSIBILITY OF SUCH DAMAGE.
     
     setHeaderName("Presenter");
     ws.socketSend("listDisplays");
-    ws.socketSend("list-current-users");
+    ws.socketSend(JSON.stringify({
+        cmd: 'list-current-users'
+    }));
 </script>
