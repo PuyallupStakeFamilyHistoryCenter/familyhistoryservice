@@ -75,7 +75,9 @@ POSSIBILITY OF SUCH DAMAGE.
             }
         }
     };
-    ws.socketSend("list-current-users");
+    ws.socketSend(JSON.stringify({
+        cmd: 'list-current-users'
+    }));
 
     $("#login-form").submit(function (event) {
         logger.clear();

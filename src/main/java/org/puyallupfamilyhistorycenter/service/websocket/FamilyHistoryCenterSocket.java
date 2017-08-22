@@ -171,6 +171,13 @@ public class FamilyHistoryCenterSocket {
         }
     }
     
+    private static class Message {
+        public final String cmd;
+        public Message(String cmd) {
+            this.cmd = cmd;
+        }
+    }
+    
     private static final long tokenInactivityTimeout = TimeUnit.MINUTES.toMillis(30); //TODO: Reset this
     private static final long userInactivityTimeout  = TimeUnit.MINUTES.toMillis(60);
     
@@ -258,11 +265,20 @@ public class FamilyHistoryCenterSocket {
         logger.debug("Got websocket request '" + message + "'");
         String response = OK_RESPONSE;
         try {
-            Scanner scanner = new Scanner(message);
-            scanner.useDelimiter(" ");
+            String cmd;
             String token = null;
             String userId = null;
-            String cmd = scanner.next();
+            Scanner scanner = new Scanner(message);
+            scanner.useDelimiter(" ");
+            
+            try {
+                Gson gson = new Gson();
+                Message messageObj = gson.fromJson(message, Message.class);
+                cmd = messageObj.cmd;
+            } catch(com.google.gson.JsonSyntaxException ex) { 
+                cmd = scanner.next();
+            }
+
             switch (cmd) {
                 case "ping":
                     response = "{\"responseType\":\"pong\"}";
