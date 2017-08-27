@@ -26,14 +26,12 @@
 package org.puyallupfamilyhistorycenter.service.utils;
 
 import com.amazonaws.HttpMethod;
-import com.amazonaws.auth.AWSCredentials;
-import com.amazonaws.auth.BasicAWSCredentials;
+import com.amazonaws.auth.DefaultAWSCredentialsProviderChain;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
 import java.net.URL;
 import org.joda.time.DateTime;
-import org.puyallupfamilyhistorycenter.service.ApplicationProperties;
 
 /**
  *
@@ -47,8 +45,7 @@ public class S3Utils {
             return client;
         }
         
-        AWSCredentials creds = new BasicAWSCredentials(ApplicationProperties.getAWSAccessKey(), ApplicationProperties.getAWSSecretKey());
-        return new AmazonS3Client(creds);
+        return new AmazonS3Client(new DefaultAWSCredentialsProviderChain());
     }
     
     public static URL getSignedPutUrl(String bucket, String key, String contentType) {

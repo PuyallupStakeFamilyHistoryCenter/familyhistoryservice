@@ -26,7 +26,7 @@
 package org.puyallupfamilyhistorycenter.service.utils;
 
 import com.amazonaws.ClientConfiguration;
-import com.amazonaws.auth.BasicAWSCredentials;
+import com.amazonaws.auth.DefaultAWSCredentialsProviderChain;
 import com.amazonaws.regions.Region;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.simpleemail.AmazonSimpleEmailService;
@@ -74,7 +74,7 @@ public class EmailUtils {
     static {
         ClientConfiguration config = new ClientConfiguration();
         //config.set
-        ses = new AmazonSimpleEmailServiceClient(new BasicAWSCredentials(ApplicationProperties.getEmailAWSAccessKey(), ApplicationProperties.getEmailAWSSecretKey()), config);
+        ses = new AmazonSimpleEmailServiceClient(new DefaultAWSCredentialsProviderChain(), config);
         ses.setRegion(Region.getRegion(Regions.US_WEST_2));
         
         emailWhitelist = ApplicationProperties.getEmailWhitelist();

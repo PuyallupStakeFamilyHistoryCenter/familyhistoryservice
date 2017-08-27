@@ -138,7 +138,7 @@ POSSIBILITY OF SUCH DAMAGE.
                 FamilySearch.init({
                     app_key: obj.key,
                     environment: obj.environment,
-                    auth_callback: 'https://' + window.location.host + '/auth-redirect.html',
+                    auth_callback: window.location.protocol + '//' + window.location.host + '/auth-redirect.html',
                     http_function: $.ajax,
                     deferred_function: $.Deferred,
                     save_access_token: false
