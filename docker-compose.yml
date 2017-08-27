@@ -1,0 +1,17 @@
+version: '2'
+
+services:
+    familyhistorydiscoveryservice:
+        build: .
+        image: familyhistorydiscoveryservice
+        expose:
+            - "8080"
+            - "8443"
+        ports:
+            - "8080:8080"
+            - "8443:8443"
+        networks:
+            - fsnet
+
+networks:
+    fsnet:
