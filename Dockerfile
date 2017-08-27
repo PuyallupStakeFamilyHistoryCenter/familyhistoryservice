@@ -1,4 +1,4 @@
-FROM maven:3-jdk-8 AS build
+FROM maven:3-jdk-8
 
 RUN mkdir -p /familyhistorydiscoveryservice
 WORKDIR /familyhistorydiscoveryservice
