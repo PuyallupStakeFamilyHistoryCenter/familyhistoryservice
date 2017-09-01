@@ -232,7 +232,7 @@ Add griffins combatant
 
 New feature ideas:
 Word search (maybe printable version in email?)
-Todo feature (for data quality issues?)eifjccgicdkegtnfekgglbfhffcrhhkrjbrlldruirdr
+Todo feature (for data quality issues?)
 
 Create image collage
 Last name meanings (oxford)
@@ -246,3 +246,8 @@ Get tests running again
 ?Add reload button to tree
 
 Fix survey button
+
+Docker:
+Mount caches in volume so data isn't lost during deployment
+Save/load session data?
+Use FamilySearch + Cognito
