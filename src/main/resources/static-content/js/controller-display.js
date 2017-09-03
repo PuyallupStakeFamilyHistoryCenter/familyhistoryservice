@@ -448,14 +448,23 @@ function sendToServer(message) {
 
 function setHeaderName(headerName) {}
 
-    
+
 function initCheckboxes(selector, values) {
     $(selector).removeProp('checked').parent().removeClass("active");
     if (values) {
-        $.each(values, function(index, value) {
+        $.each(values, function (index, value) {
             console.info("Checking checkbox " + value);
-            $(selector + "[value="+value+"]").prop('checked',true).parent().addClass("active");
+            $(selector + "[value=" + value + "]").prop('checked', true).parent().addClass("active");
         });
+    }
+}
+
+
+function initCheckbox(selector, value) {
+    if (value) {
+        $(selector).prop('checked', value).parent().addClass("active");
+    } else {
+        $(selector).removeProp('checked').parent().removeClass("active");
     }
 }
 
