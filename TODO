@@ -250,4 +250,6 @@ Fix survey button
 Docker:
 Mount caches in volume so data isn't lost during deployment
 Save/load session data?
-Use FamilySearch + Cognito
+Use FamilySearch + Cognito (doesn't work; FamilySearch is OpenID, Cognito is SAML)
+Try SQS instead of WebSockets (for scaling) or SQS+WebSockets
+
