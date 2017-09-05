@@ -170,14 +170,11 @@
                     (px + x) < 0 || (px + x) > image.width * scale ||
                     (py + y) < 0 || (py + y) > image.height * scale )
                 continue;
-
+            
             var avg = (data2[i] + data2[i + 1] + data2[i + 2]) / 3;
             data[i] = r * avg / 255;
             data[i + 1] = g * avg / 255;
             data[i + 2] = b * avg / 255;
-//                    data[i] = r * avg / colorAvg;
-//                    data[i+1] = g * avg / colorAvg;
-//                    data[i+2] = b * avg / colorAvg;
         }
 
         context.putImageData(imageData, x - brushSize, y - brushSize);
