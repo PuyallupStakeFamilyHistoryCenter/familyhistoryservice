@@ -25,10 +25,55 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 -->
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/9.8.1/bootstrap-slider.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/9.8.1/css/bootstrap-slider.min.css">
+
+<style>
+    .slider-selection {
+        background: #BABABA;
+    }
+    .slider-tick-label {
+        z-index: -1000 !important
+    }
+    .btn {
+        z-index: 1000 !important
+    }
+</style>
+
 <dl class="dl-horizontal">
     <dt>Brush color</dt>
     <dd>
-        <div id="palate"></div>
+        <input id="hue-slider" type="text"
+               style="width: 100%"
+               data-provide="slider"
+               data-slider-min="0"
+               data-slider-max="360"
+               data-slider-step="1"
+               data-slider-value="180"
+               data-slider-ticks="[0, 120, 240, 360]"
+               data-slider-ticks-labels='["Red", "Green", "Blue"]'
+               data-slider-ticks-snap-bounds="3"
+               data-slider-tooltip="hide" />
+        <input id="saturation-slider" type="text"
+               style="width: 100%"
+               data-provide="slider"
+               data-slider-step="1"
+               data-slider-value="50"
+               data-slider-ticks="[0, 100]"
+               data-slider-ticks-labels='["0%", "100%"]'
+               data-slider-tooltip="hide" />
+        <input id="value-slider" type="text"
+               style="width: 100%"
+               data-provide="slider"
+               data-slider-step="1"
+               data-slider-value="50"
+               data-slider-ticks="[0, 100]"
+               data-slider-ticks-labels='["0%", "100%"]'
+               data-slider-ticks-snap-bounds="3"
+               data-slider-tooltip="hide" />
+        <button id="calculated-swatch" class='btn btn-lg btn-default swatch-btn' style='background-color: hsl(180, 50%, 50%);'>&nbsp;</button>
+        <button id="save-swatch-btn" class="btn btn-default">Save</button>
+        <div id="palate" style="clear: both; margin-top: 15px"></div>
     </dd>
         
     <dt>Brush size</dt>
@@ -38,6 +83,18 @@ POSSIBILITY OF SUCH DAMAGE.
 </dl>
 
 <script>
+    $("#hue-slider,#saturation-slider,#value-slider").on("slide", function(slideEvt) {
+        $("#calculated-swatch").attr("style", "background-color: " + calculateColorFromSliders())
+    });
+    
+    $("#hue-slider,#saturation-slider,#value-slider").on("slideStop", function(slideEvt) {
+        sendToDisplay(JSON.stringify({
+            responseType: "swatch",
+            color: calculateColorFromSliders()
+        }))
+    });
+    
+    var colorNum = 0;
     var swatches = [
         {responseType: "swatch", color: "#FFDCB2"},
         {responseType: "swatch", color: "#FF0066"},
@@ -60,6 +117,19 @@ POSSIBILITY OF SUCH DAMAGE.
         {responseType: "brushSize", size: 15, title: "..."},
         {responseType: "brushSize", size: 19, title: "Large"}
     ]
+    
+    $("#save-swatch-btn").click(function() {
+        var swatch = {
+            responseType: "swatch",
+            color: calculateColorFromSliders()
+        };
+        var id = colorNum++;
+        $("#palate").append("<button id='swatch-"+id+"' class='btn btn-lg btn-default swatch-btn' data-swatch='" + JSON.stringify(swatch) + "' style='background-color: " + swatch.color + "'>&nbsp;</button>");
+        
+        $("#swatch-"+id).click(function () {
+            sendToDisplay($(this).attr("data-swatch"));
+        });
+    })
 
     $.each(swatches, function (index, swatch) {
         $("#palate").append("<button class='btn btn-lg btn-default swatch-btn' data-swatch='" + JSON.stringify(swatch) + "' style='background-color: " + swatch.color + "'>&nbsp;</button>");
@@ -76,4 +146,20 @@ POSSIBILITY OF SUCH DAMAGE.
     $(".brush-size-btn").click(function () {
         sendToDisplay($(this).attr("data-size"));
     });
+    
+    function scaleColorComponent(orig, scale) {
+        return orig * scale / 255;
+    }
+    
+    function toCssColor(h, s, v) {
+        return "hsl(" + Math.floor(h) + "," + Math.floor(s) + "%," + Math.floor(v) + "%)" 
+    }
+    
+    function calculateColorFromSliders() {
+        var hue = parseInt($("#hue-slider").val());
+        var saturation = parseInt($("#saturation-slider").val());
+        var value = parseInt($("#value-slider").val());
+        
+        return toCssColor(hue, saturation, value);
+    }
 </script>

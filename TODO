@@ -79,6 +79,7 @@ Set max-height on image
 Statistics:
 Add loading widget                                DONE
 Graphs should fill page
+Not working on kids ipad
 
 Quiz:
 *Add more questions                               DONE
@@ -150,16 +151,13 @@ Allow members to see ordinance information
 Add guided tour of ancestors
     Show tour on Google Earth with stock and real images
     Have quiz on people and places visited
-Fix ivy classpath
 Allow tagging people for future follow-up
 
 Email:
 Send email at log-off                   DONE
 Make email text configurable            DONE
+Allow saving and sending attachments    DONE
 Comb tree for waiting ancestors
-Not all attachments are sent
-?Allow saving and sending attachments
-?Save and send quiz scores (and perhaps suggest areas of study)
 
 Video app:
 Configure IAM credentials (not checked in)
@@ -205,6 +203,7 @@ SVG elements should be preserved           DONE
 Guest account: we need to collect email address DONE
 Stats graph view shows two headings and two x-axis labels
 Doesn't work on maps
+Hide screenshot button when screenshot not available
 
 Coat of arms:
 Allow changing foreground colors           DONE
@@ -217,14 +216,12 @@ Should fill screen                         DONE
 Add more elements                          DONE
 Fix green                                  DONE
 *Save progress so it doesn't get lost
+*Only prompt for screenshot if 'dirty'
 ?Auto-save the final version of the arms
-Show 'meaning' on display
 Add auto-generated blazon
 Allow more complicated divisions?
 Blazon search: http://oanda.sca.org/
 Add border (with auto-resize to fit)
-Fix blue
-Castle foreground color
 Ship foreground color
 Rearrange element buttons (alphabetically?)
 Add attribution (sodacan on wikipedia)
@@ -232,11 +229,11 @@ Change stroke width when transforming elements?
 Fix border color
 Use radio buttons in controller
 Add griffins combatant
-Only prompt for screenshot if 'dirty'
 
 New feature ideas:
 Word search (maybe printable version in email?)
-Todo feature (for data quality issues?)
+Todo feature (for data quality issues?)eifjccgicdkegtnfekgglbfhffcrhhkrjbrlldruirdr
+
 Create image collage
 Last name meanings (oxford)
 
@@ -244,9 +241,8 @@ Tech Debt:
 Split server and client code into separate java/javascript packages
 Get tests running again
 
-Add hard restart button to server
-Investigate partial family tree showing up
-Add reload button to tree
+?Add hard restart button to server
+?Investigate partial family tree showing up
+?Add reload button to tree
 
-Stats not working on kids ipad
-Coat-of-arms not working on kids ipad
+Fix survey button
