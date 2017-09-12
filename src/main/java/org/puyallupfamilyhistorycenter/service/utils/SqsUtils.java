@@ -94,17 +94,21 @@ public class SqsUtils {
                 .withWaitTimeSeconds(20);
         
         getExecutorService().submit(() -> {
-            getClient().createQueue(queue);
+            try {
+                getClient().createQueue(queue);
 
-            while (!CANCELLED_QUEUES.remove(queue)) {
-                ReceiveMessageResult result = getClient().receiveMessage(request);
-                for (Message message : result.getMessages()) {
-                    handler.handle(GSON.fromJson(message.getBody(), clazz));
-                    getClient().deleteMessage(queue, message.getReceiptHandle());
+                while (!CANCELLED_QUEUES.remove(queue)) {
+                    ReceiveMessageResult result = getClient().receiveMessage(request);
+                    for (Message message : result.getMessages()) {
+                        handler.handle(GSON.fromJson(message.getBody(), clazz));
+                        getClient().deleteMessage(queue, message.getReceiptHandle());
+                    }
                 }
+
+                getClient().deleteQueue(queue);
+            } catch (Exception ex) {
+                ex.printStackTrace();
             }
-            
-            getClient().deleteQueue(queue);
         });
     }
     
