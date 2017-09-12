@@ -87,6 +87,8 @@ public class SqsUtils {
     }
     
     public static <T> void listen(String queue, MessageHandler<T> handler, Class<T> clazz) {
+        CANCELLED_QUEUES.remove(queue);
+        
         ReceiveMessageRequest request = new ReceiveMessageRequest(queue)
                 .withMaxNumberOfMessages(10)
                 .withWaitTimeSeconds(20);

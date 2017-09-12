@@ -330,7 +330,7 @@ public class FamilyHistoryCenterSocket {
                 case "display": {
                     String id = scanner.next();
                     remoteDisplays.put(id, session.getRemote());
-                    SqsUtils.listen(id, m -> handleRemoteMessage(id, m), String.class);
+                    SqsUtils.listen(id, m -> sendToDisplay(id, m), String.class);
                     displayChecklists.put(id, newSessionChecklist());
                     response = "{\"responseType\":\"standby\"}";
                     resendDisplayList();
@@ -1078,15 +1078,16 @@ public class FamilyHistoryCenterSocket {
     
     protected static String sendToDisplay(String id, String message) {
         RemoteEndpoint displayEndpoint = remoteDisplays.get(id);
-        if (displayEndpoint != null) {
-            try {
+        try {
+            if (displayEndpoint != null) {
                 logger.info("Sending '" + message + "' to display " + id);
                 displayEndpoint.sendString(message);
-            } catch (Exception e) {
-                throw new IllegalStateException("Failed to send " + message + " to display " + id);
+            } else {
+                SqsUtils.send(id, message);
             }
-        } else {
-            throw new IllegalStateException("display not found '" + id + "'");
+        } catch (Exception e) {
+            SqsUtils.stopListener(id);
+            throw new IllegalStateException("Failed to send " + message + " to display " + id);
         }
         
         return OK_RESPONSE;
