@@ -27,8 +27,6 @@
 package org.puyallupfamilyhistorycenter.service.websocket;
 
 import com.google.common.collect.HashBasedTable;
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Multimap;
 import com.google.common.collect.Table;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -100,6 +98,7 @@ import org.puyallupfamilyhistorycenter.service.models.Statistics;
 import org.puyallupfamilyhistorycenter.service.models.Video;
 import org.puyallupfamilyhistorycenter.service.utils.EmailUtils;
 import org.puyallupfamilyhistorycenter.service.utils.S3Utils;
+import org.puyallupfamilyhistorycenter.service.utils.SqsUtils;
 import org.puyallupfamilyhistorycenter.service.utils.UserImageRegistry;
 
 /**
@@ -181,7 +180,7 @@ public class FamilyHistoryCenterSocket {
     private static final long tokenInactivityTimeout = TimeUnit.MINUTES.toMillis(30); //TODO: Reset this
     private static final long userInactivityTimeout  = TimeUnit.MINUTES.toMillis(60);
     
-    private static final Multimap<String, RemoteEndpoint> remoteDisplays = HashMultimap.create();
+    private static final Map<String, RemoteEndpoint> remoteDisplays = new HashMap<>();
     private static final Map<String, RemoteEndpoint> remoteControllers = new HashMap<>();
     private static final Set<RemoteEndpoint> remotePresenters = new HashSet<>();
     private static final Set<RemoteEndpoint> otherRemotes = new HashSet<>();
@@ -304,8 +303,8 @@ public class FamilyHistoryCenterSocket {
 
                 case "controller": {
                     String id = scanner.next();
-                    Collection<RemoteEndpoint> displayEndpoint = remoteDisplays.get(id);
-                    if (displayEndpoint.isEmpty()) {
+                    RemoteEndpoint displayEndpoint = remoteDisplays.get(id);
+                    if (displayEndpoint == null) {
                         response = "{\"responseType\":\"error\",\"message\":\"display not found '" + id + "'\"}";
                         break;
                     }
@@ -331,6 +330,7 @@ public class FamilyHistoryCenterSocket {
                 case "display": {
                     String id = scanner.next();
                     remoteDisplays.put(id, session.getRemote());
+                    SqsUtils.listen(id, m -> handleRemoteMessage(id, m), String.class);
                     displayChecklists.put(id, newSessionChecklist());
                     response = "{\"responseType\":\"standby\"}";
                     resendDisplayList();
@@ -344,7 +344,7 @@ public class FamilyHistoryCenterSocket {
                 }
                 
                 case "listDisplays": {
-                    //TODO: Perhaps move this to a different 'attach' method, with authenticationß
+                    //TODO: Perhaps move this to a different 'attach' method, with authentication
                     remotePresenters.add(session.getRemote());
                     otherRemotes.add(session.getRemote());
                     
@@ -419,7 +419,7 @@ public class FamilyHistoryCenterSocket {
                     String currentDisplayName = scanner.next();
                     String newDisplayName = scanner.next();
                     
-                    Collection<RemoteEndpoint> displayRemotes = remoteDisplays.get(currentDisplayName);
+                    RemoteEndpoint displayRemotes = remoteDisplays.get(currentDisplayName);
                     RemoteEndpoint controllerRemote = remoteControllers.get(currentDisplayName);
                     
                     String changeDisplayNameCommand = "{\"responseType\":\"changeDisplayName\",\"displayName\":\""+newDisplayName+"\"}";
@@ -430,14 +430,14 @@ public class FamilyHistoryCenterSocket {
                         sendToController(currentDisplayName, changeDisplayNameCommand);
                     }
                     
-                    remoteDisplays.putAll(newDisplayName, displayRemotes);
+                    remoteDisplays.put(newDisplayName, displayRemotes);
                     remoteControllers.put(newDisplayName, controllerRemote);
 
                     if (!isDisplayActive(newDisplayName)) {
                         response = getErrorResponse("Failed to change display name");
                     }
                     
-                    remoteDisplays.removeAll(currentDisplayName);
+                    remoteDisplays.remove(currentDisplayName);
                     remoteControllers.remove(currentDisplayName);
                     
                     break;
@@ -1077,20 +1077,16 @@ public class FamilyHistoryCenterSocket {
     }
     
     protected static String sendToDisplay(String id, String message) {
-        Collection<RemoteEndpoint> displayEndpoints = remoteDisplays.get(id);
-        Set<RemoteEndpoint> failedDisplays = new HashSet<>();
-        displayEndpoints.forEach(de -> {
+        RemoteEndpoint displayEndpoint = remoteDisplays.get(id);
+        if (displayEndpoint != null) {
             try {
                 logger.info("Sending '" + message + "' to display " + id);
-                de.sendString(message);
+                displayEndpoint.sendString(message);
             } catch (Exception e) {
-                failedDisplays.add(de);
+                throw new IllegalStateException("Failed to send " + message + " to display " + id);
             }
-        });
-        displayEndpoints.removeAll(failedDisplays);
-        
-        if (displayEndpoints.isEmpty()) {
-            throw new IllegalStateException("Failed to send " + message + " to display " + id);
+        } else {
+            throw new IllegalStateException("display not found '" + id + "'");
         }
         
         return OK_RESPONSE;
@@ -1257,5 +1253,9 @@ public class FamilyHistoryCenterSocket {
         precacher.precache();
         
         return precacher;
+    }
+    
+    private void handleRemoteMessage(String id, String message) {
+        
     }
 }
