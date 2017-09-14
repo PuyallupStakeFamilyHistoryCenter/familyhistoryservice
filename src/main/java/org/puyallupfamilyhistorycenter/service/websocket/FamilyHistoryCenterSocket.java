@@ -38,6 +38,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
+import com.google.gson.reflect.TypeToken;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -171,13 +172,6 @@ public class FamilyHistoryCenterSocket {
         }
     }
     
-    private static class Message {
-        public final String cmd;
-        public Message(String cmd) {
-            this.cmd = cmd;
-        }
-    }
-    
     private static final long tokenInactivityTimeout = TimeUnit.MINUTES.toMillis(30); //TODO: Reset this
     private static final long userInactivityTimeout  = TimeUnit.MINUTES.toMillis(60);
     
@@ -271,10 +265,13 @@ public class FamilyHistoryCenterSocket {
             Scanner scanner = new Scanner(message);
             scanner.useDelimiter(" ");
             
+            Map<String, String> messageMap = new HashMap();
+            
             try {
                 Gson gson = new Gson();
-                Message messageObj = gson.fromJson(message, Message.class);
-                cmd = messageObj.cmd;
+                Type type = new TypeToken<Map<String, String>>(){}.getType();
+                messageMap = gson.fromJson(message, type);
+                cmd = messageMap.get("cmd");
             } catch(com.google.gson.JsonSyntaxException ex) { 
                 cmd = scanner.next();
             }
@@ -503,12 +500,12 @@ public class FamilyHistoryCenterSocket {
                 }
                 
                 case "get-ancestors": {
-                    token = scanner.next();
-                    String personId = scanner.next();
+                    token = messageMap.get("token");
+                    String personId = messageMap.get("userId");
                     String accessToken = tokenToAccessToken(token);
                     int depth = 4;
-                    if (scanner.hasNext()) {
-                        depth = scanner.nextInt();
+                    if (messageMap.containsKey("depth")) {
+                        depth = Integer.parseInt(messageMap.get("depth"));
                     }
                     
                     List<Person> family = personDao.listAncestors(personId, depth, accessToken, true);

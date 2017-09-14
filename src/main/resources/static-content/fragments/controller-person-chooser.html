@@ -201,5 +201,9 @@ POSSIBILITY OF SUCH DAMAGE.
     }
 
     buildTree();
-    ws.socketSend("get-ancestors " + token + " " + rootId);
+    ws.socketSend(JSON.stringify({
+        cmd: 'get-ancestors',
+        token: token,
+        userId: rootId
+    }));
 </script>

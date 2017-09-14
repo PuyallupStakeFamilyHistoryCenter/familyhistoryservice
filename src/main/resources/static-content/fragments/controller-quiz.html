@@ -1037,7 +1037,12 @@ POSSIBILITY OF SUCH DAMAGE.
         if (nextDepth > 5) {
             nextDepth = 5;
         }
-        ws.socketSend("get-ancestors " + token + " " + settings.userId + " " + nextDepth);
+        ws.socketSend(JSON.stringify({
+            cmd: 'get-ancestors',
+            token: token,
+            userId: settings.userId,
+            depth: nextDepth
+        }));
         nextDepth++;
     }
     
