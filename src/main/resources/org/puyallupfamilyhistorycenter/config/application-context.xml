@@ -64,13 +64,23 @@ POSSIBILITY OF SUCH DAMAGE.
         <constructor-arg value="org.puyallupfamilyhistorycenter.service.models.Person" />
     </bean>
     <bean id="allow-all-decider" class="org.puyallupfamilyhistorycenter.service.cache.AllowAllDecider" />
+    <bean id="ddb-cache" class="org.puyallupfamilyhistorycenter.service.cache.DynamoDbCache" >
+        <constructor-arg ref="person-class" />
+        <constructor-arg value="${person-cache-ttl}" />
+        <constructor-arg value="familysearch-person" />
+        <constructor-arg value="person-id" />
+    </bean>
+    <bean id="ddb-source" class="org.puyallupfamilyhistorycenter.service.cache.CachingSource">
+        <constructor-arg ref="retrying-person-source" />
+        <constructor-arg ref="ddb-cache" />
+    </bean>
     <bean id="file-cache" class="org.puyallupfamilyhistorycenter.service.cache.FileCache" >
         <constructor-arg ref="person-class" />
         <constructor-arg value="${person-cache-dir}" />
         <constructor-arg value="${person-cache-ttl}" />
     </bean>
     <bean id="file-source" class="org.puyallupfamilyhistorycenter.service.cache.CachingSource">
-        <constructor-arg ref="retrying-person-source" />
+        <constructor-arg ref="ddb-source" />
         <constructor-arg ref="file-cache" />
         <property name="decider" ref="allow-all-decider" />
     </bean>
