@@ -63,6 +63,10 @@ POSSIBILITY OF SUCH DAMAGE.
     }
     
     function save() {
-        ws.socketSend("change-display-name " + getParameterByName("displayId") + " " + $("#display-name").val());
+        ws.socketSend(JSON.stringify({
+            cmd: 'change-display-name',
+            currentDisplayName: getParameterByName("displayId"),
+            newDisplayName: $("#display-name").val()
+        }));
     }
 </script>

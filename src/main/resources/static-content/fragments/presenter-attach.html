@@ -214,7 +214,9 @@ POSSIBILITY OF SUCH DAMAGE.
     
     $("#confirmRestartButton").click(function() {
         $("#confirmModal").modal("hide");
-        ws.socketSend("restart-server");
+        ws.socketSend(JSON.stringify({
+            cmd: 'restart-server'
+        }));
     });
     
     $("#confirmForceLogoutButton").click(function() {
@@ -250,7 +252,12 @@ POSSIBILITY OF SUCH DAMAGE.
             return;
         }
         
-        ws.socketSend("reportBug " + reporterName.replace(/ /g, "%20") + " " + reportBody.replace(/ /g, "%20"));
+        ws.socketSend(JSON.stringify({
+            cmd: 'reportBug',
+            displayName: displayId,
+            reporter: reporterName.replace(/ /g, "%20"),
+            reportBody: reportBody.replace(/ /g, "%20")
+        }));
         
         $("#bugReportModal").modal("hide");
     });
@@ -262,7 +269,9 @@ POSSIBILITY OF SUCH DAMAGE.
     
     
     setHeaderName("Presenter");
-    ws.socketSend("listDisplays");
+    ws.socketSend(JSON.stringify({
+        cmd: 'listDisplays'
+    }));
     ws.socketSend(JSON.stringify({
         cmd: 'list-current-users'
     }));

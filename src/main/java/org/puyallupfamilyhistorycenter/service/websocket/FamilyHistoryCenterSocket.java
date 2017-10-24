@@ -277,11 +277,11 @@ public class FamilyHistoryCenterSocket {
             }
 
             switch (cmd) {
-                case "ping":
+                case "ping": //Done
                     response = "{\"responseType\":\"pong\"}";
                     break;
                     
-                case "reconnect": {
+                case "reconnect": { //Can't find
                     String type = scanner.next();
                     switch (type) {
                         case "display":
@@ -294,13 +294,13 @@ public class FamilyHistoryCenterSocket {
                     break;
                 }
                     
-                case "restart-server": {
+                case "restart-server": { //Done
                     ServletLifecycleManager.restart();
                     break;
                 }
 
-                case "controller": {
-                    String id = scanner.next();
+                case "controller": { //Done
+                    String id = messageMap.get("displayName");
                     Collection<RemoteEndpoint> displayEndpoint = remoteDisplays.get(id);
                     if (displayEndpoint.isEmpty()) {
                         response = "{\"responseType\":\"error\",\"message\":\"display not found '" + id + "'\"}";
@@ -325,8 +325,8 @@ public class FamilyHistoryCenterSocket {
                     break;
                 }
 
-                case "display": {
-                    String id = scanner.next();
+                case "display": { //Can't find
+                    String id = messageMap.get("displayName");
                     remoteDisplays.put(id, session.getRemote());
                     displayChecklists.put(id, newSessionChecklist());
                     response = "{\"responseType\":\"standby\"}";
@@ -334,13 +334,13 @@ public class FamilyHistoryCenterSocket {
                     break;
                 }
 
-                case "display-name": {
+                case "display-name": { //Can't find
                     String id = Integer.toHexString(rand.nextInt());
                     response = "{\"responseType\":\"name\",\"name\":\""+id+"\"}";
                     break;
                 }
                 
-                case "listDisplays": {
+                case "listDisplays": { //Done
                     //TODO: Perhaps move this to a different 'attach' method, with authenticationß
                     remotePresenters.add(session.getRemote());
                     otherRemotes.add(session.getRemote());
@@ -349,12 +349,12 @@ public class FamilyHistoryCenterSocket {
                     break;
                 }
                 
-                case "listControllers": {
+                case "listControllers": { //Can't find
                     response = "{\"responseType\":\"controllers\",\"controllers\":"+GSON.toJson(remoteControllers.keySet())+"}";
                     break;
                 }
                 
-                case "pingDisplay": {
+                case "pingDisplay": { //TODO
                     String id = scanner.next();
                     if (!isDisplayActive(id)) {
                         response = getErrorResponse("Display " + id + " is not active");
@@ -364,8 +364,8 @@ public class FamilyHistoryCenterSocket {
                     break;
                 }
                 
-                case "reloadDisplay": {
-                    String displayName = scanner.next();
+                case "reloadDisplay": { //Done
+                    String displayName = messageMap.get("displayName");
                     if (remoteDisplays.containsKey(displayName)) {
                         scheduleReload(remoteDisplays.get(displayName), 1);
                     }
@@ -376,14 +376,14 @@ public class FamilyHistoryCenterSocket {
                     break;
                 }
                 
-                case "reportBug": {
-                    String reporter = scanner.next().replaceAll("%20", " ");
-                    String reportBody = scanner.next().replaceAll("%20", " ");
+                case "reportBug": { //Done
+                    String reporter = messageMap.get("reporter").replaceAll("%20", " ");
+                    String reportBody = messageMap.get("reportBody").replaceAll("%20", " ");
                     reportBug(reporter, reportBody);
                     break;
                 }
 
-                case "login": {
+                case "login": { //Can't find
                     userId = scanner.next();
                     String pin = scanner.next(); //TODO: This is pretty insecure
                     
@@ -400,8 +400,8 @@ public class FamilyHistoryCenterSocket {
                     break;
                 }
                 
-                case "logout": {
-                    token = scanner.next();
+                case "logout": { //Done
+                    token = messageMap.get("token");
                     userId = tokenUserIdMap.get(token);
                     
                     tokenUserIdMap.remove(token);
@@ -412,9 +412,9 @@ public class FamilyHistoryCenterSocket {
                     break;
                 }
                 
-                case "change-display-name": {
-                    String currentDisplayName = scanner.next();
-                    String newDisplayName = scanner.next();
+                case "change-display-name": { //Done
+                    String currentDisplayName = messageMap.get("currentDisplayName");
+                    String newDisplayName = messageMap.get("newDisplayName");
                     
                     Collection<RemoteEndpoint> displayRemotes = remoteDisplays.get(currentDisplayName);
                     RemoteEndpoint controllerRemote = remoteControllers.get(currentDisplayName);
@@ -440,9 +440,9 @@ public class FamilyHistoryCenterSocket {
                     break;
                 }
                 
-                case "get-person": {
-                    token = scanner.next();
-                    String personId = scanner.next();
+                case "get-person": { //Done
+                    token = messageMap.get("token");
+                    String personId = messageMap.get("personId");
                     String accessToken = tokenToAccessToken(token);
                     
                     //TODO: Check token
@@ -468,7 +468,7 @@ public class FamilyHistoryCenterSocket {
                     break;
                 }
                 
-                case "get-family": {
+                case "get-family": { //Can't find
                     token = scanner.next();
                     String personId = scanner.next();
                     String lastPageId = null;
@@ -487,7 +487,7 @@ public class FamilyHistoryCenterSocket {
                     break;
                 }
                 
-                case "send-family": {
+                case "send-family": { //Can't find
                     token = scanner.next();
                     String displayId = scanner.next();
                     String personId = scanner.next();

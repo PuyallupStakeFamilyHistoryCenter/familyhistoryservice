@@ -83,7 +83,10 @@ POSSIBILITY OF SUCH DAMAGE.
     var contentType = "image/png";
     
     $("#reload-link").click(function() {
-        ws.socketSend("reloadDisplay " + displayName);
+        ws.socketSend(JSON.stringify({
+            cmd: 'reloadDisplay',
+            displayName: displayName
+        }));
     });
     
     $("#logout-link").click(function() {
