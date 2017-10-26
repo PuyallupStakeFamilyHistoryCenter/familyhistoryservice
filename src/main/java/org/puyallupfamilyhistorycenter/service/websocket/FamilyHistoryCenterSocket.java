@@ -774,8 +774,8 @@ public class FamilyHistoryCenterSocket {
                     String key = ApplicationProperties.getVideoS3KeyPrefix() + "/" + URLEncoder.encode(userName, StandardCharsets.UTF_8.name()) + "/" + new DateTime().getMillis();
                     String contentType = scanner.next();
                     URL url = S3Utils.getSignedPutUrl(
-                            ApplicationProperties.getVideoS3Bucket(),
-                            ApplicationProperties.getVideoS3KeyPrefix() + userName + "/" + new DateTime().getMillis(),
+                            bucket,
+                            key,
                             contentType
                     );
                     response = "{\"responseType\":\"signedPutUrl\",\"userId\":\"" + userId + "\",\"url\":\"" + url + "\",\"bucket\":\"" + bucket + "\",\"key\":\"" + key + "\"}";
