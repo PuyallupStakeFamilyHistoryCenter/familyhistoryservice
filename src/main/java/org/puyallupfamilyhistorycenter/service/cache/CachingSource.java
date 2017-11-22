@@ -50,7 +50,7 @@ public class CachingSource<E> implements Source<E> {
     @Override
     public E get(String id, String accessToken) {
         if (cache.containsKey(id)) {
-            return cache.get(id);
+            return cache.getIfPresent(id);
         }
         
         E value;
@@ -60,7 +60,7 @@ public class CachingSource<E> implements Source<E> {
                 cache.put(id, value);
             }
         } catch (Exception e) {
-            value = cache.get(id);
+            value = cache.getIfPresent(id);
             if (value == null) {
                 throw e;
             }
