@@ -33,7 +33,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
+import java.util.concurrent.Callable ;
 import java.util.Collection;
+import java.util.function.BiConsumer;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
@@ -87,7 +89,7 @@ public class FileCache<V> implements Cache<String, V> {
     }
 
     @Override
-    public V get(String key) {
+    public V getIfPresent(String key) {
         File file = new File(dir, key.toString());
         if (!file.exists()) {
             return null;
@@ -101,28 +103,23 @@ public class FileCache<V> implements Cache<String, V> {
     }
 
     @Override
-    public V put(String key, V value) {
-        V previousValue = get(key);
+    public void put(String key, V value) {
+        V previousValue = getIfPresent(key);
         
         File file = new File(dir, key);
         try (Writer writer = new FileWriter(file)) {
             GSON.toJson(value, writer);
         } catch (IOException ex) {
             throw new IllegalStateException("Failed to write to cache file " + file, ex);
-        }
-        
-        return previousValue;
+        }        
     }
 
     @Override
-    public boolean remove(String key) {
+    public void remove(String key) {
         File file = new File(dir, key);
         if (file.exists()) {
             file.delete();
-            return true;
         }
-        
-        return false;
     }
 
     @Override
@@ -156,7 +153,12 @@ public class FileCache<V> implements Cache<String, V> {
     }
 
     @Override
-    public void setDropHandler(ActionKeyValue<String, V> dropHandler) {
+    public void setDropHandler(BiConsumer<String, V> dropHandler) {
+        throw new UnsupportedOperationException();
+    }
+    
+    @Override
+    public V getOrFill(String key, Callable<V> callable) {
         throw new UnsupportedOperationException();
     }
     

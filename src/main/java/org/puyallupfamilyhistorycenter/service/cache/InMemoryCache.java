@@ -30,6 +30,8 @@ import java.lang.ref.SoftReference;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.concurrent.Callable;
+import java.util.function.BiConsumer;
 import org.apache.jena.atlas.lib.ActionKeyValue;
 import org.apache.jena.atlas.lib.Cache;
 
@@ -48,7 +50,7 @@ public class InMemoryCache<K, V> implements Cache<K, V> {
     }
 
     @Override
-    public V get(K key) {
+    public V getIfPresent(K key) {
         SoftReference<V> ref = delegate.get(key);
         if (ref != null) {
             return ref.get();
@@ -57,21 +59,17 @@ public class InMemoryCache<K, V> implements Cache<K, V> {
     }
 
     @Override
-    public V put(K key, V thing) {
+    public void put(K key, V thing) {
         SoftReference<V> ref = delegate.put(key, new SoftReference(thing));
         if (ref != null) {
-            return ref.get();
         }
-        return null;
     }
 
     @Override
-    public boolean remove(K key) {
+    public void remove(K key) {
         if (delegate.containsKey(key)) {
             delegate.remove(key);
-            return true;
         }
-        return false;
     }
 
     @Override
@@ -95,7 +93,12 @@ public class InMemoryCache<K, V> implements Cache<K, V> {
     }
 
     @Override
-    public void setDropHandler(ActionKeyValue<K, V> dropHandler) {
+    public void setDropHandler(BiConsumer<K, V> dropHandler) {
+        throw new UnsupportedOperationException();
+    }
+    
+    @Override
+    public V getOrFill(K key, Callable<V> callable) {
         throw new UnsupportedOperationException();
     }
     
