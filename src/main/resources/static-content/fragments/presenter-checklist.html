@@ -136,7 +136,10 @@ POSSIBILITY OF SUCH DAMAGE.
                 });
                 
                 $(".reload-btn").click(function() {
-                    ws.socketSend("reloadDisplay " + displayId);
+                    ws.socketSend(JSON.stringify({
+                        cmd: 'reloadDisplay',
+                        displayName: displayId
+                    }));
                 });
                 
                 $(".survey-btn").click(function() {

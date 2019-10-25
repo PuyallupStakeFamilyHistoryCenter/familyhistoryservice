@@ -371,7 +371,11 @@ POSSIBILITY OF SUCH DAMAGE.
         sendToDisplay(JSON.stringify({
                     responseType: "reset"
                 }));
-        ws.socketSend("get-ancestors " + token + " " + settings.userId);
+        ws.socketSend(JSON.stringify({
+            cmd: 'get-ancestors',
+            token: token,
+            userId: settings.userId
+        }));
     }
     
     function generateMatch(people, idMap, valueMap) {

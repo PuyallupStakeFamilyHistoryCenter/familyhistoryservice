@@ -179,7 +179,11 @@ POSSIBILITY OF SUCH DAMAGE.
     settings.local.verbs.people(defaultPeople);
     var personId = getParameterByName("personId");
     if (personId) {
-        ws.socketSend("get-person " + token + " " + personId);
+        ws.socketSend(JSON.stringify({
+            cmd: 'get-person',
+            token: token,
+            personId: personId
+        }));
     } else {
         ws.socketSend("get-ancestor-images " + token + " " + settings.userId);
     }

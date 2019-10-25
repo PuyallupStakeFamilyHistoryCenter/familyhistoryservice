@@ -187,7 +187,10 @@ var defaultSettings = {
                 displayName = obj.name;
                 if (displayName) {
                     $.cookie("display-name", displayName);
-                    ws.socketSend("display " + displayName);
+                    ws.socketSend(JSON.stringify({
+                        cmd: 'display',
+                        displayName: displayName
+                    }));
                 }
             }
         },
@@ -225,7 +228,10 @@ var defaultSettings = {
         begin: getDisplayName,
         gotNewDisplayName: function(name) {
             displayName = name;
-            ws.socketSend("controller " + displayName);
+            ws.socketSend(JSON.stringify({
+             cmd: 'controller',
+             displayName: displayName
+         }));
         },
         getNewDisplayName: function() {
             navigate("controller-attach");
@@ -234,7 +240,10 @@ var defaultSettings = {
             ws.socketSend("login " + userId + " " + pin);
         },
         logOut: function() {
-            ws.socketSend("logout " + token);
+            ws.socketSend(JSON.stringify({
+                cmd: 'logout',
+                token: token
+            }));
             token = null;
             if (typeof(resetCacheProgress) === "function") {
                 resetCacheProgress();

@@ -114,7 +114,9 @@ var ws = {
             }
         }
         function ping() {
-            ws.socketSend("ping");
+            ws.socketSend(JSON.stringify({
+                cmd: 'ping'
+            }));
             pingTimeout = setTimeout(ping, 60000);
         }
         $(window).unload(function() {
